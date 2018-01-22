@@ -1,1 +1,3 @@
-# crowdai
+# CrowdAI
+
+Crowd-Machine collaboration algorithms.

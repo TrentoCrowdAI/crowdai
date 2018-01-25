@@ -14,6 +14,7 @@ from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.ensemble import BaggingClassifier
 from sklearn.svm import SVC
 from sklearn.metrics import confusion_matrix
+from scipy.integrate import quad
 
 
 import random
@@ -36,7 +37,7 @@ def initialization(criteria_num):
     labels = []
     texts = []
     pmids = []
-    getcrowdvotequestion = Cmain(criteria_num)  # change the label with first question label!
+    getcrowdvotequestion,power = Cmain(criteria_num)  # change the label with first question label!
     for item in getcrowdvotequestion.keys():
         pmids.append(item)
     for item in pmids:
@@ -48,7 +49,7 @@ def initialization(criteria_num):
     data = np.array([t1 + t2 + t3 for t1, t2, t3 in zip(pmids, labels, texts)])
     data = pd.DataFrame(data, columns=['pmid', 'label', 'text'])
 
-    return data
+    return data,power
 def classifyitems(classifier,TRset,TSset):
 
     if classifier=='KNN':
@@ -94,10 +95,14 @@ def classifyitems(classifier,TRset,TSset):
     clf = clf.fit(TRset[[2]], TRset[[1]])
     y_pred = clf.predict(TSset[[2]])
 
+def integrand(x, a1, b1, a2, b2, power):
 
-def machineRun(criteria_num, TR_size, TS_size, classifier,lr):
+    return 1
 
-    poolset = initialization(criteria_num)
+
+def machineRun(criteria_num, TR_size, TS_size, classifier,K,th):
+
+    poolset,power_criteria = initialization(criteria_num)
     randdata = (np.array(random.sample(poolset.values, TR_size))).tolist()
     TRset = pd.DataFrame(randdata, columns=['pmid', 'label', 'text'])
     poolset = poolset[~poolset['pid'].isin(randdata['pmid'])]
@@ -117,7 +122,13 @@ def machineRun(criteria_num, TR_size, TS_size, classifier,lr):
         BetaP += fp
         alphaN += tn
         BetaN += fn
-
+        EL = ((1- (float(alphaP)/(alphaP+BetaP))) * power_criteria) + (K * (float(alphaN)/(alphaN+BetaN)))(1-power_criteria)
+        #prob_EL_more_th = quad(integrand, 0, 1, args=(alphaP,BetaP,alphaN,BetaN,power_criteria))
+        # if EL < th:
+        #
+        #     # case 1
+        # if EL > th:
+        #     #case 2
         poolset = poolset[~poolset['pid'].isin(randdata['pmid'])]
 
 

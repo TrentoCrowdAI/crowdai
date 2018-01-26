@@ -95,9 +95,6 @@ def classifyitems(classifier,TRset,TSset):
     clf = clf.fit(TRset[[2]], TRset[[1]])
     y_pred = clf.predict(TSset[[2]])
 
-def integrand(x, a1, b1, a2, b2, power):
-
-    return 1
 
 
 def machineRun(criteria_num, TR_size, TS_size, classifier,K,th):
@@ -122,8 +119,8 @@ def machineRun(criteria_num, TR_size, TS_size, classifier,K,th):
         BetaP += fp
         alphaN += tn
         BetaN += fn
-        EL = ((1- (float(alphaP)/(alphaP+BetaP))) * power_criteria) + (K * (float(alphaN)/(alphaN+BetaN)))(1-power_criteria)
-        #prob_EL_more_th = quad(integrand, 0, 1, args=(alphaP,BetaP,alphaN,BetaN,power_criteria))
+        EL = power_criteria + K(1-power_criteria) - (power_criteria * (float(alphaP)/alphaP+BetaP))  - (K * (float(alphaN)/alphaN+BetaN)) + (K*power_criteria*((float(alphaN)/alphaN+BetaN)))
+
         # if EL < th:
         #
         #     # case 1

@@ -1,0 +1,11 @@
+{
+  "mturk": {
+    "production": "https://www.mturk.com/mturk/externalSubmit",
+    "development": "https://workersandbox.mturk.com/mturk/externalSubmit"
+  },
+  // production | development
+  "mode": "development",
+  // if server is not null, POST answers there. Otherwise POST directly to AMT.
+  server: "https://localhost:4000/api" | null
+}
+

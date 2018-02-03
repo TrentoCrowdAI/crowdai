@@ -1,6 +1,5 @@
 import React, {Component} from 'react';
 import {withRouter} from 'react-router-dom';
-import queryString from 'query-string';
 import axios from 'axios';
 import {Form} from 'semantic-ui-react';
 import {connect} from 'react-redux';
@@ -13,13 +12,9 @@ import {actions} from 'src/components/question-form/actions';
  * Encapsulates validation logic.
  */
 class QuestionForm extends Component {
-  componentDidMount() {
-    this.props.setWorkerAcceptedHit(this.hasAcceptedHIT()); // eslint-disable-line react/prop-types
-  }
-
   constructor(props) {
     super(props);
-    this.qs = queryString.parse(props.location.search); // eslint-disable-line react/prop-types
+    // this.qs = queryString.parse(props.location.search); // eslint-disable-line react/prop-types
     this.submit = this.submit.bind(this);
   }
 
@@ -32,23 +27,12 @@ class QuestionForm extends Component {
     );
   }
 
-  hasAcceptedHIT() {
-    return (
-      this.qs.assignmentId !== undefined &&
-      this.qs.assignmentId !== 'ASSIGNMENT_ID_NOT_AVAILABLE' &&
-      this.qs.hitId !== undefined &&
-      this.qs.workerId !== undefined
-    );
-  }
-
   submit(event) {
     event.preventDefault();
 
     let payload = {
       ...this.props.answer,
-      workerId: this.qs.workerId,
-      hitId: this.qs.hitId,
-      assignmentId: this.qs.assignmentId
+      ...this.props.session
     };
     this.props.submitAnswer(payload);
   }
@@ -62,7 +46,9 @@ QuestionForm.propTypes = {
   /** @ignore */
   submitAnswer: PropTypes.func,
   /** @ignore */
-  answer: PropTypes.object
+  answer: PropTypes.object,
+  /** @ignore */
+  session: PropTypes.object
 };
 
 const mapStateToProps = state => ({
@@ -71,7 +57,6 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-  setWorkerAcceptedHit: accepted => dispatch(actions.setWorkerAcceptedHit(accepted)),
   submitAnswer: answer => dispatch(actions.submitAnswer(answer))
 });
 

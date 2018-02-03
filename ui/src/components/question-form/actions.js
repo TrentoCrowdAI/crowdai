@@ -6,7 +6,8 @@ export const actionTypes = {
   SET_ANSWER: 'QF_SET_ANSWER',
   SUBMIT_ANSWER: 'QF_SUBMIT_ANSWER',
   SUBMIT_ANSWER_SUCCESS: 'QF_SUBMIT_ANSWER_SUCCESS',
-  SUBMIT_ANSWER_ERROR: 'QF_SUBMIT_ANSWER_ERROR'
+  SUBMIT_ANSWER_ERROR: 'QF_SUBMIT_ANSWER_ERROR',
+  SET_CURRENT_SESSION: 'QF_SET_CURRENT_SESSION'
 };
 
 export const actions = {
@@ -65,6 +66,17 @@ export const actions = {
     return {
       type: actionTypes.SUBMIT_ANSWER_ERROR,
       error
+    };
+  },
+
+  setCurrentSession(hitId, assignmentId, workerId) {
+    return {
+      type: actionTypes.SET_CURRENT_SESSION,
+      session: {
+        assignmentId,
+        hitId,
+        workerId
+      }
     };
   }
 };

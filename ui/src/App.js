@@ -2,12 +2,15 @@ import React, {Component} from 'react';
 import {Container, Grid, Divider} from 'semantic-ui-react';
 import {Provider, connect} from 'react-redux';
 import {BrowserRouter as Router, Route, withRouter} from 'react-router-dom';
+import queryString from 'query-string';
 
 import './App.css';
+import store from './store';
 import Instructions from 'src/components/Instructions';
 import FilterTask from 'src/components/FilterTask';
 import QuestionForm from 'src/components/question-form/QuestionForm';
-import store from './store';
+import WelcomePage from 'src/components/WelcomePage';
+import {actions} from 'src/components/question-form/actions';
 
 /**
  * Main component.
@@ -17,21 +20,49 @@ class ConnectedApp extends Component {
   render() {
     return (
       <Container>
-        <Grid.Row centered>
-          <Instructions />
-        </Grid.Row>
+        <Route path={'/welcome'} component={WelcomePage} />
 
-        <Grid.Row>
-          {this.props.hasAcceptedHit && ( // eslint-disable-line react/prop-types
-            <Divider as="h4" className="header" horizontal style={{textTransform: 'uppercase', marginTop: 20}}>
-              Task
-            </Divider>
+        <Route
+          path={'/task'}
+          render={props => (
+            <React.Fragment>
+              <Grid.Row centered>
+                <Instructions />
+              </Grid.Row>
+
+              <Grid.Row>
+                {props.hasAcceptedHit && ( // eslint-disable-line react/prop-types
+                  <Divider as="h4" className="header" horizontal style={{textTransform: 'uppercase', marginTop: 20}}>
+                    Task
+                  </Divider>
+                )}
+                <QuestionForm>
+                  <FilterTask />
+                </QuestionForm>
+              </Grid.Row>
+            </React.Fragment>
           )}
-          <QuestionForm>
-            <FilterTask />
-          </QuestionForm>
-        </Grid.Row>
+        />
       </Container>
+    );
+  }
+
+  componentWillMount() {
+    /* eslint-disable */
+    const qs = queryString.parse(this.props.location.search);
+    this.props.setCurrentSession(qs);
+    this.props.setWorkerAcceptedHit(this.hasAcceptedHit(qs));
+    /* eslint-enable */
+  }
+
+  hasAcceptedHit(qs) {
+    const {assignmentId, hitId, workerId} = qs;
+
+    return (
+      assignmentId !== undefined &&
+      assignmentId !== 'ASSIGNMENT_ID_NOT_AVAILABLE' &&
+      hitId !== undefined &&
+      workerId !== undefined
     );
   }
 }
@@ -40,7 +71,12 @@ const mapStateToProps = state => ({
   hasAcceptedHit: state.questionForm.hasAcceptedHit
 });
 
-const mapDispatchToProps = dispatch => ({});
+const mapDispatchToProps = dispatch => ({
+  setWorkerAcceptedHit: accepted => dispatch(actions.setWorkerAcceptedHit(accepted)),
+
+  setCurrentSession: ({hitId, assignmentId, workerId}) =>
+    dispatch(actions.setCurrentSession(hitId, assignmentId, workerId))
+});
 
 const ConnectedAppWrapper = withRouter(connect(mapStateToProps, mapDispatchToProps)(ConnectedApp));
 

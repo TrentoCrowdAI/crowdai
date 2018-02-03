@@ -5,6 +5,11 @@ const defaultState = {
   task: undefined,
   error: undefined,
   loading: false,
+  session: {
+    assignmentId: undefined,
+    hitId: undefined,
+    workerId: undefined
+  },
   /**
    * an answer has the form of {taskId: <id>, response: 'worker response'}
    */
@@ -56,6 +61,11 @@ const reducer = (state = defaultState, action) => {
       return {
         ...state,
         answerSubmitError: action.error
+      };
+    case actionTypes.SET_CURRENT_SESSION:
+      return {
+        ...state,
+        session: action.session
       };
     default:
       return state;

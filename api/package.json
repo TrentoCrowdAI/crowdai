@@ -7,6 +7,7 @@
   },
   "dependencies": {
     "aws-sdk": ">= 2.0.9",
+    "couchbase": "^2.4.3",
     "csvtojson": "^1.1.9",
     "koa": "^2.4.1",
     "koa-better-body": "^3.0.4",

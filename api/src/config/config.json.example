@@ -1,0 +1,8 @@
+{
+  "db": {
+    "user": "admin",
+    "password": "123456",
+    "host": "localhost",
+    "bucket": "crowdai-amt"
+  }
+}

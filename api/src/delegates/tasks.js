@@ -48,6 +48,12 @@ const count = (exports.count = async () => {
 
 exports.next = async workerId => {
   try {
+    const answersCount = await answersDelegate.getWorkerAnswersCount(workerId);
+    if (answersCount >= config.rules.maxTasks) {
+      return {
+        maxTasks: true
+      };
+    }
     const tasksIds = await getWorkerAvailableTasks(workerId);
     const idx = Math.floor(Math.random() * tasksIds.length);
 

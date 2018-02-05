@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {Segment, Header, Button, Grid, Message, Dimmer, Loader} from 'semantic-ui-react';
+import {Segment, Header, Button, Grid, Message, Dimmer, Loader, Icon} from 'semantic-ui-react';
 import {connect} from 'react-redux';
 
 import {actions} from 'src/components/question-form/actions';
@@ -25,6 +25,22 @@ class FilterTask extends React.Component {
             </Grid.Row>
           </Grid>
         </Segment>
+      );
+    }
+
+    if (this.props.task.maxTasks) {
+      return (
+        <Message icon style={{marginTop: 20}}>
+          <Icon name="checkmark box" />
+          <Message.Content>
+            <Message.Header>Max tasks reached</Message.Header>
+            <p>
+              Thank you for completing the tasks. Click on the following button to finish and go back to Mechanical
+              Turk.
+            </p>
+            <FinishButton onClick={() => this.finish()} />
+          </Message.Content>
+        </Message>
       );
     }
     const {task, answer} = this.props;
@@ -85,9 +101,7 @@ class FilterTask extends React.Component {
                     Next task?
                   </Button>
 
-                  <Button type="button" positive style={{marginTop: 40}}>
-                    Finish
-                  </Button>
+                  <FinishButton style={{marginTop: 40}} onClick={() => this.finish()} />
                 </React.Fragment>
               )}
 
@@ -111,7 +125,19 @@ class FilterTask extends React.Component {
   componentDidMount() {
     this.props.getNextTask();
   }
+
+  finish() {
+    console.log('finish');
+  }
 }
+
+const FinishButton = props => {
+  return (
+    <Button type="button" positive {...props}>
+      Finish
+    </Button>
+  );
+};
 
 FilterTask.propTypes = {
   /** @ignore */

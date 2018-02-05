@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Container, Grid, Divider} from 'semantic-ui-react';
+import {Container, Grid, Divider, Statistic, Segment} from 'semantic-ui-react';
 import {Provider, connect} from 'react-redux';
 import {BrowserRouter as Router, Route, withRouter} from 'react-router-dom';
 import queryString from 'query-string';
@@ -26,6 +26,13 @@ class ConnectedApp extends Component {
           path={'/task'}
           render={props => (
             <React.Fragment>
+              <Grid.Row
+                style={{
+                  textAlign: 'right',
+                  marginBottom: '-3rem'
+                }}>
+                <Statistic label="Expected reward" value="5550 $" />
+              </Grid.Row>
               <Grid.Row centered>
                 <Instructions />
               </Grid.Row>

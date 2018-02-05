@@ -6,7 +6,9 @@ import axios from 'src/utils/axios';
 
 const getNextTask = (action$, store) =>
   action$.ofType(actionTypes.NEXT_TASK).switchMap(action => {
-    return Observable.defer(() => axios.get('tasks/next', {}))
+    const {session} = store.getState().questionForm;
+    const params = {workerId: session.workerId};
+    return Observable.defer(() => axios.get('tasks/next', {params}))
       .mergeMap(response => Observable.of(actions.getNextTaskSuccess(response.data)))
       .catch(error => Observable.concat(Observable.of(actions.getNextTaskError(error))));
   });

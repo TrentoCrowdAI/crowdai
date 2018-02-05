@@ -1,12 +1,11 @@
 /**
- * This scripts loads tasks and filters to the database. Before running
+ * Loads tasks and filters to the database. Before running
  * this scripts, create the bucket using web interface.
  */
 
 const csv = require('csvtojson');
 const couchbase = require('couchbase');
 const config = require('../config/config.json');
-const documents = require('./index').documents;
 
 const ITEMS_FILE = __dirname + '/../data/items.csv';
 const FILTERS_FILE = __dirname + '/../data/filters.csv';
@@ -47,7 +46,7 @@ function loadTasks(tasks) {
   const bucket = cluster.openBucket(config.db.bucket);
 
   for (task of tasks) {
-    const key = `${documents.Task}${task.id}`;
+    const key = `'Task::'${task.id}`;
     bucket.insert(key, task, (error, result) => {
       if (error) {
         console.error(`Error while inserting document ${key}. Error: ${error}`);
@@ -67,7 +66,8 @@ const generateTasks = (items, filters) => {
       tasks.push({
         id: ++i,
         filter,
-        item
+        item,
+        type: 'task'
       });
     }
   }

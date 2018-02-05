@@ -1,11 +1,12 @@
+const delegates = require(__base + 'delegates');
+
 const get = async ctx => {
-  // TODO: read from db
+  let tasks = await delegates.tasks.all();
   ctx.response.body = tasks;
 };
 
 const getNext = async ctx => {
-  // TODO: read from db
-  ctx.response.body = tasks[Math.floor(Math.random() * tasks.length)];
+  ctx.response.body = await delegates.tasks.next(ctx.query.workerId);
 };
 
 exports.register = router => {

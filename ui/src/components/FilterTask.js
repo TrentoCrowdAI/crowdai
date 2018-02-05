@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {Segment, Header, Button, Grid} from 'semantic-ui-react';
+import {Segment, Header, Button, Grid, Message, Dimmer, Loader} from 'semantic-ui-react';
 import {connect} from 'react-redux';
 
 import {actions} from 'src/components/question-form/actions';
@@ -15,7 +15,17 @@ class FilterTask extends React.Component {
    */
   render() {
     if (!this.props.task) {
-      return <div>Loading....</div>;
+      return (
+        <Segment vertical>
+          <Grid>
+            <Grid.Row>
+              <Dimmer active inverted>
+                <Loader inverted>Loading</Loader>
+              </Dimmer>
+            </Grid.Row>
+          </Grid>
+        </Segment>
+      );
     }
     const {task, answer} = this.props;
 
@@ -38,6 +48,7 @@ class FilterTask extends React.Component {
               <Header as="h3" style={{fontSize: '2em'}}>
                 {task.filter.description}
               </Header>
+
               <Button.Group>
                 <Button
                   style={answer && answer.response === 'yes' ? style : null}
@@ -61,9 +72,35 @@ class FilterTask extends React.Component {
                 </Button>
               </Button.Group>
 
-              <Button type="submit" positive style={{marginTop: 40}} disabled={!this.props.hasAcceptedHit}>
-                Submit
-              </Button>
+              {this.props.answerSubmitError && (
+                <Message negative>
+                  <Message.Header>Error</Message.Header>
+                  <p>Your answer could not be saved.</p>
+                </Message>
+              )}
+
+              {this.props.answerSaved && (
+                <React.Fragment>
+                  <Button type="button" positive style={{marginTop: 40}} onClick={() => window.location.reload()}>
+                    Next task?
+                  </Button>
+
+                  <Button type="button" positive style={{marginTop: 40}}>
+                    Finish
+                  </Button>
+                </React.Fragment>
+              )}
+
+              {!this.props.answerSaved && (
+                <Button
+                  type="submit"
+                  loading={this.props.answerSubmitLoading}
+                  positive
+                  style={{marginTop: 40}}
+                  disabled={!this.props.hasAcceptedHit}>
+                  Submit
+                </Button>
+              )}
             </Grid.Column>
           </Grid.Row>
         </Grid>
@@ -71,17 +108,29 @@ class FilterTask extends React.Component {
     );
   }
 
-  componentWillMount() {
+  componentDidMount() {
     this.props.getNextTask();
   }
 }
 
 FilterTask.propTypes = {
+  /** @ignore */
   task: PropTypes.object,
+
+  /** @ignore */
   answer: PropTypes.object,
 
   /** @ignore */
+  answerSaved: PropTypes.object,
+
+  /** @ignore */
+  answerSubmitError: PropTypes.object,
+
+  /** @ignore */
   hasAcceptedHit: PropTypes.bool,
+
+  /** @ignore */
+  answerSubmitLoading: PropTypes.bool,
 
   /** @ignore */
   getNextTask: PropTypes.func,
@@ -93,7 +142,10 @@ FilterTask.propTypes = {
 const mapStateToProps = state => ({
   hasAcceptedHit: state.questionForm.hasAcceptedHit,
   task: state.questionForm.task,
-  answer: state.questionForm.answer
+  answer: state.questionForm.answer,
+  answerSaved: state.questionForm.answerSaved,
+  answerSubmitLoading: state.questionForm.answerSubmitLoading,
+  answerSubmitError: state.questionForm.answerSubmitError
 });
 
 const mapDispatchToProps = dispatch => ({

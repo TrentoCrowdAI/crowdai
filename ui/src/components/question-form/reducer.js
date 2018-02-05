@@ -14,7 +14,9 @@ const defaultState = {
    * an answer has the form of {taskId: <id>, response: 'worker response'}
    */
   answer: undefined,
-  answerSubmitError: undefined
+  answerSaved: undefined,
+  answerSubmitError: undefined,
+  answerSubmitLoading: false
 };
 
 const reducer = (state = defaultState, action) => {
@@ -50,17 +52,20 @@ const reducer = (state = defaultState, action) => {
       return {
         ...state,
         answerSubmitError: undefined,
-        loading: true
+        answerSaved: undefined,
+        answerSubmitLoading: true
       };
     case actionTypes.SUBMIT_ANSWER_SUCCESS:
       return {
         ...state,
-        loading: false
+        answerSubmitLoading: false,
+        answerSaved: action.response
       };
     case actionTypes.SUBMIT_ANSWER_ERROR:
       return {
         ...state,
-        answerSubmitError: action.error
+        answerSubmitError: action.error,
+        answerSubmitLoading: false
       };
     case actionTypes.SET_CURRENT_SESSION:
       return {

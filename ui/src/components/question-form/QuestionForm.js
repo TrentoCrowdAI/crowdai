@@ -1,11 +1,9 @@
 import React, {Component} from 'react';
 import {withRouter} from 'react-router-dom';
-import axios from 'axios';
 import {Form} from 'semantic-ui-react';
 import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
 
-import config from 'src/config/config.json';
 import {actions} from 'src/components/question-form/actions';
 
 /**
@@ -53,7 +51,8 @@ QuestionForm.propTypes = {
 
 const mapStateToProps = state => ({
   hasAcceptedHit: state.questionForm.hasAcceptedHit,
-  answer: state.questionForm.answer
+  answer: state.questionForm.answer,
+  session: state.questionForm.session
 });
 
 const mapDispatchToProps = dispatch => ({

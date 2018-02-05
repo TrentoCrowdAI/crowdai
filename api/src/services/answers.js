@@ -1,6 +1,7 @@
+const delegates = require(__base + 'delegates');
+
 const post = async ctx => {
-  console.log('payload', ctx.request.fields);
-  ctx.response.body = ctx.request.fields;
+  ctx.response.body = await delegates.answers.create(ctx.request.fields);
 };
 
 exports.register = router => {

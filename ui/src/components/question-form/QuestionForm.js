@@ -12,17 +12,11 @@ import {actions} from 'src/components/question-form/actions';
 class QuestionForm extends Component {
   constructor(props) {
     super(props);
-    // this.qs = queryString.parse(props.location.search); // eslint-disable-line react/prop-types
     this.submit = this.submit.bind(this);
   }
 
   render() {
-    return (
-      <div>
-        <Form onSubmit={this.submit}>{this.props.hasAcceptedHit && this.props.children}</Form>
-        <form id="turkForm" method="POST" />
-      </div>
-    );
+    return <Form onSubmit={this.submit}>{this.props.hasAcceptedHit && this.props.children}</Form>;
   }
 
   submit(event) {

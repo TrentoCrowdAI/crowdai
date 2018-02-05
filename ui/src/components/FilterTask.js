@@ -14,7 +14,7 @@ class FilterTask extends React.Component {
    * @return {React.Component}
    */
   render() {
-    if (!this.props.task) {
+    if (!this.props.task || this.props.assigmentStatusLoading) {
       return (
         <Segment vertical>
           <Grid>
@@ -28,21 +28,34 @@ class FilterTask extends React.Component {
       );
     }
 
-    if (this.props.task.maxTasks) {
+    if (this.props.assignmentStatus && this.props.assignmentStatus.finished) {
+      return (
+        <Message icon style={{marginTop: 20}}>
+          <Icon name="checkmark box" />
+          <Message.Content>
+            <Message.Header>Finished</Message.Header>
+            <p>
+              Thank you for completing the tasks. Please close this tab/window and go back to the HIT page on Amazon
+              Mechanical Turk.
+            </p>
+          </Message.Content>
+        </Message>
+      );
+    }
+
+    if (!this.props.assigmentStatusLoading && this.props.task.maxTasks) {
       return (
         <Message icon style={{marginTop: 20}}>
           <Icon name="checkmark box" />
           <Message.Content>
             <Message.Header>Max tasks reached</Message.Header>
-            <p>
-              Thank you for completing the tasks. Click on the following button to finish and go back to Mechanical
-              Turk.
-            </p>
+            <p>Thank you for completing the tasks. Click on the following button to finish.</p>
             <FinishButton onClick={() => this.finish()} />
           </Message.Content>
         </Message>
       );
     }
+
     const {task, answer} = this.props;
 
     const style = {
@@ -123,11 +136,12 @@ class FilterTask extends React.Component {
   }
 
   componentDidMount() {
+    this.props.checkAssignmentStatus();
     this.props.getNextTask();
   }
 
   finish() {
-    console.log('finish');
+    this.props.finishAssignment();
   }
 }
 
@@ -162,7 +176,19 @@ FilterTask.propTypes = {
   getNextTask: PropTypes.func,
 
   /** @ignore */
-  setAnswer: PropTypes.func
+  setAnswer: PropTypes.func,
+
+  /** @ignore */
+  assignmentStatus: PropTypes.object,
+
+  /** @ignore */
+  finishAssignment: PropTypes.func,
+
+  /** @ignore */
+  checkAssignmentStatus: PropTypes.func,
+
+  /** @ignore */
+  assigmentStatusLoading: PropTypes.bool
 };
 
 const mapStateToProps = state => ({
@@ -171,12 +197,16 @@ const mapStateToProps = state => ({
   answer: state.questionForm.answer,
   answerSaved: state.questionForm.answerSaved,
   answerSubmitLoading: state.questionForm.answerSubmitLoading,
-  answerSubmitError: state.questionForm.answerSubmitError
+  answerSubmitError: state.questionForm.answerSubmitError,
+  assignmentStatus: state.questionForm.assignmentStatus,
+  assigmentStatusLoading: state.questionForm.assigmentStatusLoading
 });
 
 const mapDispatchToProps = dispatch => ({
   getNextTask: _ => dispatch(actions.getNextTask()),
-  setAnswer: (taskId, response) => dispatch(actions.setAnswer(taskId, response))
+  setAnswer: (taskId, response) => dispatch(actions.setAnswer(taskId, response)),
+  finishAssignment: () => dispatch(actions.finishAssignment()),
+  checkAssignmentStatus: () => dispatch(actions.checkAssignmentStatus())
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(FilterTask);

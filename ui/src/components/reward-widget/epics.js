@@ -9,7 +9,7 @@ const getWorkerReward = (action$, store) =>
     const {session} = store.getState().questionForm;
     return Observable.defer(() => axios.get(`workers/${session.workerId}/reward`))
       .mergeMap(response => Observable.of(actions.requestRewardSuccess(response.data.reward)))
-      .catch(error => Observable.concat(Observable.of(actions.requestRewardError(error))));
+      .catch(error => Observable.of(actions.requestRewardError(error)));
   });
 
 export default combineEpics(getWorkerReward);

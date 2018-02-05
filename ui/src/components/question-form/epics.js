@@ -11,7 +11,7 @@ const getNextTask = (action$, store) =>
     const params = {workerId: session.workerId};
     return Observable.defer(() => axios.get('tasks/next', {params}))
       .mergeMap(response => Observable.of(actions.getNextTaskSuccess(response.data)))
-      .catch(error => Observable.concat(Observable.of(actions.getNextTaskError(error))));
+      .catch(error => Observable.of(actions.getNextTaskError(error)));
   });
 
 const postAnswer = (action$, store) =>
@@ -23,7 +23,28 @@ const postAnswer = (action$, store) =>
           Observable.of(rewardActions.requestReward())
         )
       )
-      .catch(error => Observable.concat(Observable.of(actions.submitAnswerError(error))));
+      .catch(error => Observable.of(actions.submitAnswerError(error)));
   });
 
-export default combineEpics(getNextTask, postAnswer);
+const finishAssignment = (action$, store) =>
+  action$.ofType(actionTypes.FINISH_ASSIGNMENT).switchMap(action => {
+    const {session} = store.getState().questionForm;
+    return Observable.defer(() => axios.post(`workers/${session.workerId}/finish-assignment`))
+      .mergeMap(response =>
+        Observable.concat(
+          Observable.of(actions.finishAssignmentSuccess()),
+          Observable.of(actions.checkAssignmentStatus())
+        )
+      )
+      .catch(error => Observable.of(actions.finishAssignmentError(error)));
+  });
+
+const checkAssignmentStatus = (action$, store) =>
+  action$.ofType(actionTypes.CHECK_ASSIGNMENT_STATUS).switchMap(action => {
+    const {session} = store.getState().questionForm;
+    return Observable.defer(() => axios.get(`/workers/${session.workerId}/assignment-status`))
+      .mergeMap(response => Observable.of(actions.checkAssignmentStatusSuccess(response.data)))
+      .catch(error => Observable.of(actions.checkAssignmentStatusError(error)));
+  });
+
+export default combineEpics(getNextTask, postAnswer, finishAssignment, checkAssignmentStatus);

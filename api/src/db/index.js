@@ -7,7 +7,8 @@ const bucket = cluster.openBucket(config.db.bucket);
 
 const DOCUMENTS = {
   Task: 'Task::',
-  Answer: 'Answer::'
+  Answer: 'Answer::',
+  WorkerAssignment: 'WorkerAssignment::'
 };
 
 module.exports = {

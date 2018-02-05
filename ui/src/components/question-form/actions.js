@@ -7,7 +7,13 @@ export const actionTypes = {
   SUBMIT_ANSWER: 'QF_SUBMIT_ANSWER',
   SUBMIT_ANSWER_SUCCESS: 'QF_SUBMIT_ANSWER_SUCCESS',
   SUBMIT_ANSWER_ERROR: 'QF_SUBMIT_ANSWER_ERROR',
-  SET_CURRENT_SESSION: 'QF_SET_CURRENT_SESSION'
+  SET_CURRENT_SESSION: 'QF_SET_CURRENT_SESSION',
+  FINISH_ASSIGNMENT: 'QF_FINISH_ASSIGNMENT',
+  FINISH_ASSIGNMENT_SUCCESS: 'QF_FINISH_ASSIGNMENT_SUCCESS',
+  FINISH_ASSIGNMENT_ERROR: 'QF_FINISH_ASSIGNMENT_ERROR',
+  CHECK_ASSIGNMENT_STATUS: 'QF_CHECK_ASSIGNMENT_STATUS',
+  CHECK_ASSIGNMENT_STATUS_SUCCESS: 'QF_CHECK_ASSIGNMENT_STATUS_SUCCESS',
+  CHECK_ASSIGNMENT_STATUS_ERROR: 'QF_CHECK_ASSIGNMENT_STATUS_ERROR'
 };
 
 export const actions = {
@@ -77,6 +83,45 @@ export const actions = {
         hitId,
         workerId
       }
+    };
+  },
+
+  finishAssignment() {
+    return {
+      type: actionTypes.FINISH_ASSIGNMENT
+    };
+  },
+
+  finishAssignmentSuccess() {
+    return {
+      type: actionTypes.FINISH_ASSIGNMENT_SUCCESS
+    };
+  },
+
+  finishAssignmentError(error) {
+    return {
+      type: actionTypes.FINISH_ASSIGNMENT_ERROR,
+      error
+    };
+  },
+
+  checkAssignmentStatus() {
+    return {
+      type: actionTypes.CHECK_ASSIGNMENT_STATUS
+    };
+  },
+
+  checkAssignmentStatusSuccess(status) {
+    return {
+      type: actionTypes.CHECK_ASSIGNMENT_STATUS_SUCCESS,
+      status
+    };
+  },
+
+  checkAssignmentStatusError(error) {
+    return {
+      type: actionTypes.CHECK_ASSIGNMENT_STATUS_ERROR,
+      error
     };
   }
 };

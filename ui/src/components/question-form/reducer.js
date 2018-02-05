@@ -5,6 +5,10 @@ const defaultState = {
   task: undefined,
   error: undefined,
   loading: false,
+  assignmentStatus: undefined,
+  assigmentStatusLoading: false,
+  assignmentStatusError: undefined,
+  finishAssignmentError: undefined,
   session: {
     assignmentId: undefined,
     hitId: undefined,
@@ -71,6 +75,44 @@ const reducer = (state = defaultState, action) => {
       return {
         ...state,
         session: action.session
+      };
+    case actionTypes.FINISH_ASSIGNMENT:
+      return {
+        ...state,
+        assignmentStatus: undefined,
+        finishAssignmentError: undefined,
+        loading: true
+      };
+    case actionTypes.FINISH_ASSIGNMENT_SUCCESS:
+      return {
+        ...state,
+        loading: false
+      };
+    case actionTypes.FINISH_ASSIGNMENT_ERROR:
+      return {
+        ...state,
+        finishAssignmentError: action.error,
+        loading: false
+      };
+    case actionTypes.CHECK_ASSIGNMENT_STATUS:
+      return {
+        ...state,
+        assignmentStatus: undefined,
+        assignmentStatusError: undefined,
+        assigmentStatusLoading: true
+      };
+
+    case actionTypes.CHECK_ASSIGNMENT_STATUS_SUCCESS:
+      return {
+        ...state,
+        assignmentStatus: action.status,
+        assigmentStatusLoading: false
+      };
+    case actionTypes.CHECK_ASSIGNMENT_STATUS_ERROR:
+      return {
+        ...state,
+        assignmentStatusError: action.error,
+        assigmentStatusLoading: false
       };
     default:
       return state;

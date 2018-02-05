@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Container, Grid, Divider, Statistic, Segment} from 'semantic-ui-react';
+import {Container, Grid, Divider} from 'semantic-ui-react';
 import {Provider, connect} from 'react-redux';
 import {BrowserRouter as Router, Route, withRouter} from 'react-router-dom';
 import queryString from 'query-string';
@@ -11,6 +11,7 @@ import FilterTask from 'src/components/FilterTask';
 import QuestionForm from 'src/components/question-form/QuestionForm';
 import WelcomePage from 'src/components/WelcomePage';
 import {actions} from 'src/components/question-form/actions';
+import RewardWidget from 'src/components/reward-widget/RewardWidget';
 
 /**
  * Main component.
@@ -31,7 +32,7 @@ class ConnectedApp extends Component {
                   textAlign: 'right',
                   marginBottom: '-3rem'
                 }}>
-                <Statistic label="Expected reward" value="5550 $" />
+                <RewardWidget />
               </Grid.Row>
               <Grid.Row centered>
                 <Instructions />

@@ -3,5 +3,6 @@ let router = new Router();
 
 require('./tasks').register(router);
 require('./answers').register(router);
+require('./workers').register(router);
 
 module.exports = router.routes();

@@ -56,6 +56,7 @@ const getWorkerAnswersCount = (exports.getWorkerAnswersCount = async workerId =>
       config.db.bucket
     }\` where type="answer" and workerId='${workerId}'`;
     const q = couchbase.N1qlQuery.fromString(qs);
+    q.consistency(couchbase.N1qlQuery.Consistency.STATEMENT_PLUS);
     return await new Promise((resolve, reject) => {
       bucket.query(q, (err, data) => {
         if (err) {

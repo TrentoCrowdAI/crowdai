@@ -7,6 +7,8 @@
   },
   "rules": {
     // number of task a worker can answer.
-    "maxTasks": 2
+    "maxTasks": 2,
+    // worker's reward per solved task
+    "taskReward": 0.5
   }
 }

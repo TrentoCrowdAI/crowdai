@@ -114,6 +114,13 @@ const reducer = (state = defaultState, action) => {
         assignmentStatusError: action.error,
         assigmentStatusLoading: false
       };
+    case actionTypes.CHECK_POLLING:
+    case actionTypes.CHECK_POLLING_KEEP:
+      return {
+        ...state,
+        assignmentStatusError: undefined,
+        assigmentStatusLoading: true
+      };
     default:
       return state;
   }

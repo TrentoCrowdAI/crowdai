@@ -4,6 +4,7 @@ import {combineEpics} from 'redux-observable';
 import {actionTypes, actions} from './actions';
 import {actions as rewardActions} from 'src/components/reward-widget/actions';
 import axios from 'src/utils/axios';
+import config from 'src/config/config.json';
 
 const getNextTask = (action$, store) =>
   action$.ofType(actionTypes.NEXT_TASK).switchMap(action => {
@@ -42,9 +43,33 @@ const finishAssignment = (action$, store) =>
 const checkAssignmentStatus = (action$, store) =>
   action$.ofType(actionTypes.CHECK_ASSIGNMENT_STATUS).switchMap(action => {
     const {session} = store.getState().questionForm;
+
     return Observable.defer(() => axios.get(`/workers/${session.workerId}/assignment-status`))
-      .mergeMap(response => Observable.of(actions.checkAssignmentStatusSuccess(response.data)))
+      .mergeMap(response => {
+        return Observable.of(actions.checkAssignmentStatusSuccess(response.data));
+      })
       .catch(error => Observable.of(actions.checkAssignmentStatusError(error)));
   });
 
-export default combineEpics(getNextTask, postAnswer, finishAssignment, checkAssignmentStatus);
+const checkPolling = (action$, store) =>
+  action$.ofType(actionTypes.CHECK_POLLING).switchMap(action => {
+    const {session} = store.getState().questionForm;
+
+    return Observable.interval(config.pollingInterval)
+      .takeUntil(action$.ofType(actionTypes.CHECK_POLLING_DONE))
+      .mergeMap(() =>
+        Observable.defer(() => axios.get(`/workers/${session.workerId}/assignment-status`))
+          .mergeMap(response => {
+            if (response.data.finished) {
+              return Observable.concat(
+                Observable.of(actions.checkPollingDone()),
+                Observable.of(actions.checkAssignmentStatusSuccess(response.data))
+              );
+            }
+            return Observable.of(actions.checkPollingKeep());
+          })
+          .catch(error => Observable.of(actions.checkAssignmentStatusError(error)))
+      );
+  });
+
+export default combineEpics(getNextTask, postAnswer, finishAssignment, checkAssignmentStatus, checkPolling);

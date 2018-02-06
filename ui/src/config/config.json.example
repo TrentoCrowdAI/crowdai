@@ -6,6 +6,7 @@
   // production | development
   "mode": "development",
   // if server is not null, POST answers there. Otherwise POST directly to AMT.
-  server: "https://localhost:4000" | null
+  server: "https://localhost:4000" | null,
+  "pollingInterval": 10000
 }
 

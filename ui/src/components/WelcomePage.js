@@ -7,6 +7,7 @@ import PropTypes from 'prop-types';
 import Instructions from 'src/components/Instructions';
 import {actions} from 'src/components/question-form/actions';
 import config from 'src/config/config.json';
+import RewardWidget from 'src/components/reward-widget/RewardWidget';
 
 class WelcomePage extends React.Component {
   render() {
@@ -15,7 +16,7 @@ class WelcomePage extends React.Component {
         <Instructions />
 
         {this.props.assigmentStatusLoading && (
-          <Segment vertical>
+          <Segment vertical style={{borderBottom: 0}}>
             <Grid>
               <Grid.Row>
                 <Dimmer active inverted>
@@ -35,7 +36,7 @@ class WelcomePage extends React.Component {
   renderRedirectBtn() {
     const {assignmentId, hitId, workerId} = this.props.session;
 
-    if (!this.props.assigmentStatusLoading && this.props.hasAcceptedHit && !this.props.assignmentStatus) {
+    if (this.props.hasAcceptedHit && this.props.assignmentStatus && !this.props.assignmentStatus.finished) {
       return (
         <Segment>
           <p>Please click on the following button to start. It will open a new window/tab.</p>
@@ -56,7 +57,7 @@ class WelcomePage extends React.Component {
       return (
         <React.Fragment>
           <Message icon style={{marginTop: 20}}>
-            <Icon name="checkmark box" />
+            <RewardWidget style={{marginRight: 20}} />
             <Message.Content>
               <Message.Header>Finished</Message.Header>
               <p>Thank you for completing the tasks. Please click the following button to submit your work</p>
@@ -81,6 +82,7 @@ class WelcomePage extends React.Component {
 
   componentDidMount() {
     this.props.checkAssignmentStatus();
+    this.props.checkPolling();
   }
 }
 
@@ -94,7 +96,9 @@ WelcomePage.propTypes = {
   /** @ignore */
   assignmentStatus: PropTypes.object,
   /** @ignore */
-  assigmentStatusLoading: PropTypes.bool
+  assigmentStatusLoading: PropTypes.bool,
+  /** @ignore */
+  checkPolling: PropTypes.func
 };
 
 const mapStateToProps = state => ({
@@ -105,7 +109,8 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-  checkAssignmentStatus: () => dispatch(actions.checkAssignmentStatus())
+  checkAssignmentStatus: () => dispatch(actions.checkAssignmentStatus()),
+  checkPolling: () => dispatch(actions.checkPolling())
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(WelcomePage);

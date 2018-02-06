@@ -13,7 +13,10 @@ export const actionTypes = {
   FINISH_ASSIGNMENT_ERROR: 'QF_FINISH_ASSIGNMENT_ERROR',
   CHECK_ASSIGNMENT_STATUS: 'QF_CHECK_ASSIGNMENT_STATUS',
   CHECK_ASSIGNMENT_STATUS_SUCCESS: 'QF_CHECK_ASSIGNMENT_STATUS_SUCCESS',
-  CHECK_ASSIGNMENT_STATUS_ERROR: 'QF_CHECK_ASSIGNMENT_STATUS_ERROR'
+  CHECK_ASSIGNMENT_STATUS_ERROR: 'QF_CHECK_ASSIGNMENT_STATUS_ERROR',
+  CHECK_POLLING: 'QF_CHECK_POLLING',
+  CHECK_POLLING_DONE: 'QF_CHECK_POLLING_DONE',
+  CHECK_POLLING_KEEP: 'QF_CHECK_POLLING_KEEP'
 };
 
 export const actions = {
@@ -122,6 +125,24 @@ export const actions = {
     return {
       type: actionTypes.CHECK_ASSIGNMENT_STATUS_ERROR,
       error
+    };
+  },
+
+  checkPolling() {
+    return {
+      type: actionTypes.CHECK_POLLING
+    };
+  },
+
+  checkPollingDone() {
+    return {
+      type: actionTypes.CHECK_POLLING_DONE
+    };
+  },
+
+  checkPollingKeep() {
+    return {
+      type: actionTypes.CHECK_POLLING_KEEP
     };
   }
 };

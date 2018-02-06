@@ -13,6 +13,17 @@ const TESTS_FILE = __dirname + '/../data/tests.csv';
 
 const cluster = new couchbase.Cluster(`couchbase://${config.db.host}`);
 cluster.authenticate(config.db.user, config.db.password);
+const bucket = cluster.openBucket(config.db.bucket);
+const bucketManager = bucket.manager();
+
+bucketManager.createPrimaryIndex({ name: 'crowdai-amt-pi' }, error => {
+  if (error) {
+    console.error('Error while creating primery index', error);
+    process.exist(1);
+  }
+  // insert records in the database
+  loadItems();
+});
 
 function loadItems() {
   console.log('loading items...');
@@ -46,7 +57,6 @@ function loadFilters(items) {
 
 function loadTasks(tasks) {
   console.log('loading tasks...');
-  const bucket = cluster.openBucket(config.db.bucket);
 
   for (let [idx, task] of tasks.entries()) {
     const key = `Task::${task.id}`;
@@ -81,7 +91,6 @@ function loadTests() {
 
 function saveTests(tests) {
   console.log('Saving tests to the DB');
-  const bucket = cluster.openBucket(config.db.bucket);
 
   for (let [idx, test] of tests.entries()) {
     const key = `TestTask::${test.id}`;
@@ -116,6 +125,3 @@ const generateTasks = (items, filters) => {
   }
   return tasks;
 };
-
-// insert records in the database
-loadItems();

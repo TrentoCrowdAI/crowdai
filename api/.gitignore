@@ -31,3 +31,4 @@ send/*
 items.csv
 filters.csv
 tests.csv
+.env

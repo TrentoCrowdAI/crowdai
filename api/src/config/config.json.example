@@ -7,8 +7,10 @@
   },
   "rules": {
     // number of task a worker can answer.
-    "maxTasks": 2,
+    "maxTasks": 4,
     // worker's reward per solved task
-    "taskReward": 0.5
+    "taskReward": 0.5,
+    // Test Frequency
+    "testFrequency": 2
   }
 }

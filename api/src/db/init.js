@@ -69,7 +69,7 @@ function loadTests() {
   let tests = [];
   csv()
     .fromFile(TESTS_FILE)
-    .on('json', test => tests.push({ ...test, type: 'test' }))
+    .on('json', test => tests.push({ ...test, type: 'testTask' }))
     .on('end', error => {
       if (error) {
         console.warn('Error while loading tests: ', error);

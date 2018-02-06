@@ -3,7 +3,7 @@ const Boom = require('boom');
 
 const bucket = require(__base + 'db').bucket;
 const config = require(__base + 'config/config.json');
-const DOCUMENTS = require(__base + 'db').DOCUMENTS;
+const { DOCUMENTS, TYPES } = require(__base + 'db');
 const answersDelegate = require('./answers');
 
 exports.all = async () => {
@@ -49,16 +49,30 @@ const count = (exports.count = async () => {
 exports.next = async workerId => {
   try {
     const answersCount = await answersDelegate.getWorkerAnswersCount(workerId);
+    const testCount = await answersDelegate.getWorkerTestAnswersCount(workerId);
+
     if (answersCount >= config.rules.maxTasks) {
       return {
         maxTasks: true
       };
     }
-    const tasksIds = await getWorkerAvailableTasks(workerId);
-    const idx = Math.floor(Math.random() * tasksIds.length);
+
+    const runTest =
+      (answersCount + testCount + 1) % (config.rules.testFrequency + 1) === 0;
+
+    if (runTest) {
+      // we need to return a test task
+      const testsIds = await getWorkerAvailableTests(workerId);
+      const idx = Math.floor(Math.random() * testsIds.length);
+      key = `${DOCUMENTS.TestTask}${testsIds[idx]}`;
+    } else {
+      const tasksIds = await getWorkerAvailableTasks(workerId);
+      const idx = Math.floor(Math.random() * tasksIds.length);
+      key = `${DOCUMENTS.Task}${tasksIds[idx]}`;
+    }
 
     return await new Promise((resolve, reject) => {
-      bucket.get(`${DOCUMENTS.Task}${tasksIds[idx]}`, (err, data) => {
+      bucket.get(key, (err, data) => {
         if (err) {
           reject(err);
         } else {
@@ -95,9 +109,9 @@ const getWorkerCompletedTasks = (exports.getWorkerCompletedTasks = async workerI
 const getWorkerAvailableTasks = (exports.getWorkerAvailableTasks = async workerId => {
   try {
     let completedTasks = await getWorkerCompletedTasks(workerId);
-    const qs = `select id from \`${
-      config.db.bucket
-    }\` where type="task" and id not in [${completedTasks}]`;
+    const qs = `select id from \`${config.db.bucket}\` where type="${
+      TYPES.task
+    }" and id not in [${completedTasks}]`;
     const q = couchbase.N1qlQuery.fromString(qs);
     return await new Promise((resolve, reject) => {
       bucket.query(q, (err, rows) => {
@@ -111,5 +125,50 @@ const getWorkerAvailableTasks = (exports.getWorkerAvailableTasks = async workerI
   } catch (error) {
     console.error(error);
     throw Boom.badImplementation('Error while trying to fetch available task');
+  }
+});
+
+/**
+ * Returns an array of testId available to the worker.
+ *
+ * @param {Number} workerId
+ */
+const getWorkerAvailableTests = (exports.getWorkerAvailableTests = async workerId => {
+  try {
+    let completedTests = await getWorkerCompletedTests(workerId);
+    console.log(completedTests);
+    const qs = `select id from \`${config.db.bucket}\` where type="${
+      TYPES.testTask
+    }" and id not in [${completedTests}]`;
+    const q = couchbase.N1qlQuery.fromString(qs);
+    return await new Promise((resolve, reject) => {
+      bucket.query(q, (err, rows) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(rows.map(a => a.id));
+        }
+      });
+    });
+  } catch (error) {
+    console.error(error);
+    throw Boom.badImplementation(
+      'Error while trying to fetch available test task'
+    );
+  }
+});
+
+/**
+ * Returns an array of testId completed by the worker.
+ *
+ * @param {Number} workerId
+ */
+const getWorkerCompletedTests = (exports.getWorkerCompletedTests = async workerId => {
+  try {
+    const testAnswers = await answersDelegate.getWorkerTestAnswers(workerId);
+    return testAnswers.map(a => a[config.db.bucket]).map(a => a.testTaskId);
+  } catch (error) {
+    console.error(error);
+    throw Boom.badImplementation('Error while trying to fetch completed test');
   }
 });

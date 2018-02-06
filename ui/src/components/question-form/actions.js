@@ -47,11 +47,11 @@ export const actions = {
     };
   },
 
-  setAnswer(taskId, response) {
+  setAnswer(task, response) {
     return {
       type: actionTypes.SET_ANSWER,
       answer: {
-        taskId,
+        task,
         response
       }
     };

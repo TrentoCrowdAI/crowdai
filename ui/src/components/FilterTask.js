@@ -56,7 +56,21 @@ class FilterTask extends React.Component {
       );
     }
 
-    const {task, answer} = this.props;
+    let {task, answer} = this.props;
+
+    if (task.type === 'testTask') {
+      task = {
+        id: task.id,
+        item: {
+          id: task.id,
+          description: task.itemDescription
+        },
+        filter: {
+          description: task.filterDescription
+        },
+        test: true
+      };
+    }
 
     const style = {
       background: '#75de8e',
@@ -82,21 +96,21 @@ class FilterTask extends React.Component {
                 <Button
                   style={answer && answer.response === 'yes' ? style : null}
                   type="button"
-                  onClick={() => this.props.setAnswer(task.id, 'yes')}>
+                  onClick={() => this.props.setAnswer(this.props.task, 'yes')}>
                   Yes
                 </Button>
                 <Button.Or />
                 <Button
                   style={answer && answer.response === 'no' ? style : null}
                   type="button"
-                  onClick={() => this.props.setAnswer(task.id, 'no')}>
+                  onClick={() => this.props.setAnswer(this.props.task, 'no')}>
                   No
                 </Button>
                 <Button.Or />
                 <Button
                   style={answer && answer.response === 'not clear' ? style : null}
                   type="button"
-                  onClick={() => this.props.setAnswer(task.id, 'not clear')}>
+                  onClick={() => this.props.setAnswer(this.props.task, 'not clear')}>
                   Not clear from the text
                 </Button>
               </Button.Group>

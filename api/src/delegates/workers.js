@@ -8,8 +8,9 @@ const DOCUMENTS = require(__base + 'db').DOCUMENTS;
 
 const getWorkerReward = (exports.getWorkerReward = async workerId => {
   try {
-    const count = await answersDelegate.getWorkerAnswersCount(workerId);
-    return { reward: count * config.rules.taskReward };
+    const taskCount = await answersDelegate.getWorkerAnswersCount(workerId);
+    const testCount = await answersDelegate.getWorkerTestAnswersCount(workerId);
+    return { reward: (taskCount + testCount) * config.rules.taskReward };
   } catch (error) {
     console.error(error);
     throw Boom.badImplementation('Error while computing reward');

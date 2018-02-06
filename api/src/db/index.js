@@ -9,14 +9,16 @@ const DOCUMENTS = {
   Task: 'Task::',
   Answer: 'Answer::',
   WorkerAssignment: 'WorkerAssignment::',
-  TestTask: 'TestTask::'
+  TestTask: 'TestTask::',
+  TestAnswer: 'TestAnswer::'
 };
 
 const TYPES = {
   task: 'task',
   answer: 'answer',
   assignment: 'assignment',
-  test: 'test'
+  testTask: 'testTask',
+  testAnswer: 'testAnswer'
 };
 
 module.exports = {

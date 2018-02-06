@@ -19,7 +19,7 @@ const bucketManager = bucket.manager();
 bucketManager.createPrimaryIndex({ name: 'crowdai-amt-pi' }, error => {
   if (error) {
     console.error('Error while creating primery index', error);
-    process.exist(1);
+    process.exit(1);
   }
   // insert records in the database
   loadItems();

@@ -3,8 +3,8 @@ services:
   db:
     image: couchbase/server:community-5.0.1
     ports:
-      - 8091-8094:8091-8094
-      - 11210:11210
+      - "8091-8094:8091-8094"
+      - "11210:11210"
     volumes:
       - $COUCHBASE_DATA_DIR:/opt/couchbase/var
   api:
@@ -13,6 +13,6 @@ services:
       - "$PORT:$PORT"
     depends_on:
       - db
-    command: ["npm", "start"]
+    command: ["./wait-for-it.sh", "db:8091", "--", "npm", "start"]
     environment:
-      NODE_ENV: production   
+      NODE_ENV: production       

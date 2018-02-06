@@ -13,6 +13,8 @@ RUN npm install
 
 COPY $SOURCES .
 
-RUN mkdir public
+# descargamos este helper script para poder hacer la verificación de ready de la base de datos.
+RUN wget https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh
+RUN chmod +x wait-for-it.sh
 
 CMD ["npm", "start"]

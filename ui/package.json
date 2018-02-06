@@ -23,7 +23,7 @@
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject",
-    "deploy": "gh-pages -d build -e external-question",
+    "deploy": "gh-pages -d build",
     "precommit": "lint-staged"
   },
   "eslintConfig": {
@@ -48,9 +48,6 @@
     "lint-staged": "^4.3.0"
   },
   "lint-staged": {
-    "src/**/*.js": [
-      "node_modules/.bin/eslint --fix",
-      "git add"
-    ]
+    "src/**/*.js": ["node_modules/.bin/eslint --fix", "git add"]
   }
 }

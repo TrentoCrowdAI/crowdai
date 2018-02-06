@@ -19,7 +19,7 @@ const getWorkerReward = (exports.getWorkerReward = async workerId => {
 const finishAssignment = (exports.finishAssignment = async workerId => {
   try {
     const key = `${DOCUMENTS.WorkerAssignment}${workerId}`;
-    let record = { type: 'assignment', finished: true };
+    let record = { type: 'assignment', finished: true, workerId };
     return await new Promise((resolve, reject) => {
       bucket.insert(key, record, (error, result) => {
         if (error) {

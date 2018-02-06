@@ -28,3 +28,6 @@ config/database.dev.json
 config/database.prod.json
 config/database.json
 send/*
+items.csv
+filters.csv
+tests.csv

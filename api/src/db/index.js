@@ -8,10 +8,19 @@ const bucket = cluster.openBucket(config.db.bucket);
 const DOCUMENTS = {
   Task: 'Task::',
   Answer: 'Answer::',
-  WorkerAssignment: 'WorkerAssignment::'
+  WorkerAssignment: 'WorkerAssignment::',
+  TestTask: 'TestTask::'
+};
+
+const TYPES = {
+  task: 'task',
+  answer: 'answer',
+  assignment: 'assignment',
+  test: 'test'
 };
 
 module.exports = {
   DOCUMENTS,
+  TYPES,
   bucket
 };

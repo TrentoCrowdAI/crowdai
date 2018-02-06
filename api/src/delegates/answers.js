@@ -15,9 +15,7 @@ const create = (exports.create = async answer => {
       key = `${DOCUMENTS.Answer}${answer.task.id}`;
       payload.taskId = answer.task.id;
       payload.type = TYPES.answer;
-    }
-
-    if (answer.task.type === TYPES.testTask) {
+    } else if (answer.task.type === TYPES.testTask) {
       key = `${DOCUMENTS.TestAnswer}${answer.task.id}`;
       payload.testTaskId = answer.task.id;
       payload.type = TYPES.testAnswer;

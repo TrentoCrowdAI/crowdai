@@ -8,7 +8,9 @@ const answersDelegate = require('./answers');
 
 exports.all = async () => {
   try {
-    const qs = `select * from \`${config.db.bucket}\` where type="task"`;
+    const qs = `select * from \`${config.db.bucket}\` where type="${
+      TYPES.task
+    }"`;
     const q = couchbase.N1qlQuery.fromString(qs);
     return await new Promise((resolve, reject) => {
       bucket.query(q, (err, tasks) => {
@@ -29,7 +31,7 @@ const count = (exports.count = async () => {
   try {
     const qs = `select count(*) as count from \`${
       config.db.bucket
-    }\` where type="task"`;
+    }\` where type="${TYPES.task}"`;
     const q = couchbase.N1qlQuery.fromString(qs);
     return await new Promise((resolve, reject) => {
       bucket.query(q, (err, data) => {

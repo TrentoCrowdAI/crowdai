@@ -4,7 +4,7 @@ const couchbase = require('couchbase');
 const bucket = require(__base + 'db').bucket;
 const config = require(__base + 'config/config.json');
 const answersDelegate = require('./answers');
-const DOCUMENTS = require(__base + 'db').DOCUMENTS;
+const { DOCUMENTS, TYPES } = require(__base + 'db');
 
 const getWorkerReward = (exports.getWorkerReward = async workerId => {
   try {
@@ -20,7 +20,7 @@ const getWorkerReward = (exports.getWorkerReward = async workerId => {
 const finishAssignment = (exports.finishAssignment = async workerId => {
   try {
     const key = `${DOCUMENTS.WorkerAssignment}${workerId}`;
-    let record = { type: 'assignment', finished: true, workerId };
+    let record = { type: TYPES.assignment, finished: true, workerId };
     return await new Promise((resolve, reject) => {
       bucket.insert(key, record, (error, result) => {
         if (error) {

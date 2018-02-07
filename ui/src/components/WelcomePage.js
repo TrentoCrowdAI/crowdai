@@ -41,6 +41,7 @@ class WelcomePage extends React.Component {
         <Segment>
           <p>Please click on the following button to start. It will open a new window/tab.</p>
           <Button
+            onClick={() => this.props.checkPolling()}
             as={Link}
             positive
             to={`/task?assignmentId=${assignmentId}&workerId=${workerId}&hitId=${hitId}`}
@@ -82,7 +83,6 @@ class WelcomePage extends React.Component {
 
   componentDidMount() {
     this.props.checkAssignmentStatus();
-    this.props.checkPolling();
   }
 }
 

@@ -43,7 +43,7 @@ class WelcomePage extends React.Component {
           <Button
             as={Link}
             positive
-            to={`task?assignmentId=${assignmentId}&workerId=${workerId}&hitId=${hitId}`}
+            to={`/task?assignmentId=${assignmentId}&workerId=${workerId}&hitId=${hitId}`}
             target="_blank">
             Open
           </Button>

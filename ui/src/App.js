@@ -12,6 +12,7 @@ import QuestionForm from 'src/components/question-form/QuestionForm';
 import WelcomePage from 'src/components/WelcomePage';
 import {actions} from 'src/components/question-form/actions';
 import RewardWidget from 'src/components/reward-widget/RewardWidget';
+import config from 'src/config/config.json';
 
 /**
  * Main component.
@@ -93,7 +94,7 @@ class App extends Component {
   render() {
     return (
       <Provider store={store}>
-        <Router>
+        <Router basename={config.routesBaseUrl}>
           <Route path={'/'} component={ConnectedAppWrapper} />
         </Router>
       </Provider>

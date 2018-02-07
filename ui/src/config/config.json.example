@@ -7,6 +7,9 @@
   "mode": "development",
   // if server is not null, POST answers there. Otherwise POST directly to AMT.
   server: "https://localhost:4000" | null,
-  "pollingInterval": 10000
+  "pollingInterval": 10000,
+
+  // base url for routes. In production should be equal to /crowdai, null for development.
+  "routesBaseUrl": "/crowdai"
 }
 

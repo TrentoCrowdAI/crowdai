@@ -2,7 +2,7 @@ const Boom = require('boom');
 const couchbase = require('couchbase');
 
 const bucket = require(__base + 'db').bucket;
-const config = require(__base + 'config/config.json');
+const config = require(__base + 'config');
 const answersDelegate = require('./answers');
 const { DOCUMENTS, TYPES } = require(__base + 'db');
 

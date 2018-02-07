@@ -2,7 +2,7 @@ const couchbase = require('couchbase');
 const Boom = require('boom');
 
 const bucket = require(__base + 'db').bucket;
-const config = require(__base + 'config/config.json');
+const config = require(__base + 'config');
 const { DOCUMENTS, TYPES } = require(__base + 'db');
 
 const create = (exports.create = async answer => {

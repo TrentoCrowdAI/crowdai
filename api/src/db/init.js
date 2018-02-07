@@ -5,7 +5,7 @@
 
 const csv = require('csvtojson');
 const couchbase = require('couchbase');
-const config = require('../config/config.json');
+const config = require('../config');
 
 const ITEMS_FILE = __dirname + '/../data/items.csv';
 const FILTERS_FILE = __dirname + '/../data/filters.csv';

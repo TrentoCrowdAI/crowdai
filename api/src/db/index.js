@@ -1,5 +1,5 @@
 const couchbase = require('couchbase');
-const config = require(__base + 'config/config.json');
+const config = require(__base + 'config');
 
 const cluster = new couchbase.Cluster(`couchbase://${config.db.host}`);
 cluster.authenticate(config.db.user, config.db.password);

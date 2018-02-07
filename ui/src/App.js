@@ -93,7 +93,7 @@ class App extends Component {
   render() {
     return (
       <Provider store={store}>
-        <Router basename={process.env.PUBLIC_URL}>
+        <Router>
           <Route path={'/'} component={ConnectedAppWrapper} />
         </Router>
       </Provider>

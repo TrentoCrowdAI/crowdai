@@ -21,12 +21,9 @@ Thumbs.db
 *.REMOTE*
 *.BACKUP*
 
-config/config.json
-config/config.dev.json
-config/config.prod.json
-config/database.dev.json
-config/database.prod.json
-config/database.json
+src/config/config.json
+src/config/config.dev.json
+src/config/config.prod.json
 send/*
 items.csv
 filters.csv

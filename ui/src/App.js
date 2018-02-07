@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {Container, Grid, Divider} from 'semantic-ui-react';
 import {Provider, connect} from 'react-redux';
-import {BrowserRouter as Router, Route, withRouter} from 'react-router-dom';
+import {HashRouter as Router, Route, withRouter} from 'react-router-dom';
 import queryString from 'query-string';
 
 import './App.css';
@@ -12,7 +12,6 @@ import QuestionForm from 'src/components/question-form/QuestionForm';
 import WelcomePage from 'src/components/WelcomePage';
 import {actions} from 'src/components/question-form/actions';
 import RewardWidget from 'src/components/reward-widget/RewardWidget';
-import config from 'src/config/config.json';
 
 /**
  * Main component.
@@ -94,7 +93,7 @@ class App extends Component {
   render() {
     return (
       <Provider store={store}>
-        <Router basename={config.routesBaseUrl}>
+        <Router basename={process.env.PUBLIC_URL}>
           <Route path={'/'} component={ConnectedAppWrapper} />
         </Router>
       </Provider>

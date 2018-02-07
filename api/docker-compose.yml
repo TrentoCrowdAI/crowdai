@@ -5,14 +5,31 @@ services:
     ports:
       - "8091-8094:8091-8094"
       - "11210:11210"
+    expose:
+      - "8091-8094"
     volumes:
       - $COUCHBASE_DATA_DIR:/opt/couchbase/var
+    environment:
+      - VIRTUAL_HOST=db.crowdai.jramirez.me
+      - VIRTUAL_PORT=8091
+      - LETSENCRYPT_HOST=db.crowdai.jramirez.me
+      - LETSENCRYPT_EMAIL=jordanms2@gmail.com
   api:
     image: crowdai-api
     ports:
       - "$PORT:$PORT"
+    expose:
+      - "$PORT"
     depends_on:
       - db
     command: ["./wait-for-it.sh", "db:8091", "--", "npm", "start"]
     environment:
-      NODE_ENV: production       
+      - NODE_ENV=production
+      - VIRTUAL_HOST=api.crowdai.jramirez.me
+      - LETSENCRYPT_HOST=api.crowdai.jramirez.me
+      - LETSENCRYPT_EMAIL=jordanms2@gmail.com
+
+networks:
+  default:
+    external:
+      name: webproxy

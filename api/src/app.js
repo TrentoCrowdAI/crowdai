@@ -48,4 +48,4 @@ app.use(async (ctx, next) => {
 
 app.use(mount('/api/v1', api));
 
-app.listen(4000);
+app.listen(process.env.PORT || 4000);

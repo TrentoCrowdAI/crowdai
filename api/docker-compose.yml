@@ -17,9 +17,9 @@ services:
   api:
     image: crowdai-api
     ports:
-      - "$PORT:$PORT"
+      - "$API_PORT:$API_PORT"
     expose:
-      - "$PORT"
+      - "$API_PORT"
     depends_on:
       - db
     command: ["./wait-for-it.sh", "db:8091", "--", "npm", "start"]

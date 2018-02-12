@@ -8,12 +8,13 @@ module.exports = {
     bucket: process.env.DB_BUCKET
   },
   rules: {
-    maxTasks: process.env.MAX_TASKS_RULE,
-    taskReward: process.env.TASK_REWARD_RULE,
-    testFrequency: process.env.TEST_FREQUENCY_RULE,
-    initialTests: process.env.INITIAL_TESTS,
-    initialTestsMinCorrectAnswers:
-      process.env.INITIAL_TEST_MIN_CORRECT_ANSWERS_RULE,
-    votesPerTask: process.env.VOTES_PER_TASK_RULE
+    maxTasks: Number(process.env.MAX_TASKS_RULE),
+    taskReward: Number(process.env.TASK_REWARD_RULE),
+    testFrequency: Number(process.env.TEST_FREQUENCY_RULE),
+    initialTests: Number(process.env.INITIAL_TESTS_RULE),
+    initialTestsMinCorrectAnswers: Number(
+      process.env.INITIAL_TEST_MIN_CORRECT_ANSWERS_RULE
+    ),
+    votesPerTask: Number(process.env.VOTES_PER_TASK_RULE)
   }
 };

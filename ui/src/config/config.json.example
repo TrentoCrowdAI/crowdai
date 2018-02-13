@@ -9,7 +9,11 @@
   server: "https://localhost:4000" | null,
   "pollingInterval": 10000,
 
-  // base url for routes. In production should be equal to /crowdai, null for development.
-  "routesBaseUrl": "/crowdai"
+  "google": {
+    "clientId": "898969009397-pp85b412vt2uph9ifvcp271omdbq2vhm.apps.googleusercontent.com"
+  },
+
+  // key for authentication data stored in local storage.
+  "localStorageKey": "crowdaiAuth"
 }
 

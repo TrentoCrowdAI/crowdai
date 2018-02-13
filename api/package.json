@@ -12,6 +12,7 @@
     "couchbase": "^2.4.3",
     "csvtojson": "^1.1.9",
     "dotenv": "^5.0.0",
+    "google-auth-library": "^1.2.1",
     "koa": "^2.4.1",
     "koa-better-body": "^3.0.4",
     "koa-compress": "^2.0.0",
@@ -19,6 +20,7 @@
     "koa-mount": "^3.0.0",
     "koa-response-time": "^2.0.0",
     "koa-router": "^7.3.0",
+    "koa-unless": "^1.0.7",
     "koa2-cors": "^2.0.5"
   }
 }

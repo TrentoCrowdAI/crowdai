@@ -10,8 +10,11 @@ const compress = require('koa-compress');
 const responseTime = require('koa-response-time');
 const koaBetterBody = require('koa-better-body');
 const cors = require('koa2-cors');
+const Boom = require('boom');
 
-const api = require('./services');
+const api = require('./services/api');
+const auth = require('./services/auth');
+const authentication = require('./middlewares/authentication');
 
 const app = new Koa();
 
@@ -26,6 +29,9 @@ app.use(logger());
 app.use(responseTime());
 app.use(compress());
 app.use(koaBetterBody());
+
+// google-based authentication protects URLs under /admin
+app.use(authentication.unless({ path: [/^\/auth/, /^\/api/] }));
 
 // error-handling middleware
 app.use(async (ctx, next) => {
@@ -47,5 +53,6 @@ app.use(async (ctx, next) => {
 });
 
 app.use(mount('/api/v1', api));
+app.use(mount('/auth', auth));
 
 app.listen(process.env.PORT || 4000);

@@ -16,5 +16,9 @@ module.exports = {
       process.env.INITIAL_TEST_MIN_CORRECT_ANSWERS_RULE
     ),
     votesPerTask: Number(process.env.VOTES_PER_TASK_RULE)
+  },
+  google: {
+    clientId: process.env.GOOGLE_CLIENT_ID,
+    secret: process.env.GOOGLE_CLIENT_SECRET
   }
 };

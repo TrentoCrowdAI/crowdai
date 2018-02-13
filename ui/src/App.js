@@ -12,6 +12,7 @@ import QuestionForm from 'src/components/question-form/QuestionForm';
 import WelcomePage from 'src/components/WelcomePage';
 import {actions} from 'src/components/question-form/actions';
 import RewardWidget from 'src/components/reward-widget/RewardWidget';
+import Dashboard from 'src/components/admin/dashboard/Dashboard';
 
 /**
  * Main component.
@@ -21,6 +22,7 @@ class ConnectedApp extends Component {
   render() {
     return (
       <Container>
+        <Route path={'/admin'} component={Dashboard} />
         <Route path={'/welcome'} component={WelcomePage} />
 
         <Route

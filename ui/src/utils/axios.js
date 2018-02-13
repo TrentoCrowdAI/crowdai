@@ -6,4 +6,17 @@ const instance = axios.create({
   timeout: 5000
 });
 
+const axiosAuth = axios.create({
+  baseURL: `${config.server}/auth`,
+  timeout: 5000
+});
+
+const token = localStorage.getItem(config.localStorageKey);
+
+if (token) {
+  axiosAuth.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+}
+
 export default instance;
+
+export {axiosAuth};

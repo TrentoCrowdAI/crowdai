@@ -11,7 +11,7 @@ const axiosAuth = axios.create({
   timeout: 5000
 });
 
-const workersApi = axios.create({
+const requestersApi = axios.create({
   baseURL: `${config.server}/requesters/api/v1`,
   timeout: 5000
 });
@@ -20,9 +20,9 @@ const token = localStorage.getItem(config.localStorageKey);
 
 if (token) {
   axiosAuth.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-  workersApi.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+  requestersApi.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 }
 
 export default instance;
 
-export {axiosAuth, workersApi};
+export {axiosAuth, requestersApi};

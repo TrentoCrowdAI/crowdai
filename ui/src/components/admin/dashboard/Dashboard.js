@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 // import {GoogleLogout} from 'react-google-login';
-import {Menu, Grid, Icon, Image} from 'semantic-ui-react';
+import {Menu, Icon, Image} from 'semantic-ui-react';
 import {Route, withRouter, Link, Switch} from 'react-router-dom';
 
 import Login from 'src/components/admin/login/Login';
@@ -50,12 +50,12 @@ class DashboardWidget extends React.Component {
           </Menu.Menu>
         </Menu>
 
-        <Grid>
+        <div>
           <Switch>
             <Route path={'/admin/experiments'} component={ExperimentsRoute} />
             <Route path={'/admin/profile'} component={Profile} />
           </Switch>
-        </Grid>
+        </div>
       </React.Fragment>
     );
   }

@@ -31,8 +31,9 @@ const getRequesterById = (exports.getRequesterById = async requesterId => {
 const create = (exports.create = async requester => {
   try {
     const key = `${DOCUMENTS.Requester}${requester.id}`;
+    requester.type = TYPES.requester;
     return await new Promise((resolve, reject) => {
-      bucket.insert(key, payload, (error, result) => {
+      bucket.insert(key, requester, (error, result) => {
         if (error) {
           console.error(
             `Error while inserting document ${key}. Error: ${error}`
@@ -46,5 +47,26 @@ const create = (exports.create = async requester => {
   } catch (error) {
     console.error(error);
     throw Boom.badImplementation('Error while trying to persist requester');
+  }
+});
+
+const update = (exports.update = async requester => {
+  try {
+    const key = `${DOCUMENTS.Requester}${requester.id}`;
+    return await new Promise((resolve, reject) => {
+      bucket.upsert(key, requester, (error, result) => {
+        if (error) {
+          console.error(
+            `Error while inserting document ${key}. Error: ${error}`
+          );
+          reject(error);
+        } else {
+          resolve(result);
+        }
+      });
+    });
+  } catch (error) {
+    console.error(error);
+    throw Boom.badImplementation('Error while trying to update requester');
   }
 });

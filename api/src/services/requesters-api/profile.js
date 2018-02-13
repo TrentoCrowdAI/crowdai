@@ -10,7 +10,7 @@ const get = async ctx => {
 
   if (!requester) {
     // create requester record
-    requester = await delegates.requesters.create({
+    await delegates.requesters.create({
       id: sub,
       email: loginInfo.email,
       name: loginInfo.name,
@@ -18,10 +18,16 @@ const get = async ctx => {
       givenName: loginInfo.given_name,
       familyName: loginInfo.family_name
     });
+    requester = await delegates.requesters.getRequesterById(sub);
   }
   ctx.response.body = requester;
 };
 
+const put = async ctx => {
+  ctx.response.body = await delegates.requesters.update(ctx.request.fields);
+};
+
 exports.register = router => {
   router.get('/profile', get);
+  router.put('/profile/:id', put);
 };

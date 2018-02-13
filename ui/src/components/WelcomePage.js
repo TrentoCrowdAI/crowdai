@@ -1,5 +1,5 @@
 import React from 'react';
-import {Grid, Button, Segment, Dimmer, Loader, Message, Icon} from 'semantic-ui-react';
+import {Grid, Button, Segment, Dimmer, Loader, Message} from 'semantic-ui-react';
 import {Link} from 'react-router-dom';
 import {connect} from 'react-redux';
 import PropTypes from 'prop-types';

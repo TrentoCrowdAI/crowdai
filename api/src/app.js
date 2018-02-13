@@ -12,7 +12,8 @@ const koaBetterBody = require('koa-better-body');
 const cors = require('koa2-cors');
 const Boom = require('boom');
 
-const api = require('./services/api');
+const workersApi = require('./services/workers-api');
+const requestersApi = require('./services/requesters-api');
 const auth = require('./services/auth');
 const authentication = require('./middlewares/authentication');
 
@@ -30,8 +31,8 @@ app.use(responseTime());
 app.use(compress());
 app.use(koaBetterBody());
 
-// google-based authentication protects URLs under /admin
-app.use(authentication.unless({ path: [/^\/auth/, /^\/api/] }));
+// google-based authentication protects URLs under /requesters
+app.use(authentication.unless({ path: [/^\/auth/, /^\/workers/] }));
 
 // error-handling middleware
 app.use(async (ctx, next) => {
@@ -52,7 +53,8 @@ app.use(async (ctx, next) => {
   }
 });
 
-app.use(mount('/api/v1', api));
+app.use(mount('/workers/api/v1', workersApi));
+app.use(mount('/requesters/api/v1', requestersApi));
 app.use(mount('/auth', auth));
 
 app.listen(process.env.PORT || 4000);

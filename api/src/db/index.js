@@ -10,7 +10,8 @@ const DOCUMENTS = {
   Answer: 'Answer::',
   WorkerAssignment: 'WorkerAssignment::',
   TestTask: 'TestTask::',
-  TestAnswer: 'TestAnswer::'
+  TestAnswer: 'TestAnswer::',
+  Requester: 'Requester::'
 };
 
 const TYPES = {
@@ -18,7 +19,8 @@ const TYPES = {
   answer: 'answer',
   assignment: 'assignment',
   testTask: 'testTask',
-  testAnswer: 'testAnswer'
+  testAnswer: 'testAnswer',
+  requester: 'requester'
 };
 
 module.exports = {

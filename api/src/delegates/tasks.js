@@ -174,3 +174,23 @@ const getWorkerCompletedTests = (exports.getWorkerCompletedTests = async workerI
     throw Boom.badImplementation('Error while trying to fetch completed test');
   }
 });
+
+const createTask = (exports.createTask = async (task, isTest = false) => {
+  try {
+    const key = `${isTest ? DOCUMENTS.TestTask : DOCUMENTS.Task}${task.id}`;
+    task.type = isTest ? TYPES.testTask : TYPES.task;
+
+    return await new Promise((resolve, reject) => {
+      bucket.insert(key, task, (error, result) => {
+        if (error) {
+          reject(error);
+        } else {
+          resolve(result);
+        }
+      });
+    });
+  } catch (error) {
+    console.error(error);
+    throw Boom.badImplementation('Error while trying to persist task');
+  }
+});

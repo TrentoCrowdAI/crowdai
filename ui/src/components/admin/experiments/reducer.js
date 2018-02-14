@@ -41,6 +41,15 @@ export default combineReducers({
     name: '',
     requesterId: '',
     assignments: 0,
-    published: false
+    published: false,
+    itemsUrl: '',
+    filtersUrl: '',
+    testsUrl: '',
+    maxTasksRule: 3,
+    taskRewardRule: 0.5,
+    testFrequencyRule: 2,
+    initialTestsRule: 2,
+    initialTestsMinCorrectAnswersRule: 100,
+    votesPerTaskRule: 2
   })
 });

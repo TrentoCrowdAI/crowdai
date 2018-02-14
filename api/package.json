@@ -10,6 +10,8 @@
     "aws-sdk": ">= 2.0.9",
     "boom": "^7.1.1",
     "couchbase": "^2.4.3",
+    "csv-parse": "^2.0.2",
+    "csv-transform": "0.0.8",
     "csvtojson": "^1.1.9",
     "dotenv": "^5.0.0",
     "google-auth-library": "^1.2.1",
@@ -22,6 +24,8 @@
     "koa-router": "^7.3.0",
     "koa-unless": "^1.0.7",
     "koa2-cors": "^2.0.5",
+    "request": "^2.83.0",
+    "stream-transform": "^1.0.0",
     "uuid": "^3.2.1"
   }
 }

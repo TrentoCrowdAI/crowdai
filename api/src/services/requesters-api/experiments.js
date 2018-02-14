@@ -11,7 +11,11 @@ const getRequesterExperiments = async ctx => {
   if (!requester) {
     throw Boom.badRequest('Requester account has not been initialized');
   }
-  ctx.response.body = { experiments: [] };
+  ctx.response.body = {
+    experiments: await delegates.experiments.getByRequester(
+      requester.requesterId
+    )
+  };
 };
 
 const post = async ctx => {

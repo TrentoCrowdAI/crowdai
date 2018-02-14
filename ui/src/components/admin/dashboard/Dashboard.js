@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 // import {GoogleLogout} from 'react-google-login';
 import {Menu, Icon, Image} from 'semantic-ui-react';
-import {Route, withRouter, Link, Switch} from 'react-router-dom';
+import {Route, withRouter, Link, Switch, Redirect} from 'react-router-dom';
 
 import Login from 'src/components/admin/login/Login';
 import config from 'src/config/config.json';
@@ -21,6 +21,11 @@ class DashboardWidget extends React.Component {
   render() {
     const {name, picture} = this.props.loginInfo;
     const {pathname} = this.props.location;
+    const {profile} = this.props;
+
+    if (profile.id && !profile.requesterId && pathname !== '/admin/profile') {
+      return <Redirect to="/admin/profile" />;
+    }
 
     return (
       <React.Fragment>
@@ -78,12 +83,14 @@ class DashboardWidget extends React.Component {
 DashboardWidget.propTypes = {
   loginInfo: PropTypes.object,
   fetchProfile: PropTypes.func,
+  profile: PropTypes.object,
   /** @ignore */
   location: PropTypes.object
 };
 
 const dmapStateToProps = state => ({
-  loginInfo: state.login.loginInfo
+  loginInfo: state.login.loginInfo,
+  profile: state.profile.item
 });
 
 const dmapDispatchToProps = dispatch => ({

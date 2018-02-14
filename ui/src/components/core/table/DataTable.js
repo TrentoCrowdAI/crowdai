@@ -24,7 +24,7 @@ class DataTable extends React.Component {
         </Grid.Row>
         <Grid.Row>
           <Grid.Column>
-            <Table celled>
+            <Table columns="2" celled striped>
               <Table.Header>
                 <Table.Row>
                   {Object.keys(columns).map(field => (
@@ -41,7 +41,9 @@ class DataTable extends React.Component {
                 )}
                 {data.map(record => (
                   <Table.Row key={record.id}>
-                    {Object.keys(columns).map(field => <Table.Cell key={field}>{record[field]}</Table.Cell>)}
+                    {Object.keys(columns).map(field => (
+                      <Table.Cell key={`${record.id}-${field}`}>{record[field]}</Table.Cell>
+                    ))}
                   </Table.Row>
                 ))}
               </Table.Body>

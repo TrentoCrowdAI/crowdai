@@ -48,6 +48,33 @@ class ExperimentForm extends React.Component {
                   required
                 />
 
+                <Form.Input
+                  label="Items URL"
+                  name="itemsUrl"
+                  value={item.itemsUrl}
+                  placeholder="URL to the items CSV file"
+                  onChange={this.handleChange}
+                  required
+                />
+
+                <Form.Input
+                  label="Filters URL"
+                  name="filtersUrl"
+                  value={item.filtersUrl}
+                  placeholder="URL to the filters CSV file"
+                  onChange={this.handleChange}
+                  required
+                />
+
+                <Form.Input
+                  label="Tests URL"
+                  name="testsUrl"
+                  value={item.testsUrl}
+                  placeholder="URL to the tests CSV file"
+                  onChange={this.handleChange}
+                  required
+                />
+
                 {this.props.error && (
                   <Message
                     error

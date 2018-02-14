@@ -5,19 +5,20 @@ const bucket = require(__base + 'db').bucket;
 const config = require(__base + 'config');
 const { DOCUMENTS, TYPES } = require(__base + 'db');
 const answersDelegate = require('./answers');
+const experimentsDelegate = require('./experiments');
 
-exports.all = async () => {
+exports.all = async experimentId => {
   try {
     const qs = `select * from \`${config.db.bucket}\` where type="${
       TYPES.task
-    }"`;
+    }" and experimentId="${experimentId}"`;
     const q = couchbase.N1qlQuery.fromString(qs);
     return await new Promise((resolve, reject) => {
       bucket.query(q, (err, tasks) => {
         if (err) {
           reject(err);
         } else {
-          resolve(tasks);
+          resolve(tasks.map(t => t[config.db.bucket]));
         }
       });
     });
@@ -27,11 +28,11 @@ exports.all = async () => {
   }
 };
 
-const count = (exports.count = async () => {
+const count = (exports.count = async experimentId => {
   try {
     const qs = `select count(*) as count from \`${
       config.db.bucket
-    }\` where type="${TYPES.task}"`;
+    }\` where type="${TYPES.task}" and experimentId="${experimentId}"`;
     const q = couchbase.N1qlQuery.fromString(qs);
     return await new Promise((resolve, reject) => {
       bucket.query(q, (err, data) => {
@@ -48,10 +49,22 @@ const count = (exports.count = async () => {
   }
 });
 
-exports.next = async workerId => {
+exports.next = async (experimentId, workerId) => {
+  const experiment = await experimentsDelegate.getById(experimentId);
+
+  if (!experiment) {
+    throw Boom.badRequest('Experiment with the given ID does not exist');
+  }
+
   try {
-    const answersCount = await answersDelegate.getWorkerAnswersCount(workerId);
-    const testCount = await answersDelegate.getWorkerTestAnswersCount(workerId);
+    const answersCount = await answersDelegate.getWorkerAnswersCount(
+      experimentId,
+      workerId
+    );
+    const testCount = await answersDelegate.getWorkerTestAnswersCount(
+      experimentId,
+      workerId
+    );
 
     if (answersCount >= config.rules.maxTasks) {
       return {
@@ -64,11 +77,12 @@ exports.next = async workerId => {
 
     if (runTest) {
       // we need to return a test task
-      const testsIds = await getWorkerAvailableTests(workerId);
+      const testsIds = await getWorkerAvailableTests(experimentId, workerId);
       const idx = Math.floor(Math.random() * testsIds.length);
+      // TODO: revisit this
       key = `${DOCUMENTS.TestTask}${testsIds[idx]}`;
     } else {
-      const tasksIds = await getWorkerAvailableTasks(workerId);
+      const tasksIds = await getWorkerAvailableTasks(experimentId, workerId);
       const idx = Math.floor(Math.random() * tasksIds.length);
       key = `${DOCUMENTS.Task}${tasksIds[idx]}`;
     }
@@ -91,11 +105,18 @@ exports.next = async workerId => {
 /**
  * Returns an array of taskId completed by the worker.
  *
+ * @param {Number} experimentId
  * @param {Number} workerId
  */
-const getWorkerCompletedTasks = (exports.getWorkerCompletedTasks = async workerId => {
+const getWorkerCompletedTasks = (exports.getWorkerCompletedTasks = async (
+  experimentId,
+  workerId
+) => {
   try {
-    const answers = await answersDelegate.getWorkerAnswers(workerId);
+    const answers = await answersDelegate.getWorkerAnswers(
+      experimentId,
+      workerId
+    );
     return answers.map(a => a[config.db.bucket]).map(a => a.taskId);
   } catch (error) {
     console.error(error);
@@ -108,12 +129,18 @@ const getWorkerCompletedTasks = (exports.getWorkerCompletedTasks = async workerI
  *
  * @param {Number} workerId
  */
-const getWorkerAvailableTasks = (exports.getWorkerAvailableTasks = async workerId => {
+const getWorkerAvailableTasks = (exports.getWorkerAvailableTasks = async (
+  experimentId,
+  workerId
+) => {
   try {
-    let completedTasks = await getWorkerCompletedTasks(workerId);
+    let completedTasks = await getWorkerCompletedTasks(experimentId, workerId);
     const qs = `select id from \`${config.db.bucket}\` where type="${
       TYPES.task
-    }" and id not in [${completedTasks}]`;
+    }" and id not in [${completedTasks.map(
+      ct => `"${ct}"`
+    )}] and experimentId="${experimentId}"`;
+    console.log(qs);
     const q = couchbase.N1qlQuery.fromString(qs);
     return await new Promise((resolve, reject) => {
       bucket.query(q, (err, rows) => {
@@ -133,15 +160,20 @@ const getWorkerAvailableTasks = (exports.getWorkerAvailableTasks = async workerI
 /**
  * Returns an array of testId available to the worker.
  *
+ * @param {Number} experimentId
  * @param {Number} workerId
  */
-const getWorkerAvailableTests = (exports.getWorkerAvailableTests = async workerId => {
+const getWorkerAvailableTests = (exports.getWorkerAvailableTests = async (
+  experimentId,
+  workerId
+) => {
   try {
-    let completedTests = await getWorkerCompletedTests(workerId);
-    console.log(completedTests);
+    let completedTests = await getWorkerCompletedTests(experimentId, workerId);
     const qs = `select id from \`${config.db.bucket}\` where type="${
       TYPES.testTask
-    }" and id not in [${completedTests}]`;
+    }" and id not in [${completedTests.map(
+      ct => `"${ct}"`
+    )}] and experimentId="${experimentId}"`;
     const q = couchbase.N1qlQuery.fromString(qs);
     return await new Promise((resolve, reject) => {
       bucket.query(q, (err, rows) => {
@@ -163,11 +195,18 @@ const getWorkerAvailableTests = (exports.getWorkerAvailableTests = async workerI
 /**
  * Returns an array of testId completed by the worker.
  *
+ * @param {Number} experimentId
  * @param {Number} workerId
  */
-const getWorkerCompletedTests = (exports.getWorkerCompletedTests = async workerId => {
+const getWorkerCompletedTests = (exports.getWorkerCompletedTests = async (
+  experimentId,
+  workerId
+) => {
   try {
-    const testAnswers = await answersDelegate.getWorkerTestAnswers(workerId);
+    const testAnswers = await answersDelegate.getWorkerTestAnswers(
+      experimentId,
+      workerId
+    );
     return testAnswers.map(a => a[config.db.bucket]).map(a => a.testTaskId);
   } catch (error) {
     console.error(error);
@@ -177,8 +216,13 @@ const getWorkerCompletedTests = (exports.getWorkerCompletedTests = async workerI
 
 const createTask = (exports.createTask = async (task, isTest = false) => {
   try {
-    const key = `${isTest ? DOCUMENTS.TestTask : DOCUMENTS.Task}${task.id}`;
+    if (!task.experimentId) {
+      throw Boom.badRequest('Task must have experimentId');
+    }
+    const key = getTaskKey(task, isTest);
     task.type = isTest ? TYPES.testTask : TYPES.task;
+    // we make sure that experimentId is defined.
+    task.experimentId = experimentId;
 
     return await new Promise((resolve, reject) => {
       bucket.insert(key, task, (error, result) => {
@@ -194,3 +238,8 @@ const createTask = (exports.createTask = async (task, isTest = false) => {
     throw Boom.badImplementation('Error while trying to persist task');
   }
 });
+
+const getTaskKey = (task, isTest = false) =>
+  `${isTest ? DOCUMENTS.TestTask : DOCUMENTS.Task}${task.experimentId}::${
+    task.taskId
+  }`;

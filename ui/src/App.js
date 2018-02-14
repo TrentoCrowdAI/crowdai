@@ -25,9 +25,9 @@ class ConnectedApp extends Component {
         <Route path={'/admin'} component={Dashboard} />
 
         <Container>
-          <Route path={'/welcome'} component={WelcomePage} />
+          <Route path={'/welcome/:experimentId'} component={WelcomePage} />
           <Route
-            path={'/task'}
+            path={'/task/:experimentId'}
             render={props => (
               <React.Fragment>
                 <Grid.Row
@@ -66,7 +66,8 @@ class ConnectedApp extends Component {
   componentWillMount() {
     /* eslint-disable */
     const qs = queryString.parse(this.props.location.search);
-    this.props.setCurrentSession(qs);
+    const experimentId = this.props.location.pathname.split('/').pop();
+    this.props.setCurrentSession({ ...qs, experimentId });
     this.props.setWorkerAcceptedHit(this.hasAcceptedHit(qs));
     /* eslint-enable */
   }
@@ -90,8 +91,8 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = dispatch => ({
   setWorkerAcceptedHit: accepted => dispatch(actions.setWorkerAcceptedHit(accepted)),
 
-  setCurrentSession: ({hitId, assignmentId, workerId}) =>
-    dispatch(actions.setCurrentSession(hitId, assignmentId, workerId))
+  setCurrentSession: ({hitId, assignmentId, workerId, experimentId}) =>
+    dispatch(actions.setCurrentSession(hitId, assignmentId, workerId, experimentId))
 });
 
 const ConnectedAppWrapper = withRouter(connect(mapStateToProps, mapDispatchToProps)(ConnectedApp));

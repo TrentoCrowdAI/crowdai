@@ -6,10 +6,19 @@ const config = require(__base + 'config');
 const answersDelegate = require('./answers');
 const { DOCUMENTS, TYPES } = require(__base + 'db');
 
-const getWorkerReward = (exports.getWorkerReward = async workerId => {
+const getWorkerReward = (exports.getWorkerReward = async (
+  experimentId,
+  workerId
+) => {
   try {
-    const taskCount = await answersDelegate.getWorkerAnswersCount(workerId);
-    const testCount = await answersDelegate.getWorkerTestAnswersCount(workerId);
+    const taskCount = await answersDelegate.getWorkerAnswersCount(
+      experimentId,
+      workerId
+    );
+    const testCount = await answersDelegate.getWorkerTestAnswersCount(
+      experimentId,
+      workerId
+    );
     return { reward: (taskCount + testCount) * config.rules.taskReward };
   } catch (error) {
     console.error(error);
@@ -17,10 +26,18 @@ const getWorkerReward = (exports.getWorkerReward = async workerId => {
   }
 });
 
-const finishAssignment = (exports.finishAssignment = async workerId => {
+const finishAssignment = (exports.finishAssignment = async (
+  experimentId,
+  workerId
+) => {
   try {
-    const key = `${DOCUMENTS.WorkerAssignment}${workerId}`;
-    let record = { type: TYPES.assignment, finished: true, workerId };
+    const key = getWorkerAssignmentKey(experimentId, workerId);
+    let record = {
+      type: TYPES.assignment,
+      finished: true,
+      workerId,
+      experimentId
+    };
     return await new Promise((resolve, reject) => {
       bucket.insert(key, record, (error, result) => {
         if (error) {
@@ -39,20 +56,26 @@ const finishAssignment = (exports.finishAssignment = async workerId => {
   }
 });
 
-const checkAssignmentStatus = (exports.checkAssignmentStatus = async workerId => {
+const checkAssignmentStatus = (exports.checkAssignmentStatus = async (
+  experimentId,
+  workerId
+) => {
   try {
     return await new Promise((resolve, reject) => {
-      bucket.get(`${DOCUMENTS.WorkerAssignment}${workerId}`, (err, data) => {
-        if (err) {
-          if (err.code === couchbase.errors.keyNotFound) {
-            resolve({ finished: false });
+      bucket.get(
+        getWorkerAssignmentKey(experimentId, workerId),
+        (err, data) => {
+          if (err) {
+            if (err.code === couchbase.errors.keyNotFound) {
+              resolve({ finished: false });
+            } else {
+              reject(err);
+            }
           } else {
-            reject(err);
+            resolve({ finished: data.value.finished });
           }
-        } else {
-          resolve({ finished: data.value.finished });
         }
-      });
+      );
     });
   } catch (error) {
     console.error(error);
@@ -61,3 +84,6 @@ const checkAssignmentStatus = (exports.checkAssignmentStatus = async workerId =>
     );
   }
 });
+
+const getWorkerAssignmentKey = (experimentId, workerId) =>
+  `${DOCUMENTS.WorkerAssignment}${experimentId}::${workerId}`;

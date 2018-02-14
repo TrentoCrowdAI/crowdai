@@ -7,16 +7,19 @@ const { DOCUMENTS, TYPES } = require(__base + 'db');
 
 const create = (exports.create = async answer => {
   try {
+    if (!answer.experimentId) {
+      throw Boom.badRequest('Answer must have experimentId');
+    }
     let key;
     let payload = { ...answer };
     delete payload.task;
 
     if (answer.task.type === TYPES.task) {
-      key = `${DOCUMENTS.Answer}${answer.task.id}`;
+      key = `${DOCUMENTS.Answer}${answer.experimentId}::${answer.task.id}`;
       payload.taskId = answer.task.id;
       payload.type = TYPES.answer;
     } else if (answer.task.type === TYPES.testTask) {
-      key = `${DOCUMENTS.TestAnswer}${answer.task.id}`;
+      key = `${DOCUMENTS.TestAnswer}${answer.experimentId}::${answer.task.id}`;
       payload.testTaskId = answer.task.id;
       payload.type = TYPES.testAnswer;
     }
@@ -38,11 +41,14 @@ const create = (exports.create = async answer => {
   }
 });
 
-const getWorkerAnswers = (exports.getWorkerAnswers = async workerId => {
+const getWorkerAnswers = (exports.getWorkerAnswers = async (
+  experimentId,
+  workerId
+) => {
   try {
     const qs = `select * from \`${config.db.bucket}\` where type="${
       TYPES.answer
-    }" and workerId='${workerId}'`;
+    }" and workerId='${workerId}' and experimentId="${experimentId}"`;
     const q = couchbase.N1qlQuery.fromString(qs);
     return await new Promise((resolve, reject) => {
       bucket.query(q, (err, answers) => {
@@ -61,11 +67,16 @@ const getWorkerAnswers = (exports.getWorkerAnswers = async workerId => {
   }
 });
 
-const getWorkerAnswersCount = (exports.getWorkerAnswersCount = async workerId => {
+const getWorkerAnswersCount = (exports.getWorkerAnswersCount = async (
+  experimentId,
+  workerId
+) => {
   try {
     const qs = `select count(*) as count from \`${
       config.db.bucket
-    }\` where type="${TYPES.answer}" and workerId='${workerId}'`;
+    }\` where type="${
+      TYPES.answer
+    }" and workerId='${workerId}' and experimentId="${experimentId}"`;
     const q = couchbase.N1qlQuery.fromString(qs);
     q.consistency(couchbase.N1qlQuery.Consistency.STATEMENT_PLUS);
     return await new Promise((resolve, reject) => {
@@ -85,11 +96,14 @@ const getWorkerAnswersCount = (exports.getWorkerAnswersCount = async workerId =>
   }
 });
 
-const getWorkerTestAnswers = (exports.getWorkerTestAnswers = async workerId => {
+const getWorkerTestAnswers = (exports.getWorkerTestAnswers = async (
+  experimentId,
+  workerId
+) => {
   try {
     const qs = `select * from \`${config.db.bucket}\` where type="${
       TYPES.testAnswer
-    }" and workerId='${workerId}'`;
+    }" and workerId='${workerId}' and experimentId="${experimentId}"`;
     const q = couchbase.N1qlQuery.fromString(qs);
     return await new Promise((resolve, reject) => {
       bucket.query(q, (err, answers) => {
@@ -108,11 +122,16 @@ const getWorkerTestAnswers = (exports.getWorkerTestAnswers = async workerId => {
   }
 });
 
-const getWorkerTestAnswersCount = (exports.getWorkerTestAnswersCount = async workerId => {
+const getWorkerTestAnswersCount = (exports.getWorkerTestAnswersCount = async (
+  experimentId,
+  workerId
+) => {
   try {
     const qs = `select count(*) as count from \`${
       config.db.bucket
-    }\` where type="${TYPES.testAnswer}" and workerId='${workerId}'`;
+    }\` where type="${
+      TYPES.testAnswer
+    }" and workerId='${workerId}' and experimentId="${experimentId}"`;
     const q = couchbase.N1qlQuery.fromString(qs);
     q.consistency(couchbase.N1qlQuery.Consistency.STATEMENT_PLUS);
     return await new Promise((resolve, reject) => {

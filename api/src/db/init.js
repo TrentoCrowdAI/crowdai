@@ -1,6 +1,8 @@
 /**
  * Loads tasks and filters to the database. Before running
  * this scripts, create the bucket using web interface.
+ *
+ * @deprecated We now use Requester dashboard for this.
  */
 
 const csv = require('csvtojson');

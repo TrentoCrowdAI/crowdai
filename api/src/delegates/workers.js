@@ -5,11 +5,18 @@ const bucket = require(__base + 'db').bucket;
 const config = require(__base + 'config');
 const answersDelegate = require('./answers');
 const { DOCUMENTS, TYPES } = require(__base + 'db');
+const experimentsDelegate = require('./experiments');
 
 const getWorkerReward = (exports.getWorkerReward = async (
   experimentId,
   workerId
 ) => {
+  const experiment = await experimentsDelegate.getById(experimentId);
+
+  if (!experiment) {
+    throw Boom.badRequest('Experiment with the given ID does not exist');
+  }
+
   try {
     const taskCount = await answersDelegate.getWorkerAnswersCount(
       experimentId,
@@ -19,7 +26,7 @@ const getWorkerReward = (exports.getWorkerReward = async (
       experimentId,
       workerId
     );
-    return { reward: (taskCount + testCount) * config.rules.taskReward };
+    return { reward: (taskCount + testCount) * experiment.taskRewardRule };
   } catch (error) {
     console.error(error);
     throw Boom.badImplementation('Error while computing reward');

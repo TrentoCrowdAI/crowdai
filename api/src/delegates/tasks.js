@@ -65,26 +65,28 @@ exports.next = async (experimentId, workerId) => {
       experimentId,
       workerId
     );
+    console.log('answers', answersCount, 'tests', testCount);
+    console.log('maxTaks', experiment.maxTasksRule);
 
-    if (answersCount >= config.rules.maxTasks) {
+    if (answersCount >= experiment.maxTasksRule) {
       return {
         maxTasks: true
       };
     }
 
     const runTest =
-      (answersCount + testCount + 1) % (config.rules.testFrequency + 1) === 0;
+      (answersCount + testCount + 1) % (experiment.testFrequencyRule + 1) === 0;
+    console.log('run tests?', runTest);
 
     if (runTest) {
       // we need to return a test task
       const testsIds = await getWorkerAvailableTests(experimentId, workerId);
       const idx = Math.floor(Math.random() * testsIds.length);
-      // TODO: revisit this
-      key = `${DOCUMENTS.TestTask}${testsIds[idx]}`;
+      key = getTaskKey({ experimentId, id: testsIds[idx] }, true);
     } else {
       const tasksIds = await getWorkerAvailableTasks(experimentId, workerId);
       const idx = Math.floor(Math.random() * tasksIds.length);
-      key = `${DOCUMENTS.Task}${tasksIds[idx]}`;
+      key = getTaskKey({ experimentId, id: tasksIds[idx] });
     }
 
     return await new Promise((resolve, reject) => {
@@ -140,7 +142,6 @@ const getWorkerAvailableTasks = (exports.getWorkerAvailableTasks = async (
     }" and id not in [${completedTasks.map(
       ct => `"${ct}"`
     )}] and experimentId="${experimentId}"`;
-    console.log(qs);
     const q = couchbase.N1qlQuery.fromString(qs);
     return await new Promise((resolve, reject) => {
       bucket.query(q, (err, rows) => {
@@ -221,8 +222,6 @@ const createTask = (exports.createTask = async (task, isTest = false) => {
     }
     const key = getTaskKey(task, isTest);
     task.type = isTest ? TYPES.testTask : TYPES.task;
-    // we make sure that experimentId is defined.
-    task.experimentId = experimentId;
 
     return await new Promise((resolve, reject) => {
       bucket.insert(key, task, (error, result) => {
@@ -241,5 +240,5 @@ const createTask = (exports.createTask = async (task, isTest = false) => {
 
 const getTaskKey = (task, isTest = false) =>
   `${isTest ? DOCUMENTS.TestTask : DOCUMENTS.Task}${task.experimentId}::${
-    task.taskId
+    task.id
   }`;

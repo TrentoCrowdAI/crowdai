@@ -78,7 +78,18 @@ const create = (exports.create = async item => {
   try {
     item.id = uuid();
     const key = `${DOCUMENTS.Experiment}${item.id}`;
-    item.type = TYPES.experiment;
+    item = {
+      ...item,
+      maxTasksRule: Number(item.maxTasksRule),
+      taskRewardRule: Number(item.taskRewardRule),
+      testFrequencyRule: Number(item.testFrequencyRule),
+      initialTestsRule: Number(item.initialTestsRule),
+      initialTestsMinCorrectAnswersRule: Number(
+        item.initialTestsMinCorrectAnswersRule
+      ),
+      votesPerTaskRule: Number(item.votesPerTaskRule),
+      type: TYPES.experiment
+    };
 
     let cas = await new Promise((resolve, reject) => {
       bucket.insert(key, item, (error, result) => {

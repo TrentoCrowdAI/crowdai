@@ -11,7 +11,6 @@
     "boom": "^7.1.1",
     "couchbase": "^2.4.3",
     "csv-parse": "^2.0.2",
-    "csv-transform": "0.0.8",
     "csvtojson": "^1.1.9",
     "dotenv": "^5.0.0",
     "google-auth-library": "^1.2.1",

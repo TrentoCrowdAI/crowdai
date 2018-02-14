@@ -1,5 +1,6 @@
 const getActionTypes = scope => {
   return {
+    CLEAN_STATE: `C_${scope}_FORM_CLEAN_STATE`,
     SUBMIT: `C_${scope}_FORM_SUBMIT`,
     SUBMIT_SUCCESS: `C_${scope}_FORM_SUBMIT_SUCCESS`,
     SUBMIT_ERROR: `C_${scope}_FORM_SUBMIT_ERROR`,
@@ -14,6 +15,12 @@ const getActions = scope => {
   const actionTypes = getActionTypes(scope);
 
   return {
+    cleanState() {
+      return {
+        type: actionTypes.CLEAN_STATE
+      };
+    },
+
     submit() {
       return {
         type: actionTypes.SUBMIT
@@ -76,6 +83,10 @@ const getReducer = (scope, formFields) => {
 
   return (state = defaultState, action) => {
     switch (action.type) {
+      case actionTypes.CLEAN_STATE:
+        return {
+          ...defaultState
+        };
       case actionTypes.SUBMIT:
         return {
           ...state,

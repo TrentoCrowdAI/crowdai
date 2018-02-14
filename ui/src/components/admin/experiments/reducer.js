@@ -40,7 +40,7 @@ export default combineReducers({
   form: getReducer(scopes.EXPERIMENTS, {
     name: '',
     requesterId: '',
-    assignments: 0,
+    assignments: 1,
     published: false,
     itemsUrl: '',
     filtersUrl: '',

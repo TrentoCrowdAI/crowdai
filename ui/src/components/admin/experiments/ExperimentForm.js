@@ -1,40 +1,52 @@
 import React from 'react';
+import {Container, Form, Button, Grid, Message} from 'semantic-ui-react';
 import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
-import {Container, Form, Button, Grid, Message} from 'semantic-ui-react';
 
 import {actions} from './actions';
 
-class Profile extends React.Component {
+class ExperimentForm extends React.Component {
   constructor(props) {
     super(props);
     this.handleChange = this.handleChange.bind(this);
   }
 
   render() {
-    const {profile} = this.props;
+    const {item} = this.props;
 
     return (
       <Container>
         <Grid container centered>
           <Grid.Row>
-            <Grid.Column width="8" textAlign="center">
-              <h1>My Profile</h1>
+            <Grid.Column width="4">
+              <h1>New experiment</h1>
             </Grid.Column>
           </Grid.Row>
           <Grid.Row>
             <Grid.Column width="8">
-              <Form error={this.props.error !== undefined} loading={this.props.loading} success={this.props.saved}>
+              <Form
+                error={this.props.error !== undefined}
+                loading={this.props.loading}
+                success={this.props.saved}
+                onSubmit={() => this.props.submit()}>
                 <Form.Input
-                  label="Requester ID"
-                  name="requesterId"
-                  value={profile.requesterId}
-                  placeholder="Mechanical Turk Requester ID..."
+                  label="Name"
+                  name="name"
+                  value={item.name}
+                  placeholder="Experiment name"
                   onChange={this.handleChange}
                   required
                 />
-                <Form.Input label="Email" value={profile.email} readOnly />
-                <Form.Input label="Name" value={profile.name} readOnly />
+                <Form.Input
+                  label="Number of Assignments"
+                  name="assignments"
+                  value={item.assigments}
+                  placeholder="1"
+                  onChange={this.handleChange}
+                  type="number"
+                  min="1"
+                  required
+                />
 
                 {this.props.error && (
                   <Message
@@ -43,8 +55,8 @@ class Profile extends React.Component {
                     content={this.props.error.message || 'Changes not saved. Please try again.'}
                   />
                 )}
-                {this.props.saved && <Message success header="Success" content="Profile saved!" />}
-                <Button floated="right" positive onClick={() => this.doSubmit()}>
+                {this.props.saved && <Message success header="Success" content="Changes saved!" />}
+                <Button floated="right" positive>
                   Save
                 </Button>
               </Form>
@@ -58,16 +70,11 @@ class Profile extends React.Component {
   handleChange(e, {name, value}) {
     this.props.setInputValue(name, value);
   }
-
-  doSubmit() {
-    this.props.submit();
-  }
 }
 
-Profile.propTypes = {
-  profile: PropTypes.object,
+ExperimentForm.propTypes = {
+  item: PropTypes.object,
   loading: PropTypes.bool,
-  fetchProfile: PropTypes.func,
   error: PropTypes.any,
   saved: PropTypes.bool,
   submit: PropTypes.func,
@@ -75,10 +82,10 @@ Profile.propTypes = {
 };
 
 const mapStateToProps = state => ({
-  profile: state.profile.item,
-  loading: state.profile.loading,
-  error: state.profile.error,
-  saved: state.profile.saved
+  item: state.experiment.form.item,
+  loading: state.experiment.form.loading,
+  error: state.experiment.form.error,
+  saved: state.experiment.form.saved
 });
 
 const mapDispatchToProps = dispatch => ({
@@ -86,4 +93,4 @@ const mapDispatchToProps = dispatch => ({
   setInputValue: (name, value) => dispatch(actions.setInputValue(name, value))
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(Profile);
+export default connect(mapStateToProps, mapDispatchToProps)(ExperimentForm);

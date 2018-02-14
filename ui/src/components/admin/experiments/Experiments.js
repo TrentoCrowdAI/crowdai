@@ -4,8 +4,20 @@ import PropTypes from 'prop-types';
 import {Redirect} from 'react-router-dom';
 
 import {actions} from './actions';
+import DataTable from 'src/components/core/table/DataTable';
 
 const ACCOUNT_NOT_INITIALIZED = 'Requester account has not been initialized';
+
+const options = {
+  columns: {
+    id: {
+      label: 'ID'
+    },
+    name: {
+      label: 'Name'
+    }
+  }
+};
 
 class Experiments extends React.Component {
   render() {
@@ -15,7 +27,14 @@ class Experiments extends React.Component {
     if (this.props.error && this.props.error.message === ACCOUNT_NOT_INITIALIZED) {
       return <Redirect to="/admin/profile" />;
     }
-    return <h1>Experiments</h1>;
+    return (
+      <DataTable
+        title="My experiments"
+        options={options}
+        data={this.props.experiments}
+        createUrl="/admin/experiments/new"
+      />
+    );
   }
 
   componentDidMount() {
@@ -26,11 +45,12 @@ class Experiments extends React.Component {
 Experiments.propTypes = {
   fetchExperiments: PropTypes.func,
   error: PropTypes.object,
-  loading: PropTypes.bool
+  loading: PropTypes.bool,
+  experiments: PropTypes.arrayOf(PropTypes.object)
 };
 
 const mapStateToProps = state => ({
-  experiments: state.experiment.experiments,
+  experiments: state.experiment.list.experiments,
   error: state.experiment.error,
   loading: state.experiment.loading
 });

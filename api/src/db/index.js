@@ -11,7 +11,8 @@ const DOCUMENTS = {
   WorkerAssignment: 'WorkerAssignment::',
   TestTask: 'TestTask::',
   TestAnswer: 'TestAnswer::',
-  Requester: 'Requester::'
+  Requester: 'Requester::',
+  Experiment: 'Experiment::'
 };
 
 const TYPES = {
@@ -20,7 +21,8 @@ const TYPES = {
   assignment: 'assignment',
   testTask: 'testTask',
   testAnswer: 'testAnswer',
-  requester: 'requester'
+  requester: 'requester',
+  experiment: 'experiment'
 };
 
 module.exports = {

@@ -50,11 +50,16 @@ const create = (exports.create = async requester => {
   }
 });
 
-const update = (exports.update = async requester => {
+const update = (exports.update = async (id, requester) => {
   try {
+    let saved = await getRequesterById(id);
+    let payload = {
+      ...saved,
+      ...requester
+    };
     const key = `${DOCUMENTS.Requester}${requester.id}`;
     return await new Promise((resolve, reject) => {
-      bucket.upsert(key, requester, (error, result) => {
+      bucket.upsert(key, payload, (error, result) => {
         if (error) {
           console.error(
             `Error while inserting document ${key}. Error: ${error}`

@@ -9,6 +9,7 @@ import Login from 'src/components/admin/login/Login';
 import config from 'src/config/config.json';
 import ExperimentsRoute from 'src/components/admin/experiments/ExperimentsRoute';
 import Profile from 'src/components/admin/profile/Profile';
+import {actions as profileActions} from 'src/components/admin/profile/actions';
 
 class DashboardWidget extends React.Component {
   constructor(props) {
@@ -68,10 +69,15 @@ class DashboardWidget extends React.Component {
     localStorage.removeItem(config.localStorageKey);
     window.location.reload();
   }
+
+  componentDidMount() {
+    this.props.fetchProfile();
+  }
 }
 
 DashboardWidget.propTypes = {
   loginInfo: PropTypes.object,
+  fetchProfile: PropTypes.func,
   /** @ignore */
   location: PropTypes.object
 };
@@ -80,7 +86,9 @@ const dmapStateToProps = state => ({
   loginInfo: state.login.loginInfo
 });
 
-const dmapDispatchToProps = dispatch => ({});
+const dmapDispatchToProps = dispatch => ({
+  fetchProfile: () => dispatch(profileActions.fetchItem())
+});
 
 const Dashboard = connect(dmapStateToProps, dmapDispatchToProps)(DashboardWidget);
 

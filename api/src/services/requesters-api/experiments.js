@@ -14,6 +14,19 @@ const getRequesterExperiments = async ctx => {
   ctx.response.body = { experiments: [] };
 };
 
+const post = async ctx => {
+  ctx.response.body = await delegates.experiments.create(ctx.request.fields);
+};
+
+const put = async ctx => {
+  ctx.response.body = await delegates.experiments.update(
+    ctx.params.id,
+    ctx.request.fields
+  );
+};
+
 exports.register = router => {
   router.get('/experiments', getRequesterExperiments);
+  router.post('/experiments', post);
+  router.put('/experiments/:id', put);
 };

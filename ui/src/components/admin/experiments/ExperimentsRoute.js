@@ -3,10 +3,12 @@ import {Route} from 'react-router-dom';
 import PropTypes from 'prop-types';
 
 import Experiments from './Experiments';
+import ExperimentForm from './ExperimentForm';
 
 const ExperimentsRoute = props => (
   <React.Fragment>
     <Route exact path={`${props.match.url}/`} component={Experiments} />
+    <Route path={`${props.match.url}/new`} component={ExperimentForm} />
   </React.Fragment>
 );
 

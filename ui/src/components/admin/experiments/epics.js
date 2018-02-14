@@ -12,4 +12,16 @@ const getExperiments = (action$, store) =>
       .catch(error => Observable.of(actions.fetchExperimentsError(flattenError(error))));
   });
 
-export default combineEpics(getExperiments);
+const saveExperiment = (action$, store) =>
+  action$.ofType(actionTypes.SUBMIT).switchMap(action => {
+    const {item} = store.getState().experiment.form;
+    const profile = store.getState().profile.item;
+    item.requesterId = profile.requesterId;
+    return Observable.defer(
+      () => (item.id ? requestersApi.put(`experiments/${item.id}`, item) : requestersApi.post('experiments', item))
+    )
+      .mergeMap(response => Observable.of(actions.submitSuccess()))
+      .catch(error => Observable.of(actions.submitError(flattenError(error))));
+  });
+
+export default combineEpics(getExperiments, saveExperiment);

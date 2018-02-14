@@ -1,4 +1,8 @@
+import {combineReducers} from 'redux';
+
 import {actionTypes} from './actions';
+import {getReducer} from 'src/utils/form';
+import {scopes} from 'src/utils/constants';
 
 const defaultState = {
   experiments: [],
@@ -31,4 +35,12 @@ const reducer = (state = defaultState, action) => {
   }
 };
 
-export default reducer;
+export default combineReducers({
+  list: reducer,
+  form: getReducer(scopes.EXPERIMENTS, {
+    name: '',
+    requesterId: '',
+    assignments: 0,
+    published: false
+  })
+});

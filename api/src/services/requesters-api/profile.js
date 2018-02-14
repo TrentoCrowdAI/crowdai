@@ -24,7 +24,10 @@ const get = async ctx => {
 };
 
 const put = async ctx => {
-  ctx.response.body = await delegates.requesters.update(ctx.request.fields);
+  ctx.response.body = await delegates.requesters.update(
+    ctx.params.id,
+    ctx.request.fields
+  );
 };
 
 exports.register = router => {

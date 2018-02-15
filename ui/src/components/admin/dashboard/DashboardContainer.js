@@ -5,6 +5,7 @@ import {Route, withRouter, Redirect} from 'react-router-dom';
 
 import ApplicationHeader from 'src/components/admin/dashboard/ApplicationHeader';
 import Dashboard from './Dashboard';
+import Breadcrumb from './Breadcrumb';
 
 /**
  * Dashboard wrapper that checks user login status.
@@ -16,6 +17,7 @@ class DashboardContainer extends React.Component {
         {this.props.loggedIn && (
           <React.Fragment>
             <ApplicationHeader location={this.props.location} />
+            <Breadcrumb />
             <Route path="/admin" component={Dashboard} />
           </React.Fragment>
         )}

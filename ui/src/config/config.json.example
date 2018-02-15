@@ -10,10 +10,13 @@
   "pollingInterval": 10000,
 
   "google": {
-    "clientId": "898969009397-pp85b412vt2uph9ifvcp271omdbq2vhm.apps.googleusercontent.com"
+    "clientId": "SOMEKEYID.apps.googleusercontent.com"
   },
 
   // key for authentication data stored in local storage.
-  "localStorageKey": "crowdaiAuth"
+  "localStorageKey": "crowdaiAuth",
+  "axios": {
+    "timeout": 15000
+  }
 }
 

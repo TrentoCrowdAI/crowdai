@@ -3,17 +3,17 @@ import config from 'src/config/config.json';
 
 const instance = axios.create({
   baseURL: `${config.server}/workers/api/v1`,
-  timeout: 5000
+  timeout: config.axios.timeout
 });
 
 const axiosAuth = axios.create({
   baseURL: `${config.server}/auth`,
-  timeout: 5000
+  timeout: config.axios.timeout
 });
 
 const requestersApi = axios.create({
   baseURL: `${config.server}/requesters/api/v1`,
-  timeout: 5000
+  timeout: config.axios.timeout
 });
 
 const token = localStorage.getItem(config.localStorageKey);

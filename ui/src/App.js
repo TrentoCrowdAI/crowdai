@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {Container, Grid, Divider} from 'semantic-ui-react';
 import {Provider, connect} from 'react-redux';
-import {HashRouter as Router, Route, withRouter} from 'react-router-dom';
+import {HashRouter as Router, Route, withRouter, Switch} from 'react-router-dom';
 import queryString from 'query-string';
 
 import './App.css';
@@ -12,7 +12,8 @@ import QuestionForm from 'src/components/question-form/QuestionForm';
 import WelcomePage from 'src/components/WelcomePage';
 import {actions} from 'src/components/question-form/actions';
 import RewardWidget from 'src/components/reward-widget/RewardWidget';
-import Dashboard from 'src/components/admin/dashboard/Dashboard';
+import DashboardContainer from 'src/components/admin/dashboard/DashboardContainer';
+import Login from 'src/components/admin/login/Login';
 
 /**
  * Main component.
@@ -21,8 +22,9 @@ class ConnectedApp extends Component {
   // eslint-disable-next-line require-jsdoc
   render() {
     return (
-      <React.Fragment>
-        <Route path={'/admin'} component={Dashboard} />
+      <Switch>
+        <Route path="/login" component={Login} />
+        <Route path="/admin" component={DashboardContainer} />
 
         <Container>
           <Route path={'/welcome/:experimentId'} component={WelcomePage} />
@@ -59,7 +61,7 @@ class ConnectedApp extends Component {
             )}
           />
         </Container>
-      </React.Fragment>
+      </Switch>
     );
   }
 

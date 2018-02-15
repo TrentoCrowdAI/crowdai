@@ -45,9 +45,6 @@ const options = {
 
 class Experiments extends React.Component {
   render() {
-    if (this.props.loading) {
-      return <p>Loading...</p>;
-    }
     if (this.props.error && this.props.error.message === ACCOUNT_NOT_INITIALIZED) {
       return <Redirect to="/admin/profile" />;
     }
@@ -57,6 +54,7 @@ class Experiments extends React.Component {
         options={options}
         data={this.props.experiments}
         createUrl="/admin/experiments/new"
+        loading={this.props.loading}
       />
     );
   }
@@ -75,8 +73,8 @@ Experiments.propTypes = {
 
 const mapStateToProps = state => ({
   experiments: state.experiment.list.experiments,
-  error: state.experiment.error,
-  loading: state.experiment.loading
+  error: state.experiment.list.error,
+  loading: state.experiment.list.loading
 });
 
 const mapDispatchToProps = dispatch => ({

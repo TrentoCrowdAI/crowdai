@@ -1,5 +1,5 @@
 import React from 'react';
-import {Table, Grid, Header, Button} from 'semantic-ui-react';
+import {Table, Grid, Header, Button, Dimmer, Loader} from 'semantic-ui-react';
 import PropTypes from 'prop-types';
 import {Link} from 'react-router-dom';
 
@@ -10,48 +10,52 @@ class DataTable extends React.Component {
     const columnKeys = Object.keys(columns);
 
     return (
-      <Grid style={{margin: '10px'}}>
-        <Grid.Row>
-          <Grid.Column>
-            <Header>
-              <Header.Content>
-                <h2 style={{marginRight: '10px', display: 'inline'}}>{this.props.title}</h2>
-                {this.props.createUrl && (
-                  <Button icon="plus" color="blue" floated="right" size="small" as={Link} to={this.props.createUrl} />
-                )}
-              </Header.Content>
-            </Header>
-          </Grid.Column>
-        </Grid.Row>
-        <Grid.Row>
-          <Grid.Column>
-            <Table columns={columnKeys.length} celled striped>
-              <Table.Header>
-                <Table.Row>
-                  {columnKeys.map(field => <Table.HeaderCell key={field}>{columns[field].label}</Table.HeaderCell>)}
+      <div style={{position: 'relative'}}>
+        <Dimmer active={this.props.loading} inline="centered" inverted>
+          <Loader indeterminate>Loading records...</Loader>
+        </Dimmer>
+        <Grid style={{margin: '10px'}}>
+          <Grid.Row>
+            <Grid.Column>
+              <Header>
+                <Header.Content>
+                  <h2 style={{marginRight: '10px', display: 'inline'}}>{this.props.title}</h2>
+                  {this.props.createUrl && (
+                    <Button icon="plus" color="blue" floated="right" size="small" as={Link} to={this.props.createUrl} />
+                  )}
+                </Header.Content>
+              </Header>
+            </Grid.Column>
+          </Grid.Row>
+          <Grid.Row>
+            <Grid.Column>
+              <Table columns={columnKeys.length} celled striped>
+                <Table.Header>
+                  <Table.Row>
+                    {columnKeys.map(field => <Table.HeaderCell key={field}>{columns[field].label}</Table.HeaderCell>)}
 
-                  {options.actions && <Table.HeaderCell>{options.actions.label}</Table.HeaderCell>}
-                </Table.Row>
-              </Table.Header>
-
-              <Table.Body>
-                {data.length === 0 && (
-                  <Table.Row textAlign="center">
-                    <Table.Cell colSpan={columnKeys.length}>No records found.</Table.Cell>
+                    {options.actions && <Table.HeaderCell>{options.actions.label}</Table.HeaderCell>}
                   </Table.Row>
-                )}
-                {data.map(record => (
-                  <Table.Row key={record.id} positive={options.rowPositive && options.rowPositive(record)}>
-                    {columnKeys.map(field => <Table.Cell key={`${record.id}-${field}`}>{record[field]}</Table.Cell>)}
+                </Table.Header>
 
-                    {options.actions && (
-                      <Table.Cell key={`actions-${record.id}`}>{options.actions.renderer(record)}</Table.Cell>
-                    )}
-                  </Table.Row>
-                ))}
-              </Table.Body>
+                <Table.Body>
+                  {data.length === 0 && (
+                    <Table.Row textAlign="center">
+                      <Table.Cell colSpan={columnKeys.length}>No records found.</Table.Cell>
+                    </Table.Row>
+                  )}
+                  {data.map(record => (
+                    <Table.Row key={record.id} positive={options.rowPositive && options.rowPositive(record)}>
+                      {columnKeys.map(field => <Table.Cell key={`${record.id}-${field}`}>{record[field]}</Table.Cell>)}
 
-              {/* TODO: implement pagination
+                      {options.actions && (
+                        <Table.Cell key={`actions-${record.id}`}>{options.actions.renderer(record)}</Table.Cell>
+                      )}
+                    </Table.Row>
+                  ))}
+                </Table.Body>
+
+                {/* TODO: implement pagination
               <Table.Footer>
                 <Table.Row>
                   <Table.HeaderCell colSpan="3">
@@ -70,10 +74,11 @@ class DataTable extends React.Component {
                   </Table.HeaderCell>
                 </Table.Row>
               </Table.Footer> */}
-            </Table>
-          </Grid.Column>
-        </Grid.Row>
-      </Grid>
+              </Table>
+            </Grid.Column>
+          </Grid.Row>
+        </Grid>
+      </div>
     );
   }
 }
@@ -89,7 +94,8 @@ DataTable.propTypes = {
     rowPositive: PropTypes.func
   }).isRequired,
   data: PropTypes.arrayOf(PropTypes.any).isRequired,
-  createUrl: PropTypes.string
+  createUrl: PropTypes.string,
+  loading: PropTypes.bool
 };
 
 export default DataTable;

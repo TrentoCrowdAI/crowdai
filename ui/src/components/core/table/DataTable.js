@@ -7,6 +7,7 @@ class DataTable extends React.Component {
   render() {
     const {options, data} = this.props;
     const {columns} = options;
+    const columnKeys = Object.keys(columns);
 
     return (
       <Grid style={{margin: '10px'}}>
@@ -24,26 +25,28 @@ class DataTable extends React.Component {
         </Grid.Row>
         <Grid.Row>
           <Grid.Column>
-            <Table columns="2" celled striped>
+            <Table columns={columnKeys.length} celled striped>
               <Table.Header>
                 <Table.Row>
-                  {Object.keys(columns).map(field => (
-                    <Table.HeaderCell key={field}>{columns[field].label}</Table.HeaderCell>
-                  ))}
+                  {columnKeys.map(field => <Table.HeaderCell key={field}>{columns[field].label}</Table.HeaderCell>)}
+
+                  {options.actions && <Table.HeaderCell>{options.actions.label}</Table.HeaderCell>}
                 </Table.Row>
               </Table.Header>
 
               <Table.Body>
                 {data.length === 0 && (
                   <Table.Row textAlign="center">
-                    <Table.Cell colSpan="2">No records found.</Table.Cell>
+                    <Table.Cell colSpan={columnKeys.length}>No records found.</Table.Cell>
                   </Table.Row>
                 )}
                 {data.map(record => (
-                  <Table.Row key={record.id}>
-                    {Object.keys(columns).map(field => (
-                      <Table.Cell key={`${record.id}-${field}`}>{record[field]}</Table.Cell>
-                    ))}
+                  <Table.Row key={record.id} positive={options.rowPositive && options.rowPositive(record)}>
+                    {columnKeys.map(field => <Table.Cell key={`${record.id}-${field}`}>{record[field]}</Table.Cell>)}
+
+                    {options.actions && (
+                      <Table.Cell key={`actions-${record.id}`}>{options.actions.renderer(record)}</Table.Cell>
+                    )}
                   </Table.Row>
                 ))}
               </Table.Body>
@@ -78,7 +81,12 @@ class DataTable extends React.Component {
 DataTable.propTypes = {
   title: PropTypes.string.isRequired,
   options: PropTypes.shape({
-    columns: PropTypes.object
+    columns: PropTypes.object,
+    actions: PropTypes.shape({
+      label: PropTypes.string.isRequired,
+      renderer: PropTypes.func.isRequired
+    }),
+    rowPositive: PropTypes.func
   }).isRequired,
   data: PropTypes.arrayOf(PropTypes.any).isRequired,
   createUrl: PropTypes.string

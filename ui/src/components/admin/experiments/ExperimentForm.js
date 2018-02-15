@@ -1,5 +1,5 @@
 import React from 'react';
-import {Container, Form, Button, Grid, Message} from 'semantic-ui-react';
+import {Container, Form, Button, Grid, Message, List, Header} from 'semantic-ui-react';
 import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
 
@@ -13,6 +13,68 @@ class ExperimentForm extends React.Component {
 
   render() {
     const {item} = this.props;
+
+    if (this.props.summary) {
+      return (
+        <React.Fragment>
+          <Header content="Experiment Summary" />
+          <Grid>
+            <Grid.Row>
+              <Grid.Column width="8">
+                <List divided relaxed>
+                  <List.Item>
+                    <List.Content>
+                      <List.Header as="h4">Name</List.Header>
+                      <List.Description as="p">{item.name}</List.Description>
+                    </List.Content>
+                  </List.Item>
+                  <List.Item>
+                    <List.Content>
+                      <List.Header as="h4">Max. tasks</List.Header>
+                      <List.Description as="p">{item.maxTasksRule}</List.Description>
+                    </List.Content>
+                  </List.Item>
+                  <List.Item>
+                    <List.Content>
+                      <List.Header as="h4">Task reward</List.Header>
+                      <List.Description as="p">{item.taskRewardRule}</List.Description>
+                    </List.Content>
+                  </List.Item>
+                  <List.Item>
+                    <List.Content>
+                      <List.Header as="h4">Test frequency</List.Header>
+                      <List.Description as="p">{item.testFrequencyRule}</List.Description>
+                    </List.Content>
+                  </List.Item>
+                </List>
+              </Grid.Column>
+              <Grid.Column width="8">
+                <List divided relaxed>
+                  <List.Item>
+                    <List.Content>
+                      <List.Header as="h4">Initial tests</List.Header>
+                      <List.Description as="p">{item.initialTestsRule}</List.Description>
+                    </List.Content>
+                  </List.Item>
+                  <List.Item>
+                    <List.Content>
+                      <List.Header as="h4">Initial Tests min score (%)</List.Header>
+                      <List.Description as="p">{item.initialTestsMinCorrectAnswersRule}</List.Description>
+                    </List.Content>
+                  </List.Item>
+                  <List.Item>
+                    <List.Content>
+                      <List.Header as="h4">Answers per task</List.Header>
+                      <List.Description as="p">{item.votesPerTaskRule}</List.Description>
+                    </List.Content>
+                  </List.Item>
+                </List>
+              </Grid.Column>
+            </Grid.Row>
+          </Grid>
+        </React.Fragment>
+      );
+    }
 
     return (
       <Container>
@@ -31,23 +93,12 @@ class ExperimentForm extends React.Component {
                 onSubmit={() => this.props.submit()}>
                 <Form.Group>
                   <Form.Input
-                    width={12}
+                    width={16}
                     label="Name"
                     name="name"
                     value={item.name}
                     placeholder="Experiment name"
                     onChange={this.handleChange}
-                    required
-                  />
-                  <Form.Input
-                    width={4}
-                    label="Assignments"
-                    name="assignments"
-                    value={item.assignments}
-                    placeholder="1"
-                    onChange={this.handleChange}
-                    type="number"
-                    min="1"
                     required
                   />
                 </Form.Group>
@@ -174,6 +225,7 @@ class ExperimentForm extends React.Component {
 }
 
 ExperimentForm.propTypes = {
+  summary: PropTypes.bool,
   item: PropTypes.object,
   loading: PropTypes.bool,
   error: PropTypes.any,

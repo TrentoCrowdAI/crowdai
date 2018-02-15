@@ -20,5 +20,13 @@ module.exports = {
   google: {
     clientId: process.env.GOOGLE_CLIENT_ID,
     secret: process.env.GOOGLE_CLIENT_SECRET
+  },
+  frontend: {
+    url: process.env.FRONTEND_URL
+  },
+  mturk: {
+    requesterSandboxUrl: process.env.MTURK_REQUESTER_SANDBOX_URL,
+    requesterUrl: process.env.MTURK_REQUESTER_URL,
+    region: process.env.MTURK_REGION
   }
 };

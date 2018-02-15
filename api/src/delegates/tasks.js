@@ -65,8 +65,6 @@ exports.next = async (experimentId, workerId) => {
       experimentId,
       workerId
     );
-    console.log('answers', answersCount, 'tests', testCount);
-    console.log('maxTaks', experiment.maxTasksRule);
 
     if (answersCount >= experiment.maxTasksRule) {
       return {
@@ -76,7 +74,6 @@ exports.next = async (experimentId, workerId) => {
 
     const runTest =
       (answersCount + testCount + 1) % (experiment.testFrequencyRule + 1) === 0;
-    console.log('run tests?', runTest);
 
     if (runTest) {
       // we need to return a test task

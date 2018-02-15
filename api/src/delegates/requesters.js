@@ -5,10 +5,10 @@ const bucket = require(__base + 'db').bucket;
 const config = require(__base + 'config');
 const { DOCUMENTS, TYPES } = require(__base + 'db');
 
-const getRequesterById = (exports.getRequesterById = async requesterId => {
+const getRequesterById = (exports.getRequesterById = async id => {
   try {
     return await new Promise((resolve, reject) => {
-      bucket.get(`${DOCUMENTS.Requester}${requesterId}`, (err, data) => {
+      bucket.get(`${DOCUMENTS.Requester}${id}`, (err, data) => {
         if (err) {
           if (err.code === couchbase.errors.keyNotFound) {
             resolve(null);
@@ -17,6 +17,29 @@ const getRequesterById = (exports.getRequesterById = async requesterId => {
           }
         } else {
           resolve(data.value);
+        }
+      });
+    });
+  } catch (error) {
+    console.error(error);
+    throw Boom.badImplementation(
+      'Error while trying to fetch requester information'
+    );
+  }
+});
+
+const getRequesterByMTurkId = (exports.getRequesterByMTurkId = async requesterId => {
+  try {
+    const qs = `select * from \`${config.db.bucket}\` where type="${
+      TYPES.requester
+    }" and requesterId="${requesterId}"`;
+    const q = couchbase.N1qlQuery.fromString(qs);
+    return await new Promise((resolve, reject) => {
+      bucket.query(q, (err, data) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(data.map(d => d[config.db.bucket]).pop());
         }
       });
     });

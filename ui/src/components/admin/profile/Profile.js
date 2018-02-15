@@ -33,6 +33,26 @@ class Profile extends React.Component {
                   onChange={this.handleChange}
                   required
                 />
+
+                <Form.Input
+                  label="Access Key ID"
+                  name="accessKeyId"
+                  value={profile.accessKeyId}
+                  placeholder="Amazon Access Key"
+                  onChange={this.handleChange}
+                  required
+                />
+
+                <Form.Input
+                  label="Secret Access Key"
+                  name="secretAccessKey"
+                  value={profile.secretAccessKey}
+                  placeholder="Amazon Secret Access Key"
+                  type="password"
+                  onChange={this.handleChange}
+                  required
+                />
+
                 <Form.Input label="Email" value={profile.email} readOnly />
                 <Form.Input label="Name" value={profile.name} readOnly />
 
@@ -55,6 +75,10 @@ class Profile extends React.Component {
     );
   }
 
+  componentDidMount() {
+    this.props.resetSaved();
+  }
+
   handleChange(e, {name, value}) {
     this.props.setInputValue(name, value);
   }
@@ -71,7 +95,8 @@ Profile.propTypes = {
   error: PropTypes.any,
   saved: PropTypes.bool,
   submit: PropTypes.func,
-  setInputValue: PropTypes.func
+  setInputValue: PropTypes.func,
+  resetSaved: PropTypes.func
 };
 
 const mapStateToProps = state => ({
@@ -83,7 +108,8 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = dispatch => ({
   submit: () => dispatch(actions.submit()),
-  setInputValue: (name, value) => dispatch(actions.setInputValue(name, value))
+  setInputValue: (name, value) => dispatch(actions.setInputValue(name, value)),
+  resetSaved: () => dispatch(actions.resetSaved())
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Profile);

@@ -7,7 +7,7 @@
     "db:init": "node -r dotenv/config src/db/init.js"
   },
   "dependencies": {
-    "aws-sdk": ">= 2.0.9",
+    "aws-sdk": "^2.194.0",
     "boom": "^7.1.1",
     "couchbase": "^2.4.3",
     "csv-parse": "^2.0.2",

@@ -9,6 +9,8 @@ const bucket = require(__base + 'db').bucket;
 const config = require(__base + 'config');
 const { DOCUMENTS, TYPES } = require(__base + 'db');
 const tasksDelegate = require('./tasks');
+const requestersDelegate = require('./requesters');
+const MTurk = require(__base + 'utils/mturk');
 
 const getByRequester = (exports.getByRequester = async requesterId => {
   try {
@@ -134,6 +136,43 @@ const update = (exports.update = async (id, item) => {
   } catch (error) {
     console.error(error);
     throw Boom.badImplementation('Error while trying to update the record');
+  }
+});
+
+const publish = (exports.publish = async (id, experiment) => {
+  try {
+    let requester = await requestersDelegate.getRequesterByMTurkId(
+      experiment.requesterId
+    );
+    const experimentUrl = `${config.frontend.url}/#/welcome/${id}`;
+    const mt = MTurk.getInstance(requester);
+    let params = {
+      AssignmentDurationInSeconds: experiment.assignmentDurationInSeconds,
+      Description: experiment.description,
+      LifetimeInSeconds: experiment.lifetimeInSeconds,
+      Reward: `${experiment.taskRewardRule}`,
+      Title: experiment.name,
+      MaxAssignments: experiment.maxAssignments,
+      Question: `${MTurk.getExternalQuestionPayload(experimentUrl)}`,
+      RequesterAnnotation: experiment.name
+    };
+
+    let hit = await new Promise((resolve, reject) => {
+      mt.createHIT(params, function(err, data) {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(data);
+        }
+      });
+    });
+    experiment.published = true;
+    experiment.hit = { ...hit };
+    await update(id, experiment);
+    return experiment;
+  } catch (error) {
+    console.error(error);
+    throw Boom.badImplementation('Error while trying to publish experiment');
   }
 });
 

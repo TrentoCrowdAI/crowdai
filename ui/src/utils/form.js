@@ -7,7 +7,8 @@ const getActionTypes = scope => {
     SET_INPUT_VALUE: `C_${scope}_SET_INPUT_VALUE`,
     FETCH_ITEM: `C_${scope}_FETCH_ITEM`,
     FETCH_ITEM_SUCCESS: `C_${scope}_FETCH_ITEM_SUCCESS`,
-    FETCH_ITEM_ERROR: `C_${scope}_FETCH_ITEM_ERROR`
+    FETCH_ITEM_ERROR: `C_${scope}_FETCH_ITEM_ERROR`,
+    RESET_SAVED: `C_${scope}_FORM_RESET_SAVED`
   };
 };
 
@@ -15,6 +16,12 @@ const getActions = scope => {
   const actionTypes = getActionTypes(scope);
 
   return {
+    resetSaved() {
+      return {
+        type: actionTypes.RESET_SAVED
+      };
+    },
+
     cleanState() {
       return {
         type: actionTypes.CLEAN_STATE
@@ -48,9 +55,10 @@ const getActions = scope => {
       };
     },
 
-    fetchItem() {
+    fetchItem(id) {
       return {
-        type: actionTypes.FETCH_ITEM
+        type: actionTypes.FETCH_ITEM,
+        id
       };
     },
 
@@ -83,6 +91,11 @@ const getReducer = (scope, formFields) => {
 
   return (state = defaultState, action) => {
     switch (action.type) {
+      case actionTypes.RESET_SAVED:
+        return {
+          ...state,
+          saved: false
+        };
       case actionTypes.CLEAN_STATE:
         return {
           ...defaultState
@@ -125,7 +138,10 @@ const getReducer = (scope, formFields) => {
         return {
           ...state,
           loading: false,
-          item: action.item
+          item: {
+            ...formFields,
+            ...action.item
+          }
         };
       case actionTypes.FETCH_ITEM_ERROR:
         return {

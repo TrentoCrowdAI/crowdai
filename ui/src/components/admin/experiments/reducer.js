@@ -35,21 +35,68 @@ const reducer = (state = defaultState, action) => {
   }
 };
 
+const genericFormReducer = getReducer(scopes.EXPERIMENTS, {
+  name: '',
+  requesterId: '',
+  published: false,
+  itemsUrl: '',
+  filtersUrl: '',
+  testsUrl: '',
+  // HIT configurations
+  maxAssignments: 10,
+  assignmentDurationInSeconds: 600,
+  description: '',
+  lifetimeInSeconds: 5 * 60 * 60,
+  // rules
+  maxTasksRule: 3,
+  taskRewardRule: 0.5,
+  testFrequencyRule: 2,
+  initialTestsRule: 2,
+  initialTestsMinCorrectAnswersRule: 100,
+  votesPerTaskRule: 2
+});
+
+// hacky way to get the whole state of the form
+const defaultFormState = genericFormReducer(undefined, {});
+
+const formReducer = (state = defaultFormState, action) => {
+  switch (action.type) {
+    case actionTypes.PUBLISH_EXPERIMENT:
+      return {
+        ...state,
+        item: {
+          ...state.item,
+          published: false
+        },
+        error: undefined,
+        loading: true
+      };
+    case actionTypes.PUBLISH_EXPERIMENT_SUCCESS:
+      return {
+        ...state,
+        item: {
+          ...state.item,
+          published: true
+        },
+        loading: false
+      };
+    case actionTypes.PUBLISH_EXPERIMENT_ERROR:
+      return {
+        ...state,
+        error: action.error,
+        loading: false
+      };
+    default:
+      return state;
+  }
+};
+
 export default combineReducers({
   list: reducer,
-  form: getReducer(scopes.EXPERIMENTS, {
-    name: '',
-    requesterId: '',
-    assignments: 1,
-    published: false,
-    itemsUrl: '',
-    filtersUrl: '',
-    testsUrl: '',
-    maxTasksRule: 3,
-    taskRewardRule: 0.5,
-    testFrequencyRule: 2,
-    initialTestsRule: 2,
-    initialTestsMinCorrectAnswersRule: 100,
-    votesPerTaskRule: 2
-  })
+  // finally we combine generic and formReducer that handles
+  // experiments creation and publishing
+  form: (state = defaultFormState, action) => {
+    let outputState = genericFormReducer(state, action);
+    return formReducer(outputState, action);
+  }
 });

@@ -29,4 +29,20 @@ const saveExperiment = (action$, store) =>
       .catch(error => Observable.of(actions.submitError(flattenError(error))));
   });
 
-export default combineEpics(getExperiments, saveExperiment);
+const fetchExperiment = (action$, store) =>
+  action$.ofType(actionTypes.FETCH_ITEM).switchMap(action => {
+    return Observable.defer(() => requestersApi.get(`experiments/${action.id}`))
+      .mergeMap(response => Observable.of(actions.fetchItemSuccess(response.data)))
+      .catch(error => Observable.of(actions.fetchItemError(flattenError(error))));
+  });
+
+const publishExperiment = (action$, store) =>
+  action$.ofType(actionTypes.PUBLISH_EXPERIMENT).switchMap(action => {
+    const {item} = store.getState().experiment.form;
+    const config = {timeout: 10000};
+    return Observable.defer(() => requestersApi.post(`experiments/${item.id}/publish`, item, config))
+      .mergeMap(response => Observable.of(actions.publishSuccess()))
+      .catch(error => Observable.of(actions.publishError(flattenError(error))));
+  });
+
+export default combineEpics(getExperiments, saveExperiment, fetchExperiment, publishExperiment);

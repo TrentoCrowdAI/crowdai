@@ -48,6 +48,7 @@ class DashboardWidget extends React.Component {
               active={pathname === 'logout'}
               onClick={(e, data) => {
                 this.onMenuItemClick(e, data);
+                this.logoutSuccess();
                 // TODO: google logout
               }}>
               <Icon name="video camera" />

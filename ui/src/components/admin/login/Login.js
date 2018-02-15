@@ -3,6 +3,7 @@ import {GoogleLogin} from 'react-google-login';
 import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
 import {Redirect} from 'react-router';
+import {Form, Grid, Header, Segment} from 'semantic-ui-react';
 
 import config from 'src/config/config.json';
 import {actions} from './actions';
@@ -21,12 +22,35 @@ class Login extends React.Component {
       return <p>Loading...</p>;
     }
     return (
-      <GoogleLogin
-        clientId={config.google.clientId}
-        buttonText="Login"
-        onSuccess={this.onSuccess}
-        onFailure={this.onFailure}
-      />
+      <div className="login-form">
+        <style>{`
+          body > div,
+          body > div > div,
+          body > div > div > div.login-form {
+            height: 100%;
+          }
+        `}</style>
+        <Grid textAlign="center" style={{height: '100%'}} verticalAlign="middle">
+          <Grid.Column style={{maxWidth: 450}}>
+            <Header as="h2" color="blue" textAlign="center">
+              CrowdAI
+            </Header>
+            <Form size="large">
+              <Segment stacked>
+                <div style={{marginBottom: '20px'}}>Please sign in using your google account.</div>
+                <GoogleLogin
+                  className="ui google button"
+                  style={{background: '#4285f4', color: '#fff'}}
+                  clientId={config.google.clientId}
+                  buttonText="Sign in with Google"
+                  onSuccess={this.onSuccess}
+                  onFailure={this.onFailure}
+                />
+              </Segment>
+            </Form>
+          </Grid.Column>
+        </Grid>
+      </div>
     );
   }
 

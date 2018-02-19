@@ -41,7 +41,9 @@ class DataTable extends React.Component {
                 <Table.Body>
                   {data.length === 0 && (
                     <Table.Row textAlign="center">
-                      <Table.Cell colSpan={columnKeys.length}>No records found.</Table.Cell>
+                      <Table.Cell colSpan={options.actions ? columnKeys.length + 1 : columnKeys.length}>
+                        No records found.
+                      </Table.Cell>
                     </Table.Row>
                   )}
                   {data.map(record => (

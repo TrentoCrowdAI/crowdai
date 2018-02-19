@@ -63,6 +63,7 @@ class FilterTask extends React.Component {
         id: task.id,
         item: {
           id: task.id,
+          title: task.itemTitle,
           description: task.itemDescription
         },
         filter: {
@@ -83,7 +84,7 @@ class FilterTask extends React.Component {
           <Grid.Row>
             <Grid.Column width={9}>
               <Header as="h3" style={{fontSize: '2em'}}>
-                Description of the paper #{task.item.id}
+                {task.item.title}
               </Header>
               <p style={{fontSize: '1em', textAlign: 'justify'}}>{task.item.description}</p>
             </Grid.Column>

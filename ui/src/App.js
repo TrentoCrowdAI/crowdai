@@ -22,46 +22,50 @@ class ConnectedApp extends Component {
   // eslint-disable-next-line require-jsdoc
   render() {
     return (
-      <Switch>
-        <Route path="/login" component={Login} />
-        <Route path="/admin" component={DashboardContainer} />
+      <React.Fragment>
+        <Switch>
+          <Route path="/login" component={Login} />
+          <Route path="/admin" component={DashboardContainer} />
+        </Switch>
 
         <Container>
-          <Route path={'/welcome/:experimentId'} component={WelcomePage} />
-          <Route
-            path={'/task/:experimentId'}
-            render={props => (
-              <React.Fragment>
-                <Grid.Row
-                  style={{
-                    textAlign: 'right',
-                    marginBottom: '-3rem'
-                  }}>
-                  <RewardWidget />
-                </Grid.Row>
-                <Grid.Row centered>
-                  <Instructions />
-                </Grid.Row>
+          <Switch>
+            <Route path={'/welcome/:experimentId'} component={WelcomePage} />
+            <Route
+              path={'/task/:experimentId'}
+              render={props => (
+                <React.Fragment>
+                  <Grid.Row
+                    style={{
+                      textAlign: 'right',
+                      marginBottom: '-3rem'
+                    }}>
+                    <RewardWidget />
+                  </Grid.Row>
+                  <Grid.Row centered>
+                    <Instructions />
+                  </Grid.Row>
 
-                <Grid.Row>
-                  {props.hasAcceptedHit && ( // eslint-disable-line react/prop-types
-                    <Divider
-                      as="h4"
-                      className="header"
-                      horizontal
-                      style={{textTransform: 'uppercase', marginTop: 20}}>
-                      Task
-                    </Divider>
-                  )}
-                  <QuestionForm>
-                    <FilterTask />
-                  </QuestionForm>
-                </Grid.Row>
-              </React.Fragment>
-            )}
-          />
+                  <Grid.Row>
+                    {props.hasAcceptedHit && ( // eslint-disable-line react/prop-types
+                      <Divider
+                        as="h4"
+                        className="header"
+                        horizontal
+                        style={{textTransform: 'uppercase', marginTop: 20}}>
+                        Task
+                      </Divider>
+                    )}
+                    <QuestionForm>
+                      <FilterTask />
+                    </QuestionForm>
+                  </Grid.Row>
+                </React.Fragment>
+              )}
+            />
+          </Switch>
         </Container>
-      </Switch>
+      </React.Fragment>
     );
   }
 

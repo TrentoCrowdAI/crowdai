@@ -14,7 +14,6 @@ class ExperimentPublishPage extends React.Component {
 
   render() {
     let {item} = this.props;
-    console.log(item.published);
 
     return (
       <React.Fragment>

@@ -1,18 +1,42 @@
 import React from 'react';
-import {Grid, Button, Segment, Dimmer, Loader, Message} from 'semantic-ui-react';
+import {Grid, Button, Segment, Dimmer, Loader, Message, Accordion, Header} from 'semantic-ui-react';
 import {Link} from 'react-router-dom';
 import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
 
 import Instructions from 'src/components/Instructions';
 import {actions} from 'src/components/question-form/actions';
+import {actions as experimentActions} from 'src/components/admin/experiments/actions';
 import config from 'src/config/config.json';
 import RewardWidget from 'src/components/reward-widget/RewardWidget';
 
 class WelcomePage extends React.Component {
+  state = {open: true};
+
   render() {
+    const {open} = this.state;
+
     return (
       <Grid.Row centered>
+        <div>
+          <Accordion>
+            <Accordion.Title active={open} onClick={() => this.setState({open: !this.state.open})}>
+              <Header as="h1" style={{display: 'inline'}}>
+                Information of Consent {open ? '(click to collapse)' : '(click to expand)'}
+              </Header>
+            </Accordion.Title>
+            <Accordion.Content active={open}>
+              <Segment>
+                <p style={{textAlign: 'justify'}}>
+                  The information is available{' '}
+                  <a href={this.props.item.consentUrl} target="_blank">
+                    here
+                  </a>
+                </p>
+              </Segment>
+            </Accordion.Content>
+          </Accordion>
+        </div>
         <Instructions />
 
         {this.props.assigmentStatusLoading && (
@@ -83,6 +107,8 @@ class WelcomePage extends React.Component {
 
   componentDidMount() {
     this.props.checkAssignmentStatus();
+    const {experimentId} = this.props.match.params;
+    this.props.fetchItem(experimentId);
   }
 }
 
@@ -98,19 +124,24 @@ WelcomePage.propTypes = {
   /** @ignore */
   assigmentStatusLoading: PropTypes.bool,
   /** @ignore */
-  checkPolling: PropTypes.func
+  checkPolling: PropTypes.func,
+  match: PropTypes.object,
+  fetchItem: PropTypes.func,
+  item: PropTypes.object
 };
 
 const mapStateToProps = state => ({
   session: state.questionForm.session,
   hasAcceptedHit: state.questionForm.hasAcceptedHit,
   assignmentStatus: state.questionForm.assignmentStatus,
-  assigmentStatusLoading: state.questionForm.assigmentStatusLoading
+  assigmentStatusLoading: state.questionForm.assigmentStatusLoading,
+  item: state.experiment.form.item
 });
 
 const mapDispatchToProps = dispatch => ({
   checkAssignmentStatus: () => dispatch(actions.checkAssignmentStatus()),
-  checkPolling: () => dispatch(actions.checkPolling())
+  checkPolling: () => dispatch(actions.checkPolling()),
+  fetchItem: id => dispatch(experimentActions.fetchItem(id))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(WelcomePage);

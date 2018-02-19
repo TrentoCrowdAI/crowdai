@@ -105,6 +105,17 @@ class ExperimentForm extends React.Component {
 
                 <Form.Group widths="equal">
                   <Form.Input
+                    label="Information of Consent URL"
+                    name="consentUrl"
+                    value={item.consentUrl}
+                    placeholder="URL to consent file"
+                    onChange={this.handleChange}
+                    required
+                  />
+                </Form.Group>
+
+                <Form.Group widths="equal">
+                  <Form.Input
                     label="Items URL"
                     name="itemsUrl"
                     value={item.itemsUrl}
@@ -112,7 +123,6 @@ class ExperimentForm extends React.Component {
                     onChange={this.handleChange}
                     required
                   />
-
                   <Form.Input
                     label="Filters URL"
                     name="filtersUrl"

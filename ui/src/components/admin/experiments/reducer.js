@@ -39,6 +39,7 @@ const genericFormReducer = getReducer(scopes.EXPERIMENTS, {
   name: '',
   requesterId: '',
   published: false,
+  consentUrl: '',
   itemsUrl: '',
   filtersUrl: '',
   testsUrl: '',

@@ -57,7 +57,7 @@ const getByRequesterCount = (exports.getByRequesterCount = async workerId => {
 
 const getById = (exports.getById = async id => {
   try {
-    return await new Promise((resolve, reject) => {
+    let experiment = await new Promise((resolve, reject) => {
       bucket.get(`${DOCUMENTS.Experiment}${id}`, (err, data) => {
         if (err) {
           if (err.code === couchbase.errors.keyNotFound) {
@@ -70,6 +70,16 @@ const getById = (exports.getById = async id => {
         }
       });
     });
+    experiment.consent = await new Promise((resolve, reject) => {
+      request(experiment.consentUrl, (err, rsp, body) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(rsp.body);
+        }
+      });
+    });
+    return experiment;
   } catch (error) {
     console.error(error);
     throw Boom.badImplementation('Error while trying to fetch the record');

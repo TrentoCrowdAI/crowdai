@@ -6,10 +6,10 @@ import queryString from 'query-string';
 
 import './App.css';
 import store from './store';
-import Instructions from 'src/components/Instructions';
-import FilterTask from 'src/components/FilterTask';
+import Instructions from 'src/components/question-form/Instructions';
+import FilterTask from 'src/components/question-form/FilterTask';
 import QuestionForm from 'src/components/question-form/QuestionForm';
-import WelcomePage from 'src/components/WelcomePage';
+import WelcomePage from 'src/components/question-form/WelcomePage';
 import {actions} from 'src/components/question-form/actions';
 import RewardWidget from 'src/components/reward-widget/RewardWidget';
 import DashboardContainer from 'src/components/admin/dashboard/DashboardContainer';

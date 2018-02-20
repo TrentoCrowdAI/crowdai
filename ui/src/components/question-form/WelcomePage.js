@@ -3,12 +3,15 @@ import {Grid, Button, Segment, Dimmer, Loader, Message, Accordion, Header} from 
 import {Link} from 'react-router-dom';
 import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
+import showdown from 'showdown';
+import sanitizeHtml from 'sanitize-html';
 
-import Instructions from 'src/components/Instructions';
-import {actions} from 'src/components/question-form/actions';
+import Instructions from './Instructions';
+import {actions} from './actions';
 import {actions as experimentActions} from 'src/components/admin/experiments/actions';
 import config from 'src/config/config.json';
 import RewardWidget from 'src/components/reward-widget/RewardWidget';
+import {ConsentFormats} from 'src/utils/constants';
 
 class WelcomePage extends React.Component {
   state = {open: true};
@@ -27,12 +30,18 @@ class WelcomePage extends React.Component {
             </Accordion.Title>
             <Accordion.Content active={open}>
               <Segment>
-                <p style={{textAlign: 'justify'}}>
-                  The information is available{' '}
-                  <a href={this.props.item.consentUrl} target="_blank">
-                    here
-                  </a>
-                </p>
+                {!this.props.item.consentUrl && <p>Loading information...</p>}
+                {this.props.item.consentUrl &&
+                  !this.props.item.consent && (
+                    <p style={{textAlign: 'justify'}}>
+                      The information is available{' '}
+                      <a href={this.props.item.consentUrl} target="_blank">
+                        here
+                      </a>
+                    </p>
+                  )}
+
+                {this.props.item.consent && this.renderConsent()}
               </Segment>
             </Accordion.Content>
           </Accordion>
@@ -97,6 +106,29 @@ class WelcomePage extends React.Component {
     }
   }
 
+  renderConsent() {
+    const {consent, consentFormat} = this.props.item;
+    let converter = new showdown.Converter();
+    switch (consentFormat) {
+      case ConsentFormats.MARKDOWN:
+        return <div dangerouslySetInnerHTML={{__html: converter.makeHtml(consent)}} />;
+      case ConsentFormats.HTML:
+        return (
+          <div
+            dangerouslySetInnerHTML={{
+              __html: sanitizeHtml(consent, {
+                // by default sanitize does not allow h1, h2 and br.
+                allowedTags: [...sanitizeHtml.defaults.allowedTags, 'h1', 'h2', 'br']
+              })
+            }}
+          />
+        );
+      default:
+        // by default we assume PLAIN_TEXT
+        return <p>{consent}</p>;
+    }
+  }
+
   submit() {
     const {session} = this.props;
     const url = `${config.mturk[config.mode]}/?assignmentId=${session.assignmentId}`;
@@ -113,17 +145,11 @@ class WelcomePage extends React.Component {
 }
 
 WelcomePage.propTypes = {
-  /** @ignore */
   session: PropTypes.object,
-  /** @ignore */
   hasAcceptedHit: PropTypes.bool,
-  /** @ignore */
   checkAssignmentStatus: PropTypes.func,
-  /** @ignore */
   assignmentStatus: PropTypes.object,
-  /** @ignore */
   assigmentStatusLoading: PropTypes.bool,
-  /** @ignore */
   checkPolling: PropTypes.func,
   match: PropTypes.object,
   fetchItem: PropTypes.func,

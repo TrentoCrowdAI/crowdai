@@ -3,4 +3,10 @@ const scopes = {
   PROFILE: 'profile'
 };
 
-export {scopes};
+const ConsentFormats = {
+  PLAIN_TEXT: 'PLAIN TEXT',
+  HTML: 'HTML',
+  MARKDOWN: 'MARKDOWN'
+};
+
+export {scopes, ConsentFormats};

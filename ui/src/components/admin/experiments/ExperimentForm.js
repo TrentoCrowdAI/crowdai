@@ -4,6 +4,7 @@ import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
 
 import {actions} from './actions';
+import {ConsentFormats} from 'src/utils/constants';
 
 class ExperimentForm extends React.Component {
   constructor(props) {
@@ -103,14 +104,24 @@ class ExperimentForm extends React.Component {
                   />
                 </Form.Group>
 
-                <Form.Group widths="equal">
+                <Form.Group>
                   <Form.Input
+                    width={10}
                     label="Information of Consent URL"
                     name="consentUrl"
                     value={item.consentUrl}
                     placeholder="URL to consent file"
                     onChange={this.handleChange}
                     required
+                  />
+
+                  <Form.Select
+                    width={6}
+                    label="Format"
+                    name="consentFormat"
+                    value={item.consentFormat}
+                    options={Object.values(ConsentFormats).map(v => ({text: v, value: v}))}
+                    onChange={this.handleChange}
                   />
                 </Form.Group>
 

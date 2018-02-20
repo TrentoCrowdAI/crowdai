@@ -51,7 +51,15 @@ const actions = {
     };
   },
 
-  ...getActions(scopes.EXPERIMENTS)
+  ...getActions(scopes.EXPERIMENTS),
+
+  fetchItem(id, isWorker = false) {
+    return {
+      type: actionTypes.FETCH_ITEM,
+      id,
+      isWorker
+    };
+  }
 };
 
 export {actionTypes, actions};

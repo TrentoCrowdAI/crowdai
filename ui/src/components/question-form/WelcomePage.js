@@ -30,8 +30,8 @@ class WelcomePage extends React.Component {
             </Accordion.Title>
             <Accordion.Content active={open}>
               <Segment>
-                {!this.props.item.consentUrl && <p>Loading information...</p>}
-                {this.props.item.consentUrl &&
+                {!this.props.item.id && <p>Loading information...</p>}
+                {this.props.item.id &&
                   !this.props.item.consent && (
                     <p style={{textAlign: 'justify'}}>
                       The information is available{' '}
@@ -167,7 +167,7 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = dispatch => ({
   checkAssignmentStatus: () => dispatch(actions.checkAssignmentStatus()),
   checkPolling: () => dispatch(actions.checkPolling()),
-  fetchItem: id => dispatch(experimentActions.fetchItem(id))
+  fetchItem: id => dispatch(experimentActions.fetchItem(id, true))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(WelcomePage);

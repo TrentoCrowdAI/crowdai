@@ -51,6 +51,8 @@ const count = (exports.count = async experimentId => {
 
 exports.next = async (experimentId, workerId) => {
   const experiment = await experimentsDelegate.getById(experimentId);
+  let key;
+  let isInitialTest = false;
 
   if (!experiment) {
     throw Boom.badRequest('Experiment with the given ID does not exist');
@@ -63,30 +65,45 @@ exports.next = async (experimentId, workerId) => {
     );
     const testCount = await answersDelegate.getWorkerTestAnswersCount(
       experimentId,
-      workerId
+      workerId,
+      answersDelegate.TestAnswerStrategy.HONEYPOT
+    );
+    const initialTestCount = await answersDelegate.getWorkerTestAnswersCount(
+      experimentId,
+      workerId,
+      answersDelegate.TestAnswerStrategy.INITIAL
     );
 
-    if (answersCount >= experiment.maxTasksRule) {
-      return {
-        maxTasks: true
-      };
-    }
-
-    const runTest =
-      (answersCount + testCount + 1) % (experiment.testFrequencyRule + 1) === 0;
-
-    if (runTest) {
-      // we need to return a test task
-      const testsIds = await getWorkerAvailableTests(experimentId, workerId);
-      const idx = Math.floor(Math.random() * testsIds.length);
-      key = getTaskKey({ experimentId, id: testsIds[idx] }, true);
+    if (initialTestCount < experiment.initialTestsRule) {
+      // run initial tests
+      const ids = await getWorkerAvailableTests(experimentId, workerId);
+      const idx = Math.floor(Math.random() * ids.length);
+      key = getTaskKey({ experimentId, id: ids[idx] }, true);
+      isInitialTest = true;
     } else {
-      const tasksIds = await getWorkerAvailableTasks(experimentId, workerId);
-      const idx = Math.floor(Math.random() * tasksIds.length);
-      key = getTaskKey({ experimentId, id: tasksIds[idx] });
+      if (answersCount >= experiment.maxTasksRule) {
+        return {
+          maxTasks: true
+        };
+      }
+
+      const runTest =
+        (answersCount + testCount + 1) % (experiment.testFrequencyRule + 1) ===
+        0;
+
+      if (runTest) {
+        // we need to return a test task
+        const testsIds = await getWorkerAvailableTests(experimentId, workerId);
+        const idx = Math.floor(Math.random() * testsIds.length);
+        key = getTaskKey({ experimentId, id: testsIds[idx] }, true);
+      } else {
+        const tasksIds = await getWorkerAvailableTasks(experimentId, workerId);
+        const idx = Math.floor(Math.random() * tasksIds.length);
+        key = getTaskKey({ experimentId, id: tasksIds[idx] });
+      }
     }
 
-    return await new Promise((resolve, reject) => {
+    let task = await new Promise((resolve, reject) => {
       bucket.get(key, (err, data) => {
         if (err) {
           reject(err);
@@ -95,6 +112,15 @@ exports.next = async (experimentId, workerId) => {
         }
       });
     });
+
+    // create bare answer record
+    await answersDelegate.create({
+      experimentId,
+      task,
+      initial: isInitialTest,
+      workerId
+    });
+    return task;
   } catch (error) {
     console.error(error);
     throw Boom.badImplementation('Error while trying to fetch next task');

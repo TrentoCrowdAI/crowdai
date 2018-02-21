@@ -243,6 +243,7 @@ const createTasks = async experiment => {
         await tasksDelegate.createTask(
           {
             ...testTask,
+            id: uuid(),
             experimentId: experiment.id
           },
           true

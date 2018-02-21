@@ -1,5 +1,5 @@
 import React from 'react';
-import {Grid, Button, Segment, Dimmer, Loader, Message, Accordion, Header} from 'semantic-ui-react';
+import {Grid, Button, Segment, Dimmer, Loader, Message, Accordion, Header, Checkbox, Form} from 'semantic-ui-react';
 import {Link} from 'react-router-dom';
 import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
@@ -14,7 +14,12 @@ import RewardWidget from 'src/components/reward-widget/RewardWidget';
 import {ConsentFormats} from 'src/utils/constants';
 
 class WelcomePage extends React.Component {
-  state = {open: true};
+  state = {open: true, consentOk: false};
+
+  constructor(props) {
+    super(props);
+    this.onConsentCheck = this.onConsentCheck.bind(this);
+  }
 
   render() {
     const {open} = this.state;
@@ -73,7 +78,11 @@ class WelcomePage extends React.Component {
       return (
         <Segment>
           <p>Please click on the following button to start. It will open a new window/tab.</p>
+          <Form.Field style={{marginBottom: '10px'}}>
+            <Checkbox name="consentOk" label="I agree to the Information of Consent" onChange={this.onConsentCheck} />
+          </Form.Field>
           <Button
+            disabled={!this.state.consentOk}
             onClick={() => this.props.checkPolling()}
             as={Link}
             positive
@@ -129,6 +138,12 @@ class WelcomePage extends React.Component {
     }
   }
 
+  componentDidMount() {
+    this.props.checkAssignmentStatus();
+    const {experimentId} = this.props.match.params;
+    this.props.fetchItem(experimentId);
+  }
+
   submit() {
     const {session} = this.props;
     const url = `${config.mturk[config.mode]}/?assignmentId=${session.assignmentId}`;
@@ -137,10 +152,11 @@ class WelcomePage extends React.Component {
     form.submit();
   }
 
-  componentDidMount() {
-    this.props.checkAssignmentStatus();
-    const {experimentId} = this.props.match.params;
-    this.props.fetchItem(experimentId);
+  onConsentCheck(e, {name, checked}) {
+    this.setState({
+      ...this.state,
+      consentOk: checked
+    });
   }
 }
 

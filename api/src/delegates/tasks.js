@@ -6,6 +6,7 @@ const config = require(__base + 'config');
 const { DOCUMENTS, TYPES } = require(__base + 'db');
 const answersDelegate = require('./answers');
 const experimentsDelegate = require('./experiments');
+const workersDelegate = require('./workers');
 
 exports.all = async experimentId => {
   try {
@@ -75,6 +76,16 @@ exports.next = async (experimentId, workerId) => {
     );
 
     if (initialTestCount < experiment.initialTestsRule) {
+      // create assignment record if it does not exist.
+      const assignmentRecord = await workersDelegate.getAssignment(
+        experimentId,
+        workerId
+      );
+
+      if (!assignmentRecord) {
+        await workersDelegate.createAssignment(experimentId, workerId);
+      }
+
       // run initial tests
       const ids = await getWorkerAvailableTests(experimentId, workerId);
       const idx = Math.floor(Math.random() * ids.length);
@@ -84,6 +95,18 @@ exports.next = async (experimentId, workerId) => {
       if (answersCount >= experiment.maxTasksRule) {
         return {
           maxTasks: true
+        };
+      }
+      // check if the worker approved the initial tests
+      let initialTestScore = await answersDelegate.getInitialTestScore(
+        experimentId,
+        workerId
+      );
+
+      if (initialTestScore < experiment.initialTestsMinCorrectAnswersRule) {
+        await workersDelegate.rejectAssignment(experimentId, workerId);
+        return {
+          initialTestFailed: true
         };
       }
 
@@ -142,7 +165,7 @@ const getWorkerCompletedTasks = (exports.getWorkerCompletedTasks = async (
       experimentId,
       workerId
     );
-    return answers.map(a => a[config.db.bucket]).map(a => a.taskId);
+    return answers.map(a => a.taskId);
   } catch (error) {
     console.error(error);
     throw Boom.badImplementation('Error while trying to fetch completed task');
@@ -231,7 +254,7 @@ const getWorkerCompletedTests = (exports.getWorkerCompletedTests = async (
       experimentId,
       workerId
     );
-    return testAnswers.map(a => a[config.db.bucket]).map(a => a.testTaskId);
+    return testAnswers.map(a => a.testTaskId);
   } catch (error) {
     console.error(error);
     throw Boom.badImplementation('Error while trying to fetch completed test');
@@ -258,6 +281,32 @@ const createTask = (exports.createTask = async (task, isTest = false) => {
   } catch (error) {
     console.error(error);
     throw Boom.badImplementation('Error while trying to persist task');
+  }
+});
+
+const getOne = (exports.getOne = async (
+  experimentId,
+  taskId,
+  isTest = false
+) => {
+  try {
+    if (!experimentId) {
+      throw Boom.badRequest('Must provide experimentId');
+    }
+    const key = getTaskKey({ id: taskId, experimentId }, isTest);
+
+    return await new Promise((resolve, reject) => {
+      bucket.get(key, (error, result) => {
+        if (error) {
+          reject(error);
+        } else {
+          resolve(result.value);
+        }
+      });
+    });
+  } catch (error) {
+    console.error(error);
+    throw Boom.badImplementation('Error while trying to fetch task');
   }
 });
 

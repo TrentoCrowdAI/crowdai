@@ -30,7 +30,7 @@ class WelcomePage extends React.Component {
           <Accordion>
             <Accordion.Title active={open} onClick={() => this.setState({open: !this.state.open})}>
               <Header as="h1" style={{display: 'inline'}}>
-                Information of Consent {open ? '(click to collapse)' : '(click to expand)'}
+                Informed Consent {open ? '(click to collapse)' : '(click to expand)'}
               </Header>
             </Accordion.Title>
             <Accordion.Content active={open}>
@@ -79,7 +79,7 @@ class WelcomePage extends React.Component {
         <Segment>
           <p>Please click on the following button to start. It will open a new window/tab.</p>
           <Form.Field style={{marginBottom: '10px'}}>
-            <Checkbox name="consentOk" label="I agree to the Information of Consent" onChange={this.onConsentCheck} />
+            <Checkbox name="consentOk" label="I agree with the Informed Consent" onChange={this.onConsentCheck} />
           </Form.Field>
           <Button
             disabled={!this.state.consentOk}
@@ -103,7 +103,7 @@ class WelcomePage extends React.Component {
             <RewardWidget style={{marginRight: 20}} />
             <Message.Content>
               <Message.Header>Finished</Message.Header>
-              <p>Thank you for completing the tasks. Please click the following button to submit your work</p>
+              <p>Please click the following button to submit your work</p>
               <Button type="button" positive onClick={() => this.submit()}>
                 Submit
               </Button>

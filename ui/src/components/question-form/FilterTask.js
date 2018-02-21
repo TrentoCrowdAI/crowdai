@@ -43,6 +43,20 @@ class FilterTask extends React.Component {
       );
     }
 
+    if (!this.props.assigmentStatusLoading && this.props.task.initialTestFailed) {
+      return (
+        <Message icon style={{marginTop: 20}}>
+          <Icon name="frown" />
+          <Message.Content>
+            <Message.Header>Qualification test result</Message.Header>
+            <p>Thank you for participating, but you failed to pass the qualification test.</p>
+            <p>Please click on the following button to finish.</p>
+            <FinishButton onClick={() => this.finish()} />
+          </Message.Content>
+        </Message>
+      );
+    }
+
     if (!this.props.assigmentStatusLoading && this.props.task.maxTasks) {
       return (
         <Message icon style={{marginTop: 20}}>

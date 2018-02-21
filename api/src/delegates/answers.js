@@ -4,6 +4,8 @@ const Boom = require('boom');
 const bucket = require(__base + 'db').bucket;
 const config = require(__base + 'config');
 const { DOCUMENTS, TYPES } = require(__base + 'db');
+const tasksDelegate = require('./tasks');
+const experimentsDelegate = require('./experiments');
 
 const TestAnswerStrategy = (exports.TestAnswerStrategy = Object.freeze({
   ALL: 'ALL',
@@ -17,7 +19,7 @@ const create = (exports.create = async answer => {
       throw Boom.badRequest('Answer must have experimentId');
     }
     let key;
-    let payload = { ...answer };
+    let payload = { ...answer, createdAt: new Date() };
     delete payload.task;
 
     if (answer.task.type === TYPES.task) {
@@ -86,7 +88,7 @@ const update = (exports.update = async answer => {
       answer.task.id,
       answer.task.type
     );
-    let payload = { ...answerFromDB, ...answer };
+    let payload = { ...answerFromDB, ...answer, answeredAt: new Date() };
     delete payload.task;
     let key;
 
@@ -127,7 +129,7 @@ const getWorkerAnswers = (exports.getWorkerAnswers = async (
         if (err) {
           reject(err);
         } else {
-          resolve(answers);
+          resolve(answers.map(a => a[config.db.bucket]));
         }
       });
     });
@@ -194,7 +196,7 @@ const getWorkerTestAnswers = (exports.getWorkerTestAnswers = async (
         if (err) {
           reject(err);
         } else {
-          resolve(answers);
+          resolve(answers.map(a => a[config.db.bucket]));
         }
       });
     });
@@ -243,6 +245,41 @@ const getWorkerTestAnswersCount = (exports.getWorkerTestAnswersCount = async (
     console.error(error);
     throw Boom.badImplementation(
       "Error while trying to fetch worker's test answers count"
+    );
+  }
+});
+
+const getInitialTestScore = (exports.getInitialTestScore = async (
+  experimentId,
+  workerId
+) => {
+  let answers = await getWorkerTestAnswers(
+    experimentId,
+    workerId,
+    TestAnswerStrategy.INITIAL
+  );
+  let experiment = await experimentsDelegate.getById(experimentId);
+
+  try {
+    let count = 0;
+
+    for (answer of answers) {
+      // get task and compare answer
+      const task = await tasksDelegate.getOne(
+        experimentId,
+        answer.testTaskId,
+        true
+      );
+
+      if (task.answer === answer.response) {
+        ++count;
+      }
+    }
+    return count / experiment.initialTestsRule * 100;
+  } catch (error) {
+    console.error(error);
+    throw Boom.badImplementation(
+      "Error while trying to compute worker's initial test score"
     );
   }
 });

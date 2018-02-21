@@ -15,10 +15,12 @@ const finishAssignment = async ctx => {
 };
 
 const checkAssignmentStatus = async ctx => {
-  ctx.response.body = await delegates.workers.checkAssignmentStatus(
+  const record = await delegates.workers.checkAssignmentStatus(
     ctx.params.experimentId,
     ctx.params.workerId
   );
+
+  ctx.response.body = record || {};
 };
 
 exports.register = router => {

@@ -143,6 +143,11 @@ exports.next = async (experimentId, workerId) => {
       initial: isInitialTest,
       workerId
     });
+
+    if (isInitialTest) {
+      // we just mark the task as initial test
+      task.isInitialTest = isInitialTest;
+    }
     return task;
   } catch (error) {
     console.error(error);

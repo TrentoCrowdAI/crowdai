@@ -25,7 +25,7 @@ class WelcomePage extends React.Component {
     const {open} = this.state;
 
     return (
-      <Grid.Row centered>
+      <Grid.Row centered style={{marginBottom: '10px'}}>
         <div>
           <Accordion>
             <Accordion.Title active={open} onClick={() => this.setState({open: !this.state.open})}>

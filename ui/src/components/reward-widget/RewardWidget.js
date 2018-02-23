@@ -7,7 +7,7 @@ import {actions} from './actions';
 
 class RewardWidget extends React.Component {
   render() {
-    return <Statistic label="Expected reward" value={`${this.props.reward} $`} style={this.props.style} />;
+    return <Statistic label="Current reward" value={`${this.props.reward} $`} style={this.props.style} />;
   }
 
   componentDidMount() {

@@ -146,10 +146,12 @@ const getAssignment = (exports.getAssignment = async (
  *
  * @param {string} experimentId
  * @param {string} workerId
+ * @param {Object} attrs
  */
 const createAssignment = (exports.createAssignment = async (
   experimentId,
-  workerId
+  workerId,
+  attrs
 ) => {
   const key = getWorkerAssignmentKey(experimentId, workerId);
   let record = {
@@ -159,7 +161,8 @@ const createAssignment = (exports.createAssignment = async (
     experimentId,
     initialTestFailed: false,
     honeypotFailed: false,
-    assignmentStart: new Date()
+    assignmentStart: new Date(),
+    ...attrs
   };
 
   try {

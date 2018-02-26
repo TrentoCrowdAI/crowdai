@@ -8,7 +8,8 @@ const get = async ctx => {
 const getNext = async ctx => {
   ctx.response.body = await delegates.tasks.next(
     ctx.params.experimentId,
-    ctx.query.workerId
+    ctx.query.workerId,
+    ctx.query.assignmentId
   );
 };
 

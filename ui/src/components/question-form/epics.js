@@ -9,7 +9,10 @@ import config from 'src/config/config.json';
 const getNextTask = (action$, store) =>
   action$.ofType(actionTypes.NEXT_TASK).switchMap(action => {
     const {session} = store.getState().questionForm;
-    const params = {workerId: session.workerId};
+    const params = {
+      workerId: session.workerId,
+      assignmentId: session.assignmentId
+    };
     return Observable.defer(() => axios.get(`/experiments/${session.experimentId}/tasks/next`, {params}))
       .mergeMap(response => Observable.of(actions.getNextTaskSuccess(response.data)))
       .catch(error => Observable.of(actions.getNextTaskError(error)));

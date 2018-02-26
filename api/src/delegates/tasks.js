@@ -51,7 +51,7 @@ const count = (exports.count = async experimentId => {
   }
 });
 
-exports.next = async (experimentId, workerId) => {
+exports.next = async (experimentId, workerId, assignmentId) => {
   const experiment = await experimentsDelegate.getById(experimentId);
   let key;
   let isInitialTest = false;
@@ -84,7 +84,9 @@ exports.next = async (experimentId, workerId) => {
       );
 
       if (!assignmentRecord) {
-        await workersDelegate.createAssignment(experimentId, workerId);
+        await workersDelegate.createAssignment(experimentId, workerId, {
+          assignmentId
+        });
       }
 
       // run initial tests

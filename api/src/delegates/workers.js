@@ -7,6 +7,11 @@ const answersDelegate = require('./answers');
 const { DOCUMENTS, TYPES } = require(__base + 'db');
 const experimentsDelegate = require('./experiments');
 
+const RejectionType = (exports.RejectionType = Object.freeze({
+  INITIAL: 'INITIAL',
+  HONEYPOT: 'HONEYPOT'
+}));
+
 const getWorkerReward = (exports.getWorkerReward = async (
   experimentId,
   workerId
@@ -180,11 +185,14 @@ const createAssignment = (exports.createAssignment = async (
 
 const rejectAssignment = (exports.rejectAssignment = async (
   experimentId,
-  workerId
+  workerId,
+  rejectionType
 ) => {
   try {
     return await updateAssignment(experimentId, workerId, {
-      initialTestFailed: true,
+      initialTestFailed: rejectionType === RejectionType.INITIAL,
+      honeypotFailed: rejectionType === RejectionType.HONEYPOT,
+      finished: true,
       assignmentEnd: new Date()
     });
   } catch (error) {

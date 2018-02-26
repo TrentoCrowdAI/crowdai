@@ -190,6 +190,7 @@ const getWorkerTestAnswers = (exports.getWorkerTestAnswers = async (
     } else {
       throw Boom.badRequest('Strategy not supported');
     }
+    qs = `${qs} order by answeredAt asc`;
     const q = couchbase.N1qlQuery.fromString(qs);
     return await new Promise((resolve, reject) => {
       bucket.query(q, (err, answers) => {
@@ -280,6 +281,36 @@ const getInitialTestScore = (exports.getInitialTestScore = async (
     console.error(error);
     throw Boom.badImplementation(
       "Error while trying to compute worker's initial test score"
+    );
+  }
+});
+
+const checkLastHoneypot = (exports.checkLastHoneypot = async (
+  experimentId,
+  workerId
+) => {
+  let answers = await getWorkerTestAnswers(
+    experimentId,
+    workerId,
+    TestAnswerStrategy.HONEYPOT
+  );
+
+  try {
+    if (answers.length === 0) {
+      return true;
+    }
+    // we just pick the most recent answer.
+    let answer = answers[answers.length - 1];
+    const task = await tasksDelegate.getOne(
+      experimentId,
+      answer.testTaskId,
+      true
+    );
+    return task.answer === answer.response;
+  } catch (error) {
+    console.error(error);
+    throw Boom.badImplementation(
+      "Error while trying to check worker's last honeypot answer"
     );
   }
 });

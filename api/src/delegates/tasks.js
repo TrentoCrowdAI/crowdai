@@ -7,6 +7,7 @@ const { DOCUMENTS, TYPES } = require(__base + 'db');
 const answersDelegate = require('./answers');
 const experimentsDelegate = require('./experiments');
 const workersDelegate = require('./workers');
+const { RejectionType } = workersDelegate;
 
 exports.all = async experimentId => {
   try {
@@ -104,9 +105,29 @@ exports.next = async (experimentId, workerId) => {
       );
 
       if (initialTestScore < experiment.initialTestsMinCorrectAnswersRule) {
-        await workersDelegate.rejectAssignment(experimentId, workerId);
+        await workersDelegate.rejectAssignment(
+          experimentId,
+          workerId,
+          RejectionType.INITIAL
+        );
         return {
           initialTestFailed: true
+        };
+      }
+      // check if the user approved the previous honeypot
+      const honeypotApproved = await answersDelegate.checkLastHoneypot(
+        experimentId,
+        workerId
+      );
+
+      if (!honeypotApproved) {
+        await workersDelegate.rejectAssignment(
+          experimentId,
+          workerId,
+          RejectionType.HONEYPOT
+        );
+        return {
+          honeypotFailed: true
         };
       }
 

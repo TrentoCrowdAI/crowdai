@@ -7,6 +7,9 @@ import {actions} from './actions';
 
 class RewardWidget extends React.Component {
   render() {
+    if (this.props.loading) {
+      return <div style={{marginRight: '10px'}}>Calculating reward...</div>;
+    }
     return <Statistic label="Current reward" value={`${this.props.reward} $`} style={this.props.style} />;
   }
 
@@ -17,16 +20,14 @@ class RewardWidget extends React.Component {
 
 RewardWidget.propTypes = {
   style: PropTypes.object,
-
-  /** @ignore */
   reward: PropTypes.number,
-
-  /** @ignore */
-  requestReward: PropTypes.func
+  requestReward: PropTypes.func,
+  loading: PropTypes.bool
 };
 
 const mapStateToProps = state => ({
-  reward: state.rewardWidget.reward
+  reward: state.rewardWidget.reward,
+  loading: state.rewardWidget.loading
 });
 
 const mapDispatchToProps = dispatch => ({

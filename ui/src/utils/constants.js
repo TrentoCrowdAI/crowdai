@@ -9,4 +9,10 @@ const ConsentFormats = {
   MARKDOWN: 'MARKDOWN'
 };
 
-export {scopes, ConsentFormats};
+const ExperimentStatus = {
+  NOT_PUBLISHED: 'NOT_PUBLISHED',
+  PUBLISHED: 'PUBLISHED',
+  DONE: 'DONE'
+};
+
+export {scopes, ConsentFormats, ExperimentStatus};

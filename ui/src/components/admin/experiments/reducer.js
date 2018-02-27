@@ -2,7 +2,7 @@ import {combineReducers} from 'redux';
 
 import {actionTypes} from './actions';
 import {getReducer} from 'src/utils/form';
-import {scopes, ConsentFormats} from 'src/utils/constants';
+import {scopes, ConsentFormats, ExperimentStatus} from 'src/utils/constants';
 
 const defaultState = {
   experiments: [],
@@ -38,7 +38,7 @@ const reducer = (state = defaultState, action) => {
 const genericFormReducer = getReducer(scopes.EXPERIMENTS, {
   name: '',
   requesterId: '',
-  published: false,
+  status: ExperimentStatus.NOT_PUBLISHED,
   consentUrl: '',
   consentFormat: ConsentFormats.PLAIN_TEXT,
   itemsUrl: '',
@@ -68,7 +68,7 @@ const formReducer = (state = defaultFormState, action) => {
         ...state,
         item: {
           ...state.item,
-          published: false
+          status: ExperimentStatus.NOT_PUBLISHED
         },
         error: undefined,
         loading: true
@@ -78,7 +78,7 @@ const formReducer = (state = defaultFormState, action) => {
         ...state,
         item: {
           ...state.item,
-          published: true
+          status: ExperimentStatus.PUBLISHED
         },
         loading: false
       };

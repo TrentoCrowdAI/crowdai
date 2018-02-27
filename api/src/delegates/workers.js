@@ -12,9 +12,19 @@ const RejectionType = (exports.RejectionType = Object.freeze({
   HONEYPOT: 'HONEYPOT'
 }));
 
+/**
+ * Computes the worker's reward based on the answer given. If asBonus
+ * is true, then we subtract experiment.taskRewardRule from the reward
+ * so that we can pay the resulting amount to the worker as the bonus.
+ *
+ * @param {string} experimentId
+ * @param {string} workerId
+ * @param {boolean} asBonus
+ */
 const getWorkerReward = (exports.getWorkerReward = async (
   experimentId,
-  workerId
+  workerId,
+  asBonus = false
 ) => {
   const experiment = await experimentsDelegate.getById(experimentId);
 

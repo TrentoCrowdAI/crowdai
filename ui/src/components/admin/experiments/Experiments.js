@@ -6,6 +6,7 @@ import {Button, Icon, Popup} from 'semantic-ui-react';
 
 import {actions} from './actions';
 import DataTable from 'src/components/core/table/DataTable';
+import {ExperimentStatus} from 'src/utils/constants';
 
 const ACCOUNT_NOT_INITIALIZED = 'Requester account has not been initialized';
 
@@ -21,13 +22,13 @@ const options = {
   },
 
   rowPositive(item) {
-    return item.published;
+    return item.status === ExperimentStatus.PUBLISHED;
   },
 
   actions: {
     label: 'Actions',
     renderer(item) {
-      if (!item.published) {
+      if (item.status === ExperimentStatus.NOT_PUBLISHED) {
         return (
           <Popup
             trigger={

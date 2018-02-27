@@ -5,6 +5,7 @@ import {connect} from 'react-redux';
 
 import ExperimentForm from './ExperimentForm';
 import {actions} from './actions';
+import {ExperimentStatus} from 'src/utils/constants';
 
 class ExperimentPublishPage extends React.Component {
   constructor(props) {
@@ -130,7 +131,7 @@ const mapStateToProps = state => ({
   item: state.experiment.form.item,
   loading: state.experiment.form.loading,
   error: state.experiment.form.error,
-  published: state.experiment.form.item.published
+  published: state.experiment.form.item.status === ExperimentStatus.PUBLISHED
 });
 
 const mapDispatchToProps = dispatch => ({

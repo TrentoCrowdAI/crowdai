@@ -319,9 +319,8 @@ const createTasks = async experiment => {
  */
 const setupCronForHit = (experimentId, hitId, mturk) => {
   const job = new CronJob({
-    cronTime: `0 */${config.hitStatusPollTime} * * * *`,
+    cronTime: `0 */${config.cron.hitStatusPollTime} * * * *`,
     onTick: async () => {
-      // tick every 10 minutes
       console.log(`Checking HIT: ${hitId} status`);
 
       try {

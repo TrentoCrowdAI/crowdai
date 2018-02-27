@@ -18,6 +18,9 @@ const options = {
     },
     name: {
       label: 'Name'
+    },
+    status: {
+      label: 'Status'
     }
   },
 

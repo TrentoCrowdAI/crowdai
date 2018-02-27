@@ -181,7 +181,7 @@ const publish = (exports.publish = async (id, experiment) => {
         if (err) {
           reject(err);
         } else {
-          resolve(data);
+          resolve(data.HIT);
         }
       });
     });
@@ -330,7 +330,7 @@ const setupCronForHit = (experimentId, hitId, mturk) => {
             if (err) {
               reject(err);
             } else {
-              resolve(data);
+              resolve(data.HIT);
             }
           });
         });

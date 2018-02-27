@@ -146,7 +146,9 @@ class WelcomePage extends React.Component {
 
   submit() {
     const {session} = this.props;
-    const url = `${config.mturk[config.mode]}/?assignmentId=${session.assignmentId}`;
+    const url = `${config.mturk[config.mode]}/?assignmentId=${session.assignmentId}&workerId=${
+      session.workerId
+    }&hitId=${session.hitId}`;
     let form = document.getElementById('turkForm');
     form.action = `${url}`;
     form.submit();

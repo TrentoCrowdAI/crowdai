@@ -46,7 +46,12 @@ const getWorkerReward = (exports.getWorkerReward = async (
     if (assignment.initialTestFailed) {
       return { reward: 0 };
     }
-    return { reward: (taskCount + testCount) * experiment.taskRewardRule };
+    // the total amount that we pay to a worker is HIT reward + bonus. Therefore we
+    // should subtract 1 in order to pay the worker using the reward + bonus strategy.
+    const delta = asBonus ? -1 : 0;
+    return {
+      reward: (taskCount + testCount + delta) * experiment.taskRewardRule
+    };
   } catch (error) {
     console.error(error);
     throw Boom.badImplementation('Error while computing reward');

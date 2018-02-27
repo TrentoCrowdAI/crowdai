@@ -336,6 +336,7 @@ const setupCronForHit = (experimentId, hitId, mturk) => {
         });
 
         if (hit.HITStatus === 'Reviewable') {
+          console.log(`HIT: ${hitId} is reviewable`);
           const stop = await reviewAssignments(experimentId, mturk);
 
           if (stop) {
@@ -359,12 +360,14 @@ const setupCronForHit = (experimentId, hitId, mturk) => {
  * @param {Object} mturk
  */
 const reviewAssignments = async (experimentId, mturk) => {
-  console.log(`Review assigments for experiment: ${experimentId}`);
+  console.log(`Review assignments for experiment: ${experimentId}`);
 
   try {
     const assignments = await getAssignments(experimentId);
 
     for (assignment of assignments) {
+      console.log(`Reviewing ${assignment.assignmentId}`);
+
       if (!assignment.finished) {
         console.warn(
           `reviewAssignments called even though the assignment ${
@@ -381,6 +384,7 @@ const reviewAssignments = async (experimentId, mturk) => {
         await sendBonus(experimentId, workerId, assignment.assignmentId, mturk);
       }
     }
+    console.log(`Review assignments for experiment: ${experimentId} done`);
     const experiment = await getById(experimentId);
     await update(experimentId, {
       ...experiment,
@@ -402,11 +406,15 @@ const reviewAssignments = async (experimentId, mturk) => {
  * @param {Object} mturk
  */
 const mturkApproveAssignment = async (id, mturk) => {
+  console.log(`Approving assignment ${id}...`);
   return await new Promise((resolve, reject) => {
     mturk.approveAssignment({ AssignmentId: id }, function(err, data) {
       if (err) {
         reject(err);
       } else {
+        console.log(
+          `Approve assignment response for ${id} is: ${JSON.stringify(data)}`
+        );
         resolve(data);
       }
     });
@@ -419,6 +427,7 @@ const mturkApproveAssignment = async (id, mturk) => {
  * @param {Object} mturk
  */
 const mturkRejectAssignment = async (id, mturk) => {
+  console.log(`Rejecting assignment ${id}...`);
   const payload = {
     AssignmentId: id,
     RequesterFeedback:
@@ -429,6 +438,9 @@ const mturkRejectAssignment = async (id, mturk) => {
       if (err) {
         reject(err);
       } else {
+        console.log(
+          `Reject assignment response for ${id} is: ${JSON.stringify(data)}`
+        );
         resolve(data);
       }
     });

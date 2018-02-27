@@ -461,14 +461,14 @@ const mturkRejectAssignment = async (id, mturk) => {
  * @param {Object} mturk
  */
 const sendBonus = async (experimentId, workerId, assignmentId, mturk) => {
-  const amount = await workersDelegate.getWorkerReward(
+  const { reward } = await workersDelegate.getWorkerReward(
     experimentId,
     workerId,
     true
   );
   const payload = {
     AssignmentId: assignmentId,
-    BonusAmount: `${amount}`,
+    BonusAmount: `${reward}`,
     Reason: 'Reward based on the number of answers given',
     WorkerId: workerId
   };

@@ -364,6 +364,7 @@ const reviewAssignments = async (experimentId, mturk) => {
 
   try {
     const assignments = await getAssignments(experimentId);
+    console.log(assignments);
 
     for (assignment of assignments) {
       console.log(`Reviewing ${assignment.assignmentId}`);

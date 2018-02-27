@@ -43,7 +43,7 @@ const getWorkerReward = (exports.getWorkerReward = async (
     );
     const assignment = await getAssignment(experimentId, workerId);
 
-    if (assignment.initialTestFailed) {
+    if (!assignment || assignment.initialTestFailed) {
       return { reward: 0 };
     }
     // the total amount that we pay to a worker is HIT reward + bonus. Therefore we

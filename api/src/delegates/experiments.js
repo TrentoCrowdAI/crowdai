@@ -333,9 +333,9 @@ const setupCronForHit = (experimentId, hitId, mturk) => {
             }
           });
         });
+        console.log(`HIT: ${hitId} is ${hit.HITStatus}`);
 
         if (hit.HITStatus === 'Reviewable') {
-          console.log(`HIT: ${hitId} is reviewable`);
           const stop = await reviewAssignments(experimentId, mturk);
 
           if (stop) {

@@ -79,7 +79,11 @@ class WelcomePage extends React.Component {
         <Segment>
           <p>Please click on the following button to start. It will open a new window/tab.</p>
           <Form.Field style={{marginBottom: '10px'}}>
-            <Checkbox name="consentOk" label="I agree with the Informed Consent" onChange={this.onConsentCheck} />
+            <Checkbox
+              name="consentOk"
+              label="I hereby confirm that I have read and understood the terms and conditions of this task, and that I give my consent to use of the data resulted from my work."
+              onChange={this.onConsentCheck}
+            />
           </Form.Field>
           <Button
             disabled={!this.state.consentOk}

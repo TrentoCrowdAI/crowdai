@@ -205,7 +205,7 @@ const publish = (exports.publish = async (id, experiment) => {
 const getAssignments = (exports.getAssignments = async experimentId => {
   try {
     const qs = `select * from \`${config.db.bucket}\` where type="${
-      TYPES.WorkerAssignment
+      TYPES.assignment
     }" and experimentId="${experimentId}"`;
     const q = couchbase.N1qlQuery.fromString(qs);
     return await new Promise((resolve, reject) => {

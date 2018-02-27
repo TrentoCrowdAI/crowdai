@@ -363,7 +363,6 @@ const reviewAssignments = async (experimentId, mturk) => {
 
   try {
     const assignments = await getAssignments(experimentId);
-    console.log(assignments);
 
     for (assignment of assignments) {
       console.log(`Reviewing ${assignment.assignmentId}`);
@@ -381,7 +380,12 @@ const reviewAssignments = async (experimentId, mturk) => {
         await mturkRejectAssignment(assignment.assignmentId, mturk);
       } else {
         await mturkApproveAssignment(assignment.assignmentId, mturk);
-        await sendBonus(experimentId, workerId, assignment.assignmentId, mturk);
+        await sendBonus(
+          experimentId,
+          assignment.workerId,
+          assignment.assignmentId,
+          mturk
+        );
       }
     }
     console.log(`Review assignments for experiment: ${experimentId} done`);

@@ -11,7 +11,7 @@ import {actions} from './actions';
 import {actions as experimentActions} from 'src/components/admin/experiments/actions';
 import config from 'src/config/config.json';
 import RewardWidget from 'src/components/reward-widget/RewardWidget';
-import {ConsentFormats} from 'src/utils/constants';
+import {FileFormats} from 'src/utils/constants';
 
 class WelcomePage extends React.Component {
   state = {open: true, consentOk: false};
@@ -123,9 +123,9 @@ class WelcomePage extends React.Component {
     const {consent, consentFormat} = this.props.item;
     let converter = new showdown.Converter();
     switch (consentFormat) {
-      case ConsentFormats.MARKDOWN:
+      case FileFormats.MARKDOWN:
         return <div dangerouslySetInnerHTML={{__html: converter.makeHtml(consent)}} />;
-      case ConsentFormats.HTML:
+      case FileFormats.HTML:
         return (
           <div
             dangerouslySetInnerHTML={{

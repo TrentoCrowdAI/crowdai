@@ -3,7 +3,7 @@ const scopes = {
   PROFILE: 'profile'
 };
 
-const ConsentFormats = {
+const FileFormats = {
   PLAIN_TEXT: 'PLAIN TEXT',
   HTML: 'HTML',
   MARKDOWN: 'MARKDOWN'
@@ -15,4 +15,4 @@ const ExperimentStatus = {
   DONE: 'DONE'
 };
 
-export {scopes, ConsentFormats, ExperimentStatus};
+export {scopes, FileFormats, ExperimentStatus};

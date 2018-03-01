@@ -2,7 +2,7 @@ import {combineReducers} from 'redux';
 
 import {actionTypes} from './actions';
 import {getReducer} from 'src/utils/form';
-import {scopes, ConsentFormats, ExperimentStatus} from 'src/utils/constants';
+import {scopes, FileFormats, ExperimentStatus} from 'src/utils/constants';
 
 const defaultState = {
   experiments: [],
@@ -40,7 +40,8 @@ const genericFormReducer = getReducer(scopes.EXPERIMENTS, {
   requesterId: '',
   status: ExperimentStatus.NOT_PUBLISHED,
   consentUrl: '',
-  consentFormat: ConsentFormats.PLAIN_TEXT,
+  consentFormat: FileFormats.PLAIN_TEXT,
+  taskInstructionsFormat: FileFormats.PLAIN_TEXT,
   itemsUrl: '',
   filtersUrl: '',
   testsUrl: '',
@@ -49,13 +50,15 @@ const genericFormReducer = getReducer(scopes.EXPERIMENTS, {
   assignmentDurationInSeconds: 600,
   description: '',
   lifetimeInSeconds: 5 * 60 * 60,
-  // rules
+  // parameters
   maxTasksRule: 3,
   taskRewardRule: 0.5,
   testFrequencyRule: 2,
   initialTestsRule: 2,
   initialTestsMinCorrectAnswersRule: 100,
-  votesPerTaskRule: 2
+  votesPerTaskRule: 2,
+  expertCostRule: 0.2,
+  crowdsourcingStrategy: 'baseline'
 });
 
 // hacky way to get the whole state of the form

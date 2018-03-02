@@ -25,7 +25,7 @@ class ExperimentForm extends React.Component {
     this.showRulesClick = this.showRulesClick.bind(this);
     this.state = {
       showRules: false,
-      expertMode: true,
+      expertMode: false,
       activeStep: 'info'
     };
   }
@@ -207,7 +207,7 @@ class ExperimentForm extends React.Component {
           <Grid.Column>
             <Form.Input
               type="number"
-              label="Are technology and/or technological solutions involved?"
+              label="(C1) Are technology and/or technological solutions involved?"
               name="c1"
               value={item.c1}
               onChange={this.handleChange}
@@ -221,7 +221,7 @@ class ExperimentForm extends React.Component {
           <Grid.Column>
             <Form.Input
               type="number"
-              label="Are the elderly involved?"
+              label="(C2) Are the elderly involved?"
               name="c2"
               value={item.c2}
               onChange={this.handleChange}
@@ -235,7 +235,7 @@ class ExperimentForm extends React.Component {
           <Grid.Column>
             <Form.Input
               type="number"
-              label="Is it related to loneliness, social isolation, or social connectedness reason?"
+              label="(C3) Is it related to loneliness, social isolation, or social connectedness reason?"
               name="c3"
               value={item.c2}
               onChange={this.handleChange}

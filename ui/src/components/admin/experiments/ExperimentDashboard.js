@@ -1,11 +1,28 @@
 import React from 'react';
-import {Step, Icon, Segment, Grid, Form, Button, Statistic, Divider, Header, Card} from 'semantic-ui-react';
+import {
+  Step,
+  Icon,
+  Segment,
+  Grid,
+  Form,
+  Button,
+  Statistic,
+  Divider,
+  Header,
+  Card,
+  Image,
+  List
+} from 'semantic-ui-react';
+
+import lossPrice from 'src/images/lossprice.png';
 
 class ExperimentDashboard extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      activeStep: 'process'
+      activeStep: 'process',
+      isRunning: true,
+      expertMode: false
     };
   }
   render() {
@@ -37,6 +54,9 @@ class ExperimentDashboard extends React.Component {
   }
 
   renderProcess() {
+    let item = {
+      aggregationStrategy: 'mv'
+    };
     return (
       <Form>
         <Grid>
@@ -44,45 +64,27 @@ class ExperimentDashboard extends React.Component {
             <Grid.Column>
               <h4 style={{textAlign: 'center'}}>Estimated results</h4>
               <hr />
-              <Statistic.Group widths="2">
-                <Statistic>
-                  <Statistic.Value>
-                    <Icon
-                      name="calculator"
-                      // color="blue"
-                      size="small"
-                      style={{
-                        verticalAlign: 'top',
-                        marginTop: '8px',
-                        marginRight: '2px'
-                      }}
-                    />
-                    0.40
-                  </Statistic.Value>
-                  <Statistic.Label>Estimated precision</Statistic.Label>
-                </Statistic>
-
-                <Statistic>
-                  <Statistic.Value>
-                    <Icon
-                      name="calculator"
-                      // color="blue"
-                      size="small"
-                      style={{
-                        verticalAlign: 'top',
-                        marginTop: '8px',
-                        marginRight: '2px'
-                      }}
-                    />
-                    0.80
-                  </Statistic.Value>
-                  <Statistic.Label>Estimated price ratio</Statistic.Label>
-                </Statistic>
-              </Statistic.Group>
+              {this.state.expertMode ? this.renderExpertEstimations() : this.renderAuthorsEstimations()}
             </Grid.Column>
             <Grid.Column>
               <h4 style={{textAlign: 'center'}}>Actual results</h4>
               <hr />
+              <div hidden={!this.state.expertMode} style={{marginBottom: '20px'}}>
+                <Form.Select
+                  label="Aggregation strategy"
+                  name="aggregationStrategy"
+                  value={item.aggregationStrategy}
+                  options={[
+                    {text: 'Majority Voting', value: 'mv'},
+                    {text: 'Truth Finder', value: 'tf'},
+                    {text: 'Dawid & Skene', value: 'ds'},
+                    {text: 'SUMS', value: 'sums'},
+                    {text: 'Investment', value: 'inv'},
+                    {text: 'Average-log', value: 'avg'}
+                  ]}
+                  onChange={this.handleChange}
+                />
+              </div>
               <Statistic.Group widths="3">
                 <Statistic>
                   <Statistic.Value>
@@ -120,13 +122,128 @@ class ExperimentDashboard extends React.Component {
           </Grid.Row>
           <Grid.Row>
             <Grid.Column>
-              <Button floated="right" size="large" style={{width: '200px'}} positive>
-                Stop
+              <Button floated="right" size="large" negative={this.state.isRunning} positive={!this.state.isRunning}>
+                {this.state.isRunning ? 'Stop' : 'Run'}
               </Button>
+              {this.state.expertMode && (
+                <Button floated="right" size="large" style={{width: '200px'}}>
+                  Update parameters
+                </Button>
+              )}
             </Grid.Column>
           </Grid.Row>
         </Grid>
       </Form>
+    );
+  }
+
+  renderExpertEstimations() {
+    let item = {
+      maxTasksRule: 3,
+      taskRewardRule: 0.5,
+      testFrequencyRule: 2,
+      initialTestsRule: 2,
+      initialTestsMinCorrectAnswersRule: 100,
+      votesPerTaskRule: 2,
+      expertCostRule: 0.2
+    };
+    return (
+      <div>
+        <Image src={lossPrice} style={{width: '400px', marginLeft: 'auto', marginRight: 'auto'}} />
+        <Header as="h2" content="Parameters" textAlign="center" />
+        <Grid>
+          <Grid.Row>
+            <Grid.Column width="8">
+              <List divided relaxed>
+                <List.Item>
+                  <List.Content>
+                    <List.Header as="h4">Max. tasks</List.Header>
+                    <List.Description as="p">{item.maxTasksRule}</List.Description>
+                  </List.Content>
+                </List.Item>
+                <List.Item>
+                  <List.Content>
+                    <List.Header as="h4">Task reward</List.Header>
+                    <List.Description as="p">{item.taskRewardRule}</List.Description>
+                  </List.Content>
+                </List.Item>
+                <List.Item>
+                  <List.Content>
+                    <List.Header as="h4">Test frequency</List.Header>
+                    <List.Description as="p">{item.testFrequencyRule}</List.Description>
+                  </List.Content>
+                </List.Item>
+                <List.Item>
+                  <List.Content>
+                    <List.Header as="h4">Expert cost</List.Header>
+                    <List.Description as="p">{item.expertCostRule}</List.Description>
+                  </List.Content>
+                </List.Item>
+              </List>
+            </Grid.Column>
+            <Grid.Column width="8">
+              <List divided relaxed>
+                <List.Item>
+                  <List.Content>
+                    <List.Header as="h4">Initial tests</List.Header>
+                    <List.Description as="p">{item.initialTestsRule}</List.Description>
+                  </List.Content>
+                </List.Item>
+                <List.Item>
+                  <List.Content>
+                    <List.Header as="h4">Initial Tests min score (%)</List.Header>
+                    <List.Description as="p">{item.initialTestsMinCorrectAnswersRule}</List.Description>
+                  </List.Content>
+                </List.Item>
+                <List.Item>
+                  <List.Content>
+                    <List.Header as="h4">Answers per task</List.Header>
+                    <List.Description as="p">{item.votesPerTaskRule}</List.Description>
+                  </List.Content>
+                </List.Item>
+              </List>
+            </Grid.Column>
+          </Grid.Row>
+        </Grid>
+      </div>
+    );
+  }
+
+  renderAuthorsEstimations() {
+    return (
+      <Statistic.Group widths="2">
+        <Statistic>
+          <Statistic.Value>
+            <Icon
+              name="calculator"
+              size="small"
+              style={{
+                verticalAlign: 'top',
+                marginTop: '8px',
+                marginRight: '2px'
+              }}
+            />
+            0.40
+          </Statistic.Value>
+          <Statistic.Label>Estimated precision</Statistic.Label>
+        </Statistic>
+
+        <Statistic>
+          <Statistic.Value>
+            <Icon
+              name="calculator"
+              size="small"
+              style={{
+                verticalAlign: 'top',
+                marginTop: '8px',
+                marginRight: '2px'
+              }}
+            />
+            0.80
+          </Statistic.Value>
+          <Statistic.Label>Estimated price ratio</Statistic.Label>
+        </Statistic>
+      </Statistic.Group>
     );
   }
 

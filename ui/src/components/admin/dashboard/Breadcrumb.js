@@ -10,7 +10,7 @@ class BreadcrumbWidget extends React.Component {
 
     return (
       <Grid style={{margin: '10px'}}>
-        <Grid.Row>
+        <Grid.Row style={{paddingBottom: 0, paddingTop: 0}}>
           <Grid.Column>
             <Breadcrumb size="large">
               {breadcrumbs.map(({breadcrumb, path, match}, idx) => (
@@ -37,6 +37,7 @@ const routes = [
   {path: '/admin', breadcrumb: <Icon name="home" />},
   {path: '/admin/experiments', breadcrumb: 'Experiments'},
   {path: '/admin/experiments/new', breadcrumb: 'New'},
+  {path: '/admin/experiments/:experimentId/dashboard', breadcrumb: 'Dashboard'},
   {path: '/admin/profile', breadcrumb: 'Personal Information'}
 ];
 

@@ -31,18 +31,23 @@ const options = {
   actions: {
     label: 'Actions',
     renderer(item) {
-      if (item.status === ExperimentStatus.NOT_PUBLISHED) {
-        return (
-          <Popup
-            trigger={
-              <Button icon color="blue" size="mini" as={Link} to={`/admin/experiments/${item.id}/publish`}>
-                <Icon name="play" />
-              </Button>
-            }
-            content="Publish your experiment on Mechanical Turk"
-          />
-        );
-      }
+      return (
+        <React.Fragment>
+          {item.status === ExperimentStatus.NOT_PUBLISHED && (
+            <Popup
+              trigger={
+                <Button icon color="blue" size="mini" as={Link} to={`/admin/experiments/${item.id}/publish`}>
+                  <Icon name="play" />
+                </Button>
+              }
+              content="Publish your experiment on Mechanical Turk"
+            />
+          )}
+          <Button icon color="blue" size="mini" as={Link} to={`/admin/experiments/${item.id}/dashboard`}>
+            <Icon name="setting" />
+          </Button>
+        </React.Fragment>
+      );
     }
   }
 };

@@ -29,7 +29,7 @@ class DataTable extends React.Component {
           </Grid.Row>
           <Grid.Row>
             <Grid.Column>
-              <Table columns={columnKeys.length} celled striped>
+              <Table columns={columnKeys.length + 1} celled striped>
                 <Table.Header>
                   <Table.Row>
                     {columnKeys.map(field => <Table.HeaderCell key={field}>{columns[field].label}</Table.HeaderCell>)}

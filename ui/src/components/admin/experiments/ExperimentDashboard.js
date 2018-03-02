@@ -1,18 +1,5 @@
 import React from 'react';
-import {
-  Step,
-  Icon,
-  Segment,
-  Grid,
-  Form,
-  Button,
-  Statistic,
-  Divider,
-  Header,
-  Card,
-  Image,
-  List
-} from 'semantic-ui-react';
+import {Step, Icon, Segment, Grid, Form, Button, Statistic, Header, Image, List, Accordion} from 'semantic-ui-react';
 
 import lossPrice from 'src/images/lossprice.png';
 
@@ -22,8 +9,10 @@ class ExperimentDashboard extends React.Component {
     this.state = {
       activeStep: 'process',
       isRunning: true,
-      expertMode: false
+      expertMode: false,
+      activeIndex: 0
     };
+    this.handleAccordionClick = this.handleAccordionClick.bind(this);
   }
   render() {
     return (
@@ -277,43 +266,54 @@ class ExperimentDashboard extends React.Component {
         color: 'green'
       }
     ];
-    return [1, 2, 3].map((paper, idx) => (
-      <Card key={paper} style={{boxShadow: 'none'}} fluid>
-        <Card.Content>
-          <Card.Header style={{marginBottom: '10px', textAlign: 'center'}}>
-            <Icon size="large" name={results[idx].icon} color={results[idx].color} />
-            Paper #{paper}
-          </Card.Header>
-          <Divider clearing />
-          <Card.Description textAlign="center">
-            {['C1', 'C2', 'C3'].map(f => (
-              <div key={f} style={{display: 'inline-block', marginRight: '10px'}}>
-                <Header size="large" content={f} textAlign="center" />
-                <Button
-                  size="mini"
-                  content="IN"
-                  icon="check"
-                  label={{basic: true, pointing: 'left', content: results[idx].votes[f].in}}
-                />
-                <Button
-                  basic
-                  size="mini"
-                  content="OUT"
-                  icon="remove"
-                  label={{as: 'a', basic: true, pointing: 'left', content: results[idx].votes[f].out}}
-                />
-              </div>
-            ))}
-          </Card.Description>
-        </Card.Content>
-      </Card>
-    ));
+    return (
+      <Accordion style={{width: '100%'}} styled>
+        {[1, 2, 3].map((paper, idx) => (
+          <div key={idx}>
+            <Accordion.Title active={this.state.activeIndex === idx} index={idx} onClick={this.handleAccordionClick}>
+              <Icon name="dropdown" />
+              Paper #{paper}
+              <Icon name={results[idx].icon} color={results[idx].color} style={{marginLeft: '10px'}} />
+            </Accordion.Title>
+            <Accordion.Content active={this.state.activeIndex === idx} style={{textAlign: 'center'}}>
+              {['C1', 'C2', 'C3'].map(f => (
+                <div key={f} style={{display: 'inline-block', marginRight: '10px'}}>
+                  <Header size="large" content={f} textAlign="center" />
+                  <Button
+                    size="mini"
+                    content="IN"
+                    icon="check"
+                    label={{basic: true, pointing: 'left', content: results[idx].votes[f].in}}
+                  />
+                  <Button
+                    basic
+                    size="mini"
+                    content="OUT"
+                    icon="remove"
+                    label={{as: 'a', basic: true, pointing: 'left', content: results[idx].votes[f].out}}
+                  />
+                </div>
+              ))}
+            </Accordion.Content>
+          </div>
+        ))}
+      </Accordion>
+    );
   }
 
   setStep(activeStep) {
     this.setState({
       ...this.state,
       activeStep
+    });
+  }
+
+  handleAccordionClick(e, {index}) {
+    const {activeIndex} = this.state;
+    const newIndex = activeIndex === index ? -1 : index;
+    this.setState({
+      ...this.state,
+      activeIndex: newIndex
     });
   }
 }

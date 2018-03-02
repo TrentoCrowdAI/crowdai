@@ -40,7 +40,7 @@ class ExperimentForm extends React.Component {
         <Grid container centered>
           <Grid.Row style={{padding: 0}}>
             <Grid.Column width="4">
-              <h1>New experiment</h1>
+              <h1>New screening</h1>
             </Grid.Column>
           </Grid.Row>
           <Grid.Row>
@@ -111,7 +111,7 @@ class ExperimentForm extends React.Component {
 
           <Form.Input
             width={6}
-            label="Information of Consent URL"
+            label="Informed Consent URL"
             name="consentUrl"
             value={item.consentUrl}
             placeholder="URL to consent file"
@@ -207,7 +207,7 @@ class ExperimentForm extends React.Component {
               name="c1"
               value={item.c1}
               onChange={this.handleChange}
-              min="1"
+              min="0"
               max="100"
               placeholder="% of papers you think would meet the criteria"
             />
@@ -221,7 +221,7 @@ class ExperimentForm extends React.Component {
               name="c2"
               value={item.c2}
               onChange={this.handleChange}
-              min="1"
+              min="0"
               max="100"
               placeholder="% of papers you think would meet the criteria"
             />
@@ -235,7 +235,7 @@ class ExperimentForm extends React.Component {
               name="c3"
               value={item.c2}
               onChange={this.handleChange}
-              min="1"
+              min="0"
               max="100"
               placeholder="% of papers you think would meet the criteria"
             />
@@ -296,8 +296,14 @@ class ExperimentForm extends React.Component {
                 </List.Item>
                 <List.Item>
                   <List.Content>
-                    <List.Header as="h4">Answers per task</List.Header>
+                    <List.Header as="h4">#Votes per (paper,criteria)</List.Header>
                     <List.Description as="p">{item.votesPerTaskRule}</List.Description>
+                  </List.Content>
+                </List.Item>
+                <List.Item>
+                  <List.Content>
+                    <List.Header as="h4">Expert cost (in USD)</List.Header>
+                    <List.Description as="p">{item.expertCostRule}</List.Description>
                   </List.Content>
                 </List.Item>
               </List>
@@ -374,7 +380,7 @@ class ExperimentForm extends React.Component {
 
             <Form.Input
               width={4}
-              label="Answers per task"
+              label="#Votes per (paper,criteria)"
               name="votesPerTaskRule"
               value={item.votesPerTaskRule}
               onChange={this.handleChange}
@@ -384,7 +390,7 @@ class ExperimentForm extends React.Component {
             />
             <Form.Input
               width={4}
-              label="Expert cost"
+              label="Expert cost (in USD)"
               name="expertCostRule"
               value={item.expertCostRule}
               onChange={this.handleChange}
@@ -393,20 +399,6 @@ class ExperimentForm extends React.Component {
               required
             />
           </Form.Group>
-          {/* <Form.Group widths="equal">
-            <Form.Input
-              label="Expert cost"
-              name="expertCostRule"
-              value={item.expertCostRule}
-              onChange={this.handleChange}
-              type="number"
-              min="1"
-              required
-            /> */}
-          {/* dumb inputs just to ensure correct sizing  */}
-          {/* <Form.Input type="hidden" /> */}
-          {/* <Form.Input type="hidden" /> */}
-          {/* </Form.Group> */}
         </Accordion.Content>
       </Accordion>
     );

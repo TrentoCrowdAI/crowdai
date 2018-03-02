@@ -1,3 +1,3 @@
 # CrowdAI
 
-Crowd-Machine collaboration algorithms.
+A platform for crowd-based screening of literature reviews.

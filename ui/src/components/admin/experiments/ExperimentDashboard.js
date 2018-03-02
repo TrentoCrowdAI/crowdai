@@ -3,6 +3,15 @@ import {Step, Icon, Segment, Grid, Form, Button, Statistic, Header, Image, List,
 
 import lossPrice from 'src/images/lossprice.png';
 
+const AGGREGATION_STRATEGIES = [
+  {text: 'Majority Voting', value: 'mv'},
+  {text: 'Truth Finder', value: 'tf'},
+  {text: 'Dawid & Skene', value: 'ds'},
+  {text: 'SUMS', value: 'sums'},
+  {text: 'Investment', value: 'inv'},
+  {text: 'Average-log', value: 'avg'}
+];
+
 class ExperimentDashboard extends React.Component {
   constructor(props) {
     super(props);
@@ -10,7 +19,7 @@ class ExperimentDashboard extends React.Component {
       activeStep: 'process',
       isRunning: true,
       expertMode: false,
-      activeIndex: 0
+      activeIndex: {}
     };
     this.handleAccordionClick = this.handleAccordionClick.bind(this);
   }
@@ -44,7 +53,7 @@ class ExperimentDashboard extends React.Component {
 
   renderProcess() {
     let item = {
-      aggregationStrategy: 'mv'
+      aggregationStrategy: 'ds'
     };
     return (
       <Form>
@@ -63,14 +72,7 @@ class ExperimentDashboard extends React.Component {
                   label="Aggregation strategy"
                   name="aggregationStrategy"
                   value={item.aggregationStrategy}
-                  options={[
-                    {text: 'Majority Voting', value: 'mv'},
-                    {text: 'Truth Finder', value: 'tf'},
-                    {text: 'Dawid & Skene', value: 'ds'},
-                    {text: 'SUMS', value: 'sums'},
-                    {text: 'Investment', value: 'inv'},
-                    {text: 'Average-log', value: 'avg'}
-                  ]}
+                  options={AGGREGATION_STRATEGIES}
                   onChange={this.handleChange}
                 />
               </div>
@@ -164,7 +166,7 @@ class ExperimentDashboard extends React.Component {
                 </List.Item>
                 <List.Item>
                   <List.Content>
-                    <List.Header as="h4">Expert cost</List.Header>
+                    <List.Header as="h4">Expert cost (in USD)</List.Header>
                     <List.Description as="p">{item.expertCostRule}</List.Description>
                   </List.Content>
                 </List.Item>
@@ -186,7 +188,7 @@ class ExperimentDashboard extends React.Component {
                 </List.Item>
                 <List.Item>
                   <List.Content>
-                    <List.Header as="h4">Answers per task</List.Header>
+                    <List.Header as="h4">Votes per (paper,criteria)</List.Header>
                     <List.Description as="p">{item.votesPerTaskRule}</List.Description>
                   </List.Content>
                 </List.Item>
@@ -241,11 +243,11 @@ class ExperimentDashboard extends React.Component {
       {
         votes: {
           C1: {in: 2, out: 1},
-          C2: {in: 1, out: 2},
+          C2: {in: 1, out: 0},
           C3: {in: 2, out: 1}
         },
-        icon: 'check',
-        color: 'green'
+        pout: 0.15,
+        in: true
       },
       {
         votes: {
@@ -253,8 +255,9 @@ class ExperimentDashboard extends React.Component {
           C2: {in: 1, out: 2},
           C3: {in: 1, out: 2}
         },
-        icon: 'remove',
-        color: 'red'
+        pout: 0.99,
+        in: false,
+        reason: 'not on 75+ older adults'
       },
       {
         votes: {
@@ -262,42 +265,61 @@ class ExperimentDashboard extends React.Component {
           C2: {in: 1, out: 2},
           C3: {in: 2, out: 1}
         },
-        icon: 'check',
-        color: 'green'
+        pout: 0.03,
+        in: true
       }
     ];
+    const item = {aggregationStrategy: 'ds'};
+
     return (
-      <Accordion style={{width: '100%'}} styled>
-        {[1, 2, 3].map((paper, idx) => (
-          <div key={idx}>
-            <Accordion.Title active={this.state.activeIndex === idx} index={idx} onClick={this.handleAccordionClick}>
-              <Icon name="dropdown" />
-              Paper #{paper}
-              <Icon name={results[idx].icon} color={results[idx].color} style={{marginLeft: '10px'}} />
-            </Accordion.Title>
-            <Accordion.Content active={this.state.activeIndex === idx} style={{textAlign: 'center'}}>
-              {['C1', 'C2', 'C3'].map(f => (
-                <div key={f} style={{display: 'inline-block', marginRight: '10px'}}>
-                  <Header size="large" content={f} textAlign="center" />
-                  <Button
-                    size="mini"
-                    content="IN"
-                    icon="check"
-                    label={{basic: true, pointing: 'left', content: results[idx].votes[f].in}}
-                  />
-                  <Button
-                    basic
-                    size="mini"
-                    content="OUT"
-                    icon="remove"
-                    label={{as: 'a', basic: true, pointing: 'left', content: results[idx].votes[f].out}}
-                  />
-                </div>
-              ))}
-            </Accordion.Content>
-          </div>
-        ))}
-      </Accordion>
+      <Form>
+        <div hidden={!this.state.expertMode} style={{marginBottom: '20px'}}>
+          <Form.Select
+            label="Aggregation strategy"
+            name="aggregationStrategy"
+            value={item.aggregationStrategy}
+            options={AGGREGATION_STRATEGIES}
+            onChange={this.handleChange}
+          />
+        </div>
+        <Accordion style={{width: '100%'}} styled exclusive={false}>
+          {[1, 2, 3].map((paper, idx) => (
+            <div key={idx}>
+              <Accordion.Title active={this.state.activeIndex[idx]} index={idx} onClick={this.handleAccordionClick}>
+                <Icon name="dropdown" />
+                Paper #{paper}
+                <Icon
+                  name={results[idx].in ? 'check' : 'remove'}
+                  color={results[idx].in ? 'green' : 'red'}
+                  style={{marginLeft: '10px'}}
+                />
+                <span style={{marginLeft: '10px'}}>P(OUT) = {results[idx].pout}</span>
+                {!results[idx].in && <span style={{marginLeft: '10px'}}>Reason: {results[idx].reason}</span>}
+              </Accordion.Title>
+              <Accordion.Content active={this.state.activeIndex === idx} style={{textAlign: 'center'}}>
+                {['C1', 'C2', 'C3'].map(f => (
+                  <div key={f} style={{display: 'inline-block', marginRight: '10px'}}>
+                    <Header size="large" content={f} textAlign="center" />
+                    <Button
+                      size="mini"
+                      content="IN"
+                      icon="check"
+                      label={{basic: true, pointing: 'left', content: results[idx].votes[f].in}}
+                    />
+                    <Button
+                      basic
+                      size="mini"
+                      content="OUT"
+                      icon="remove"
+                      label={{as: 'a', basic: true, pointing: 'left', content: results[idx].votes[f].out}}
+                    />
+                  </div>
+                ))}
+              </Accordion.Content>
+            </div>
+          ))}
+        </Accordion>
+      </Form>
     );
   }
 

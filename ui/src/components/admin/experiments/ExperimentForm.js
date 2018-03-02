@@ -25,7 +25,7 @@ class ExperimentForm extends React.Component {
     this.showRulesClick = this.showRulesClick.bind(this);
     this.state = {
       showRules: false,
-      expertMode: false,
+      expertMode: true,
       activeStep: 'info'
     };
   }
@@ -100,7 +100,7 @@ class ExperimentForm extends React.Component {
       <React.Fragment>
         <Form.Group>
           <Form.Input
-            width={16}
+            width={5}
             label="Name"
             name="name"
             value={item.name}
@@ -108,11 +108,9 @@ class ExperimentForm extends React.Component {
             onChange={this.handleChange}
             required
           />
-        </Form.Group>
 
-        <Form.Group>
           <Form.Input
-            width={10}
+            width={6}
             label="Information of Consent URL"
             name="consentUrl"
             value={item.consentUrl}
@@ -122,7 +120,7 @@ class ExperimentForm extends React.Component {
           />
 
           <Form.Select
-            width={6}
+            width={4}
             label="Format"
             name="consentFormat"
             value={item.consentFormat}
@@ -131,9 +129,8 @@ class ExperimentForm extends React.Component {
           />
         </Form.Group>
 
-        <Form.Group>
+        <Form.Group widths="equal">
           <Form.Input
-            width={10}
             label="Task instructions URL"
             name="taskInstructionsUrl"
             value={item.taskInstructionsUrl}
@@ -143,7 +140,6 @@ class ExperimentForm extends React.Component {
           />
 
           <Form.Select
-            width={6}
             label="Format"
             name="taskInstructionsFormat"
             value={item.taskInstructionsFormat}
@@ -354,6 +350,7 @@ class ExperimentForm extends React.Component {
 
           <Form.Group widths="equal">
             <Form.Input
+              width={2}
               label="Initial tests"
               name="initialTestsRule"
               value={item.initialTestsRule}
@@ -364,6 +361,7 @@ class ExperimentForm extends React.Component {
             />
 
             <Form.Input
+              width={4}
               label="Initial Tests min score (%)"
               name="initialTestsMinCorrectAnswersRule"
               value={item.initialTestsMinCorrectAnswersRule}
@@ -375,6 +373,7 @@ class ExperimentForm extends React.Component {
             />
 
             <Form.Input
+              width={4}
               label="Answers per task"
               name="votesPerTaskRule"
               value={item.votesPerTaskRule}
@@ -383,9 +382,8 @@ class ExperimentForm extends React.Component {
               min="1"
               required
             />
-          </Form.Group>
-          <Form.Group widths="equal">
             <Form.Input
+              width={4}
               label="Expert cost"
               name="expertCostRule"
               value={item.expertCostRule}
@@ -394,10 +392,21 @@ class ExperimentForm extends React.Component {
               min="1"
               required
             />
-            {/* dumb inputs just to ensure correct sizing  */}
-            <Form.Input type="hidden" />
-            <Form.Input type="hidden" />
           </Form.Group>
+          {/* <Form.Group widths="equal">
+            <Form.Input
+              label="Expert cost"
+              name="expertCostRule"
+              value={item.expertCostRule}
+              onChange={this.handleChange}
+              type="number"
+              min="1"
+              required
+            /> */}
+          {/* dumb inputs just to ensure correct sizing  */}
+          {/* <Form.Input type="hidden" /> */}
+          {/* <Form.Input type="hidden" /> */}
+          {/* </Form.Group> */}
         </Accordion.Content>
       </Accordion>
     );

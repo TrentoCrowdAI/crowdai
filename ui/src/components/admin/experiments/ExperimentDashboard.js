@@ -1,5 +1,5 @@
 import React from 'react';
-import {Step, Icon, Segment, Grid, Form, Button, Statistic} from 'semantic-ui-react';
+import {Step, Icon, Segment, Grid, Form, Button, Statistic, Divider, Header, Card} from 'semantic-ui-react';
 
 class ExperimentDashboard extends React.Component {
   constructor(props) {
@@ -131,7 +131,66 @@ class ExperimentDashboard extends React.Component {
   }
 
   renderFinalResults() {
-    return <p>final results</p>;
+    let results = [
+      {
+        votes: {
+          C1: {in: 2, out: 1},
+          C2: {in: 1, out: 2},
+          C3: {in: 2, out: 1}
+        },
+        icon: 'check',
+        color: 'green'
+      },
+      {
+        votes: {
+          C1: {in: 1, out: 2},
+          C2: {in: 1, out: 2},
+          C3: {in: 1, out: 2}
+        },
+        icon: 'remove',
+        color: 'red'
+      },
+      {
+        votes: {
+          C1: {in: 2, out: 1},
+          C2: {in: 1, out: 2},
+          C3: {in: 2, out: 1}
+        },
+        icon: 'check',
+        color: 'green'
+      }
+    ];
+    return [1, 2, 3].map((paper, idx) => (
+      <Card key={paper} style={{boxShadow: 'none'}} fluid>
+        <Card.Content>
+          <Card.Header style={{marginBottom: '10px', textAlign: 'center'}}>
+            <Icon size="large" name={results[idx].icon} color={results[idx].color} />
+            Paper #{paper}
+          </Card.Header>
+          <Divider clearing />
+          <Card.Description textAlign="center">
+            {['C1', 'C2', 'C3'].map(f => (
+              <div key={f} style={{display: 'inline-block', marginRight: '10px'}}>
+                <Header size="large" content={f} textAlign="center" />
+                <Button
+                  size="mini"
+                  content="IN"
+                  icon="check"
+                  label={{basic: true, pointing: 'left', content: results[idx].votes[f].in}}
+                />
+                <Button
+                  basic
+                  size="mini"
+                  content="OUT"
+                  icon="remove"
+                  label={{as: 'a', basic: true, pointing: 'left', content: results[idx].votes[f].out}}
+                />
+              </div>
+            ))}
+          </Card.Description>
+        </Card.Content>
+      </Card>
+    ));
   }
 
   setStep(activeStep) {

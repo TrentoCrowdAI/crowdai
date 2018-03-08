@@ -48,7 +48,11 @@ class DataTable extends React.Component {
                   )}
                   {data.map(record => (
                     <Table.Row key={record.id} positive={options.rowPositive && options.rowPositive(record)}>
-                      {columnKeys.map(field => <Table.Cell key={`${record.id}-${field}`}>{record[field]}</Table.Cell>)}
+                      {columnKeys.map(field => (
+                        <Table.Cell key={`${record.id}-${field}`}>
+                          {columns[field].renderer ? columns[field].renderer(record) : record[field]}
+                        </Table.Cell>
+                      ))}
 
                       {options.actions && (
                         <Table.Cell key={`actions-${record.id}`}>{options.actions.renderer(record)}</Table.Cell>
@@ -85,12 +89,18 @@ class DataTable extends React.Component {
   }
 }
 
+// const ColumnType = PropTypes.shape({
+//   label: PropTypes.string.isRequired,
+//   renderer: PropTypes.func
+// });
+
 DataTable.propTypes = {
   title: PropTypes.string.isRequired,
   options: PropTypes.shape({
     columns: PropTypes.object,
     actions: PropTypes.shape({
       label: PropTypes.string.isRequired,
+      // function that receives the item as an argument
       renderer: PropTypes.func.isRequired
     }),
     rowPositive: PropTypes.func

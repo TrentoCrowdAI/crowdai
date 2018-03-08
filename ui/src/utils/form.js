@@ -1,4 +1,5 @@
 import set from 'set-value';
+import cloneDeep from 'clone-deep';
 
 const getActionTypes = scope => {
   return {
@@ -122,7 +123,7 @@ const getReducer = (scope, formFields) => {
           error: action.error
         };
       case actionTypes.SET_INPUT_VALUE:
-        let newState = {...state};
+        let newState = cloneDeep(state);
         set(newState.item, action.name, action.value);
         return newState;
       case actionTypes.FETCH_ITEM:

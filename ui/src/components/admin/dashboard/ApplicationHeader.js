@@ -14,9 +14,9 @@ class ApplicationHeader extends React.Component {
 
     return (
       <Menu stackable style={{width: '100%'}}>
-        <Menu.Item name="experiments" active={pathname === '/admin/experiments'}>
-          <Link to="/admin/experiments" style={{color: 'rgba(0,0,0,.87)'}}>
-            Experiments
+        <Menu.Item name="projects" active={pathname === '/admin/projects'}>
+          <Link to="/admin/projects" style={{color: 'rgba(0,0,0,.87)'}}>
+            Projects
           </Link>
         </Menu.Item>
 

@@ -2,10 +2,11 @@
 
 module.exports = {
   db: {
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    host: process.env.DB_HOST,
-    bucket: process.env.DB_BUCKET
+    user: process.env.PGUSER,
+    password: process.env.PGPASSWORD,
+    host: process.env.PGHOST,
+    port: process.env.PGPORT,
+    database: process.env.PGDATABASE
   },
   rules: {
     maxTasks: Number(process.env.MAX_TASKS_RULE),

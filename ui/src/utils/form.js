@@ -1,3 +1,5 @@
+import set from 'set-value';
+
 const getActionTypes = scope => {
   return {
     CLEAN_STATE: `C_${scope}_FORM_CLEAN_STATE`,
@@ -120,13 +122,9 @@ const getReducer = (scope, formFields) => {
           error: action.error
         };
       case actionTypes.SET_INPUT_VALUE:
-        return {
-          ...state,
-          item: {
-            ...state.item,
-            [action.name]: action.value
-          }
-        };
+        let newState = {...state};
+        set(newState.item, action.name, action.value);
+        return newState;
       case actionTypes.FETCH_ITEM:
         return {
           ...state,

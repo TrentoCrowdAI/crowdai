@@ -1,32 +1,38 @@
-const couchbase = require('couchbase');
+const { Pool } = require('pg');
+
 const config = require(__base + 'config');
 
-const cluster = new couchbase.Cluster(`couchbase://${config.db.host}`);
-cluster.authenticate(config.db.user, config.db.password);
-const bucket = cluster.openBucket(config.db.bucket);
+const pool = new Pool({
+  database: config.db.database,
+  host: config.db.host,
+  port: config.db.port,
+  user: config.db.user,
+  password: config.db.password
+});
 
-const DOCUMENTS = {
-  Task: 'Task::',
-  Answer: 'Answer::',
-  WorkerAssignment: 'WorkerAssignment::',
-  TestTask: 'TestTask::',
-  TestAnswer: 'TestAnswer::',
-  Requester: 'Requester::',
-  Experiment: 'Experiment::'
-};
+const TABLES = Object.freeze({
+  Requester: 'requester',
+  Project: 'project',
+  Experiment: 'experiment',
+  Worker: 'worker',
+  WorkerAssignment: 'worker_assignment',
+  Item: 'item',
+  Criterion: 'criterion',
+  Test: 'test',
+  Task: 'task',
+  TestTask: 'test_task',
+  TaskAnswer: 'task_answer'
+});
 
-const TYPES = {
-  task: 'task',
-  answer: 'answer',
-  assignment: 'assignment',
-  testTask: 'testTask',
-  testAnswer: 'testAnswer',
-  requester: 'requester',
-  experiment: 'experiment'
-};
+/**
+ * Query wrapper to not use pg directly.
+ *
+ * @param {string} text
+ * @param {any[]} params
+ */
+const query = (text, params) => pool.query(text, params);
 
 module.exports = {
-  DOCUMENTS,
-  TYPES,
-  bucket
+  TABLES,
+  query
 };

@@ -26,18 +26,9 @@ class Profile extends React.Component {
             <Grid.Column width="8">
               <Form error={this.props.error !== undefined} loading={this.props.loading} success={this.props.saved}>
                 <Form.Input
-                  label="Requester ID"
-                  name="requesterId"
-                  value={profile.requesterId}
-                  placeholder="Mechanical Turk Requester ID..."
-                  onChange={this.handleChange}
-                  required
-                />
-
-                <Form.Input
                   label="Access Key ID"
-                  name="accessKeyId"
-                  value={profile.accessKeyId}
+                  name="data.accessKeyId"
+                  value={profile.data.accessKeyId}
                   placeholder="Amazon Access Key"
                   onChange={this.handleChange}
                   required
@@ -45,16 +36,16 @@ class Profile extends React.Component {
 
                 <Form.Input
                   label="Secret Access Key"
-                  name="secretAccessKey"
-                  value={profile.secretAccessKey}
+                  name="data.secretAccessKey"
+                  value={profile.data.secretAccessKey}
                   placeholder="Amazon Secret Access Key"
                   type="password"
                   onChange={this.handleChange}
                   required
                 />
 
-                <Form.Input label="Email" value={profile.email} readOnly />
-                <Form.Input label="Name" value={profile.name} readOnly />
+                <Form.Input label="Email" value={profile.data.email} readOnly />
+                <Form.Input label="Name" value={profile.data.name} readOnly />
 
                 {this.props.error && (
                   <Message

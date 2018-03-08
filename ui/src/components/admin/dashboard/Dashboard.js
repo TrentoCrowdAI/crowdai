@@ -15,7 +15,7 @@ class Dashboard extends React.Component {
     const {profile} = this.props;
     const {pathname} = this.props.location;
 
-    if (profile.id && !profile.requesterId && pathname !== '/admin/profile') {
+    if (profile.id && !profile.data.accessKeyId && pathname !== '/admin/profile') {
       return <Redirect to="/admin/profile" />;
     }
 

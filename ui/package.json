@@ -21,6 +21,7 @@
     "sanitize-html": "^1.17.0",
     "semantic-ui-css": "^2.2.14",
     "semantic-ui-react": "^0.77.2",
+    "set-value": "^3.0.0",
     "showdown": "^1.8.6"
   },
   "scripts": {

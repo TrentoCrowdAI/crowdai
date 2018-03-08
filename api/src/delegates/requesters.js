@@ -1,25 +1,16 @@
 const Boom = require('boom');
 const couchbase = require('couchbase');
 
-const bucket = require(__base + 'db').bucket;
+const db = require(__base + 'db');
 const config = require(__base + 'config');
-const { DOCUMENTS, TYPES } = require(__base + 'db');
 
-const getRequesterById = (exports.getRequesterById = async id => {
+const getById = (exports.getById = async id => {
   try {
-    return await new Promise((resolve, reject) => {
-      bucket.get(`${DOCUMENTS.Requester}${id}`, (err, data) => {
-        if (err) {
-          if (err.code === couchbase.errors.keyNotFound) {
-            resolve(null);
-          } else {
-            reject(err);
-          }
-        } else {
-          resolve(data.value);
-        }
-      });
-    });
+    let res = await db.query(
+      `select * from ${db.TABLES.Requester} where id = $1`,
+      [id]
+    );
+    return res.rows[0];
   } catch (error) {
     console.error(error);
     throw Boom.badImplementation(
@@ -28,21 +19,13 @@ const getRequesterById = (exports.getRequesterById = async id => {
   }
 });
 
-const getRequesterByMTurkId = (exports.getRequesterByMTurkId = async requesterId => {
+const getRequesterByGid = (exports.getRequesterByGid = async gid => {
   try {
-    const qs = `select * from \`${config.db.bucket}\` where type="${
-      TYPES.requester
-    }" and requesterId="${requesterId}"`;
-    const q = couchbase.N1qlQuery.fromString(qs);
-    return await new Promise((resolve, reject) => {
-      bucket.query(q, (err, data) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(data.map(d => d[config.db.bucket]).pop());
-        }
-      });
-    });
+    let res = await db.query(
+      `select * from ${db.TABLES.Requester} where data ->> 'gid' = $1`,
+      [gid]
+    );
+    return res.rows[0];
   } catch (error) {
     console.error(error);
     throw Boom.badImplementation(
@@ -51,22 +34,15 @@ const getRequesterByMTurkId = (exports.getRequesterByMTurkId = async requesterId
   }
 });
 
-const create = (exports.create = async requester => {
+const create = (exports.create = async requesterData => {
   try {
-    const key = `${DOCUMENTS.Requester}${requester.id}`;
-    requester.type = TYPES.requester;
-    return await new Promise((resolve, reject) => {
-      bucket.insert(key, requester, (error, result) => {
-        if (error) {
-          console.error(
-            `Error while inserting document ${key}. Error: ${error}`
-          );
-          reject(error);
-        } else {
-          resolve(result);
-        }
-      });
-    });
+    let res = await db.query(
+      `insert into ${
+        db.TABLES.Requester
+      }(created_at, data) values($1, $2) returning *`,
+      [new Date(), requesterData]
+    );
+    return res.rows[0];
   } catch (error) {
     console.error(error);
     throw Boom.badImplementation('Error while trying to persist requester');
@@ -75,24 +51,19 @@ const create = (exports.create = async requester => {
 
 const update = (exports.update = async (id, requester) => {
   try {
-    let saved = await getRequesterById(id);
+    let saved = await getById(id);
     let payload = {
-      ...saved,
-      ...requester
+      ...saved.data,
+      ...requester.data
     };
-    const key = `${DOCUMENTS.Requester}${requester.id}`;
-    return await new Promise((resolve, reject) => {
-      bucket.upsert(key, payload, (error, result) => {
-        if (error) {
-          console.error(
-            `Error while inserting document ${key}. Error: ${error}`
-          );
-          reject(error);
-        } else {
-          resolve(result);
-        }
-      });
-    });
+
+    let res = await db.query(
+      `update ${
+        db.TABLES.Requester
+      } set updated_at = $1, data = $2 where id = $3 returning *`,
+      [new Date(), payload, id]
+    );
+    return res.rows[0];
   } catch (error) {
     console.error(error);
     throw Boom.badImplementation('Error while trying to update requester');

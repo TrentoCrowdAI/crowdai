@@ -37,18 +37,7 @@ const getById = (exports.getById = async id => {
       `select * from ${db.TABLES.Experiment} where id = $1`,
       [id]
     );
-    const experiment = res.rows[0];
-    // TODO
-    // experiment.consent = await new Promise((resolve, reject) => {
-    //   request(experiment.data.consentUrl, (err, rsp, body) => {
-    //     if (err) {
-    //       reject(err);
-    //     } else {
-    //       resolve(rsp.body);
-    //     }
-    //   });
-    // });
-    return experiment;
+    return res.rows[0];
   } catch (error) {
     console.error(error);
     throw Boom.badImplementation('Error while trying to fetch the record');

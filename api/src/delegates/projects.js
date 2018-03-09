@@ -57,17 +57,24 @@ const create = (exports.create = async project => {
   }
 
   try {
+    await db.query('BEGIN');
     let res = await db.query(
       `insert into ${
         db.TABLES.Project
       }(requester_id, created_at, data) values($1, $2, $3) returning *`,
       [project.requester_id, new Date(), project.data]
     );
+    const saved = res.rows[0];
+    await createItems(saved);
+    await createCriteria(saved);
+    await createTests(saved);
+    await db.query('COMMIT');
     //await createTasks(item);
     //return cas;
-    return res.rows[0];
+    return saved;
   } catch (error) {
     console.error(error);
+    await db.query('ROLLBACK');
     throw Boom.badImplementation('Error while trying to persist the record');
   }
 });
@@ -97,6 +104,97 @@ const update = (exports.update = async (id, item) => {
     throw Boom.badImplementation('Error while trying to update the record');
   }
 });
+
+const createItems = async project => {
+  let parser = parse({ delimiter: ',', columns: true });
+  let items = [];
+  const transformer = transform(item => items.push(item), { parallel: 10 });
+
+  request(project.data.itemsUrl)
+    .pipe(parser)
+    .pipe(transformer);
+
+  await new Promise((resolve, reject) => {
+    transformer.on('finish', () => {
+      resolve();
+    });
+
+    transformer.on('error', err => {
+      reject(err);
+    });
+  });
+
+  for (item of items) {
+    await db.query(
+      `insert into ${
+        db.TABLES.Item
+      }(created_at, project_id, data) values($1, $2, $3)`,
+      [new Date(), project.id, item]
+    );
+  }
+};
+
+const createCriteria = async project => {
+  let parser = parse({ delimiter: ',', columns: true });
+  let criteria = [];
+  const transformer = transform(criterion => criteria.push(criterion), {
+    parallel: 10
+  });
+
+  request(project.data.filtersUrl)
+    .pipe(parser)
+    .pipe(transformer);
+
+  await new Promise((resolve, reject) => {
+    transformer.on('finish', () => {
+      resolve();
+    });
+
+    transformer.on('error', err => {
+      reject(err);
+    });
+  });
+
+  for (criterion of criteria) {
+    await db.query(
+      `insert into ${
+        db.TABLES.Criterion
+      }(created_at, project_id, data) values($1, $2, $3)`,
+      [new Date(), project.id, criterion]
+    );
+  }
+};
+
+const createTests = async project => {
+  let parser = parse({ delimiter: ',', columns: true });
+  let tests = [];
+  const transformer = transform(test => tests.push(test), {
+    parallel: 10
+  });
+
+  request(project.data.testsUrl)
+    .pipe(parser)
+    .pipe(transformer);
+
+  await new Promise((resolve, reject) => {
+    transformer.on('finish', () => {
+      resolve();
+    });
+
+    transformer.on('error', err => {
+      reject(err);
+    });
+  });
+
+  for (test of tests) {
+    await db.query(
+      `insert into ${
+        db.TABLES.Test
+      }(created_at, project_id, data) values($1, $2, $3)`,
+      [new Date(), project.id, test]
+    );
+  }
+};
 
 const createTasks = async experiment => {
   let parser = parse({ delimiter: ',', columns: true });

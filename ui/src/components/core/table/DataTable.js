@@ -2,6 +2,7 @@ import React from 'react';
 import {Table, Grid, Header, Button, Dimmer, Loader} from 'semantic-ui-react';
 import PropTypes from 'prop-types';
 import {Link} from 'react-router-dom';
+import getValue from 'get-value';
 
 class DataTable extends React.Component {
   render() {
@@ -50,7 +51,9 @@ class DataTable extends React.Component {
                     <Table.Row key={record.id} positive={options.rowPositive && options.rowPositive(record)}>
                       {columnKeys.map(field => (
                         <Table.Cell key={`${record.id}-${field}`}>
-                          {columns[field].renderer ? columns[field].renderer(record) : record[field]}
+                          {columns[field].renderer
+                            ? columns[field].renderer(record)
+                            : columns[field].key ? getValue(record, columns[field].key) : record[field]}
                         </Table.Cell>
                       ))}
 

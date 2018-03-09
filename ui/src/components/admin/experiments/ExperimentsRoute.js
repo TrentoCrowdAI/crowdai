@@ -9,10 +9,10 @@ import ExperimentDashboard from './ExperimentDashboard';
 
 const ExperimentsRoute = props => (
   <React.Fragment>
-    <Route exact path={`${props.match.url}/`} component={Experiments} />
-    <Route path={`${props.match.url}/new`} component={ExperimentForm} />
-    <Route path={`${props.match.url}/:experimentId/publish`} component={ExperimentPublishPage} />
-    <Route path={`${props.match.url}/:experimentId/dashboard`} component={ExperimentDashboard} />
+    <Route exact path={`${props.match.path}`} component={Experiments} />
+    <Route path={`${props.match.path}/new`} component={ExperimentForm} />
+    <Route path={`${props.match.path}/:experimentId/publish`} component={ExperimentPublishPage} />
+    <Route path={`${props.match.path}/:experimentId/dashboard`} component={ExperimentDashboard} />
   </React.Fragment>
 );
 

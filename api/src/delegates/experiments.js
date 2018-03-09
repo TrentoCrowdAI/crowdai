@@ -1,14 +1,12 @@
 const Boom = require('boom');
-const couchbase = require('couchbase');
 const uuid = require('uuid/v4');
 const request = require('request');
 const parse = require('csv-parse');
 const transform = require('stream-transform');
 const CronJob = require('cron').CronJob;
 
-const bucket = require(__base + 'db').bucket;
 const config = require(__base + 'config');
-const { DOCUMENTS, TYPES } = require(__base + 'db');
+const db = require(__base + 'db');
 const tasksDelegate = require('./tasks');
 const requestersDelegate = require('./requesters');
 const MTurk = require(__base + 'utils/mturk');
@@ -20,21 +18,13 @@ const ExperimentStatus = Object.freeze({
   DONE: 'DONE'
 });
 
-const getByRequester = (exports.getByRequester = async requesterId => {
+const getByProject = (exports.getByProject = async projectId => {
   try {
-    const qs = `select * from \`${config.db.bucket}\` where type="${
-      TYPES.experiment
-    }" and requesterId='${requesterId}'`;
-    const q = couchbase.N1qlQuery.fromString(qs);
-    return await new Promise((resolve, reject) => {
-      bucket.query(q, (err, answers) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(answers.map(a => a[config.db.bucket]));
-        }
-      });
-    });
+    let res = await db.query(
+      `select * from ${db.TABLES.Experiment} where project_id = $1`,
+      [projectId]
+    );
+    return { rows: res.rows, meta: { count: res.rowCount } };
   } catch (error) {
     console.error(error);
     throw Boom.badImplementation('Error while trying to fetch records');

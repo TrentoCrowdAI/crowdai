@@ -5,7 +5,10 @@ import {getReducer} from 'src/utils/form';
 import {scopes, FileFormats, ExperimentStatus} from 'src/utils/constants';
 
 const defaultState = {
-  experiments: [],
+  experiments: {
+    rows: [],
+    meta: {}
+  },
   error: undefined,
   loading: false
 };
@@ -21,7 +24,7 @@ const reducer = (state = defaultState, action) => {
     case actionTypes.FETCH_EXPERIMENTS_SUCCESS:
       return {
         ...state,
-        experiments: action.response.experiments,
+        experiments: action.response,
         loading: false
       };
     case actionTypes.FETCH_EXPERIMENTS_ERROR:

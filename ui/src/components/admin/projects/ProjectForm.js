@@ -2,6 +2,7 @@ import React from 'react';
 import {Container, Form, Button, Grid, Message} from 'semantic-ui-react';
 import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
+import {withRouter} from 'react-router';
 
 import {actions} from './actions';
 import {FileFormats} from 'src/utils/constants';
@@ -43,6 +44,9 @@ class ProjectForm extends React.Component {
                 <Button floated="right" positive>
                   Save
                 </Button>
+                <Button floated="right" type="button" onClick={() => this.props.history.push('/admin/projects')}>
+                  Cancel
+                </Button>
               </Form>
             </Grid.Column>
           </Grid.Row>
@@ -53,7 +57,6 @@ class ProjectForm extends React.Component {
 
   renderForm() {
     const {item} = this.props;
-    console.log(item);
 
     return (
       <React.Fragment>
@@ -124,7 +127,6 @@ class ProjectForm extends React.Component {
   }
 
   handleChange(e, {name, value}) {
-    console.log(name, value);
     this.props.setInputValue(name, value);
   }
 }
@@ -136,7 +138,8 @@ ProjectForm.propTypes = {
   saved: PropTypes.bool,
   submit: PropTypes.func,
   setInputValue: PropTypes.func,
-  cleanState: PropTypes.func
+  cleanState: PropTypes.func,
+  history: PropTypes.object
 };
 
 const mapStateToProps = state => ({
@@ -152,4 +155,4 @@ const mapDispatchToProps = dispatch => ({
   setInputValue: (name, value) => dispatch(actions.setInputValue(name, value))
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(ProjectForm);
+export default connect(mapStateToProps, mapDispatchToProps)(withRouter(ProjectForm));

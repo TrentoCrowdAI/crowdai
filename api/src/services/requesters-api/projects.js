@@ -11,9 +11,7 @@ const getRequesterProjects = async ctx => {
   if (!requester) {
     throw Boom.badRequest('Requester account has not been initialized');
   }
-  ctx.response.body = {
-    projects: await delegates.projects.getByRequester(requester.id)
-  };
+  ctx.response.body = await delegates.projects.getByRequester(requester.id);
 };
 
 const getById = async ctx => {

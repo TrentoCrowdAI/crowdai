@@ -23,11 +23,13 @@ CREATE TABLE project (
 CREATE TABLE experiment (
   id bigserial NOT NULL,
   project_id bigint NOT NULL,
+  uuid varchar(255) NOT NULL,
   created_at timestamp,
   updated_at timestamp,
   deleted_at timestamp,
   data JSONB,
-  CONSTRAINT pk_experiment PRIMARY KEY (id)
+  CONSTRAINT pk_experiment PRIMARY KEY (id),
+  CONSTRAINT uniq_experiment_uuid unique (uuid)
 );
 
 CREATE TABLE worker (

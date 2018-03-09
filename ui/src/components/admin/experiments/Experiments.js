@@ -1,26 +1,26 @@
 import React from 'react';
 import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
-import {Redirect, Link} from 'react-router-dom';
+import {Link} from 'react-router-dom';
 import {Button, Icon, Popup} from 'semantic-ui-react';
 
 import {actions} from './actions';
 import DataTable from 'src/components/core/table/DataTable';
 import {ExperimentStatus} from 'src/utils/constants';
 
-const ACCOUNT_NOT_INITIALIZED = 'Requester account has not been initialized';
-
 // configuration options for our DataTable.
 const options = {
   columns: {
-    id: {
-      label: 'ID'
+    uuid: {
+      label: 'UUID'
     },
     name: {
-      label: 'Name'
+      label: 'Name',
+      key: 'data.name'
     },
     status: {
-      label: 'Status'
+      label: 'Status',
+      key: 'data.status'
     }
   },
 
@@ -54,30 +54,28 @@ const options = {
 
 class Experiments extends React.Component {
   render() {
-    if (this.props.error && this.props.error.message === ACCOUNT_NOT_INITIALIZED) {
-      return <Redirect to="/admin/profile" />;
-    }
     return (
       <DataTable
-        title="My experiments"
+        title="My screenings"
         options={options}
-        data={this.props.experiments}
-        createUrl="/admin/experiments/new"
+        data={this.props.experiments.rows}
+        createUrl={`${this.props.match.url}/new`}
         loading={this.props.loading}
       />
     );
   }
 
   componentDidMount() {
-    this.props.fetchExperiments();
+    this.props.fetchExperiments(Number(this.props.match.params.projectId));
   }
 }
 
 Experiments.propTypes = {
   fetchExperiments: PropTypes.func,
-  error: PropTypes.object,
+  error: PropTypes.any,
   loading: PropTypes.bool,
-  experiments: PropTypes.arrayOf(PropTypes.object)
+  experiments: PropTypes.arrayOf(PropTypes.object),
+  match: PropTypes.object
 };
 
 const mapStateToProps = state => ({
@@ -87,7 +85,7 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-  fetchExperiments: () => dispatch(actions.fetchExperiments())
+  fetchExperiments: projectId => dispatch(actions.fetchExperiments(projectId))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Experiments);

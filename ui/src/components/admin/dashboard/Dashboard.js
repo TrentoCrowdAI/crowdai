@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import {Route, Switch, Redirect} from 'react-router-dom';
 
-import ExperimentsRoute from 'src/components/admin/experiments/ExperimentsRoute';
 import Profile from 'src/components/admin/profile/Profile';
 import {actions as profileActions} from 'src/components/admin/profile/actions';
 import ProjectsRoute from 'src/components/admin/projects/ProjectsRoute';
@@ -23,7 +22,6 @@ class Dashboard extends React.Component {
     return (
       <Switch>
         <Route path={'/admin/projects'} component={ProjectsRoute} />
-        <Route path={'/admin/experiments'} component={ExperimentsRoute} />
         <Route path={'/admin/profile'} component={Profile} />
         <Route render={() => <Redirect to="/admin/projects" />} />
       </Switch>

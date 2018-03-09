@@ -12,9 +12,10 @@ const actionTypes = {
 };
 
 const actions = {
-  fetchExperiments() {
+  fetchExperiments(projectId) {
     return {
-      type: actionTypes.FETCH_EXPERIMENTS
+      type: actionTypes.FETCH_EXPERIMENTS,
+      projectId
     };
   },
 

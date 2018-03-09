@@ -37,9 +37,9 @@ const routes = [
   {path: '/admin', breadcrumb: <Icon name="home" />},
   {path: '/admin/projects', breadcrumb: 'Projects'},
   {path: '/admin/projects/new', breadcrumb: 'New'},
-  {path: '/admin/experiments', breadcrumb: 'Experiments'},
-  {path: '/admin/experiments/new', breadcrumb: 'New'},
-  {path: '/admin/experiments/:experimentId/dashboard', breadcrumb: 'Dashboard'},
+  {path: '/admin/projects/:projectId/screenings', breadcrumb: 'Experiments'},
+  {path: '/admin/projects/:projectId/screenings/new', breadcrumb: 'New'},
+  {path: '/admin/projects/:projectId/screenings/:experimentId/dashboard', breadcrumb: 'Dashboard'},
   {path: '/admin/profile', breadcrumb: 'Personal Information'}
 ];
 

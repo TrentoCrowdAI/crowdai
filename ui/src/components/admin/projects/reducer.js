@@ -24,7 +24,7 @@ const reducer = (state = defaultState, action) => {
     case actionTypes.FETCH_PROJECTS_SUCCESS:
       return {
         ...state,
-        projects: action.response.projects,
+        projects: action.response,
         loading: false
       };
     case actionTypes.FETCH_PROJECTS_ERROR:

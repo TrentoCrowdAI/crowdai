@@ -7,7 +7,7 @@ import {flattenError} from 'src/utils';
 
 const getExperiments = (action$, store) =>
   action$.ofType(actionTypes.FETCH_EXPERIMENTS).switchMap(action => {
-    return Observable.defer(() => requestersApi.get('experiments'))
+    return Observable.defer(() => requestersApi.get(`projects/${action.projectId}/experiments`))
       .mergeMap(response => Observable.of(actions.fetchExperimentsSuccess(response.data)))
       .catch(error => Observable.of(actions.fetchExperimentsError(flattenError(error))));
   });

@@ -33,4 +33,21 @@ const LabelOptions = {
   yns: 'Yes | No | I am not sure'
 };
 
-export {scopes, FileFormats, ExperimentStatus, CrowdsourcingStrategies, AbstractPresentationTechniques, LabelOptions};
+const AggregationStrategies = {
+  mv: 'Majority Voting',
+  tf: 'Truth Finder',
+  ds: 'Dawid & Skene',
+  sums: 'SUMS',
+  inv: 'Investment',
+  avg: 'Average-log'
+};
+
+export {
+  scopes,
+  FileFormats,
+  ExperimentStatus,
+  CrowdsourcingStrategies,
+  AbstractPresentationTechniques,
+  LabelOptions,
+  AggregationStrategies
+};

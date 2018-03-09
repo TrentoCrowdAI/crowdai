@@ -33,28 +33,21 @@ const getByProject = (exports.getByProject = async projectId => {
 
 const getById = (exports.getById = async id => {
   try {
-    let experiment = await new Promise((resolve, reject) => {
-      bucket.get(`${DOCUMENTS.Experiment}${id}`, (err, data) => {
-        if (err) {
-          if (err.code === couchbase.errors.keyNotFound) {
-            resolve(null);
-          } else {
-            reject(err);
-          }
-        } else {
-          resolve(data.value);
-        }
-      });
-    });
-    experiment.consent = await new Promise((resolve, reject) => {
-      request(experiment.consentUrl, (err, rsp, body) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(rsp.body);
-        }
-      });
-    });
+    let res = await db.query(
+      `select * from ${db.TABLES.Experiment} where id = $1`,
+      [id]
+    );
+    const experiment = res.rows[0];
+    // TODO
+    // experiment.consent = await new Promise((resolve, reject) => {
+    //   request(experiment.data.consentUrl, (err, rsp, body) => {
+    //     if (err) {
+    //       reject(err);
+    //     } else {
+    //       resolve(rsp.body);
+    //     }
+    //   });
+    // });
     return experiment;
   } catch (error) {
     console.error(error);

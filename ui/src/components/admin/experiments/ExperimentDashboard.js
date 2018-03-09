@@ -1,16 +1,12 @@
 import React from 'react';
-import {Step, Icon, Segment, Grid, Form, Button, Statistic, Header, Image, List, Accordion} from 'semantic-ui-react';
+import {Step, Icon, Segment, Grid, Form, Button, Statistic, Header, Image, Accordion} from 'semantic-ui-react';
+import {connect} from 'react-redux';
+import PropTypes from 'prop-types';
 
 import lossPrice from 'src/images/lossprice.png';
-
-const AGGREGATION_STRATEGIES = [
-  {text: 'Majority Voting', value: 'mv'},
-  {text: 'Truth Finder', value: 'tf'},
-  {text: 'Dawid & Skene', value: 'ds'},
-  {text: 'SUMS', value: 'sums'},
-  {text: 'Investment', value: 'inv'},
-  {text: 'Average-log', value: 'avg'}
-];
+import {actions} from './actions';
+import {AggregationStrategies, ExperimentStatus} from 'src/utils/constants';
+import ExperimentParameters from './ExperimentParameters';
 
 class ExperimentDashboard extends React.Component {
   constructor(props) {
@@ -18,8 +14,9 @@ class ExperimentDashboard extends React.Component {
     this.state = {
       activeStep: 'process',
       isRunning: true,
-      expertMode: false,
-      activeIndex: {}
+      expertMode: true,
+      activeIndex: {},
+      aggregationStrategy: 'ds'
     };
     this.handleAccordionClick = this.handleAccordionClick.bind(this);
   }
@@ -52,9 +49,8 @@ class ExperimentDashboard extends React.Component {
   }
 
   renderProcess() {
-    let item = {
-      aggregationStrategy: 'ds'
-    };
+    const {item} = this.props;
+
     return (
       <Form>
         <Grid>
@@ -68,13 +64,7 @@ class ExperimentDashboard extends React.Component {
               <h4 style={{textAlign: 'center'}}>Actual results</h4>
               <hr />
               <div hidden={!this.state.expertMode} style={{marginBottom: '20px'}}>
-                <Form.Select
-                  label="Aggregation strategy"
-                  name="aggregationStrategy"
-                  value={item.aggregationStrategy}
-                  options={AGGREGATION_STRATEGIES}
-                  onChange={this.handleChange}
-                />
+                {this.renderAggregationStrategySelector()}
               </div>
               <Statistic.Group widths="3">
                 <Statistic>
@@ -113,8 +103,12 @@ class ExperimentDashboard extends React.Component {
           </Grid.Row>
           <Grid.Row>
             <Grid.Column>
-              <Button floated="right" size="large" negative={this.state.isRunning} positive={!this.state.isRunning}>
-                {this.state.isRunning ? 'Stop' : 'Run'}
+              <Button
+                floated="right"
+                size="large"
+                negative={item.data.status === ExperimentStatus.PUBLISHED}
+                positive={item.data.status === ExperimentStatus.NOT_PUBLISHED}>
+                {item.data.status === ExperimentStatus.NOT_PUBLISHED ? 'Run' : 'Stop'}
               </Button>
               {this.state.expertMode && (
                 <Button floated="right" size="large" style={{width: '200px'}}>
@@ -128,74 +122,25 @@ class ExperimentDashboard extends React.Component {
     );
   }
 
+  renderAggregationStrategySelector() {
+    return (
+      <Form.Select
+        label="Aggregation strategy"
+        value={this.state.aggregationStrategy}
+        options={Object.entries(AggregationStrategies).map(([key, val]) => ({text: val, value: key}))}
+        onChange={(e, {value}) => this.setState({...this.state, aggregationStrategy: value})}
+      />
+    );
+  }
+
   renderExpertEstimations() {
-    let item = {
-      maxTasksRule: 3,
-      taskRewardRule: 0.5,
-      testFrequencyRule: 2,
-      initialTestsRule: 2,
-      initialTestsMinCorrectAnswersRule: 100,
-      votesPerTaskRule: 2,
-      expertCostRule: 0.2
-    };
+    const {item} = this.props;
+
     return (
       <div>
         <Image src={lossPrice} style={{width: '400px', marginLeft: 'auto', marginRight: 'auto'}} />
         <Header as="h2" content="Parameters" textAlign="center" />
-        <Grid>
-          <Grid.Row>
-            <Grid.Column width="8">
-              <List divided relaxed>
-                <List.Item>
-                  <List.Content>
-                    <List.Header as="h4">Max. tasks</List.Header>
-                    <List.Description as="p">{item.maxTasksRule}</List.Description>
-                  </List.Content>
-                </List.Item>
-                <List.Item>
-                  <List.Content>
-                    <List.Header as="h4">Task reward</List.Header>
-                    <List.Description as="p">{item.taskRewardRule}</List.Description>
-                  </List.Content>
-                </List.Item>
-                <List.Item>
-                  <List.Content>
-                    <List.Header as="h4">Test frequency</List.Header>
-                    <List.Description as="p">{item.testFrequencyRule}</List.Description>
-                  </List.Content>
-                </List.Item>
-                <List.Item>
-                  <List.Content>
-                    <List.Header as="h4">Expert cost (in USD)</List.Header>
-                    <List.Description as="p">{item.expertCostRule}</List.Description>
-                  </List.Content>
-                </List.Item>
-              </List>
-            </Grid.Column>
-            <Grid.Column width="8">
-              <List divided relaxed>
-                <List.Item>
-                  <List.Content>
-                    <List.Header as="h4">Initial tests</List.Header>
-                    <List.Description as="p">{item.initialTestsRule}</List.Description>
-                  </List.Content>
-                </List.Item>
-                <List.Item>
-                  <List.Content>
-                    <List.Header as="h4">Initial Tests min score (%)</List.Header>
-                    <List.Description as="p">{item.initialTestsMinCorrectAnswersRule}</List.Description>
-                  </List.Content>
-                </List.Item>
-                <List.Item>
-                  <List.Content>
-                    <List.Header as="h4">Votes per (paper,criteria)</List.Header>
-                    <List.Description as="p">{item.votesPerTaskRule}</List.Description>
-                  </List.Content>
-                </List.Item>
-              </List>
-            </Grid.Column>
-          </Grid.Row>
-        </Grid>
+        <ExperimentParameters item={item} />
       </div>
     );
   }
@@ -269,18 +214,12 @@ class ExperimentDashboard extends React.Component {
         in: true
       }
     ];
-    const item = {aggregationStrategy: 'ds'};
+    const {item} = this.props;
 
     return (
       <Form>
         <div hidden={!this.state.expertMode} style={{marginBottom: '20px'}}>
-          <Form.Select
-            label="Aggregation strategy"
-            name="aggregationStrategy"
-            value={item.aggregationStrategy}
-            options={AGGREGATION_STRATEGIES}
-            onChange={this.handleChange}
-          />
+          {this.renderAggregationStrategySelector()}
         </div>
         <Accordion style={{width: '100%'}} styled exclusive={false}>
           {[1, 2, 3].map((paper, idx) => (
@@ -323,6 +262,10 @@ class ExperimentDashboard extends React.Component {
     );
   }
 
+  componentDidMount() {
+    this.props.fetchItem(this.props.match.params.experimentId);
+  }
+
   setStep(activeStep) {
     this.setState({
       ...this.state,
@@ -340,4 +283,24 @@ class ExperimentDashboard extends React.Component {
   }
 }
 
-export default ExperimentDashboard;
+ExperimentDashboard.propTypes = {
+  item: PropTypes.object,
+  match: PropTypes.object,
+  fetchItem: PropTypes.func
+};
+
+const mapStateToProps = state => ({
+  item: state.experiment.form.item,
+  loading: state.experiment.form.loading,
+  error: state.experiment.form.error,
+  saved: state.experiment.form.saved
+});
+
+const mapDispatchToProps = dispatch => ({
+  submit: () => dispatch(actions.submit()),
+  cleanState: () => dispatch(actions.cleanState()),
+  setInputValue: (name, value) => dispatch(actions.setInputValue(name, value)),
+  fetchItem: id => dispatch(actions.fetchItem(id))
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(ExperimentDashboard);

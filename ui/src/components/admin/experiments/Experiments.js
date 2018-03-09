@@ -33,18 +33,31 @@ const options = {
     renderer(item) {
       return (
         <React.Fragment>
-          {item.status === ExperimentStatus.NOT_PUBLISHED && (
-            <Popup
-              trigger={
-                <Button icon color="blue" size="mini" as={Link} to={`/admin/experiments/${item.id}/publish`}>
-                  <Icon name="play" />
-                </Button>
-              }
-              content="Publish your experiment on Mechanical Turk"
-            />
+          {item.data.status === ExperimentStatus.NOT_PUBLISHED && (
+            // <Popup
+            //   trigger={
+            //     <Button icon color="blue" size="mini" as={Link} to={`/admin/experiments/${item.id}/publish`}>
+            //       <Icon name="play" />
+            //     </Button>
+            //   }
+            //   content="Publish your experiment on Mechanical Turk"
+            // />
+            <Button
+              icon
+              color="blue"
+              size="mini"
+              as={Link}
+              to={`/admin/projects/${item.project_id}/screenings/${item.id}/edit`}>
+              <Icon name="edit" />
+            </Button>
           )}
-          <Button icon color="blue" size="mini" as={Link} to={`/admin/experiments/${item.id}/dashboard`}>
-            <Icon name="setting" />
+          <Button
+            icon
+            color="blue"
+            size="mini"
+            as={Link}
+            to={`/admin/projects/${item.project_id}/screenings/${item.id}/dashboard`}>
+            <Icon name="play" />
           </Button>
         </React.Fragment>
       );

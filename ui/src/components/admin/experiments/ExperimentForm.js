@@ -5,8 +5,6 @@ import {
   Button,
   Grid,
   Message,
-  List,
-  Header,
   Accordion,
   Icon,
   Step,
@@ -38,10 +36,6 @@ class ExperimentForm extends React.Component {
   }
 
   render() {
-    if (this.props.summary) {
-      return this.renderSummary();
-    }
-
     return (
       <Container>
         <Grid container centered>
@@ -291,75 +285,6 @@ class ExperimentForm extends React.Component {
     );
   }
 
-  renderSummary() {
-    const {item} = this.props;
-    return (
-      <React.Fragment>
-        <Header content="Experiment Summary" />
-        <Grid>
-          <Grid.Row>
-            <Grid.Column width="8">
-              <List divided relaxed>
-                <List.Item>
-                  <List.Content>
-                    <List.Header as="h4">Name</List.Header>
-                    <List.Description as="p">{item.name}</List.Description>
-                  </List.Content>
-                </List.Item>
-                <List.Item>
-                  <List.Content>
-                    <List.Header as="h4">Max. tasks</List.Header>
-                    <List.Description as="p">{item.maxTasksRule}</List.Description>
-                  </List.Content>
-                </List.Item>
-                <List.Item>
-                  <List.Content>
-                    <List.Header as="h4">Task reward</List.Header>
-                    <List.Description as="p">{item.taskRewardRule}</List.Description>
-                  </List.Content>
-                </List.Item>
-                <List.Item>
-                  <List.Content>
-                    <List.Header as="h4">Test frequency</List.Header>
-                    <List.Description as="p">{item.testFrequencyRule}</List.Description>
-                  </List.Content>
-                </List.Item>
-              </List>
-            </Grid.Column>
-            <Grid.Column width="8">
-              <List divided relaxed>
-                <List.Item>
-                  <List.Content>
-                    <List.Header as="h4">Initial tests</List.Header>
-                    <List.Description as="p">{item.initialTestsRule}</List.Description>
-                  </List.Content>
-                </List.Item>
-                <List.Item>
-                  <List.Content>
-                    <List.Header as="h4">Initial Tests min score (%)</List.Header>
-                    <List.Description as="p">{item.initialTestsMinCorrectAnswersRule}</List.Description>
-                  </List.Content>
-                </List.Item>
-                <List.Item>
-                  <List.Content>
-                    <List.Header as="h4">#Votes per (paper,criteria)</List.Header>
-                    <List.Description as="p">{item.votesPerTaskRule}</List.Description>
-                  </List.Content>
-                </List.Item>
-                <List.Item>
-                  <List.Content>
-                    <List.Header as="h4">Expert cost (in USD)</List.Header>
-                    <List.Description as="p">{item.expertCostRule}</List.Description>
-                  </List.Content>
-                </List.Item>
-              </List>
-            </Grid.Column>
-          </Grid.Row>
-        </Grid>
-      </React.Fragment>
-    );
-  }
-
   renderParametersSection() {
     const {item} = this.props;
     return (
@@ -472,7 +397,6 @@ class ExperimentForm extends React.Component {
 }
 
 ExperimentForm.propTypes = {
-  summary: PropTypes.bool,
   item: PropTypes.object,
   loading: PropTypes.bool,
   error: PropTypes.any,

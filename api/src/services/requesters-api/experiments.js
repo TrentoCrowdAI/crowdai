@@ -32,8 +32,8 @@ const publish = async ctx => {
 
 exports.register = router => {
   router.get('/projects/:projectId/experiments', getProjectExperiments);
-  router.post('/projects/:projectId/experiments', post);
-  router.put('/projects/:projectId/experiments/:id', put);
-  router.get('/projects/:projectId/experiments/:id', getById);
-  router.post('/projects/:projectId/experiments/:id/publish', publish);
+  router.post('/experiments', post);
+  router.put('/experiments/:id', put);
+  router.get('/experiments/:id', getById);
+  router.post('/experiments/:id/publish', publish);
 };

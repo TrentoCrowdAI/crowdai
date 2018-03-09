@@ -441,7 +441,6 @@ class ExperimentForm extends React.Component {
               value={item.data.expertCostRule}
               onChange={this.handleChange}
               type="number"
-              min="0"
             />
           </Form.Group>
         </Accordion.Content>
@@ -451,6 +450,7 @@ class ExperimentForm extends React.Component {
 
   componentDidMount() {
     this.props.cleanState();
+    this.props.setInputValue('project_id', Number(this.props.match.params.projectId));
   }
 
   handleChange(e, {name, value}) {

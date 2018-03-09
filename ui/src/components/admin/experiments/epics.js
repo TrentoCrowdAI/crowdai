@@ -15,15 +15,8 @@ const getExperiments = (action$, store) =>
 const saveExperiment = (action$, store) =>
   action$.ofType(actionTypes.SUBMIT).switchMap(action => {
     const {item} = store.getState().experiment.form;
-    const profile = store.getState().profile.item;
-    item.requesterId = profile.requesterId;
-    // this is temporary. We should improve for large files.
-    const config = {timeout: 10000};
     return Observable.defer(
-      () =>
-        item.id
-          ? requestersApi.put(`experiments/${item.id}`, item, config)
-          : requestersApi.post('experiments', item, config)
+      () => (item.id ? requestersApi.put(`/experiments/${item.id}`, item) : requestersApi.post('/experiments', item))
     )
       .mergeMap(response => Observable.of(actions.submitSuccess()))
       .catch(error => Observable.of(actions.submitError(flattenError(error))));

@@ -31,28 +31,6 @@ const getByProject = (exports.getByProject = async projectId => {
   }
 });
 
-const getByRequesterCount = (exports.getByRequesterCount = async workerId => {
-  try {
-    const qs = `select count(*) as count from \`${
-      config.db.bucket
-    }\` where type="${TYPES.experiment}" and requesterId='${requesterId}'`;
-    const q = couchbase.N1qlQuery.fromString(qs);
-    q.consistency(couchbase.N1qlQuery.Consistency.STATEMENT_PLUS);
-    return await new Promise((resolve, reject) => {
-      bucket.query(q, (err, data) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(data[0].count);
-        }
-      });
-    });
-  } catch (error) {
-    console.error(error);
-    throw Boom.badImplementation('Error while trying to fetch records count');
-  }
-});
-
 const getById = (exports.getById = async id => {
   try {
     let experiment = await new Promise((resolve, reject) => {
@@ -84,38 +62,16 @@ const getById = (exports.getById = async id => {
   }
 });
 
-const create = (exports.create = async item => {
+const create = (exports.create = async experiment => {
   try {
-    item.id = uuid();
-    const key = `${DOCUMENTS.Experiment}${item.id}`;
-    item = {
-      ...item,
-      maxTasksRule: Number(item.maxTasksRule),
-      taskRewardRule: Number(item.taskRewardRule),
-      testFrequencyRule: Number(item.testFrequencyRule),
-      initialTestsRule: Number(item.initialTestsRule),
-      initialTestsMinCorrectAnswersRule: Number(
-        item.initialTestsMinCorrectAnswersRule
-      ),
-      votesPerTaskRule: Number(item.votesPerTaskRule),
-      createdAt: new Date(),
-      type: TYPES.experiment
-    };
-
-    let cas = await new Promise((resolve, reject) => {
-      bucket.insert(key, item, (error, result) => {
-        if (error) {
-          console.error(
-            `Error while inserting document ${key}. Error: ${error}`
-          );
-          reject(error);
-        } else {
-          resolve(result);
-        }
-      });
-    });
-    await createTasks(item);
-    return cas;
+    let res = await db.query(
+      `insert into ${
+        db.TABLES.Experiment
+      }(project_id, uuid, created_at, data) values($1, $2, $3, $4) returning *`,
+      [experiment.project_id, uuid(), new Date(), experiment.data]
+    );
+    return res.rows[0];
+    //await createTasks(item);
   } catch (error) {
     console.error(error);
     throw Boom.badImplementation('Error while trying to persist the record');

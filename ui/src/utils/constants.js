@@ -16,4 +16,21 @@ const ExperimentStatus = {
   DONE: 'DONE'
 };
 
-export {scopes, FileFormats, ExperimentStatus};
+const CrowdsourcingStrategies = {
+  baseline: 'Baseline',
+  mr: 'Multi-run',
+  sr: 'Shortest run'
+};
+
+const AbstractPresentationTechniques = {
+  kh: 'Keyword highlighting',
+  ts: 'Text summarization'
+};
+
+const LabelOptions = {
+  yn: 'Yes | No',
+  ynk: 'Yes | No | I do not know',
+  yns: 'Yes | No | I am not sure'
+};
+
+export {scopes, FileFormats, ExperimentStatus, CrowdsourcingStrategies, AbstractPresentationTechniques, LabelOptions};

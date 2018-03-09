@@ -39,29 +39,34 @@ const reducer = (state = defaultState, action) => {
 };
 
 const genericFormReducer = getReducer(scopes.EXPERIMENTS, {
-  name: '',
-  requesterId: '',
-  status: ExperimentStatus.NOT_PUBLISHED,
-  consentUrl: '',
-  consentFormat: FileFormats.PLAIN_TEXT,
-  taskInstructionsFormat: FileFormats.PLAIN_TEXT,
-  itemsUrl: '',
-  filtersUrl: '',
-  testsUrl: '',
-  // HIT configurations
-  maxAssignments: 10,
-  assignmentDurationInSeconds: 600,
-  description: '',
-  lifetimeInSeconds: 5 * 60 * 60,
-  // parameters
-  maxTasksRule: 3,
-  taskRewardRule: 0.5,
-  testFrequencyRule: 2,
-  initialTestsRule: 2,
-  initialTestsMinCorrectAnswersRule: 100,
-  votesPerTaskRule: 2,
-  expertCostRule: 0.2,
-  crowdsourcingStrategy: 'baseline'
+  id: undefined,
+  project_id: undefined,
+  uuid: '',
+  data: {
+    name: '',
+    requesterId: '',
+    status: ExperimentStatus.NOT_PUBLISHED,
+    taskInstructionsFormat: FileFormats.PLAIN_TEXT,
+    // True: ask each worker multiple criteria per paper. False: ask one criterion only per paper.
+    multipleCriteria: false,
+    criteriaQualityAnalysis: false,
+    abstractPresentationTechnique: 'kh',
+    labelOptions: 'ynk',
+    // HIT configurations
+    maxAssignments: 10,
+    assignmentDurationInSeconds: 600,
+    description: '',
+    lifetimeInSeconds: 5 * 60 * 60,
+    // parameters
+    maxTasksRule: 3,
+    taskRewardRule: 0.5,
+    testFrequencyRule: 2,
+    initialTestsRule: 2,
+    initialTestsMinCorrectAnswersRule: 100,
+    votesPerTaskRule: 2,
+    expertCostRule: 0.2,
+    crowdsourcingStrategy: 'baseline'
+  }
 });
 
 // hacky way to get the whole state of the form

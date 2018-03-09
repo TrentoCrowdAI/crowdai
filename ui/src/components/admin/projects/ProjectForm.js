@@ -2,7 +2,6 @@ import React from 'react';
 import {Container, Form, Button, Grid, Message} from 'semantic-ui-react';
 import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
-import {withRouter} from 'react-router';
 
 import {actions} from './actions';
 import {FileFormats} from 'src/utils/constants';
@@ -155,4 +154,4 @@ const mapDispatchToProps = dispatch => ({
   setInputValue: (name, value) => dispatch(actions.setInputValue(name, value))
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(withRouter(ProjectForm));
+export default connect(mapStateToProps, mapDispatchToProps)(ProjectForm);

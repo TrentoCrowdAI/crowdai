@@ -74,7 +74,7 @@ Experiments.propTypes = {
   fetchExperiments: PropTypes.func,
   error: PropTypes.any,
   loading: PropTypes.bool,
-  experiments: PropTypes.arrayOf(PropTypes.object),
+  experiments: PropTypes.object,
   match: PropTypes.object
 };
 

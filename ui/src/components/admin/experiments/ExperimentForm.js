@@ -10,13 +10,20 @@ import {
   Accordion,
   Icon,
   Step,
-  Segment
+  Segment,
+  Radio,
+  Checkbox
 } from 'semantic-ui-react';
 import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
 
 import {actions} from './actions';
-import {FileFormats} from 'src/utils/constants';
+import {
+  FileFormats,
+  CrowdsourcingStrategies,
+  AbstractPresentationTechniques,
+  LabelOptions
+} from 'src/utils/constants';
 
 class ExperimentForm extends React.Component {
   constructor(props) {
@@ -24,7 +31,7 @@ class ExperimentForm extends React.Component {
     this.handleChange = this.handleChange.bind(this);
     this.showRulesClick = this.showRulesClick.bind(this);
     this.state = {
-      showRules: false,
+      showRules: true,
       expertMode: true,
       activeStep: 'info'
     };
@@ -55,7 +62,7 @@ class ExperimentForm extends React.Component {
                     <Step active={this.state.activeStep === 'info'} onClick={() => this.setStep('info')}>
                       <Icon name="setting" />
                       <Step.Content>
-                        <Step.Title>Experiment information</Step.Title>
+                        <Step.Title>Screening details</Step.Title>
                       </Step.Content>
                     </Step>
 
@@ -85,6 +92,14 @@ class ExperimentForm extends React.Component {
                 <Button floated="right" positive>
                   Save
                 </Button>
+                <Button
+                  floated="right"
+                  type="button"
+                  onClick={() =>
+                    this.props.history.push(`/admin/projects/${this.props.match.params.projectId}/screenings`)
+                  }>
+                  Cancel
+                </Button>
               </Form>
             </Grid.Column>
           </Grid.Row>
@@ -100,21 +115,21 @@ class ExperimentForm extends React.Component {
       <React.Fragment>
         <Form.Group>
           <Form.Input
-            width={5}
+            width={6}
             label="Name"
-            name="name"
-            value={item.name}
-            placeholder="Experiment name"
+            name="data.name"
+            value={item.data.name}
+            placeholder="Screening name"
             onChange={this.handleChange}
             required
           />
 
           <Form.Input
-            width={6}
-            label="Informed Consent URL"
-            name="consentUrl"
-            value={item.consentUrl}
-            placeholder="URL to consent file"
+            width={5}
+            label="Task instructions URL"
+            name="data.taskInstructionsUrl"
+            value={item.data.taskInstructionsUrl}
+            placeholder="URL to file"
             onChange={this.handleChange}
             required
           />
@@ -122,76 +137,107 @@ class ExperimentForm extends React.Component {
           <Form.Select
             width={4}
             label="Format"
-            name="consentFormat"
-            value={item.consentFormat}
+            name="data.taskInstructionsFormat"
+            value={item.data.taskInstructionsFormat}
             options={Object.values(FileFormats).map(v => ({text: v, value: v}))}
             onChange={this.handleChange}
           />
         </Form.Group>
 
-        <Form.Group widths="equal">
-          <Form.Input
-            label="Task instructions URL"
-            name="taskInstructionsUrl"
-            value={item.taskInstructionsUrl}
-            placeholder="URL to task instructions file"
-            onChange={this.handleChange}
-            required
-          />
+        {this.renderCriteriaSection()}
 
+        <Form.Field>
+          <Checkbox
+            label="Assist me in criteria quality analysis"
+            name="data.criteriaQualityAnalysis"
+            checked={item.data.criteriaQualityAnalysis}
+            onChange={(e, {name, value}) => this.handleChange(e, {name, value: !item.data.criteriaQualityAnalysis})}
+          />
+        </Form.Field>
+
+        <Form.Group widths="equal">
           <Form.Select
-            label="Format"
-            name="taskInstructionsFormat"
-            value={item.taskInstructionsFormat}
-            options={Object.values(FileFormats).map(v => ({text: v, value: v}))}
+            label="Smart abstract presentation technique"
+            name="data.abstractPresentationTechnique"
+            value={item.data.abstractPresentationTechnique}
+            options={Object.entries(AbstractPresentationTechniques).map(([key, val]) => ({text: val, value: key}))}
             onChange={this.handleChange}
           />
-        </Form.Group>
-
-        <Form.Group widths="equal">
-          <Form.Input
-            label="Items URL"
-            name="itemsUrl"
-            value={item.itemsUrl}
-            placeholder="URL to items CSV file"
+          <Form.Select
+            label="Label options"
+            name="data.labelOptions"
+            value={item.data.labelOptions}
+            options={Object.entries(LabelOptions).map(([key, val]) => ({text: val, value: key}))}
             onChange={this.handleChange}
-            required
-          />
-          <Form.Input
-            label="Filters URL"
-            name="filtersUrl"
-            value={item.filtersUrl}
-            placeholder="URL to filters CSV file"
-            onChange={this.handleChange}
-            required
-          />
-
-          <Form.Input
-            label="Tests URL"
-            name="testsUrl"
-            value={item.testsUrl}
-            placeholder="URL to tests CSV file"
-            onChange={this.handleChange}
-            required
           />
         </Form.Group>
 
         <div hidden={!this.state.expertMode}>
           <Form.Select
             label="Crowdsourcing strategy"
-            name="crowdsourcingStrategy"
-            value={item.crowdsourcingStrategy}
-            options={[
-              {text: 'Baseline', value: 'baseline'},
-              {text: 'Multi-run', value: 'mr'},
-              {text: 'Shortest run', value: 'sr'}
-            ]}
+            name="data.crowdsourcingStrategy"
+            value={item.data.crowdsourcingStrategy}
+            options={Object.entries(CrowdsourcingStrategies).map(([key, val]) => ({text: val, value: key}))}
             onChange={this.handleChange}
           />
 
           {this.renderParametersSection()}
         </div>
       </React.Fragment>
+    );
+  }
+
+  renderCriteriaSection() {
+    const {item} = this.props;
+
+    return (
+      <div style={{marginBottom: '1em'}}>
+        <h3>Criteria</h3>
+        <Form.Field>
+          <Radio
+            label="Ask worker each worker multiple criteria"
+            name="data.multipleCriteria"
+            value={1}
+            checked={item.data.multipleCriteria}
+            onChange={(e, {name, value}) => this.handleChange(e, {name, value: !!value})}
+          />
+        </Form.Field>
+        <div style={{marginBottom: '1em', marginLeft: '2em'}}>
+          <Form.Field>
+            <Checkbox
+              label="(C1) Check this box"
+              onChange={this.toggle}
+              checked={this.state.checked}
+              disabled={!item.data.multipleCriteria}
+            />
+          </Form.Field>
+          <Form.Field>
+            <Checkbox
+              label="(C2) Check this box"
+              onChange={this.toggle}
+              checked={this.state.checked}
+              disabled={!item.data.multipleCriteria}
+            />
+          </Form.Field>
+          <Form.Field>
+            <Checkbox
+              label="(C3) Check this box"
+              onChange={this.toggle}
+              checked={this.state.checked}
+              disabled={!item.data.multipleCriteria}
+            />
+          </Form.Field>
+        </div>
+        <Form.Field>
+          <Radio
+            label="Ask each worker one criterion only"
+            name="data.multipleCriteria"
+            value={0}
+            checked={!item.data.multipleCriteria}
+            onChange={(e, {name, value}) => this.handleChange(e, {name, value: !!value})}
+          />
+        </Form.Field>
+      </div>
     );
   }
 
@@ -325,9 +371,19 @@ class ExperimentForm extends React.Component {
         <Accordion.Content active={this.state.showRules}>
           <Form.Group widths="equal">
             <Form.Input
-              label="Max. tasks"
-              name="maxTasksRule"
-              value={item.maxTasksRule}
+              label="Max. tasks per worker"
+              name="data.maxTasksRule"
+              value={item.data.maxTasksRule}
+              onChange={this.handleChange}
+              type="number"
+              min="1"
+              required
+            />
+
+            <Form.Input
+              label="#Votes per paper"
+              name="data.votesPerTaskRule"
+              value={item.data.votesPerTaskRule}
               onChange={this.handleChange}
               type="number"
               min="1"
@@ -336,30 +392,30 @@ class ExperimentForm extends React.Component {
 
             <Form.Input
               label="Task reward (in USD)"
-              name="taskRewardRule"
-              value={item.taskRewardRule}
+              name="data.taskRewardRule"
+              value={item.data.taskRewardRule}
               onChange={this.handleChange}
               type="number"
-              required
-            />
-
-            <Form.Input
-              label="Test frequency"
-              name="testFrequencyRule"
-              value={item.testFrequencyRule}
-              onChange={this.handleChange}
-              type="number"
-              min="1"
               required
             />
           </Form.Group>
 
           <Form.Group widths="equal">
             <Form.Input
+              width={4}
+              label="Test frequency"
+              name="data.testFrequencyRule"
+              value={item.data.testFrequencyRule}
+              onChange={this.handleChange}
+              type="number"
+              min="1"
+              required
+            />
+            <Form.Input
               width={2}
               label="Initial tests"
-              name="initialTestsRule"
-              value={item.initialTestsRule}
+              name="data.initialTestsRule"
+              value={item.data.initialTestsRule}
               onChange={this.handleChange}
               type="number"
               min="1"
@@ -369,8 +425,8 @@ class ExperimentForm extends React.Component {
             <Form.Input
               width={4}
               label="Initial Tests min score (%)"
-              name="initialTestsMinCorrectAnswersRule"
-              value={item.initialTestsMinCorrectAnswersRule}
+              name="data.initialTestsMinCorrectAnswersRule"
+              value={item.data.initialTestsMinCorrectAnswersRule}
               onChange={this.handleChange}
               type="number"
               min="1"
@@ -380,23 +436,12 @@ class ExperimentForm extends React.Component {
 
             <Form.Input
               width={4}
-              label="#Votes per (paper,criteria)"
-              name="votesPerTaskRule"
-              value={item.votesPerTaskRule}
-              onChange={this.handleChange}
-              type="number"
-              min="1"
-              required
-            />
-            <Form.Input
-              width={4}
               label="Expert cost (in USD)"
-              name="expertCostRule"
-              value={item.expertCostRule}
+              name="data.expertCostRule"
+              value={item.data.expertCostRule}
               onChange={this.handleChange}
               type="number"
-              min="1"
-              required
+              min="0"
             />
           </Form.Group>
         </Accordion.Content>
@@ -434,7 +479,9 @@ ExperimentForm.propTypes = {
   saved: PropTypes.bool,
   submit: PropTypes.func,
   setInputValue: PropTypes.func,
-  cleanState: PropTypes.func
+  cleanState: PropTypes.func,
+  history: PropTypes.object,
+  match: PropTypes.object
 };
 
 const mapStateToProps = state => ({

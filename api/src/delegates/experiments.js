@@ -46,15 +46,18 @@ const getById = (exports.getById = async id => {
 
 const create = (exports.create = async experiment => {
   try {
+    await db.query('BEGIN');
     let res = await db.query(
       `insert into ${
         db.TABLES.Experiment
       }(project_id, uuid, created_at, data) values($1, $2, $3, $4) returning *`,
       [experiment.project_id, uuid(), new Date(), experiment.data]
     );
-    return res.rows[0];
-    //await createTasks(item);
+    const saved = res.rows[0];
+    await db.query('COMMIT');
+    return saved;
   } catch (error) {
+    await db.query('ROLLBACK');
     console.error(error);
     throw Boom.badImplementation('Error while trying to persist the record');
   }
@@ -152,90 +155,6 @@ const getAssignments = (exports.getAssignments = async experimentId => {
     );
   }
 });
-
-const createTasks = async experiment => {
-  let parser = parse({ delimiter: ',', columns: true });
-  // first we read the filters
-  let filters = [];
-  const filtersTransformer = transform(record => filters.push(record), {
-    parallel: 10
-  });
-
-  try {
-    request(experiment.filtersUrl)
-      .pipe(parser)
-      .pipe(filtersTransformer);
-
-    await new Promise((resolve, reject) => {
-      filtersTransformer.on('finish', () => {
-        resolve();
-      });
-
-      filtersTransformer.on('error', err => {
-        reject(err);
-      });
-    });
-    // insert tasks into the database.
-    const itemsTransformer = transform(
-      async item => {
-        for (filter of filters) {
-          await tasksDelegate.createTask({
-            id: uuid(),
-            filter,
-            item,
-            experimentId: experiment.id
-          });
-        }
-      },
-      { parallel: 10 }
-    );
-    let itemsParser = parse({ delimiter: ',', columns: true });
-    request(experiment.itemsUrl)
-      .pipe(itemsParser)
-      .pipe(itemsTransformer);
-
-    await new Promise((resolve, reject) => {
-      itemsTransformer.on('finish', () => {
-        resolve();
-      });
-
-      itemsTransformer.on('error', err => {
-        reject(err);
-      });
-    });
-
-    // insert test task into the database
-    const testsTransformer = transform(
-      async testTask => {
-        await tasksDelegate.createTask(
-          {
-            ...testTask,
-            id: uuid(),
-            experimentId: experiment.id
-          },
-          true
-        );
-      },
-      { parallel: 10 }
-    );
-    let testsParser = parse({ delimiter: ',', columns: true });
-    request(experiment.testsUrl)
-      .pipe(testsParser)
-      .pipe(testsTransformer);
-
-    await new Promise((resolve, reject) => {
-      testsTransformer.on('finish', () => {
-        resolve();
-      });
-
-      testsTransformer.on('error', err => {
-        reject(err);
-      });
-    });
-  } catch (error) {
-    console.error(error);
-  }
-};
 
 /**
  * Set a cron job that polls the HIT status in order to know when

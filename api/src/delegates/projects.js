@@ -4,6 +4,7 @@ const uuid = require('uuid/v4');
 const request = require('request');
 const parse = require('csv-parse');
 const transform = require('stream-transform');
+const QueryStream = require('pg-query-stream');
 
 const db = require(__base + 'db');
 const config = require(__base + 'config');
@@ -69,8 +70,6 @@ const create = (exports.create = async project => {
     await createCriteria(saved);
     await createTests(saved);
     await db.query('COMMIT');
-    //await createTasks(item);
-    //return cas;
     return saved;
   } catch (error) {
     console.error(error);
@@ -102,6 +101,26 @@ const update = (exports.update = async (id, item) => {
   } catch (error) {
     console.error(error);
     throw Boom.badImplementation('Error while trying to update the record');
+  }
+});
+
+/**
+ * Returns the items that are associated with the given project.
+ *
+ * @param {Number} projectId
+ * @return {QueryStream} stream-like cursor to iterate over the rows.
+ */
+const getItemsQS = (exports.getItems = async projectId => {
+  try {
+    const query = new QueryStream(
+      `select * from  ${db.TABLES.Item} where project_id = $1`,
+      [projectId]
+    );
+    const stream = await db.query(query);
+    return stream;
+  } catch (error) {
+    console.error(error);
+    throw Boom.badImplementation('Error while trying to fetch project items');
   }
 });
 
@@ -193,89 +212,5 @@ const createTests = async project => {
       }(created_at, project_id, data) values($1, $2, $3)`,
       [new Date(), project.id, test]
     );
-  }
-};
-
-const createTasks = async experiment => {
-  let parser = parse({ delimiter: ',', columns: true });
-  // first we read the filters
-  let filters = [];
-  const filtersTransformer = transform(record => filters.push(record), {
-    parallel: 10
-  });
-
-  try {
-    request(experiment.filtersUrl)
-      .pipe(parser)
-      .pipe(filtersTransformer);
-
-    await new Promise((resolve, reject) => {
-      filtersTransformer.on('finish', () => {
-        resolve();
-      });
-
-      filtersTransformer.on('error', err => {
-        reject(err);
-      });
-    });
-    // insert tasks into the database.
-    const itemsTransformer = transform(
-      async item => {
-        for (filter of filters) {
-          await tasksDelegate.createTask({
-            id: uuid(),
-            filter,
-            item,
-            experimentId: experiment.id
-          });
-        }
-      },
-      { parallel: 10 }
-    );
-    let itemsParser = parse({ delimiter: ',', columns: true });
-    request(experiment.itemsUrl)
-      .pipe(itemsParser)
-      .pipe(itemsTransformer);
-
-    await new Promise((resolve, reject) => {
-      itemsTransformer.on('finish', () => {
-        resolve();
-      });
-
-      itemsTransformer.on('error', err => {
-        reject(err);
-      });
-    });
-
-    // insert test task into the database
-    const testsTransformer = transform(
-      async testTask => {
-        await tasksDelegate.createTask(
-          {
-            ...testTask,
-            id: uuid(),
-            experimentId: experiment.id
-          },
-          true
-        );
-      },
-      { parallel: 10 }
-    );
-    let testsParser = parse({ delimiter: ',', columns: true });
-    request(experiment.testsUrl)
-      .pipe(testsParser)
-      .pipe(testsTransformer);
-
-    await new Promise((resolve, reject) => {
-      testsTransformer.on('finish', () => {
-        resolve();
-      });
-
-      testsTransformer.on('error', err => {
-        reject(err);
-      });
-    });
-  } catch (error) {
-    console.error(error);
   }
 };

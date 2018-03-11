@@ -74,7 +74,7 @@ class WelcomePage extends React.Component {
   renderRedirectBtn() {
     const {assignmentId, hitId, workerId, experimentId} = this.props.session;
 
-    if (this.props.hasAcceptedHit && this.props.assignmentStatus && !this.props.assignmentStatus.finished) {
+    if (this.props.hasAcceptedHit && this.props.assignmentStatus && !this.props.assignmentStatus.data.finished) {
       return (
         <Segment>
           <p>Please click on the following button to start. It will open a new window/tab.</p>
@@ -100,7 +100,7 @@ class WelcomePage extends React.Component {
   }
 
   renderFinalStep() {
-    if (this.props.assignmentStatus && this.props.assignmentStatus.finished) {
+    if (this.props.assignmentStatus && this.props.assignmentStatus.data.finished) {
       return (
         <React.Fragment>
           <Message icon style={{marginTop: 20}}>

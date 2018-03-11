@@ -44,6 +44,19 @@ const getById = (exports.getById = async id => {
   }
 });
 
+const getByUuid = (exports.getByUuid = async uuid => {
+  try {
+    let res = await db.query(
+      `select * from ${db.TABLES.Experiment} where uuid = $1`,
+      [uuid]
+    );
+    return res.rows[0];
+  } catch (error) {
+    console.error(error);
+    throw Boom.badImplementation('Error while trying to fetch the record');
+  }
+});
+
 const create = (exports.create = async experiment => {
   try {
     await db.query('BEGIN');

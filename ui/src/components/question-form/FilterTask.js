@@ -42,7 +42,7 @@ class FilterTask extends React.Component {
       );
     }
 
-    if (this.props.assignmentStatus && this.props.assignmentStatus.finished) {
+    if (this.props.assignmentStatus && this.props.assignmentStatus.data.finished) {
       return (
         <Message icon style={{marginTop: 20}}>
           <Icon name="checkmark box" />
@@ -70,23 +70,7 @@ class FilterTask extends React.Component {
       );
     }
 
-    let {task, answer} = this.props;
-
-    if (task.type === 'testTask') {
-      task = {
-        id: task.id,
-        item: {
-          id: task.id,
-          title: task.itemTitle,
-          description: task.itemDescription
-        },
-        filter: {
-          description: task.filterDescription
-        },
-        test: true
-      };
-    }
-
+    let {task} = this.props;
     const style = {
       background: '#75de8e',
       color: 'white'
@@ -98,37 +82,41 @@ class FilterTask extends React.Component {
           <Grid.Row>
             <Grid.Column width={9}>
               <Header as="h3" style={{fontSize: '2em'}}>
-                {task.item.title}
+                {task.data.item.title}
               </Header>
-              <p style={{fontSize: '1em', textAlign: 'justify'}}>{task.item.description}</p>
+              <p style={{fontSize: '1em', textAlign: 'justify'}}>{task.data.item.description}</p>
             </Grid.Column>
             <Grid.Column width={6}>
-              <Header as="h3" style={{fontSize: '2em'}}>
-                {task.filter.description}
-              </Header>
+              {task.data.criteria.map((criterion, idx) => (
+                <div key={idx}>
+                  <Header as="h3" style={{fontSize: '2em'}}>
+                    {criterion.description}
+                  </Header>
 
-              <Button.Group>
-                <Button
-                  style={answer && answer.response === 'yes' ? style : null}
-                  type="button"
-                  onClick={() => this.props.setAnswer(this.props.task, 'yes')}>
-                  Yes
-                </Button>
-                <Button.Or />
-                <Button
-                  style={answer && answer.response === 'no' ? style : null}
-                  type="button"
-                  onClick={() => this.props.setAnswer(this.props.task, 'no')}>
-                  No
-                </Button>
-                <Button.Or />
-                <Button
-                  style={answer && answer.response === 'not clear' ? style : null}
-                  type="button"
-                  onClick={() => this.props.setAnswer(this.props.task, 'not clear')}>
-                  Not clear from the text
-                </Button>
-              </Button.Group>
+                  <Button.Group>
+                    <Button
+                      style={criterion.workerAnswer === 'yes' ? style : null}
+                      type="button"
+                      onClick={() => this.props.setAnswer(criterion, 'yes')}>
+                      Yes
+                    </Button>
+                    <Button.Or />
+                    <Button
+                      style={criterion.workerAnswer === 'no' ? style : null}
+                      type="button"
+                      onClick={() => this.props.setAnswer(criterion, 'no')}>
+                      No
+                    </Button>
+                    <Button.Or />
+                    <Button
+                      style={criterion.workerAnswer === 'not clear' ? style : null}
+                      type="button"
+                      onClick={() => this.props.setAnswer(criterion, 'not clear')}>
+                      Not clear from the text
+                    </Button>
+                  </Button.Group>
+                </div>
+              ))}
 
               {this.props.answerSubmitError && (
                 <Message negative>

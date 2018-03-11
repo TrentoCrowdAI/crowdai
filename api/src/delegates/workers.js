@@ -1,10 +1,9 @@
 const Boom = require('boom');
-const couchbase = require('couchbase');
 
-const bucket = require(__base + 'db').bucket;
+const db = require(__base + 'db');
 const config = require(__base + 'config');
-const answersDelegate = require('./answers');
-const { DOCUMENTS, TYPES } = require(__base + 'db');
+const tasksDelegate = require('./tasks');
+const testTasksDelegate = require('./test-tasks');
 const experimentsDelegate = require('./experiments');
 
 const RejectionType = (exports.RejectionType = Object.freeze({
@@ -12,45 +11,75 @@ const RejectionType = (exports.RejectionType = Object.freeze({
   HONEYPOT: 'HONEYPOT'
 }));
 
+const getByTurkId = (exports.getByTurkId = async turkId => {
+  try {
+    let res = await db.query(
+      `select * from ${db.TABLES.Worker} where turk_id = $1`,
+      [turkId]
+    );
+    return res.rowCount > 0 ? res.rows[0] : null;
+  } catch (error) {
+    console.error(error);
+    throw Boom.badImplementation('Error while trying to fetch worker');
+  }
+});
+
+const create = (exports.create = async turkId => {
+  try {
+    let res = await db.query(
+      `insert into ${
+        db.TABLES.Worker
+      }(turk_id, created_at) values($1, $2) returning *`,
+      [turkId, new Date()]
+    );
+    return res.rowCount > 0 ? res.rows[0] : null;
+  } catch (error) {
+    console.error(error);
+    throw Boom.badImplementation('Error while trying to create worker');
+  }
+});
+
 /**
  * Computes the worker's reward based on the answer given. If asBonus
- * is true, then we subtract experiment.taskRewardRule from the reward
+ * is true, then we subtract experiment.data.taskRewardRule from the reward
  * so that we can pay the resulting amount to the worker as the bonus.
  *
- * @param {string} experimentId
- * @param {string} workerId
+ * @param {string} uuid - The experiment UUID
+ * @param {string} turkId - Worker's AMT ID
  * @param {boolean} asBonus
  */
 const getWorkerReward = (exports.getWorkerReward = async (
-  experimentId,
-  workerId,
+  uuid,
+  turkId,
   asBonus = false
 ) => {
-  const experiment = await experimentsDelegate.getById(experimentId);
+  const experiment = await experimentsDelegate.getByUuid(uuid);
 
   if (!experiment) {
     throw Boom.badRequest('Experiment with the given ID does not exist');
   }
 
   try {
-    const taskCount = await answersDelegate.getWorkerAnswersCount(
-      experimentId,
+    const worker = await getByTurkId(turkId);
+    const workerId = worker.id;
+    const taskCount = await tasksDelegate.getWorkerTasksCount(
+      experiment.id,
       workerId
     );
-    const testCount = await answersDelegate.getWorkerTestAnswersCount(
-      experimentId,
+    const testCount = await testTasksDelegate.getWorkerTestTasksCount(
+      experiment.id,
       workerId
     );
-    const assignment = await getAssignment(experimentId, workerId);
+    const assignment = await getAssignment(uuid, workerId);
 
-    if (!assignment || assignment.initialTestFailed) {
+    if (!assignment || assignment.data.initialTestFailed) {
       return { reward: 0 };
     }
     // the total amount that we pay to a worker is HIT reward + bonus. Therefore we
     // should subtract 1 in order to pay the worker using the reward + bonus strategy.
     const delta = asBonus ? -1 : 0;
     return {
-      reward: (taskCount + testCount + delta) * experiment.taskRewardRule
+      reward: (taskCount + testCount + delta) * experiment.data.taskRewardRule
     };
   } catch (error) {
     console.error(error);
@@ -58,12 +87,16 @@ const getWorkerReward = (exports.getWorkerReward = async (
   }
 });
 
-const finishAssignment = (exports.finishAssignment = async (
-  experimentId,
-  workerId
-) => {
+/**
+ * Finishes worker's assignment.
+ *
+ * @param {string} uuid - The experiment UUID
+ * @param {string} turkId - Worker's AMT ID
+ */
+const finishAssignment = (exports.finishAssignment = async (uuid, turkId) => {
   try {
-    return await updateAssignment(experimentId, workerId, {
+    let worker = await getByTurkId(turkId);
+    return await updateAssignment(uuid, worker.id, {
       finished: true,
       assignmentEnd: new Date()
     });
@@ -74,37 +107,30 @@ const finishAssignment = (exports.finishAssignment = async (
 });
 
 /**
- * Updates the given assignment.
+ * Updates assigment data column.
  *
- * @param {string} experimentId
+ * @param {string} uuid - The experiment UUID
  * @param {string} workerId
- * @param {Object} assignment - The assignment with attributes updated.
+ * @param {Object} assignmentData - Attributes to update in data column
  */
 const updateAssignment = (exports.updateAssignment = async (
-  experimentId,
+  uuid,
   workerId,
-  assignment
+  assignmentData
 ) => {
   try {
-    const key = getWorkerAssignmentKey(experimentId, workerId);
-    let record = await getAssignment(experimentId, workerId);
-    record = {
-      ...record,
-      ...assignment
+    let assigment = await getAssignment(uuid, workerId);
+    assigment.data = {
+      ...assigment.data,
+      ...assignmentData
     };
-
-    return await new Promise((resolve, reject) => {
-      bucket.upsert(key, record, (error, result) => {
-        if (error) {
-          console.error(
-            `Error while inserting document ${key}. Error: ${error}`
-          );
-          reject(error);
-        } else {
-          resolve(result);
-        }
-      });
-    });
+    let res = await db.query(
+      `update ${
+        db.TABLES.WorkerAssignment
+      } set updated_at = $1, data = $2 where id = $3 returning *`,
+      [new Date(), assigment.data, assigment.id]
+    );
+    return res.rows[0];
   } catch (error) {
     console.error(error);
     throw Boom.badImplementation(
@@ -113,12 +139,19 @@ const updateAssignment = (exports.updateAssignment = async (
   }
 });
 
+/**
+ * Verify the status of the worker's assignment.
+ *
+ * @param {string} uuid - The experiment UUID
+ * @param {string} turkId - Worker's AMT ID
+ */
 const checkAssignmentStatus = (exports.checkAssignmentStatus = async (
-  experimentId,
-  workerId
+  uuid,
+  turkId
 ) => {
   try {
-    return await getAssignment(experimentId, workerId);
+    const worker = await getByTurkId(turkId);
+    return await getAssignment(uuid, worker.id);
   } catch (error) {
     console.error(error);
     throw Boom.badImplementation(
@@ -127,27 +160,21 @@ const checkAssignmentStatus = (exports.checkAssignmentStatus = async (
   }
 });
 
-const getAssignment = (exports.getAssignment = async (
-  experimentId,
-  workerId
-) => {
+/**
+ * Returns the worker_assigment record
+ *
+ * @param {string} uuid - The experiment's UUID
+ * @param {string} workerId
+ */
+const getAssignment = (exports.getAssignment = async (uuid, workerId) => {
   try {
-    return await new Promise((resolve, reject) => {
-      bucket.get(
-        getWorkerAssignmentKey(experimentId, workerId),
-        (err, data) => {
-          if (err) {
-            if (err.code === couchbase.errors.keyNotFound) {
-              resolve(null);
-            } else {
-              reject(err);
-            }
-          } else {
-            resolve(data.value);
-          }
-        }
-      );
-    });
+    const res = await db.query(
+      `select * from ${
+        db.TABLES.WorkerAssignment
+      } where experiment_uuid = $1 and worker_id = $2`,
+      [uuid, workerId]
+    );
+    return res.rowCount > 0 ? res.rows[0] : null;
   } catch (error) {
     console.error(error);
     throw Boom.badImplementation(
@@ -159,40 +186,31 @@ const getAssignment = (exports.getAssignment = async (
 /**
  * Initializes the assignment record.
  *
- * @param {string} experimentId
- * @param {string} workerId
- * @param {Object} attrs
+ * @param {Object} assignment
  */
-const createAssignment = (exports.createAssignment = async (
-  experimentId,
-  workerId,
-  attrs
-) => {
-  const key = getWorkerAssignmentKey(experimentId, workerId);
-  let record = {
-    type: TYPES.assignment,
+const createAssignment = (exports.createAssignment = async assignment => {
+  let data = {
+    ...assignment.data,
     finished: false,
-    workerId,
-    experimentId,
     initialTestFailed: false,
     honeypotFailed: false,
-    assignmentStart: new Date(),
-    ...attrs
+    assignmentStart: new Date()
   };
 
   try {
-    return await new Promise((resolve, reject) => {
-      bucket.insert(key, record, (error, result) => {
-        if (error) {
-          console.error(
-            `Error while inserting document ${key}. Error: ${error}`
-          );
-          reject(error);
-        } else {
-          resolve(result);
-        }
-      });
-    });
+    let res = await db.query(
+      `insert into ${
+        db.TABLES.WorkerAssignment
+      }(experiment_id, experiment_uuid, worker_id, created_at, data) values($1, $2, $3, $4, $5) returning *`,
+      [
+        assignment.experimentId,
+        assignment.experimentUuid,
+        assignment.workerId,
+        new Date(),
+        data
+      ]
+    );
+    return res.rows[0];
   } catch (error) {
     console.error(error);
     throw Boom.badImplementation(
@@ -201,13 +219,20 @@ const createAssignment = (exports.createAssignment = async (
   }
 });
 
+/**
+ * Verify the status of the worker's assignment.
+ *
+ * @param {string} uuid - The experiment UUID
+ * @param {string} turkId - Worker's AMT ID
+ */
 const rejectAssignment = (exports.rejectAssignment = async (
-  experimentId,
-  workerId,
+  uuid,
+  turkId,
   rejectionType
 ) => {
   try {
-    return await updateAssignment(experimentId, workerId, {
+    let worker = await getByTurkId(turkId);
+    return await updateAssignment(uuid, worker.id, {
       initialTestFailed: rejectionType === RejectionType.INITIAL,
       honeypotFailed: rejectionType === RejectionType.HONEYPOT,
       finished: true,
@@ -220,6 +245,3 @@ const rejectAssignment = (exports.rejectAssignment = async (
     );
   }
 });
-
-const getWorkerAssignmentKey = (experimentId, workerId) =>
-  `${DOCUMENTS.WorkerAssignment}${experimentId}::${workerId}`;

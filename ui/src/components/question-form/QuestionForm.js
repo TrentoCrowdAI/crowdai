@@ -23,8 +23,8 @@ class QuestionForm extends Component {
     event.preventDefault();
 
     let payload = {
-      ...this.props.answer,
-      ...this.props.session
+      task: this.props.task,
+      session: this.props.session
     };
     this.props.submitAnswer(payload);
   }
@@ -32,20 +32,15 @@ class QuestionForm extends Component {
 
 QuestionForm.propTypes = {
   children: PropTypes.element,
-
-  /** @ignore */
   hasAcceptedHit: PropTypes.bool,
-  /** @ignore */
   submitAnswer: PropTypes.func,
-  /** @ignore */
-  answer: PropTypes.object,
-  /** @ignore */
+  task: PropTypes.object,
   session: PropTypes.object
 };
 
 const mapStateToProps = state => ({
   hasAcceptedHit: state.questionForm.hasAcceptedHit,
-  answer: state.questionForm.answer,
+  task: state.questionForm.task,
   session: state.questionForm.session
 });
 

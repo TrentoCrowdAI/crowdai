@@ -1,4 +1,5 @@
 import {actionTypes} from './actions';
+import cloneDeep from 'clone-deep';
 
 const defaultState = {
   hasAcceptedHit: false,
@@ -48,10 +49,11 @@ const reducer = (state = defaultState, action) => {
         loading: true
       };
     case actionTypes.SET_ANSWER:
-      return {
-        ...state,
-        answer: action.answer
-      };
+      let newState = cloneDeep(state);
+      let {criteria} = newState.task.data;
+      let criterion = criteria.filter(c => c.label === action.answer.criterion.label)[0];
+      criterion.workerAnswer = action.answer.response;
+      return newState;
     case actionTypes.SUBMIT_ANSWER:
       return {
         ...state,

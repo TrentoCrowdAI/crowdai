@@ -2,22 +2,22 @@ const delegates = require(__base + 'delegates');
 
 const getWorkerReward = async ctx => {
   ctx.response.body = await delegates.workers.getWorkerReward(
-    ctx.params.experimentId,
-    ctx.params.workerId
+    ctx.params.uuid,
+    ctx.params.workerTurkId
   );
 };
 
 const finishAssignment = async ctx => {
   ctx.response.body = await delegates.workers.finishAssignment(
-    ctx.params.experimentId,
-    ctx.params.workerId
+    ctx.params.uuid,
+    ctx.params.workerTurkId
   );
 };
 
 const checkAssignmentStatus = async ctx => {
   const record = await delegates.workers.checkAssignmentStatus(
-    ctx.params.experimentId,
-    ctx.params.workerId
+    ctx.params.uuid,
+    ctx.params.workerTurkId
   );
 
   ctx.response.body = record || {};
@@ -25,15 +25,15 @@ const checkAssignmentStatus = async ctx => {
 
 exports.register = router => {
   router.get(
-    '/experiments/:experimentId/workers/:workerId/reward',
+    '/experiments/:uuid/workers/:workerTurkId/reward',
     getWorkerReward
   );
   router.post(
-    '/experiments/:experimentId/workers/:workerId/finish-assignment',
+    '/experiments/:uuid/workers/:workerTurkId/finish-assignment',
     finishAssignment
   );
   router.get(
-    '/experiments/:experimentId/workers/:workerId/assignment-status',
+    '/experiments/:uuid/workers/:workerTurkId/assignment-status',
     checkAssignmentStatus
   );
 };

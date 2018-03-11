@@ -23,21 +23,13 @@ const getByRequester = (exports.getByRequester = async id => {
 
 const getById = (exports.getById = async id => {
   try {
-    let experiment = await new Promise((resolve, reject) => {
-      bucket.get(`${DOCUMENTS.Experiment}${id}`, (err, data) => {
-        if (err) {
-          if (err.code === couchbase.errors.keyNotFound) {
-            resolve(null);
-          } else {
-            reject(err);
-          }
-        } else {
-          resolve(data.value);
-        }
-      });
-    });
-    experiment.consent = await new Promise((resolve, reject) => {
-      request(experiment.consentUrl, (err, rsp, body) => {
+    let res = await db.query(
+      `select * from ${db.TABLES.Project} where id = $1`,
+      [id]
+    );
+    const project = res.rows[0];
+    project.consent = await new Promise((resolve, reject) => {
+      request(project.data.consentUrl, (err, rsp, body) => {
         if (err) {
           reject(err);
         } else {
@@ -45,7 +37,7 @@ const getById = (exports.getById = async id => {
         }
       });
     });
-    return experiment;
+    return project;
   } catch (error) {
     console.error(error);
     throw Boom.badImplementation('Error while trying to fetch the record');
@@ -124,10 +116,58 @@ const getItemsQS = (exports.getItems = async projectId => {
   }
 });
 
+/**
+ * Returns the criterion list associated with the project
+ *
+ * @param {Number} id - The project's ID
+ * @return {Object[]}
+ */
+const getCriteria = (exports.getCriteria = async id => {
+  try {
+    let res = await db.query(
+      `select * from ${db.TABLES.Criterion} where project_id = $1`,
+      [id]
+    );
+    return res.rowCount > 0
+      ? { rows: res.rows, meta: { count: res.rowCount } }
+      : null;
+  } catch (error) {
+    console.error(error);
+    throw Boom.badImplementation('Error while trying to fetch records');
+  }
+});
+
+/**
+ * Returns the criteria for the given criterion ID list.
+ *
+ * @param {Number[]} criteria - Array of criterion IDs
+ * @return {Object[]}
+ */
+const getCriteriaFromIds = (exports.getCriteriaFromIds = async criteria => {
+  try {
+    let res = await db.query(
+      `select * from ${db.TABLES.Criterion} where id in $1`,
+      [criteria]
+    );
+    return res.rowCount > 0
+      ? { rows: res.rows, meta: { count: res.rowCount } }
+      : null;
+  } catch (error) {
+    console.error(error);
+    throw Boom.badImplementation('Error while trying to fetch records');
+  }
+});
+
 const createItems = async project => {
   let parser = parse({ delimiter: ',', columns: true });
   let items = [];
-  const transformer = transform(item => items.push(item), { parallel: 10 });
+  const transformer = transform(
+    item =>
+      items.push({
+        item: { title: item.itemTitle, description: item.itemDescription }
+      }),
+    { parallel: 10 }
+  );
 
   request(project.data.itemsUrl)
     .pipe(parser)
@@ -156,9 +196,18 @@ const createItems = async project => {
 const createCriteria = async project => {
   let parser = parse({ delimiter: ',', columns: true });
   let criteria = [];
-  const transformer = transform(criterion => criteria.push(criterion), {
-    parallel: 10
-  });
+  let labelCount = 1;
+
+  const transformer = transform(
+    criterion =>
+      criteria.push({
+        label: `C${labelCount++}`,
+        description: criterion.filterDescription
+      }),
+    {
+      parallel: 10
+    }
+  );
 
   request(project.data.filtersUrl)
     .pipe(parser)
@@ -205,12 +254,32 @@ const createTests = async project => {
     });
   });
 
+  let criteria = await getCriteria(project.id);
+  let descriptionMap = {};
+
+  for (c of criteria.rows) {
+    descriptionMap[c.data.description.trim()] = c;
+  }
+
   for (test of tests) {
+    let criterion = descriptionMap[test.filterDescription.trim()];
+    let data = {
+      item: { title: test.itemTitle, description: test.itemDescription },
+      criteria: [
+        {
+          id: criterion.id,
+          label: criterion.data.label,
+          description: test.filterDescription.trim(),
+          answer: test.answer
+        }
+      ]
+    };
+
     await db.query(
       `insert into ${
         db.TABLES.Test
       }(created_at, project_id, data) values($1, $2, $3)`,
-      [new Date(), project.id, test]
+      [new Date(), project.id, data]
     );
   }
 };

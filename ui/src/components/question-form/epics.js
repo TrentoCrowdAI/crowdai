@@ -20,7 +20,8 @@ const getNextTask = (action$, store) =>
 
 const postAnswer = (action$, store) =>
   action$.ofType(actionTypes.SUBMIT_ANSWER).switchMap(action => {
-    return Observable.defer(() => axios.post('answers', action.answer))
+    const {session} = store.getState().questionForm;
+    return Observable.defer(() => axios.post(`/experiments/${session.experimentId}/answers`, action.answer))
       .mergeMap(response =>
         Observable.concat(
           Observable.of(actions.submitAnswerSuccess(response.data)),

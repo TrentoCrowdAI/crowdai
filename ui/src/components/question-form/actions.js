@@ -47,13 +47,10 @@ export const actions = {
     };
   },
 
-  setAnswer(task, response) {
+  setAnswer(criterion, response) {
     return {
       type: actionTypes.SET_ANSWER,
-      answer: {
-        task,
-        response
-      }
+      answer: {criterion, response}
     };
   },
 

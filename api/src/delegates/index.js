@@ -1,5 +1,8 @@
-exports.tasks = require('./tasks');
 exports.answers = require('./answers');
+exports.items = require('./items');
+exports.tasks = require('./tasks');
+exports.testTasks = require('./test-tasks');
+exports.nextTask = require('./next-task');
 exports.workers = require('./workers');
 exports.requesters = require('./requesters');
 exports.experiments = require('./experiments');

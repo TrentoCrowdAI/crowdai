@@ -131,7 +131,7 @@ class FilterTask extends React.Component {
                     Next task?
                   </Button>
 
-                  {!this.props.task.isInitialTest && (
+                  {!this.props.task.data.initial && (
                     <FinishButton style={{marginTop: 40}} onClick={() => this.finish()} />
                   )}
                 </React.Fragment>

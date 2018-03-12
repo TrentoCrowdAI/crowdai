@@ -138,6 +138,14 @@ class ExperimentForm extends React.Component {
           />
         </Form.Group>
 
+        <Form.TextArea
+          label="Description"
+          name="data.description"
+          placeholder="The screening description, as it will appear on Amazon Mechanical Turk"
+          value={item.data.description}
+          onChange={this.handleChange}
+        />
+
         {this.renderCriteriaSection()}
 
         <Form.Field>

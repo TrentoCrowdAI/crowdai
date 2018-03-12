@@ -5,6 +5,7 @@ const testTasksDelegate = require('./test-tasks');
 const tasksDelegate = require('./tasks');
 const experimentsDelegate = require('./experiments');
 const workersDelegate = require('./workers');
+const projectsDelegate = require('./projects');
 const { RejectionType } = workersDelegate;
 const { TestAnswerStrategy } = testTasksDelegate;
 
@@ -18,15 +19,8 @@ const { TestAnswerStrategy } = testTasksDelegate;
 exports.next = async (uuid, workerTurkId, assignmentId) => {
   const experiment = await experimentsDelegate.getByUuid(uuid);
   const worker = await workersDelegate.getByTurkId(workerTurkId);
-
-  if (!worker) {
-    worker = await workersDelegate.create(workerTurkId);
-  }
-
   const workerId = worker.id;
   const experimentId = experiment.id;
-  let key;
-  let isInitialTest = false;
 
   if (!experiment) {
     throw Boom.badRequest('Experiment with the given ID does not exist');
@@ -98,7 +92,7 @@ exports.next = async (uuid, workerTurkId, assignmentId) => {
         initialTestScore < experiment.data.initialTestsMinCorrectAnswersRule
       ) {
         await workersDelegate.rejectAssignment(
-          experimentId,
+          uuid,
           workerId,
           RejectionType.INITIAL
         );
@@ -114,7 +108,7 @@ exports.next = async (uuid, workerTurkId, assignmentId) => {
 
       if (!honeypotApproved) {
         await workersDelegate.rejectAssignment(
-          experimentId,
+          uuid,
           workerId,
           RejectionType.HONEYPOT
         );

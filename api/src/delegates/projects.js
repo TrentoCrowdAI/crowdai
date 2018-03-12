@@ -117,6 +117,25 @@ const getItemsQS = (exports.getItems = async projectId => {
 });
 
 /**
+ * Returns the number of items that are associated with the given project.
+ *
+ * @param {Number} projectId
+ * @return {Number}
+ */
+const getItemsCount = (exports.getItemsCount = async projectId => {
+  try {
+    let res = await db.query(
+      `select count(*) as count from  ${db.TABLES.Item} where project_id = $1`,
+      [projectId]
+    );
+    return Number(res.rows[0].count);
+  } catch (error) {
+    console.error(error);
+    throw Boom.badImplementation('Error while trying to fetch project items');
+  }
+});
+
+/**
  * Returns the criterion list associated with the project
  *
  * @param {Number} id - The project's ID
@@ -146,8 +165,8 @@ const getCriteria = (exports.getCriteria = async id => {
 const getCriteriaFromIds = (exports.getCriteriaFromIds = async criteria => {
   try {
     let res = await db.query(
-      `select * from ${db.TABLES.Criterion} where id in $1`,
-      [criteria]
+      `select * from ${db.TABLES.Criterion} where id in ($1)`,
+      [criteria.join(',')]
     );
     return res.rowCount > 0
       ? { rows: res.rows, meta: { count: res.rowCount } }
@@ -164,7 +183,8 @@ const createItems = async project => {
   const transformer = transform(
     item =>
       items.push({
-        item: { title: item.itemTitle, description: item.itemDescription }
+        title: item.itemTitle,
+        description: item.itemDescription
       }),
     { parallel: 10 }
   );

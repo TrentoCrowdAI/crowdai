@@ -1,4 +1,5 @@
 import {combineReducers} from 'redux';
+import cloneDeep from 'clone-deep';
 
 import {actionTypes} from './actions';
 import {getReducer} from 'src/utils/form';
@@ -44,6 +45,7 @@ const genericFormReducer = getReducer(scopes.EXPERIMENTS, {
   uuid: '',
   data: {
     name: '',
+    description: '',
     requesterId: '',
     status: ExperimentStatus.NOT_PUBLISHED,
     taskInstructionsUrl: '',
@@ -53,11 +55,11 @@ const genericFormReducer = getReducer(scopes.EXPERIMENTS, {
     criteriaQualityAnalysis: false,
     abstractPresentationTechnique: 'kh',
     labelOptions: 'ynk',
-    // HIT configurations
-    maxAssignments: 10,
-    assignmentDurationInSeconds: 600,
-    description: '',
-    lifetimeInSeconds: 5 * 60 * 60,
+    hitConfig: {
+      maxAssignments: 10,
+      lifetimeInMinutes: 5 * 24 * 60,
+      assignmentDurationInMinutes: 20
+    },
     // parameters
     maxTasksRule: 3,
     taskRewardRule: 0.5,
@@ -78,10 +80,6 @@ const formReducer = (state = defaultFormState, action) => {
     case actionTypes.PUBLISH_EXPERIMENT:
       return {
         ...state,
-        item: {
-          ...state.item,
-          status: ExperimentStatus.NOT_PUBLISHED
-        },
         error: undefined,
         loading: true
       };
@@ -89,10 +87,10 @@ const formReducer = (state = defaultFormState, action) => {
       return {
         ...state,
         item: {
-          ...state.item,
-          status: ExperimentStatus.PUBLISHED
+          ...action.experiment
         },
-        loading: false
+        loading: false,
+        saved: true
       };
     case actionTypes.PUBLISH_EXPERIMENT_ERROR:
       return {

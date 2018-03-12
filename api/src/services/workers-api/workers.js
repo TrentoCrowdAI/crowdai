@@ -20,7 +20,7 @@ const checkAssignmentStatus = async ctx => {
     ctx.params.workerTurkId
   );
 
-  ctx.response.body = record || {};
+  ctx.response.body = record || { data: {} };
 };
 
 exports.register = router => {

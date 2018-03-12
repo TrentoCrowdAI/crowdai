@@ -35,8 +35,8 @@ const publishExperiment = (action$, store) =>
   action$.ofType(actionTypes.PUBLISH_EXPERIMENT).switchMap(action => {
     const {item} = store.getState().experiment.form;
     const config = {timeout: 10000};
-    return Observable.defer(() => requestersApi.post(`experiments/${item.id}/publish`, item, config))
-      .mergeMap(response => Observable.of(actions.publishSuccess()))
+    return Observable.defer(() => requestersApi.post(`experiments/${item.id}/publish`, {}, config))
+      .mergeMap(response => Observable.of(actions.publishSuccess(response.data)))
       .catch(error => Observable.of(actions.publishError(flattenError(error))));
   });
 

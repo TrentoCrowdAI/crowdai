@@ -24,10 +24,7 @@ const put = async ctx => {
 };
 
 const publish = async ctx => {
-  ctx.response.body = await delegates.experiments.publish(
-    ctx.params.id,
-    ctx.request.fields
-  );
+  ctx.response.body = await delegates.experiments.publish(ctx.params.id);
 };
 
 exports.register = router => {

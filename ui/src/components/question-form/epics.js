@@ -70,7 +70,7 @@ const checkPolling = (action$, store) =>
           axios.get(`/experiments/${session.experimentId}/workers/${session.workerId}/assignment-status`)
         )
           .mergeMap(response => {
-            if (response.data.finished) {
+            if (response.data.data.finished) {
               return Observable.concat(
                 Observable.of(actions.checkPollingDone()),
                 Observable.of(actions.checkAssignmentStatusSuccess(response.data))

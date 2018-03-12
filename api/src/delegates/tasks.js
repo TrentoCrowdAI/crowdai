@@ -25,15 +25,26 @@ const createTaskForWorker = (exports.createTaskForWorker = async (
     experimentId,
     workerId
   );
-  const criterionRecords = await projectsDelegate.getCriteriaFromIds(criteria);
+  let criterionRecords = await projectsDelegate.getCriteriaFromIds(criteria);
+
+  const flattenedCriteria = criterionRecords.rows.map(c => ({
+    id: c.id,
+    label: c.data.label,
+    description: c.data.description
+  }));
+
+  const flattenedItems = {
+    title: itemRecord.data.title,
+    description: itemRecord.data.description
+  };
 
   return await createTask({
     experiment_id: experimentId,
     worker_id: workerId,
     item_id: itemRecord.id,
     data: {
-      item: itemRecord,
-      criteria: criterionRecords.rows
+      item: flattenedItems,
+      criteria: flattenedCriteria
     }
   });
 });
@@ -74,19 +85,72 @@ const getTaskById = (exports.getTaskById = async id => {
 /**
  * Overrides data column for the given task.
  *
- * @param {Object} task
+ * @param {Number} id
+ * @param {Object} taskData
  */
-const updateTask = (exports.updateTask = async task => {
+const updateTask = (exports.updateTask = async (id, taskData) => {
   try {
     let res = await db.query(
       `update ${
         db.TABLES.Task
       } set updated_at = $1, data = $2 where id = $3 returning *`,
-      [new Date(), task.data, task.id]
+      [new Date(), taskData, id]
     );
     return res.rows[0];
   } catch (error) {
     console.error(error);
     throw Boom.badImplementation('Error while trying to update record');
+  }
+});
+
+/**
+ * Returns the number of task records that the worker has already answered.
+ *
+ * @param {Number} experimentId
+ * @param {Number} workerId
+ */
+const getWorkerTasks = (exports.getWorkerTasks = async (
+  experimentId,
+  workerId
+) => {
+  try {
+    let res = await db.query(
+      `select t.* from ${
+        db.TABLES.Task
+      } t where t.experiment_id = $1 and t.worker_id = $2 and t.data ? 'answered'`,
+      [experimentId, workerId]
+    );
+    return { rows: res.rows, meta: { count: res.rowCount } };
+  } catch (error) {
+    console.error(error);
+    throw Boom.badImplementation(
+      "Error while trying to fetch worker's test answers count"
+    );
+  }
+});
+
+/**
+ * Returns the number of task records that the worker has already answered.
+ *
+ * @param {Number} experimentId
+ * @param {Number} workerId
+ */
+const getWorkerTasksCount = (exports.getWorkerTasksCount = async (
+  experimentId,
+  workerId
+) => {
+  try {
+    let res = await db.query(
+      `select count(t.*) from ${
+        db.TABLES.Task
+      } t where t.experiment_id = $1 and t.worker_id = $2 and t.data ? 'answered'`,
+      [experimentId, workerId]
+    );
+    return Number(res.rows[0].count);
+  } catch (error) {
+    console.error(error);
+    throw Boom.badImplementation(
+      "Error while trying to fetch worker's test answers count"
+    );
   }
 });

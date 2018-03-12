@@ -30,7 +30,7 @@ const saveAnswer = (exports.saveAnswer = async payload => {
         c.workerAnswer = answersMap[c.label];
       }
       testTask.data.answered = true;
-      return await testTasksDelegate.updateTestTask(testTask);
+      return await testTasksDelegate.updateTestTask(testTask.id, testTask.data);
     } else {
       let task = await tasksDelegate.getTaskById(payload.task.id);
 
@@ -47,7 +47,7 @@ const saveAnswer = (exports.saveAnswer = async payload => {
         c.workerAnswer = answersMap[c.label];
       }
       task.data.answered = true;
-      return await tasksDelegate.updateTask(task);
+      return await tasksDelegate.updateTask(task.id, task.data);
     }
   } catch (error) {
     console.error(error);

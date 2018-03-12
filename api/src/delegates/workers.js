@@ -32,7 +32,7 @@ const create = (exports.create = async turkId => {
       }(turk_id, created_at) values($1, $2) returning *`,
       [turkId, new Date()]
     );
-    return res.rowCount > 0 ? res.rows[0] : null;
+    return res.rows[0];
   } catch (error) {
     console.error(error);
     throw Boom.badImplementation('Error while trying to create worker');
@@ -150,7 +150,11 @@ const checkAssignmentStatus = (exports.checkAssignmentStatus = async (
   turkId
 ) => {
   try {
-    const worker = await getByTurkId(turkId);
+    let worker = await getByTurkId(turkId);
+
+    if (!worker) {
+      worker = await create(turkId);
+    }
     return await getAssignment(uuid, worker.id);
   } catch (error) {
     console.error(error);
@@ -222,17 +226,16 @@ const createAssignment = (exports.createAssignment = async assignment => {
 /**
  * Verify the status of the worker's assignment.
  *
- * @param {string} uuid - The experiment UUID
- * @param {string} turkId - Worker's AMT ID
+ * @param {string} uuid - The experiment's UUID
+ * @param {string} workerId - The worker's ID
  */
 const rejectAssignment = (exports.rejectAssignment = async (
   uuid,
-  turkId,
+  workerId,
   rejectionType
 ) => {
   try {
-    let worker = await getByTurkId(turkId);
-    return await updateAssignment(uuid, worker.id, {
+    return await updateAssignment(uuid, workerId, {
       initialTestFailed: rejectionType === RejectionType.INITIAL,
       honeypotFailed: rejectionType === RejectionType.HONEYPOT,
       finished: true,

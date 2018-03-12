@@ -39,9 +39,10 @@ const actions = {
     };
   },
 
-  publishSuccess() {
+  publishSuccess(experiment) {
     return {
-      type: actionTypes.PUBLISH_EXPERIMENT_SUCCESS
+      type: actionTypes.PUBLISH_EXPERIMENT_SUCCESS,
+      experiment
     };
   },
 

@@ -132,7 +132,7 @@ const getWorkerTestTasks = (exports.getWorkerTestTasks = async (
       } t where t.experiment_id = $1 and t.worker_id = $2 and t.data ? 'answered' ${where} order by t.created_at asc`,
       [experimentId, workerId]
     );
-    return res.rows[0];
+    return { rows: res.rows, meta: { count: res.rowCount } };
   } catch (error) {
     console.error(error);
     throw Boom.badImplementation(
@@ -190,7 +190,7 @@ const getInitialTestScore = (exports.getInitialTestScore = async (
   try {
     let count = 0;
 
-    for (task of testTasks) {
+    for (task of testTasks.rows) {
       let score = task.data.criteria.reduce(
         (sum, criterion) =>
           criterion.answer === criterion.workerAnswer ? sum + 1 : sum,
@@ -228,11 +228,11 @@ const checkLastHoneypot = (exports.checkLastHoneypot = async (
   );
 
   try {
-    if (testTasks.length === 0) {
+    if (testTasks.meta.count === 0) {
       return true;
     }
     // we just pick the most recent answer.
-    let task = testTasks[testTasks.length - 1];
+    let task = testTasks.rows[testTasks.meta.count - 1];
     let score = task.data.criteria.reduce(
       (sum, criterion) =>
         criterion.answer === criterion.workerAnswer ? sum + 1 : sum,
@@ -263,15 +263,16 @@ const getTestTaskById = (exports.getTestTaskById = async id => {
 /**
  * Overrides data column for the given test_task.
  *
- * @param {Object} testTask
+ * @param {Number} id
+ * @param {Object} testTaskData
  */
-const updateTestTask = (exports.updateTestTask = async testTask => {
+const updateTestTask = (exports.updateTestTask = async (id, testTaskData) => {
   try {
     let res = await db.query(
       `update ${
         db.TABLES.TestTask
       } set updated_at = $1, data = $2 where id = $3 returning *`,
-      [new Date(), testTask.data, testTask.id]
+      [new Date(), testTaskData, id]
     );
     return res.rows[0];
   } catch (error) {

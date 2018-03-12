@@ -1,5 +1,17 @@
 import React from 'react';
-import {Step, Icon, Segment, Grid, Form, Button, Statistic, Header, Image, Accordion} from 'semantic-ui-react';
+import {
+  Step,
+  Icon,
+  Segment,
+  Grid,
+  Form,
+  Button,
+  Statistic,
+  Header,
+  Image,
+  Accordion,
+  Message
+} from 'semantic-ui-react';
 import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
 
@@ -13,12 +25,13 @@ class ExperimentDashboard extends React.Component {
     super(props);
     this.state = {
       activeStep: 'process',
-      isRunning: true,
       expertMode: true,
       activeIndex: {},
-      aggregationStrategy: 'ds'
+      aggregationStrategy: 'ds',
+      showSuccessMsg: true
     };
     this.handleAccordionClick = this.handleAccordionClick.bind(this);
+    this.handleChange = this.handleChange.bind(this);
   }
   render() {
     return (
@@ -52,7 +65,7 @@ class ExperimentDashboard extends React.Component {
     const {item} = this.props;
 
     return (
-      <Form>
+      <Form error={this.props.error !== undefined} success={this.props.saved} loading={this.props.loading}>
         <Grid>
           <Grid.Row columns="equal">
             <Grid.Column>
@@ -101,15 +114,76 @@ class ExperimentDashboard extends React.Component {
               </Statistic.Group>
             </Grid.Column>
           </Grid.Row>
+          {item.data.status === ExperimentStatus.NOT_PUBLISHED && (
+            <Grid.Row>
+              <Grid.Column width="10" style={{marginLeft: 'auto', marginRight: 'auto'}}>
+                <Header content="HIT configuration" />
+
+                <Form.Group>
+                  <Form.Input
+                    width={5}
+                    label="Max. assignments"
+                    name="data.hitConfig.maxAssignments"
+                    value={item.data.hitConfig.maxAssignments}
+                    placeholder="10"
+                    onChange={this.handleChange}
+                    type="number"
+                    min="1"
+                    required
+                  />
+                  <Form.Input
+                    width={6}
+                    label="Assignment duration (in minutes)"
+                    name="data.hitConfig.assignmentDurationInMinutes"
+                    value={item.data.hitConfig.assignmentDurationInMinutes}
+                    onChange={this.handleChange}
+                    required
+                  />
+                  <Form.Input
+                    width={5}
+                    label="Lifetime (in minutes)"
+                    name="data.hitConfig.lifetimeInMinutes"
+                    value={item.data.hitConfig.lifetimeInMinutes}
+                    placeholder="120"
+                    onChange={this.handleChange}
+                    required
+                  />
+                </Form.Group>
+              </Grid.Column>
+            </Grid.Row>
+          )}
+          <Grid.Row>
+            <Grid.Column width="10" style={{marginLeft: 'auto', marginRight: 'auto'}}>
+              {this.props.error && (
+                <Message
+                  error
+                  header="Error"
+                  content={this.props.error.message || 'An error ocurred, please try again.'}
+                />
+              )}
+              {this.props.saved &&
+                this.state.showSuccessMsg && (
+                  <Message
+                    onDismiss={() => this.setState({...this.state, showSuccessMsg: false})}
+                    success
+                    header="Success"
+                    content="Published!"
+                  />
+                )}
+            </Grid.Column>
+          </Grid.Row>
           <Grid.Row>
             <Grid.Column>
-              <Button
-                floated="right"
-                size="large"
-                negative={item.data.status === ExperimentStatus.PUBLISHED}
-                positive={item.data.status === ExperimentStatus.NOT_PUBLISHED}>
-                {item.data.status === ExperimentStatus.NOT_PUBLISHED ? 'Run' : 'Stop'}
-              </Button>
+              {item.data.status === ExperimentStatus.NOT_PUBLISHED && (
+                <Button onClick={() => this.props.publish()} floated="right" size="large" positive>
+                  Run
+                </Button>
+              )}
+              {item.data.status === ExperimentStatus.PUBLISHED && (
+                <Button floated="right" size="large" negative>
+                  Stop
+                </Button>
+              )}
               {this.state.expertMode && (
                 <Button floated="right" size="large" style={{width: '200px'}}>
                   Update parameters
@@ -281,12 +355,21 @@ class ExperimentDashboard extends React.Component {
       activeIndex: newIndex
     });
   }
+
+  handleChange(e, {name, value}) {
+    this.props.setInputValue(name, value);
+  }
 }
 
 ExperimentDashboard.propTypes = {
   item: PropTypes.object,
   match: PropTypes.object,
-  fetchItem: PropTypes.func
+  fetchItem: PropTypes.func,
+  publish: PropTypes.func,
+  loading: PropTypes.bool,
+  saved: PropTypes.bool,
+  error: PropTypes.object,
+  setInputValue: PropTypes.func
 };
 
 const mapStateToProps = state => ({
@@ -300,7 +383,8 @@ const mapDispatchToProps = dispatch => ({
   submit: () => dispatch(actions.submit()),
   cleanState: () => dispatch(actions.cleanState()),
   setInputValue: (name, value) => dispatch(actions.setInputValue(name, value)),
-  fetchItem: id => dispatch(actions.fetchItem(id))
+  fetchItem: id => dispatch(actions.fetchItem(id)),
+  publish: () => dispatch(actions.publish())
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(ExperimentDashboard);

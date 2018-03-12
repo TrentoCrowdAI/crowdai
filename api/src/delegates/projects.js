@@ -1,5 +1,4 @@
 const Boom = require('boom');
-const couchbase = require('couchbase');
 const uuid = require('uuid/v4');
 const request = require('request');
 const parse = require('csv-parse');
@@ -67,32 +66,6 @@ const create = (exports.create = async project => {
     console.error(error);
     await db.query('ROLLBACK');
     throw Boom.badImplementation('Error while trying to persist the record');
-  }
-});
-
-const update = (exports.update = async (id, item) => {
-  try {
-    let saved = await getById(id);
-    let payload = {
-      ...saved,
-      ...item
-    };
-    const key = `${DOCUMENTS.Experiment}${item.id}`;
-    return await new Promise((resolve, reject) => {
-      bucket.upsert(key, payload, (error, result) => {
-        if (error) {
-          console.error(
-            `Error while inserting document ${key}. Error: ${error}`
-          );
-          reject(error);
-        } else {
-          resolve(result);
-        }
-      });
-    });
-  } catch (error) {
-    console.error(error);
-    throw Boom.badImplementation('Error while trying to update the record');
   }
 });
 

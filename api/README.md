@@ -1,11 +1,11 @@
 # api
 
-Service + Business layer for CrowdRev. This project uses [koajs](http://koajs.com/) for the service layer. The business layer uses [Couchbase](https://www.couchbase.com/) as database.
+Service + Business layer for CrowdRev. This project uses [koajs](http://koajs.com/) for the service layer. The business layer uses [PostgreSQL](https://www.postgresql.org/) as database.
 
 ## Requirements
 
 * Node.js 8+
-* Couchbase server (community version 5.0.1)
+* PostgreSQL server 9.5
 
 ## Configure
 
@@ -27,24 +27,19 @@ $ npm install
 
 ### Database
 
-As mentioned before, CrowdRev uses Couchbase database. You can use docker to start couchbase server easily. If you don't have docker, go to the [docker community edition page](https://www.docker.com/community-edition) and follow the steps to install it in your platform. To start the couchbase server:
+As mentioned before, CrowdRev uses PostgreSQL. You can use docker to start a postgres server easily. If you don't have docker, go to the [docker community edition page](https://www.docker.com/community-edition) and follow the steps to install it in your platform. To start the server:
 
 ```
-$ docker run -d --name db -p 8091-8094:8091-8094 -p 11210:11210 couchbase/server:community-5.0.1
+$ docker run --name postgres -e POSTGRES_PASSWORD=yourpassword -d -p 5432:5432 postgres:9.5
 ```
 
 ##### Configure the database
 
-After starting the database, you need to setup the cluster (server) and bucket (where we store our data) before using running the backend of CrowdRev. To initalize the cluster, follow the steps described [here](https://developer.couchbase.com/documentation/server/5.1/install/init-setup.html). To create a bucket, follow [these](https://developer.couchbase.com/documentation/server/5.1/clustersetup/create-bucket.html) steps (basically just set the name of the bucket, Couchbase as type and enable Flushing). Keep in mind that the database information should match with what you defined in your `.env` file.
+Create a database based on the configuration parameters you define in your `.env` file.
 
 ##### Initialize the database
 
-To run [queries](https://developer.couchbase.com/documentation/server/5.1/getting-started/try-a-query.html) in our database bucket, we first need to create [a primary index](https://developer.couchbase.com/documentation/server/5.1/sdk/n1ql-query.html#story-h2-8). To do this, run the following:
-
-```
-$ npm run db:init
-```
-
+Run the script _src/db/init.sql_ to initialize the database.
 Now you have the database up & running.
 
 ### Development
@@ -53,6 +48,12 @@ To run in development mode, just issue the following:
 
 ```
 $ npm start
+```
+
+For debugging, you can start the server using the following:
+
+```
+$ npm run debug
 ```
 
 The API should be available at http://localhost:4000/

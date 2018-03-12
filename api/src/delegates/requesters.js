@@ -1,5 +1,4 @@
 const Boom = require('boom');
-const couchbase = require('couchbase');
 
 const db = require(__base + 'db');
 const config = require(__base + 'config');

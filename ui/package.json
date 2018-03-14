@@ -6,6 +6,7 @@
   "dependencies": {
     "axios": "^0.17.1",
     "clone-deep": "^3.0.1",
+    "d3": "^4.13.0",
     "get-value": "^3.0.1",
     "koa-jwt": "^3.3.0",
     "query-string": "^5.0.1",

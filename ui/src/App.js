@@ -15,7 +15,7 @@ import RewardWidget from 'src/components/reward-widget/RewardWidget';
 import DashboardContainer from 'src/components/admin/dashboard/DashboardContainer';
 import Login from 'src/components/admin/login/Login';
 
-import SimpleLineChart from 'src/components/charts/SimpleLineChart'
+import ChartWrapper from 'src/components/charts/ChartWrapper'
 
 /**
  * Main component.
@@ -32,7 +32,7 @@ class ConnectedApp extends Component {
 
         <Container>
           <Switch>
-            <Route path={'/charting'} component={SimpleLineChart} />
+            <Route path={'/charting'} component={ChartWrapper} />
             <Route path={'/welcome/:experimentId'} component={WelcomePage} />
             <Route
               path={'/task/:experimentId'}

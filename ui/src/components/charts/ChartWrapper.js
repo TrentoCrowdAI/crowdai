@@ -1,5 +1,5 @@
 import React from 'react'
-import * as d3 from 'd3'
+//import * as d3 from 'd3'
 import {connect} from 'react-redux'
 import PropTypes from 'prop-types'
 
@@ -26,17 +26,41 @@ var chartData = [{
   name: "rocky",
   altezza: "170",
   peso: "88"
+},{
+  name: "rose",
+  altezza: "160",
+  peso: "55"
+},{
+  name: "lola",
+  altezza: "190",
+  peso: "76"
 }]
 
 class ChartWrapper extends React.Component {
+
   render() {
     return(
       <div>
-        <SimpleLineChart data={chartData} x={'peso'} y={'altezza'} selector={'chart1'} color={'blue'}/>
+        <SimpleLineChart
+          data={chartData}
+          x={'peso'}
+          y={'altezza'}
+          selector={'chart1'}
+          color={'blue'}/>
         <hr />
-        <SimpleLineChart data={chartData} x={'altezza'} y={'peso'} selector={'chart2'} color={'black'}/>
+        <SimpleLineChart
+          data={chartData}
+          x={'altezza'}
+          y={'peso'}
+          selector={'chart2'}
+          color={'black'}/>
         <hr />
-        <Histogram data={chartData} x={'peso'} y={'altezza'} selector={'chart3'} color={'green'}/>
+        <Histogram
+          data={chartData}
+          x={'peso'}
+          y={'altezza'}
+          selector={'chart3'}
+          color={'green'}/>
         <hr />
       </div>
     )

@@ -6,17 +6,22 @@ import PropTypes from 'prop-types'
 class Histogram extends React.Component {
   constructor(props) {
     super(props);
+    this.state = {
+      data: this.props.data
+    }
+    this.buildGraph = this.buildGraph.bind(this);
+    this.handleConcat = this.handleConcat.bind(this);
+    this.handleReduce = this.handleReduce.bind(this);
   }
 
-  componentDidMount() {
+  buildGraph() {
     var svg = d3.select("."+this.props.selector);
     var x = this.props.x
-    var y = this.props.y
+    //var y = this.props.y
 
-    var data = this.props.data.sort( function(a,b) {
+    var data = this.state.data.sort( function(a,b) {
       return (a[x] > b[x]) ? 1 : ((b[x] > a[x]) ? -1 : 0);
     })
-    console.log(data)
 
     var margin = {top: 30, right: 30, bottom: 30, left: 30};
     var width = +svg.attr("width") - margin.left - margin.right;
@@ -86,15 +91,46 @@ class Histogram extends React.Component {
           .attr("transform","rotate(-90)")
           .attr("text-anchor","end")
           .attr("dy","2em")
-          .text(this.props.y);
+          .text("# objects");
+  }
 
+  componentDidMount() {
+    this.buildGraph();
+  }
+
+  componentDidUpdate() {
+    d3.select("."+this.props.selector).selectAll("g").remove();
+    this.buildGraph();
+  }
+
+  handleConcat() {
+    this.setState(prevState => ({
+      data: prevState.data.concat([{
+        name: "rollo",
+        altezza: "150",
+        peso: "80"
+      },{
+        name: "faramir",
+        peso: "40",
+        altezza: "145"
+      }])
+    }))
+  }
+
+  handleReduce() {
+    this.setState(prevState => ({
+      data: prevState.data.splice(1,1)
+    }))
   }
 
   render() {
+    console.log(this.state)
     return (
       <div>
       - Histogram -
         <svg className={this.props.selector} width="600" height="400"> </svg>
+        <button onClick={this.handleConcat}>Concat Data</button>
+        <button onClick={this.handleReduce} style={{'backgroundColor': 'red'}}>Reduce Data</button>
       </div>
     );
   }

@@ -57,8 +57,8 @@ class ChartWrapper extends React.Component {
         <hr />
         <Histogram
           data={chartData}
-          x={'peso'}
-          y={'altezza'}
+          x={'altezza'}
+          y={'peso'}
           selector={'chart3'}
           color={'green'}/>
         <hr />

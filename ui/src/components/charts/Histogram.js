@@ -2,6 +2,9 @@ import React from 'react'
 import { connect } from 'react-redux'
 import * as d3 from 'd3'
 import PropTypes from 'prop-types'
+import Math from 'math'
+
+var count = 0;
 
 class Histogram extends React.Component {
   constructor(props) {
@@ -48,7 +51,7 @@ class Histogram extends React.Component {
         .enter().append("g")
         .attr("class", "bar")
         .attr("transform", function(d) {
-          console.log(d.x0,d.x1,d.length)
+          //console.log(d.x0,d.x1,d.length)
           return "translate(" + xscale(d.x0) + "," + yscale(d.length) + ")"; });
 
     bar.append("rect")
@@ -68,10 +71,10 @@ class Histogram extends React.Component {
 
     bar.append("text")
           .attr("dy", ".75em")
-          .attr("y", function(d) { return d.length+5 })
+          .attr("y", function(d) { return -15 })
           .attr("x", function(d) { return (xscale(d.x1)-xscale(d.x0))/2 })
           .attr("text-anchor", "middle")
-          .style("fill","white")
+          .style("fill", color)
           .text(function(d) { return d.length })
 
     g.append("g")
@@ -104,23 +107,25 @@ class Histogram extends React.Component {
   }
 
   handleConcat() {
-    this.setState(prevState => ({
-      data: prevState.data.concat([{
-        name: "rollo",
-        altezza: "150",
-        peso: "80"
-      },{
-        name: "faramir",
-        peso: "40",
-        altezza: "145"
-      }])
-    }))
+    var num = Math.floor(Math.random()*10)+1;
+    for(var i=0; i<num; i++) {
+      this.setState(prevState => ({
+        data: prevState.data.concat(
+          [{
+            name: "nuovodato"+(count++).toString(),
+            altezza: (Math.floor(Math.random()*100)+100).toString(),
+            peso: (Math.floor(Math.random()*80)+40).toString()
+          }]
+        )
+      }))
+    }
   }
 
   handleReduce() {
     this.setState(prevState => ({
       data: prevState.data.splice(1,1)
     }))
+    count=0;
   }
 
   render() {

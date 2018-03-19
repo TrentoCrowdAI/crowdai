@@ -3,8 +3,6 @@ import PropTypes from 'prop-types'
 import * as d3 from 'd3'
 import {connect} from 'react-redux'
 
-
-
 class SimpleLineChart extends React.Component {
   constructor(props) {
     super(props);
@@ -125,23 +123,25 @@ class SimpleLineChart extends React.Component {
     this.setState({
         data : [{
           name: "rollo",
-          altezza: "150",
-          peso: "80"
+          altezza: 150,
+          peso: 80
         },{
           name: "faramir",
-          peso: "40",
-          altezza: "145"
+          peso: 40,
+          altezza: 145
         }]
       })
   }
 
   render() {
-    console.log(this.state)
+    //console.log(this.state)
     return(
     <div>
     - Simple Line Chart -
       <svg className={this.props.selector} width="600" height="400"> </svg>
       <button onClick={this.handleClick} >Generate Data</button>
+      <button onClick={this.props.handleConcat}>Concat Data</button>
+      <button onClick={this.props.handleReduce} style={{color: 'red'}}>Reduce Data</button>
     </div>
   );
   }

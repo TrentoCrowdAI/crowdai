@@ -10,11 +10,11 @@ class SimpleLineChart extends React.Component {
       data: this.props.data
     }
     this.buildGraph = this.buildGraph.bind(this);
-    this.handleClick = this.handleClick.bind(this);
   }
 
   buildGraph() {
-    //console.log(this.props)
+    console.log(this.props.color+' chart STATE: ',this.state)
+    console.log(this.props.color+' chart PROPS: ',this.state)
 
     //selector necessary when displaying more different graphs on the same page,
     //to append them to different canvas/svg
@@ -31,7 +31,7 @@ class SimpleLineChart extends React.Component {
     var y = this.props.y
 
     //to order data basing on x-coordinate, to display a ordered line
-    var data = this.state.data.sort( function(a,b) {
+    var data = this.props.data.sort( function(a,b) {
       return (a[x] > b[x]) ? 1 : ((b[x] > a[x]) ? -1 : 0);
       //return (a[y] > b[y]) ? 1 : ((b[y] > a[y]) ? -1 : 0);
     })
@@ -68,7 +68,7 @@ class SimpleLineChart extends React.Component {
       .style("fill","none")
       .style("stroke-width",2)
 
-   g.selectAll(".dot")
+    g.selectAll(".dot")
       .data(data).enter()
         .append("circle")
         .style("fill", color)
@@ -118,43 +118,29 @@ class SimpleLineChart extends React.Component {
     this.buildGraph();
   }
 
-  handleClick() {
-    //generating new data to update the chart
-    this.setState({
-        data : [{
-          name: "rollo",
-          altezza: 150,
-          peso: 80
-        },{
-          name: "faramir",
-          peso: 40,
-          altezza: 145
-        }]
-      })
-  }
-
   render() {
-    //console.log(this.state)
     return(
-    <div>
-    - Simple Line Chart -
-      <svg className={this.props.selector} width="600" height="400"> </svg>
-      <button onClick={this.handleClick} >Generate Data</button>
-      <button onClick={this.props.handleConcat}>Concat Data</button>
-      <button onClick={this.props.handleReduce} style={{color: 'red'}}>Reduce Data</button>
-    </div>
-  );
+      <div>
+      - Simple Line Chart -
+        <svg className={this.props.selector} width="600" height="400"> </svg>
+        <br />
+        <button onClick={this.props.handleConcat}>Concat Data</button>
+        <button onClick={this.props.handleReduce} style={{color: 'red'}}>Reduce Data</button>
+      </div>
+    )
   }
 }
 
 SimpleLineChart.propTypes = {
-
+  data : PropTypes.array
 }
 
 const mapStateToProps = state => ({
+
 })
 
 const mapDispatchToProps = dispatch => ({
+
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(SimpleLineChart);

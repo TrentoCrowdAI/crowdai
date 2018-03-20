@@ -78,15 +78,6 @@ class ChartWrapper extends React.Component {
           handleConcat={this.handleConcat.bind(this)}
           handleReduce={this.handleReduce.bind(this)}
           data={this.state.data}
-          x={'peso'}
-          y={'altezza'}
-          selector={'chart1'}
-          color={'blue'}/>
-        <hr />
-        <SimpleLineChart
-          handleConcat={this.handleConcat.bind(this)}
-          handleReduce={this.handleReduce.bind(this)}
-          data={this.state.data}
           x={'altezza'}
           y={'peso'}
           selector={'chart2'}

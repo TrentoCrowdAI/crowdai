@@ -18,7 +18,7 @@ class Histogram extends React.Component {
     var x = this.props.x
     //var y = this.props.y
 
-    var data = this.state.data.sort( function(a,b) {
+    var data = this.props.data.sort( function(a,b) {
       return (a[x] > b[x]) ? 1 : ((b[x] > a[x]) ? -1 : 0);
     })
 

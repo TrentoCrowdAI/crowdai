@@ -30,7 +30,7 @@ class Histogram extends React.Component {
 
     var xscale = d3.scaleLinear()
         .range([0, width])
-        .domain(d3.extent(data, d => d[x]))
+        .domain([0,120])
     var xAxis = d3.axisBottom(xscale);
 
     var yscale = d3.scaleLinear()
@@ -40,6 +40,7 @@ class Histogram extends React.Component {
 
     var histo = d3.histogram()
     .domain(d3.extent(data, d => d[x]))
+    .thresholds(xscale.ticks(10))
     (data.map(d => d[x]));
 
     var bar = g.selectAll(".bar")
@@ -61,8 +62,8 @@ class Histogram extends React.Component {
           .on("mouseout", function() {
             d3.select(this).style("opacity","1")
           })
-          .on("click", function(d) {
-            //console.log elements of the selection
+          .on("click", (d) => {
+            console.log(d, d.x0, d.x1)
           })
 
     bar.append("text")
@@ -108,6 +109,7 @@ class Histogram extends React.Component {
       <div>
       - Histogram -
         <svg className={this.props.selector} width="600" height="400"> </svg>
+        <br />
         <button onClick={this.props.handleConcat}>Concat Data</button>
         <button onClick={this.props.handleReduce} style={{color: 'red'}}>Reduce Data</button>
       </div>

@@ -13,8 +13,8 @@ class SimpleLineChart extends React.Component {
   }
 
   buildGraph() {
-    console.log(this.props.color+' chart STATE: ',this.state)
-    console.log(this.props.color+' chart PROPS: ',this.state)
+    //console.log(this.props.color+' chart STATE: ',this.state)
+    //console.log(this.props.color+' chart PROPS: ',this.state)
 
     //selector necessary when displaying more different graphs on the same page,
     //to append them to different canvas/svg
@@ -122,6 +122,7 @@ class SimpleLineChart extends React.Component {
     return(
       <div>
       - Simple Line Chart -
+        <br />
         <svg className={this.props.selector} width="600" height="400"> </svg>
         <br />
         <button onClick={this.props.handleConcat}>Concat Data</button>

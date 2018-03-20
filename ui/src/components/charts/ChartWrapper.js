@@ -5,6 +5,7 @@ import PropTypes from 'prop-types'
 
 import SimpleLineChart from './SimpleLineChart.js'
 import Histogram from './Histogram.js'
+import Histogramtwo from './Histogramtwo.js'
 
 var count = 0;
 
@@ -12,7 +13,7 @@ var count = 0;
 var chartData = [{
   name: "will",
   altezza: 160,
-  peso: 69
+  peso: 92
 },{
   name: "rob",
   altezza: 185,
@@ -24,11 +25,11 @@ var chartData = [{
 },{
   name: "fabio",
   altezza: 177,
-  peso: 65
+  peso: 112
 },{
   name: "rocky",
   altezza: 170,
-  peso: 88
+  peso: 39
 },{
   name: "rose",
   altezza: 160,
@@ -72,27 +73,33 @@ class ChartWrapper extends React.Component {
   }
 
   render() {
-    return(
-      <div>
-        <SimpleLineChart
-          handleConcat={this.handleConcat.bind(this)}
-          handleReduce={this.handleReduce.bind(this)}
-          data={this.state.data}
-          x={'altezza'}
-          y={'peso'}
-          selector={'chart2'}
-          color={'red'}/>
-        <hr />
-        <Histogram
-          handleConcat={this.handleConcat.bind(this)}
-          handleReduce={this.handleReduce.bind(this)}
-          data={this.state.data}
-          x={'peso'}
-          selector={'chart3'}
-          color={'grey'}/>
-        <hr />
-      </div>
-    )
+    switch(this.props.chart) {
+      case 'histogram':
+        return(
+          <div>
+          <Histogram
+            handleConcat={this.handleConcat.bind(this)}
+            handleReduce={this.handleReduce.bind(this)}
+            data={this.state.data}
+            x={'peso'}
+            selector={'chart3'}
+            color={'darkblue'}/>
+          </div>
+        );
+      case 'linechart':
+        return(
+          <div>
+          <SimpleLineChart
+            handleConcat={this.handleConcat.bind(this)}
+            handleReduce={this.handleReduce.bind(this)}
+            data={this.state.data}
+            x={'altezza'}
+            y={'peso'}
+            selector={'chart2'}
+            color={'darkred'}/>
+          </div>
+        );
+    }
   }
 }
 

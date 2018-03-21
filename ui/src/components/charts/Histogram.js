@@ -21,6 +21,7 @@ class Histogram extends React.Component {
     var data = this.props.data.sort( function(a,b) {
       return (a[x] > b[x]) ? 1 : ((b[x] > a[x]) ? -1 : 0);
     })
+    console.log(data)
 
     var margin = {top: 30, right: 30, bottom: 30, left: 30};
     var width = +svg.attr("width") - margin.left - margin.right;
@@ -30,7 +31,7 @@ class Histogram extends React.Component {
 
     var xscale = d3.scaleLinear()
         .range([0, width])
-        .domain([0,120])
+        .domain([d3.min(data, d => d[x])-5, d3.max(data, d => d[x])+5])
     var xAxis = d3.axisBottom(xscale);
 
     var yscale = d3.scaleLinear()
@@ -39,9 +40,9 @@ class Histogram extends React.Component {
     var yAxis = d3.axisLeft(yscale);
 
     var histo = d3.histogram()
-    .domain(d3.extent(data, d => d[x]))
-    .thresholds(xscale.ticks(10))
-    (data.map(d => d[x]));
+        //.domain(d3.extent(data, d => d[x]))
+        .thresholds(xscale.ticks(10))
+        (data.map(d => d[x]));
 
     var bar = g.selectAll(".bar")
         .data(histo)
@@ -52,10 +53,10 @@ class Histogram extends React.Component {
           return "translate(" + xscale(d.x0) + "," + yscale(d.length) + ")"; });
 
     bar.append("rect")
-          .style("fill", color)
+          .style("fill", "light"+color)
           .attr("x", 1)
-          .attr("width", function(d) { return xscale(d.x1)-xscale(d.x0)-1 })
-          .attr("height", function(d) { return height - yscale(d.length); })
+          .attr("width", d => xscale(d.x1)-xscale(d.x0)-1 )
+          .attr("height", d => height-yscale(d.length) )
           .on("mouseover", function() {
             d3.select(this).style("opacity","0.8")
           })
@@ -63,16 +64,22 @@ class Histogram extends React.Component {
             d3.select(this).style("opacity","1")
           })
           .on("click", (d) => {
-            console.log(d, d.x0, d.x1)
+            console.log("data of clicked bar ["+d.x0+","+d.x1+"]")
+            data.map(step => {
+              if(step[x]>=d.x0 && step[x]<=d.x1) {
+                console.log(step)
+              }
+            })
           })
+          .transition().duration(700).style("fill", color)
 
     bar.append("text")
           .attr("dy", ".75em")
-          .attr("y", function(d) { return -15 })
-          .attr("x", function(d) { return (xscale(d.x1)-xscale(d.x0))/2 })
+          .attr("y", d => -15)
+          .attr("x", d => (xscale(d.x1)-xscale(d.x0))/2 )
           .attr("text-anchor", "middle")
           .style("fill", color)
-          .text(function(d) { return d.length })
+          .text( d => d.length ? d.length : null)
 
     g.append("g")
        .attr("class","x axis")

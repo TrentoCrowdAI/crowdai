@@ -35,7 +35,7 @@ class SimpleLineChart extends React.Component {
       return (a[x] > b[x]) ? 1 : ((b[x] > a[x]) ? -1 : 0);
       //return (a[y] > b[y]) ? 1 : ((b[y] > a[y]) ? -1 : 0);
     })
-
+    console.log(data)
     //if we want to display different lines on the same graph,
     //to specify different colors
     var color = this.props.color
@@ -52,6 +52,26 @@ class SimpleLineChart extends React.Component {
         //.domain([0, d3.max(data, d => d[y] )])
         .range([height, 0]);
     var yAxis = d3.axisLeft(yscale);
+
+    //add axis
+    g.append("g")
+       .attr("class","x axis")
+       .attr("transform","translate(0,"+height+")")
+       .call(xAxis)
+       .append("text")
+          .attr("fill","black")
+          .attr("transform","translate("+(width-10)+",0)")
+          .attr("dy","-1em")
+          .text(this.props.x);
+    g.append("g")
+       .attr("class","y axis")
+       .call(yAxis)
+       .append("text")
+          .attr("fill","black")
+          .attr("transform","rotate(-90)")
+          .attr("text-anchor","end")
+          .attr("dy","2em")
+          .text(this.props.y);
 
     //define line
     var line = d3.line()
@@ -77,8 +97,51 @@ class SimpleLineChart extends React.Component {
         .attr("cy", d => yscale(d[y]) )
         .attr("r",5)
         //add HERE onClick events for the points in the graph
-        .on("click", (d) => console.log(d))
-        //point highlighted when mouse is over
+        .on("click", (d) => {
+          console.log("points on clicked data: ")
+          data.map(step => {
+            if(step[x] === d[x] && step[y] === d[y]) {
+              console.log(step)
+            }
+          })
+        })
+        .call(d3.drag()
+          .on("drag", function(d) {
+            d[x] = Math.round(xscale.invert(d3.event.x))
+            d[y] = Math.round(yscale.invert(d3.event.y))
+            console.log(d)
+
+            d3.select(this)
+            .attr("cx",xscale(d[x]))
+            .attr("cy",yscale(d[y]))
+
+            g.select("path").remove()
+
+            g.append("path")
+              .datum(data)
+              .attr("class","line")
+              .attr("d", line)
+              .style("stroke", color)
+              .style("fill","none")
+              .style("stroke-width",2)
+          })
+          .on("end", function() {
+
+            g.selectAll("path").remove()
+
+            data.sort( function(a,b) {
+              return (a[x] > b[x]) ? 1 : ((b[x] > a[x]) ? -1 : 0);
+            })
+
+            g.append("path")
+              .datum(data)
+              .attr("class","line")
+              .attr("d", line)
+              .style("stroke", color)
+              .style("fill","none")
+              .style("stroke-width",2)
+          })
+        )
         .on("mouseover", function() {
           d3.select(this)
           .style("opacity", "0.5")
@@ -88,25 +151,6 @@ class SimpleLineChart extends React.Component {
           .style("opacity","1")
         })
 
-    //add axis
-    g.append("g")
-       .attr("class","x axis")
-       .attr("transform","translate(0,"+height+")")
-       .call(xAxis)
-       .append("text")
-          .attr("fill","black")
-          .attr("transform","translate("+(width-10)+",0)")
-          .attr("dy","-1em")
-          .text(this.props.x);
-    g.append("g")
-       .attr("class","y axis")
-       .call(yAxis)
-       .append("text")
-          .attr("fill","black")
-          .attr("transform","rotate(-90)")
-          .attr("text-anchor","end")
-          .attr("dy","2em")
-          .text(this.props.y);
   }
 
   componentDidMount() {

@@ -14,9 +14,23 @@ class Diff extends React.Component {
 	render() {
 		return(
 			<div>
-				<ChartWrapper chart='histogram'/>
+				<ChartWrapper chart='histogram'
+            x={'peso'}
+            y={'altezza'}
+            selector={'chart1'}
+            color={'blue'}/>
 				<hr />
-				<ChartWrapper chart='linechart'/>
+				<ChartWrapper chart='linechart'
+            x={'peso'}
+            y={'altezza'}
+            selector={'chart2'}
+            color={'red'}/>
+				<hr />
+				<ChartWrapper chart='heatmap'
+              x={'peso'}
+              y={'altezza'}
+              selector={'chart3'}
+              color={'green'}/>
 			</div>
 		)
 	}

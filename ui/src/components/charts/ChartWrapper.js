@@ -5,23 +5,20 @@ import PropTypes from 'prop-types'
 
 import SimpleLineChart from './SimpleLineChart.js'
 import Histogram from './Histogram.js'
-import Histogramtwo from './Histogramtwo.js'
+import HeatMap from './HeatMap.js'
 
-var count = 0;
-
-//data to retrieve from backend
 var chartData = [{
   name: "will",
   altezza: 160,
   peso: 92
 },{
   name: "rob",
-  altezza: 185,
-  peso: 90
+  altezza: 165,
+  peso: 50
 },{
   name: "july",
-  peso: 45,
-  altezza: 165
+  altezza: 165,
+  peso: 45
 },{
   name: "fabio",
   altezza: 177,
@@ -29,16 +26,22 @@ var chartData = [{
 },{
   name: "rocky",
   altezza: 170,
-  peso: 39
+  peso: 45
 },{
   name: "rose",
   altezza: 160,
   peso: 55
 },{
   name: "lola",
-  altezza: 190,
+  altezza: 195,
   peso: 76
+},{
+  name: "dani",
+  altezza: 150,
+  peso: 55
 }]
+
+var count = 0;
 
 class ChartWrapper extends React.Component {
 
@@ -47,6 +50,8 @@ class ChartWrapper extends React.Component {
     this.state = {
       data: chartData
     }
+    this.handleConcat = this.handleConcat.bind(this);
+    this.handleReduce = this.handleReduce.bind(this);
   }
 
   handleConcat() {
@@ -62,7 +67,6 @@ class ChartWrapper extends React.Component {
         )
       }))
     }
-    console.log(this.state.data)
   }
 
   handleReduce() {
@@ -78,25 +82,39 @@ class ChartWrapper extends React.Component {
         return(
           <div>
           <Histogram
-            handleConcat={this.handleConcat.bind(this)}
-            handleReduce={this.handleReduce.bind(this)}
+            handleConcat={this.handleConcat}
+            handleReduce={this.handleReduce}
             data={this.state.data}
-            x={'peso'}
-            selector={'chart3'}
-            color={'darkblue'}/>
+            {... this.props}
+            />
           </div>
         );
       case 'linechart':
         return(
           <div>
           <SimpleLineChart
-            handleConcat={this.handleConcat.bind(this)}
-            handleReduce={this.handleReduce.bind(this)}
+            handleConcat={this.handleConcat}
+            handleReduce={this.handleReduce}
             data={this.state.data}
-            x={'altezza'}
-            y={'peso'}
-            selector={'chart2'}
-            color={'darkred'}/>
+            {... this.props}
+            />
+          </div>
+        );
+      case 'heatmap':
+        return(
+          <div>
+            <HeatMap 
+              handleConcat={this.handleConcat} 
+              handleReduce={this.handleReduce}
+              data={this.state.data}
+              {... this.props}
+              />
+          </div>
+        );
+      default:
+        return(
+          <div>
+            missing chart
           </div>
         );
     }

@@ -148,7 +148,7 @@ class SimpleLineChart extends React.Component {
             data.sort( function(a,b) {
               return (a[x] > b[x]) ? 1 : ((b[x] > a[x]) ? -1 : 0);
             })
-
+            
             g.append("path")
               .datum(data)
               .attr("class","line")

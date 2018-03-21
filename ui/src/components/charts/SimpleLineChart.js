@@ -115,7 +115,7 @@ class SimpleLineChart extends React.Component {
             .attr("cx",xscale(d[x]))
             .attr("cy",yscale(d[y]))
 
-            g.select("path").remove()
+            g.select(".line").remove()
 
             g.append("path")
               .datum(data)
@@ -127,7 +127,7 @@ class SimpleLineChart extends React.Component {
           })
           .on("end", function() {
 
-            g.selectAll("path").remove()
+            g.selectAll(".line").remove()
 
             data.sort( function(a,b) {
               return (a[x] > b[x]) ? 1 : ((b[x] > a[x]) ? -1 : 0);

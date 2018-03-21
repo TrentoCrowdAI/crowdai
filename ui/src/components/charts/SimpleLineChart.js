@@ -87,6 +87,22 @@ class SimpleLineChart extends React.Component {
       .style("stroke", color)
       .style("fill","none")
       .style("stroke-width",2)
+      /*.on("click", function() {
+        console.log(xscale.invert(d3.event.x),yscale.invert(d3.event.y))
+        g.append("circle")
+          .attr("cx", xscale(xscale.invert(d3.event.x)))
+          .attr("cy", yscale(yscale.invert(d3.event.y)))
+          .attr("r",5)
+          .style("fill",color)
+      })
+      .on("mouseover", function() {
+        d3.select(this)
+        .style("opacity","0.7")
+      })
+      .on("mouseout", function() {
+        d3.select(this)
+        .style("opacity","1")
+      })*/
 
     g.selectAll(".dot")
       .data(data).enter()

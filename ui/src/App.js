@@ -16,7 +16,6 @@ import DashboardContainer from 'src/components/admin/dashboard/DashboardContaine
 import Login from 'src/components/admin/login/Login';
 
 import Diff from 'src/components/charts/Diff'
-import Reports from 'src/components/Reports'
 
 /**
  * Main component.
@@ -34,7 +33,6 @@ class ConnectedApp extends Component {
         <Container>
           <Switch>
             <Route path={'/charting'} component={Diff} />
-            <Route path={'/reports'} component={Reports} />
             <Route path={'/welcome/:experimentId'} component={WelcomePage} />
             <Route
               path={'/task/:experimentId'}

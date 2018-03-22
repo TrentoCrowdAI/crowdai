@@ -82,7 +82,7 @@ class SimpleLineChart extends React.Component {
 
     g.append("path")
       .datum(data)
-      .attr("class","line")
+      .attr("class","original")
       .attr("d", line)
       .style("stroke", color)
       .style("fill","none")
@@ -121,7 +121,7 @@ class SimpleLineChart extends React.Component {
               .datum(data)
               .attr("class","line")
               .attr("d", line)
-              .style("stroke", color)
+              .style("stroke", "dark"+color)
               .style("fill","none")
               .style("stroke-width",2)
           })
@@ -137,7 +137,7 @@ class SimpleLineChart extends React.Component {
               .datum(data)
               .attr("class","line")
               .attr("d", line)
-              .style("stroke", color)
+              .style("stroke", "dark"+color)
               .style("fill","none")
               .style("stroke-width",2)
           })
@@ -171,6 +171,7 @@ class SimpleLineChart extends React.Component {
         <br />
         <button onClick={this.props.handleConcat}>Concat Data</button>
         <button onClick={this.props.handleReduce} style={{color: 'red'}}>Reduce Data</button>
+        <button style={{color: 'green'}}>Apply Change</button>
       </div>
     )
   }

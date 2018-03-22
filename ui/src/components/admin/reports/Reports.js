@@ -31,7 +31,7 @@ class Reports extends React.Component {
             x={'peso'}
             y={'altezza'}
             selector={'chart2'}
-            color={'red'}/>
+            color={'green'}/>
 				})
 				break;
 			case '/admin/reports/agreements' : 
@@ -41,7 +41,7 @@ class Reports extends React.Component {
             x={'altezza'}
             y={'peso'}
             selector={'chart3'}
-            color={'darkgreen'}/>
+            color={'blue'}/>
 				})
 				break;
 			default : 

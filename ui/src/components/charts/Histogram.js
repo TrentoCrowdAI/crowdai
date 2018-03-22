@@ -33,7 +33,7 @@ class Histogram extends React.Component {
 
     var xscale = d3.scaleLinear()
         .range([0, width])
-        .domain([d3.min(data, d => d[x])-5, d3.max(data, d => d[x])+5])
+        .domain([d3.min(data, d => Math.floor(d[x]/10)*10), d3.max(data, d => Math.round((d[x]+4)/10)*10)])
     var xAxis = d3.axisBottom(xscale);
 
     var yscale = d3.scaleLinear()
@@ -52,12 +52,13 @@ class Histogram extends React.Component {
         .attr("class", "bar")
         .attr("transform", function(d) {
           //console.log(d.x0,d.x1,d.length)
-          return "translate(" + xscale(d.x0) + "," + yscale(d.length) + ")"; });
+          return "translate(" + xscale(Math.floor(d.x0/10)*10) + "," + yscale(d.length) + ")";
+        })
 
     bar.append("rect")
           .style("fill", color)
           .attr("x", 1)
-          .attr("width", d => xscale(d.x1)-xscale(d.x0)-1 )
+          .attr("width", d => xscale(Math.round((d.x1+4)/10)*10)-xscale(Math.floor(d.x0/10)*10)-1 )
           .attr("height", d => height-yscale(d.length) )
           .on("mouseover", function() {
             d3.select(this).style("opacity","0.8")
@@ -66,13 +67,13 @@ class Histogram extends React.Component {
             d3.select(this).style("opacity","1")
           })
           .on("click", (d) => {
-            console.log(d.x0,d.x1)
+            console.log(d.x0,d.x1,d.length)
             data.map( step => {
               if(step[x]>=d.x0 && step[x]<d.x1) {
                 console.log(step)
               }
             })
-            console.log("------------------------------")
+            console.log("------------------------------------------------------------")
             this.handleClick(d)
           })
           .transition().duration(700).attr("height", d => height-yscale(d.length))
@@ -80,7 +81,7 @@ class Histogram extends React.Component {
     bar.append("text")
           .attr("dy", ".75em")
           .attr("y", d => -15)
-          .attr("x", d => (xscale(d.x1)-xscale(d.x0))/2 )
+          .attr("x", d => ((Math.floor(xscale(d.x1)/10)*10)-xscale(Math.floor(d.x0/10)*10))/2 )
           .attr("text-anchor", "middle")
           .style("fill", color)
           .text( d => d.length ? d.length : null)

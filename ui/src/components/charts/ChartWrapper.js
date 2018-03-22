@@ -6,6 +6,7 @@ import PropTypes from 'prop-types'
 import SimpleLineChart from './SimpleLineChart.js'
 import Histogram from './Histogram.js'
 import HeatMap from './HeatMap.js'
+import AreaChart from './AreaChart.js'
 
 var chartData = [{
   name: "will",
@@ -109,6 +110,17 @@ class ChartWrapper extends React.Component {
               data={this.state.data}
               {... this.props}
               />
+          </div>
+        );
+      case 'area': 
+        return(
+          <div>
+            <AreaChart
+              handleConcat={this.handleConcat} 
+              handleReduce={this.handleReduce}
+              data={this.state.data}
+              {... this.props}
+            />
           </div>
         );
       default:

@@ -8,15 +8,17 @@ class Histogram extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      data: this.props.data
+      data: this.props.data,
+      clicked: 'ripperoni'
     }
     this.buildGraph = this.buildGraph.bind(this);
+    this.handleClick = this.handleClick.bind(this);
   }
 
   buildGraph() {
     var svg = d3.select("."+this.props.selector);
     var x = this.props.x
-    //var y = this.props.y
+    var y = this.props.y
 
     var data = this.props.data.sort( function(a,b) {
       return (a[x] > b[x]) ? 1 : ((b[x] > a[x]) ? -1 : 0);
@@ -53,7 +55,7 @@ class Histogram extends React.Component {
           return "translate(" + xscale(d.x0) + "," + yscale(d.length) + ")"; });
 
     bar.append("rect")
-          .style("fill", "light"+color)
+          .style("fill", color)
           .attr("x", 1)
           .attr("width", d => xscale(d.x1)-xscale(d.x0)-1 )
           .attr("height", d => height-yscale(d.length) )
@@ -64,14 +66,16 @@ class Histogram extends React.Component {
             d3.select(this).style("opacity","1")
           })
           .on("click", (d) => {
-            console.log("data of clicked bar ["+d.x0+","+d.x1+"]")
-            data.map(step => {
-              if(step[x]>=d.x0 && step[x]<=d.x1) {
+            console.log(d.x0,d.x1)
+            data.map( step => {
+              if(step[x]>=d.x0 && step[x]<d.x1) {
                 console.log(step)
               }
             })
+            console.log("------------------------------")
+            this.handleClick(d)
           })
-          .transition().duration(700).style("fill", color)
+          .transition().duration(700).attr("height", d => height-yscale(d.length))
 
     bar.append("text")
           .attr("dy", ".75em")
@@ -110,11 +114,20 @@ class Histogram extends React.Component {
     this.buildGraph();
   }
 
+  handleClick(d) {
+    this.setState({
+      clicked: d.toString()
+    })
+  }
+
   render() {
     //console.log(this.state)
     return (
       <div>
       - Histogram -
+        <br />
+        <strong>Clicked data:</strong> {this.state.clicked}
+        <br />
         <svg className={this.props.selector} width="600" height="400"> </svg>
         <br />
         <button onClick={this.props.handleConcat}>Concat Data</button>

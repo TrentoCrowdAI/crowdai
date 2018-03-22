@@ -35,6 +35,8 @@ BreadcrumbWidget.propTypes = {
 
 const routes = [
   {path: '/admin', breadcrumb: <Icon name="home" />},
+  {path: '/admin/reports', breadcrumb: 'Reports Page'},
+  {path: '/admin/reports/:reptype', breadcrumb: 'Charts'},
   {path: '/admin/projects', breadcrumb: 'Projects'},
   {path: '/admin/projects/new', breadcrumb: 'New'},
   {path: '/admin/projects/:projectId/screenings', breadcrumb: 'Screenings'},

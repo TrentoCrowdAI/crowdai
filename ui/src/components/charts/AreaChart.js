@@ -25,25 +25,19 @@ class AreaChart extends React.Component {
     var g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
     var color = this.props.color
 
-    var xscale = d3.scaleTime()
+    var xscale = d3.scaleLinear()
         .range([0, width])
-        .domain(d3.extent(data, d => d[x]))
     var xAxis = d3.axisBottom(xscale);
 
     var yscale = d3.scaleLinear()
         .range([height,0])
-        .domain(d3.extent(data, d => d[y]))
     var yAxis = d3.axisLeft(yscale);
 
     var zoom = d3.zoom()
-    		.scaleExtent([1,32])
+    		.scaleExtent([1,5])
     		.translateExtent([[0,0],[width,height]])
     		.extent([[0,0],[width,height]])
-    		/*.on("zoom", function() {
-    			var t = d3.event.transform.rescaleX(xscale);
-    			g.select(".area").attr("d",area.xscale( d => t(d[x]) ));
-    			g.select(".axis--x").call(xAxis.scale(t));
-    		})*/
+    		.on("zoom",zoomed)
 
     var area = d3.area()
     		.curve(d3.curveMonotoneX)
@@ -57,11 +51,15 @@ class AreaChart extends React.Component {
     		.attr("width",width)
     		.attr("height",height)
 
+    xscale.domain(d3.extent(data, d => d[x]))
+    yscale.domain([0, d3.max(data, d => d[y])])
+
     g.append("path")
     		.datum(data)
     		.attr("class","area")
     		.attr("d",area)
     		.style("fill", color)
+    		.style("clip-path", "url(#clip)")
 
     g.append("g")
     		.attr("class","axis axis--x")
@@ -71,6 +69,14 @@ class AreaChart extends React.Component {
     g.append("g")
     		.attr("class","axis axis--y")
     		.call(yAxis)
+
+		function zoomed() {
+			var t = d3.event.transform;
+			var xt = t.rescaleX(xscale);
+			g.select(".area").attr("d", area.x( d => xt(d[x]) ));
+			g.select(".axis--x").call(xAxis.scale(xt));
+		}
+
 	}
 
 	componentDidMount() {

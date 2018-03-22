@@ -14,7 +14,7 @@ class Diff extends React.Component {
 	render() {
 		return(
 			<div>
-				<ChartWrapper chart=''
+				<ChartWrapper chart='histogram'
             x={'peso'}
             y={'altezza'}
             selector={'chart1'}

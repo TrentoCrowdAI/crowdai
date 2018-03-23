@@ -8,8 +8,8 @@ import ReportsForm from './ReportsForm'
 
 const ReportsRoute = props => (
   <React.Fragment>
-    <Route exact path={`${props.match.url}/`} component={ReportsForm} />
-    <Route path={`${props.match.url}/:reptype`} component={Reports} />
+    <Route exact path={`${props.match.url}`} component={ReportsForm} />
+    <Route path={`${props.match.url}/:projectid/:jobid`} component={Reports} />
   </React.Fragment>
 );
 

@@ -1,0 +1,12 @@
+.metrics {
+	width: 90%;
+}
+
+.options {
+	width: 30%;
+}
+
+.rowC {
+	display: flex;
+	flex-direction: row;
+}

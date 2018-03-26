@@ -77,9 +77,9 @@ class Reports extends React.Component {
 
 		this.setState({
 			chart: <React.Fragment>
-						 <ChartWrapper chart='linechart'
-            		x={'task_id'}
-            		y={'total_time'}
+						 <ChartWrapper chart='histogram'
+            		x={'total_time'}
+            		y={'task_id'}
             		selector={'chart1'}
             		color={'green'}
             		data={arr}

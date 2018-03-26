@@ -9,7 +9,7 @@ class Histogram extends React.Component {
     super(props);
     this.state = {
       data: this.props.data,
-      clicked: 'ripperoni'
+      clicked: []
     }
     this.buildGraph = this.buildGraph.bind(this);
     this.handleClick = this.handleClick.bind(this);
@@ -52,13 +52,13 @@ class Histogram extends React.Component {
         .attr("class", "bar")
         .attr("transform", function(d) {
           //console.log(d.x0,d.x1,d.length)
-          return "translate(" + xscale(Math.floor(d.x0/10)*10) + "," + yscale(d.length) + ")";
+          return "translate(" + xscale(d.x0) + "," + yscale(d.length) + ")";
         })
 
     bar.append("rect")
           .style("fill", color)
           .attr("x", 1)
-          .attr("width", d => xscale(Math.round((d.x1+4)/10)*10)-xscale(Math.floor(d.x0/10)*10)-1 )
+          .attr("width", d => xscale(d.x1)-xscale(d.x0)-1 )
           .attr("height", d => height-yscale(d.length) )
           .on("mouseover", function() {
             d3.select(this).style("opacity","0.8")
@@ -67,21 +67,22 @@ class Histogram extends React.Component {
             d3.select(this).style("opacity","1")
           })
           .on("click", (d) => {
+            this.setState({
+              clicked : []
+            })
             console.log(d.x0,d.x1,d.length)
-            data.map( step => {
-              if(step[x]>=d.x0 && step[x]<d.x1) {
-                console.log(step)
+            data.map( (step,i) => {
+              if((step[x]>=d.x0 && step[x]<d.x1) || (step[x]>=d.x0 && step[x]==d.x1)) {
+                this.handleClick(step[y])
               }
             })
-            console.log("------------------------------------------------------------")
-            this.handleClick(d)
           })
           .transition().duration(700).attr("height", d => height-yscale(d.length))
 
     bar.append("text")
           .attr("dy", ".75em")
           .attr("y", d => -15)
-          .attr("x", d => ((Math.floor(xscale(d.x1)/10)*10)-xscale(Math.floor(d.x0/10)*10))/2 )
+          .attr("x", d => (xscale(d.x1)-xscale(d.x0))/2 )
           .attr("text-anchor", "middle")
           .style("fill", color)
           .text( d => d.length ? d.length : null)
@@ -116,27 +117,36 @@ class Histogram extends React.Component {
   }
 
   handleClick(d) {
+    console.log(d)
+    var nuovo = this.state.clicked.concat([d])
     this.setState({
-      clicked: d.toString()
+      clicked: nuovo
     })
+    console.log(this.state)
   }
 
   render() {
-    //console.log(this.state)
+
+    var stampa = this.state.clicked.map(d => <li key={d}>{this.props.y+" "+d}</li>)
     return (
       <div>
       - Histogram -
         <br />
-        <strong>Clicked data:</strong> {this.state.clicked}
-        <br />
+        <strong>Clicked data:</strong> <ul>{stampa}</ul>
         <svg className={this.props.selector} width="600" height="400"> </svg>
         <br />
-        <button onClick={this.props.handleConcat}>Concat Data</button>
-        <button onClick={this.props.handleReduce} style={{color: 'red'}}>Reduce Data</button>
+        <button>Total Time statistics</button>
+        <button>Average Time statistics</button>
+        <button>Standard Time statistics</button>
       </div>
     );
   }
 }
+
+/*
+<button onClick={this.props.handleConcat}>Concat Data</button>
+        <button onClick={this.props.handleReduce} style={{color: 'red'}}>Reduce Data</button>
+*/
 
 Histogram.propTypes = {
 

@@ -56,13 +56,37 @@ class Reports extends React.Component {
 		super(props);
 		this.state = {
 			activeMetric : '(choose a metric)',
-			chart: '',
+			chart: <React.Fragment>
+								<h2>chart</h2>
+								<br />
+						 </React.Fragment>,
 		}
 		this.activeMetric = this.activeMetric.bind(this)
+		this.displayChart = this.displayChart.bind(this)
 	}
 
 	componentDidMount() {
 
+	}
+
+	displayChart() {
+		//convert data
+		var arr = Object.values(data);
+		console.log(arr)
+
+
+		this.setState({
+			chart: <React.Fragment>
+						 <ChartWrapper chart='linechart'
+            		x={'task_id'}
+            		y={'total_time'}
+            		selector={'chart1'}
+            		color={'green'}
+            		data={arr}
+            		/>
+						 </React.Fragment>
+		})
+		console.log(this.state)
 	}
 
 	activeMetric(e) {
@@ -70,10 +94,10 @@ class Reports extends React.Component {
 
 		console.log(data)
 		this.setState({
-			...this.state,
-			activeMetric: e.target.value,
-			chart: ''
+			activeMetric: e.target.value
 		})
+
+		this.displayChart()
 
 		console.log(this.state)
 	}
@@ -137,25 +161,21 @@ class Reports extends React.Component {
 	render() {
 		return(
 			<div style={{margin: '20px'}}>
-				<h2
-					style={{color: 'steelblue'}}
-				>
-				Selected Job: *extract job_id from location*
+				
+				<h2 style={{color: 'steelblue'}}>
+					Selected Job: *extract job_id from location*
 				</h2>
-
 				<hr />
-
 				<h3>Available metrics:</h3>
 				<br />
 
 				<div className="rowC">
-				{this.renderMetrics()}
-				
-				<React.Fragment>
-				
-				<h4 style={{color: 'steelblue'}}>Chart of: {this.state.activeMetric}</h4>
-				{this.state.chart}
-				</React.Fragment>
+					{this.renderMetrics()}
+
+					<div>
+						<h4 style={{color: 'steelblue'}}>Chart of: {this.state.activeMetric}</h4>
+						{this.state.chart}
+					</div>
 				</div>
 
 			</div>

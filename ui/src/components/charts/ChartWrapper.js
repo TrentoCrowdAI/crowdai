@@ -49,7 +49,7 @@ class ChartWrapper extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      data: chartData
+      data: this.props.data
     }
     this.handleConcat = this.handleConcat.bind(this);
     this.handleReduce = this.handleReduce.bind(this);

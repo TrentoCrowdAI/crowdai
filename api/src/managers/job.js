@@ -197,13 +197,19 @@ const publish = (exports.publish = async id => {
       job.project_id
     );
     const totalCount = itemsCount * criteriaCount * job.data.votesPerTaskRule;
+    let maxAssignments = Math.ceil(totalCount / job.data.maxTasksRule);
+
+    if (maxAssignments < 10) {
+      // see this https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/MTurk.html#createAdditionalAssignmentsForHIT-property
+      maxAssignments = 10;
+    }
     const jobUrl = `${config.frontend.url}/#/welcome/${job.uuid}`;
     const mt = MTurk.getInstance(requester);
     let params = {
       Description: job.data.description,
       Reward: `${job.data.taskRewardRule}`,
       Title: job.data.name,
-      MaxAssignments: Math.ceil(totalCount / job.data.maxTasksRule),
+      MaxAssignments: maxAssignments,
       Question: `${MTurk.getExternalQuestionPayload(jobUrl)}`,
       RequesterAnnotation: job.data.name,
       LifetimeInSeconds: job.data.hitConfig.lifetimeInMinutes * 60,
@@ -229,7 +235,36 @@ const publish = (exports.publish = async id => {
     return await delegates.jobs.update(id, job.data);
   } catch (error) {
     console.error(error);
-    throw Boom.badImplementation('Error while trying to publish job');
+    throw Boom.badImplementation('Error while trying to publish the job');
+  }
+});
+
+/**
+ * Makes sure the job stops, making unavailable to new workers. This changes
+ * the status of the HIT to Reviewable (if it was Assignable before).
+ *
+ * @param {Object} job
+ */
+const stop = (exports.stop = async job => {
+  try {
+    let requester = await delegates.jobs.getRequester(job.id);
+    const mturk = MTurk.getInstance(requester);
+    let params = {
+      ExpireAt: 0,
+      HITId: job.data.hit.HITId
+    };
+    await new Promise((resolve, reject) => {
+      mturk.updateExpirationForHIT(params, (err, data) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(data);
+        }
+      });
+    });
+  } catch (error) {
+    console.error(error);
+    throw Boom.badImplementation('Error while trying to stop the job');
   }
 });
 
@@ -290,6 +325,18 @@ const reviewAssignments = async (job, mturk) => {
 
   try {
     const assignments = await delegates.jobs.getAssignments(jobId);
+    // We check if the job is actually done.
+    const workerTmp = { id: assignments.rows[0].worker_id };
+    const jobDone = await checkJobDone(job, workerTmp);
+
+    if (!jobDone) {
+      console.debug(
+        `Job: ${job.id} is not done yet. Adding more Assignments for HIT ${
+          job.data.hit.HITId
+        }`
+      );
+      return await createAdditionalAssignmentsForHIT(job.data.hit.HITId, mturk);
+    }
 
     for (assignment of assignments.rows) {
       console.log(`Reviewing ${assignment.data.assignmentId}`);
@@ -327,6 +374,41 @@ const reviewAssignments = async (job, mturk) => {
       "Error while trying to fetch worker's answers"
     );
   }
+};
+
+/**
+ * Check if the job is actually done by calling the task assignment API.
+ *
+ * @param {Object} job
+ * @param {Object} worker
+ * @returns {Boolean} true if the job is done, false otherwise.
+ */
+const checkJobDone = async (job, worker) => {
+  let response = await taskManager.getTasksFromApi(job, worker);
+  return response.done;
+};
+
+/**
+ * Creates additional assignments for the HIT.
+ *
+ * @param {String} hitId
+ * @param {Object} mturk - Mechanical Turk instance
+ */
+const createAdditionalAssignmentsForHIT = async (hitId, mturk) => {
+  let params = {
+    HITId: hitId,
+    NumberOfAdditionalAssignments: 10
+  };
+  return await new Promise((resolve, reject) => {
+    mturk.createAdditionalAssignmentsForHIT(params, (err, data) => {
+      if (err) {
+        reject(err);
+      } else {
+        console.debug(`Added more assignments to HIT: ${hitId}`);
+        resolve(data);
+      }
+    });
+  });
 };
 
 /**

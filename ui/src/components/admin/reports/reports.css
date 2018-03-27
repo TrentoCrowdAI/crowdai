@@ -6,6 +6,10 @@
 	width: 30%;
 }
 
+.active {
+	color: red;
+}
+
 .rowC {
 	display: flex;
 	flex-direction: row;

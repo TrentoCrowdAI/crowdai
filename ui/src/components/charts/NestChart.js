@@ -4,7 +4,7 @@ import * as d3 from 'd3'
 import PropTypes from 'prop-types'
 import Math from 'math'
 
-class Histogram extends React.Component {
+class NestChart extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -22,12 +22,19 @@ class Histogram extends React.Component {
 
     var data = this.state.data
 
+    var sum = 0
+    data.map(step => {
+      sum += step[y]
+    })
+    var media = sum/data.length
+    //console.log(media)
+
     var margin = {top: 30, right: 30, bottom: 30, left: 30};
     var width = +svg.attr("width") - margin.left - margin.right;
     var height = +svg.attr("height") - margin.top - margin.bottom;
     var g = svg.append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-    var color = this.props.color
+    var color = "steelblue" //this.props.color
 
     var yscale = d3.scaleLinear()
         .rangeRound([height, 0])
@@ -49,19 +56,41 @@ class Histogram extends React.Component {
           .attr("class","bar")
           
     bar.append("rect")
-          .style("fill", color)
-          .attr("x", d => xscale(d[x]))
-          .attr("y", d => yscale(d[y]))
-          .attr("width", xscale.bandwidth())
-          .attr("height", d => height-yscale(d[y]))
+        .style("fill", d => {
+          if(d[y]>media) return color
+            else return "green"
+        })
+        .attr("x", d => xscale(d[x]))
+        .attr("y", d => yscale(d[y]))
+        .attr("width", xscale.bandwidth())
+        .attr("height", d => height-yscale(d[y]))
 
     bar.append("text")
-          .attr("dy", ".75em")
-          .attr("y", d => yscale(d[y])+10 )
-          .attr("x", d => xscale(d[x])+(xscale.bandwidth()/2) )
-          .attr("text-anchor", "middle")
-          .style("fill", "white")
-          .text( d => d[y])
+        .attr("dy", ".75em")
+        .attr("y", d => yscale(d[y])+10 )
+        .attr("x", d => xscale(d[x])+(xscale.bandwidth()/2) )
+        .attr("text-anchor", "middle")
+        .style("fill", "white")
+        .text( d => d[y])
+
+    var line = d3.line()
+        .x( (d) => {return xscale(d[x])} )
+        .y( (d) => {return yscale(d[y])} )
+
+    g.append("path")
+        .datum([{
+          total_time : media,
+          task_id : data[0][x]
+        },{
+          total_time : media,
+          task_id : data[data.length-1][x]
+        }])
+        .attr("class","original")
+        .attr("transform","translate("+(xscale.bandwidth()/2)+",0)")
+        .attr("d", line)
+        .style("stroke", "red")
+        .style("fill","none")
+        .style("stroke-width",1)
 
     g.append("g")
         .attr("class","axis axis--x")
@@ -101,6 +130,7 @@ class Histogram extends React.Component {
         <br />
         <strong>Clicked data:</strong> <ul></ul>
         <br />
+
         <button
           onClick={(event) => this.setState({
             data: this.props.data.sort( (a,b) =>
@@ -114,6 +144,7 @@ class Histogram extends React.Component {
           })}
         ><strong>Sort x</strong></button>
         <hr />
+
         <button>Total Time statistics</button>
         <button>Average Time statistics</button>
         <button>Standard Time statistics</button>
@@ -122,7 +153,7 @@ class Histogram extends React.Component {
   }
 }
 
-Histogram.propTypes = {
+NestChart.propTypes = {
 
 }
 
@@ -134,4 +165,4 @@ const mapDispatchToProps = dispatch => ({
 
 })
 
-export default connect (mapStateToProps,mapDispatchToProps)(Histogram)
+export default connect (mapStateToProps,mapDispatchToProps)(NestChart)

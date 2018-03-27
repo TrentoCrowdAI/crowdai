@@ -138,7 +138,8 @@ class ChartWrapper extends React.Component {
       default:
         return(
           <div>
-            missing chart
+            No data to display yet
+            <svg width="600"></svg>
           </div>
         );
     }

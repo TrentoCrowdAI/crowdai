@@ -19,19 +19,9 @@ import {
 } from 'semantic-ui-react';
 import { actions } from '../projects/actions';
 
-var ProjectOptions = {
-  id1: 'Project title 1',
-  id2: 'Project title 2',
-  id3: 'Project title 3',
-  id4: 'Project title 4'
-}
+var ProjectOptions = {}
 
-var JobOptions = {
-  jid1: 'Job title 1',
-  jid2: 'Job title 2',
-  jid3: 'Job title 3',
-  jid4: 'Job title 4'
-}
+var JobOptions = { }
 
 const options = {
   columns: {
@@ -68,7 +58,7 @@ class ReportsForm extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			chosenproject : 'id1',
+			chosenproject : '',
 			chosenjob : 'jid1',
 			activejob: false,
 			activechart: false
@@ -79,8 +69,11 @@ class ReportsForm extends React.Component {
     this.props.fetchProjects();
     console.log(this.props.projects.rows)
 
-    //project options to be mapped 
-    //job options to be mapped
+    this.props.projects.rows.map( step => {
+    	ProjectOptions[step.id] = step.data.name+" = "+step.created_at
+    })
+
+    console.log(ProjectOptions)
   }
 
 	render() {

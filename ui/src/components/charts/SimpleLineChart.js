@@ -7,7 +7,8 @@ class SimpleLineChart extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      data: this.props.data
+      data: this.props.data,
+      clicked: []
     }
     this.buildGraph = this.buildGraph.bind(this);
   }
@@ -98,9 +99,18 @@ class SimpleLineChart extends React.Component {
         .attr("r",5)
         .on("click", (d) => {
           //console.log("points on clicked data: ")
+          this.setState({
+            clicked: []
+          })
           data.map(step => {
             if(step[x] === d[x] && step[y] === d[y]) {
-              console.log(step)
+              //console.log(step)
+              var nuovo = this.state.clicked.concat([
+                this.props.x+" : "+d[x]+",   "+this.props.y+" : "+d[y]
+                ])
+              this.setState({
+                clicked: nuovo
+              })
             }
           })
         })
@@ -167,6 +177,7 @@ class SimpleLineChart extends React.Component {
       <div>
         <svg className={this.props.selector} width="600" height="400"> </svg>
         <br />
+        <strong>Clicked data:</strong> {this.state.clicked}
       </div>
     )
   }

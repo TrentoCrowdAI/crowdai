@@ -137,21 +137,23 @@ class NestChart extends React.Component {
               (a[this.props.y] > b[this.props.y]) ? 1 : ((b[this.props.y] > a[this.props.y]) ? -1 : 0))
           })}
         ><strong>Sort y</strong></button>
+        
         <button
           onClick={(event) => this.setState({
             data: this.props.data.sort( (a,b) =>
               (a[this.props.x] > b[this.props.x]) ? 1 : ((b[this.props.x] > a[this.props.x]) ? -1 : 0))
           })}
         ><strong>Sort x</strong></button>
-        <hr />
-
-        <button>Total Time statistics</button>
-        <button>Average Time statistics</button>
-        <button>Standard Time statistics</button>
       </div>
     );
   }
 }
+
+/*
+        <button>Total Time statistics</button>
+        <button>Average Time statistics</button>
+        <button>Standard Time statistics</button>
+*/
 
 NestChart.propTypes = {
 

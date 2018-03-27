@@ -335,7 +335,8 @@ const reviewAssignments = async (job, mturk) => {
           job.data.hit.HITId
         }`
       );
-      return await createAdditionalAssignmentsForHIT(job.data.hit.HITId, mturk);
+      await createAdditionalAssignmentsForHIT(job.data.hit.HITId, mturk);
+      return false;
     }
 
     for (assignment of assignments.rows) {

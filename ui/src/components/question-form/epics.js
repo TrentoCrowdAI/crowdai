@@ -13,7 +13,7 @@ const getNextTask = (action$, store) =>
       workerId: session.workerId,
       assignmentId: session.assignmentId
     };
-    return Observable.defer(() => axios.get(`/experiments/${session.experimentId}/tasks/next`, {params}))
+    return Observable.defer(() => axios.get(`/jobs/${session.experimentId}/tasks/next`, {params}))
       .mergeMap(response => Observable.of(actions.getNextTaskSuccess(response.data)))
       .catch(error => Observable.of(actions.getNextTaskError(error)));
   });
@@ -21,7 +21,7 @@ const getNextTask = (action$, store) =>
 const postAnswer = (action$, store) =>
   action$.ofType(actionTypes.SUBMIT_ANSWER).switchMap(action => {
     const {session} = store.getState().questionForm;
-    return Observable.defer(() => axios.post(`/experiments/${session.experimentId}/answers`, action.answer))
+    return Observable.defer(() => axios.post(`/jobs/${session.experimentId}/answers`, action.answer))
       .mergeMap(response =>
         Observable.concat(
           Observable.of(actions.submitAnswerSuccess(response.data)),
@@ -35,7 +35,7 @@ const finishAssignment = (action$, store) =>
   action$.ofType(actionTypes.FINISH_ASSIGNMENT).switchMap(action => {
     const {session} = store.getState().questionForm;
     return Observable.defer(() =>
-      axios.post(`/experiments/${session.experimentId}/workers/${session.workerId}/finish-assignment`)
+      axios.post(`/jobs/${session.experimentId}/workers/${session.workerId}/finish-assignment`)
     )
       .mergeMap(response =>
         Observable.concat(
@@ -51,7 +51,7 @@ const checkAssignmentStatus = (action$, store) =>
     const {session} = store.getState().questionForm;
 
     return Observable.defer(() =>
-      axios.get(`/experiments/${session.experimentId}/workers/${session.workerId}/assignment-status`)
+      axios.get(`/jobs/${session.experimentId}/workers/${session.workerId}/assignment-status`)
     )
       .mergeMap(response => {
         return Observable.of(actions.checkAssignmentStatusSuccess(response.data));
@@ -66,9 +66,7 @@ const checkPolling = (action$, store) =>
     return Observable.interval(config.pollingInterval)
       .takeUntil(action$.ofType(actionTypes.CHECK_POLLING_DONE))
       .mergeMap(() =>
-        Observable.defer(() =>
-          axios.get(`/experiments/${session.experimentId}/workers/${session.workerId}/assignment-status`)
-        )
+        Observable.defer(() => axios.get(`/jobs/${session.experimentId}/workers/${session.workerId}/assignment-status`))
           .mergeMap(response => {
             if (response.data.data.finished) {
               return Observable.concat(

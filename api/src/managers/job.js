@@ -1,0 +1,406 @@
+const Boom = require('boom');
+const CronJob = require('cron').CronJob;
+
+const qualityManager = require('./quality');
+const taskManager = require('./task');
+const stateManager = require('./state');
+const delegates = require(__base + 'delegates');
+const MTurk = require(__base + 'utils/mturk');
+const config = require(__base + 'config');
+
+const JobStatus = Object.freeze({
+  NOT_PUBLISHED: 'NOT_PUBLISHED',
+  PUBLISHED: 'PUBLISHED',
+  DONE: 'DONE'
+});
+
+/**
+ * Returns a task for the worker.
+ *
+ * @param {string} uuid - The job's UUID
+ * @param {string} turkId - The worker's Mechanical Turk ID.
+ * @param {string} assignmentTurkId - The worker's assignment ID on Mechanical Turk.
+ */
+exports.nextTask = async (uuid, turkId, assignmentTurkId) => {
+  try {
+    const job = await delegates.jobs.getByUuid(uuid);
+    let worker = await delegates.workers.getByTurkId(turkId);
+
+    if (!worker) {
+      worker = await delegates.workers.create(turkId);
+    }
+    let workerAssignment = await stateManager.getWorkerAssignmentStatus(
+      job,
+      worker,
+      assignmentTurkId
+    );
+
+    if (workerAssignment.data.finished) {
+      return workerAssignment;
+    }
+    let response = await taskManager.generateTasks(job, worker);
+    const runQuiz = await qualityManager.shouldRunInitialTest(job, worker);
+
+    if (runQuiz) {
+      return await qualityManager.getTestForWorker(
+        job,
+        worker,
+        response.criteria,
+        true
+      );
+    }
+    const runHoneypot = await qualityManager.shouldRunHoneypot(job, worker);
+
+    if (runHoneypot) {
+      return await qualityManager.getTestForWorker(
+        job,
+        worker,
+        response.criteria,
+        true
+      );
+    }
+    return await delegates.tasks.getTaskFromBuffer(job.id, worker.id);
+  } catch (error) {
+    console.error(error);
+
+    if (error.isBoom) {
+      throw error;
+    }
+    throw Boom.badImplementation(
+      'Error while trying to generate next task for worker'
+    );
+  }
+};
+
+/**
+ * Update task/test_task record with the worker's answer.
+ *
+ * @param {Object} payload - The answer payload. Format {workerTurkId: '', task: {...}}
+ * @param {Boolean} isTest
+ */
+const saveAnswer = (exports.saveAnswer = async (payload, isTest) => {
+  try {
+    let worker = await delegates.workers.getByTurkId(payload.workerTurkId);
+
+    if (isTest) {
+      let testTask = await delegates.testTasks.getTestTaskById(payload.task.id);
+
+      if (testTask.worker_id !== worker.id) {
+        throw Boom.badRequest('Worker does not match task record');
+      }
+      let answersMap = {};
+
+      for (c of payload.task.data.criteria) {
+        answersMap[c.id] = c.workerAnswer;
+      }
+
+      for (c of testTask.data.criteria) {
+        c.workerAnswer = answersMap[c.id];
+      }
+      testTask.data.answered = true;
+      return await delegates.testTasks.updateTestTask(
+        testTask.id,
+        testTask.data
+      );
+    } else {
+      let task = await delegates.tasks.getTaskById(payload.task.id);
+
+      if (task.worker_id !== worker.id) {
+        throw Boom.badRequest('Worker does not match task record');
+      }
+      let answersMap = {};
+
+      for (c of payload.task.data.criteria) {
+        answersMap[c.id] = c.workerAnswer;
+      }
+
+      for (c of task.data.criteria) {
+        c.workerAnswer = answersMap[c.id];
+      }
+      task.data.answered = true;
+      return await delegates.tasks.updateTask(task.id, task.data);
+    }
+  } catch (error) {
+    console.error(error);
+
+    if (error.isBoom) {
+      throw error;
+    }
+    throw Boom.badImplementation("Error while trying to save worker's answer");
+  }
+});
+
+/**
+ * Computes the worker's reward based on their answers. If asBonus
+ * is true, then we subtract job.data.taskRewardRule from the reward
+ * so that we can pay the resulting amount to the worker as a bonus.
+ *
+ * @param {string} uuid - The job's UUID
+ * @param {string} turkId - The worker's AMT ID
+ * @param {boolean} asBonus
+ */
+const getWorkerReward = (exports.getWorkerReward = async (
+  uuid,
+  turkId,
+  asBonus = false
+) => {
+  const job = await delegates.jobs.getByUuid(uuid);
+
+  if (!job) {
+    throw Boom.badRequest('Experiment with the given ID does not exist');
+  }
+
+  try {
+    let worker = await delegates.workers.getByTurkId(turkId);
+
+    if (!worker) {
+      // worker record does not exist yet.
+      return { reward: 0 };
+    }
+    const taskCount = await delegates.tasks.getWorkerTasksCount(
+      job.id,
+      worker.id
+    );
+    const testCount = await delegates.testTasks.getWorkerTestTasksCount(
+      job.id,
+      worker.id
+    );
+    const assignment = await delegates.workers.getAssignment(uuid, worker.id);
+
+    if (!assignment || assignment.data.initialTestFailed) {
+      return { reward: 0 };
+    }
+    // the total amount that we pay to a worker is HIT reward + bonus. Therefore we
+    // should subtract 1 in order to pay the worker using the reward + bonus strategy.
+    const delta = asBonus ? -1 : 0;
+    return {
+      reward: (taskCount + testCount + delta) * job.data.taskRewardRule
+    };
+  } catch (error) {
+    console.error(error);
+    throw Boom.badImplementation('Error while computing reward');
+  }
+});
+
+/**
+ * Publish the job on Amazon Mechanical Turk.
+ *
+ * @param {Number} id - The job ID.
+ * @returns {Object} - The job with new status.
+ */
+const publish = (exports.publish = async id => {
+  try {
+    let requester = await delegates.jobs.getRequester(id);
+    let job = await delegates.jobs.getById(id);
+    const itemsCount = await delegates.projects.getItemsCount(job.project_id);
+    const criteriaCount = await delegates.projects.getCriteriaCount(
+      job.project_id
+    );
+    const totalCount = itemsCount * criteriaCount * job.data.votesPerTaskRule;
+    const jobUrl = `${config.frontend.url}/#/welcome/${job.uuid}`;
+    const mt = MTurk.getInstance(requester);
+    let params = {
+      Description: job.data.description,
+      Reward: `${job.data.taskRewardRule}`,
+      Title: job.data.name,
+      MaxAssignments: Math.ceil(totalCount / job.data.maxTasksRule),
+      Question: `${MTurk.getExternalQuestionPayload(jobUrl)}`,
+      RequesterAnnotation: job.data.name,
+      LifetimeInSeconds: job.data.hitConfig.lifetimeInMinutes * 60,
+      AssignmentDurationInSeconds:
+        job.data.hitConfig.assignmentDurationInMinutes * 60
+    };
+
+    console.log(`Creating HIT on Amazon Mechanical Turk for job ${id}`);
+    let hit = await new Promise((resolve, reject) => {
+      mt.createHIT(params, function(err, data) {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(data.HIT);
+        }
+      });
+    });
+    console.log(`HIT created. HITId: ${hit.HITId}`);
+    job.data.status = JobStatus.PUBLISHED;
+    job.data.publishedAt = new Date();
+    job.data.hit = { ...hit };
+    setupCronForHit(job, hit.HITId, mt);
+    return await delegates.jobs.update(id, job.data);
+  } catch (error) {
+    console.error(error);
+    throw Boom.badImplementation('Error while trying to publish job');
+  }
+});
+
+/**
+ * Set a cron job that polls the HIT status in order to know when
+ * the approval/rejection logic should run.
+ *
+ * @param {string} job
+ * @param {string} hitId
+ * @param {Object} mturk
+ */
+const setupCronForHit = (job, hitId, mturk) => {
+  const jobId = job.id;
+  const cronjob = new CronJob({
+    cronTime: `0 */${config.cron.hitStatusPollTime} * * * *`,
+    onTick: async () => {
+      console.log(`Checking HIT: ${hitId} status`);
+
+      try {
+        let hit = await new Promise((resolve, reject) => {
+          mturk.getHIT({ HITId: hitId }, function(err, data) {
+            if (err) {
+              reject(err);
+            } else {
+              resolve(data.HIT);
+            }
+          });
+        });
+        console.log(`HIT: ${hitId} is ${hit.HITStatus}`);
+
+        if (hit.HITStatus === 'Reviewable') {
+          const stop = await reviewAssignments(job, mturk);
+
+          if (stop) {
+            console.log(`Stopping cron job for HIT: ${hitId}`);
+            cronjob.stop();
+          }
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    },
+    start: false
+  });
+
+  cronjob.start();
+};
+
+/**
+ * Approves or rejects submitted assignment for a HIT.
+ *
+ * @param {string} job
+ * @param {Object} mturk
+ */
+const reviewAssignments = async (job, mturk) => {
+  const jobId = job.id;
+  console.log(`Review assignments for job: ${jobId}`);
+
+  try {
+    const assignments = await delegates.jobs.getAssignments(jobId);
+
+    for (assignment of assignments.rows) {
+      console.log(`Reviewing ${assignment.data.assignmentId}`);
+
+      if (!assignment.data.finished) {
+        console.warn(
+          `reviewAssignments called even though the assignment ${
+            assignment.data.assignmentId
+          } did not finish`
+        );
+        continue;
+      }
+
+      if (assignment.data.initialTestFailed) {
+        await mturkRejectAssignment(assignment.data.assignmentId, mturk);
+      } else {
+        await mturkApproveAssignment(assignment.data.assignmentId, mturk);
+        await sendBonus(
+          job.uuid,
+          assignment.worker_id,
+          assignment.data.assignmentId,
+          mturk
+        );
+      }
+    }
+    console.log(`Review assignments for job: ${jobId} done`);
+    await delegates.jobs.update(jobId, {
+      status: JobStatus.DONE,
+      finishedAt: new Date()
+    });
+    return true;
+  } catch (error) {
+    console.error(error);
+    throw Boom.badImplementation(
+      "Error while trying to fetch worker's answers"
+    );
+  }
+};
+
+/**
+ * Wrapper for Mechanical Turk approveAssignment operation.
+ * @param {string} id - Assignment ID
+ * @param {Object} mturk
+ */
+const mturkApproveAssignment = async (id, mturk) => {
+  console.log(`Approving assignment ${id}...`);
+  return await new Promise((resolve, reject) => {
+    mturk.approveAssignment({ AssignmentId: id }, function(err, data) {
+      if (err) {
+        reject(err);
+      } else {
+        console.log(
+          `Approve assignment response for ${id} is: ${JSON.stringify(data)}`
+        );
+        resolve(data);
+      }
+    });
+  });
+};
+
+/**
+ * Wrapper for Mechanical Turk rejectAssignment operation.
+ * @param {string} id - Assignment ID
+ * @param {Object} mturk
+ */
+const mturkRejectAssignment = async (id, mturk) => {
+  console.log(`Rejecting assignment ${id}...`);
+  const payload = {
+    AssignmentId: id,
+    RequesterFeedback:
+      'Thank you for participating, but you failed to pass the qualification test.'
+  };
+  return await new Promise((resolve, reject) => {
+    mturk.rejectAssignment(payload, (err, data) => {
+      if (err) {
+        reject(err);
+      } else {
+        console.log(
+          `Reject assignment response for ${id} is: ${JSON.stringify(data)}`
+        );
+        resolve(data);
+      }
+    });
+  });
+};
+
+/**
+ * Wrapper for Mechanical Turk sendBonus operation. Here we pay
+ * the worker based on the number of answers given.
+ *
+ * @param {string} uuid - The job's UUID
+ * @param {string} workerId -
+ * @param {string} assignmentId
+ * @param {Object} mturk
+ */
+const sendBonus = async (uuid, workerId, assignmentId, mturk) => {
+  const worker = await delegates.workers.getById(workerId);
+  const { reward } = await getWorkerReward(uuid, worker.turk_id, true);
+  const payload = {
+    AssignmentId: assignmentId,
+    BonusAmount: `${reward}`,
+    Reason: 'Reward based on the number of answers given',
+    WorkerId: workerId
+  };
+  return await new Promise((resolve, reject) => {
+    mturk.sendBonus(payload, (err, data) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(data);
+      }
+    });
+  });
+};

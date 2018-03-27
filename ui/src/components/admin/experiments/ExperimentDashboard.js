@@ -119,20 +119,8 @@ class ExperimentDashboard extends React.Component {
               <Grid.Column width="10" style={{marginLeft: 'auto', marginRight: 'auto'}}>
                 <Header content="HIT configuration" />
 
-                <Form.Group>
+                <Form.Group widths="equal">
                   <Form.Input
-                    width={5}
-                    label="Max. assignments"
-                    name="data.hitConfig.maxAssignments"
-                    value={item.data.hitConfig.maxAssignments}
-                    placeholder="10"
-                    onChange={this.handleChange}
-                    type="number"
-                    min="1"
-                    required
-                  />
-                  <Form.Input
-                    width={6}
                     label="Assignment duration (in minutes)"
                     name="data.hitConfig.assignmentDurationInMinutes"
                     value={item.data.hitConfig.assignmentDurationInMinutes}
@@ -140,7 +128,6 @@ class ExperimentDashboard extends React.Component {
                     required
                   />
                   <Form.Input
-                    width={5}
                     label="Lifetime (in minutes)"
                     name="data.hitConfig.lifetimeInMinutes"
                     value={item.data.hitConfig.lifetimeInMinutes}

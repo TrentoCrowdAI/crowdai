@@ -20,7 +20,8 @@ CREATE TABLE project (
   CONSTRAINT pk_project PRIMARY KEY (id)
 );
 
-CREATE TABLE experiment (
+-- data: {}
+CREATE TABLE job (
   id bigserial NOT NULL,
   project_id bigint NOT NULL,
   uuid varchar(255) NOT NULL,
@@ -28,8 +29,8 @@ CREATE TABLE experiment (
   updated_at timestamp,
   deleted_at timestamp,
   data JSONB,
-  CONSTRAINT pk_experiment PRIMARY KEY (id),
-  CONSTRAINT uniq_experiment_uuid unique (uuid)
+  CONSTRAINT pk_job PRIMARY KEY (id),
+  CONSTRAINT uniq_job_uuid unique (uuid)
 );
 
 CREATE TABLE worker (
@@ -46,8 +47,8 @@ CREATE TABLE worker (
 -- data: {criteria: [c1_id, c2_id], finished: true, assignmentEnd: ...}
 CREATE TABLE worker_assignment (
   id bigserial NOT NULL,
-  experiment_id bigint,
-  experiment_uuid varchar(255),
+  job_id bigint,
+  job_uuid varchar(255),
   worker_id bigint NOT NULL,
   created_at timestamp,
   updated_at timestamp,
@@ -93,7 +94,7 @@ CREATE TABLE test (
 -- data: {criteria: [{id: 1, ... , workerAnswer: ''}], answered: true}
 CREATE TABLE task (
   id bigserial NOT NULL,
-  experiment_id bigint NOT NULL,
+  job_id bigint NOT NULL,
   item_id bigint NOT NULL,
   worker_id bigint NOT NULL,
   created_at timestamp,
@@ -106,7 +107,7 @@ CREATE TABLE task (
 -- data: {initial: true, answered: true, criteria: [{id: 1, ... , answer: '', workerAnswer: ''}]}
 CREATE TABLE test_task (
   id bigserial NOT NULL,
-  experiment_id bigint NOT NULL,
+  job_id bigint NOT NULL,
   test_id bigint NOT NULL,
   worker_id bigint NOT NULL,
   created_at timestamp,
@@ -114,4 +115,18 @@ CREATE TABLE test_task (
   deleted_at timestamp,
   data JSONB,
   CONSTRAINT pk_test_task PRIMARY KEY (id)
+);
+
+-- this table stores the task assignment algorithms that
+-- the are integrated with the platform.
+CREATE TABLE task_assignment_api (
+  id bigserial NOT NULL,
+  requester_id bigint,
+  created_at timestamp,
+  updated_at timestamp,
+  deleted_at timestamp,
+  name varchar(255),
+  url  text,
+  aggregation boolean, -- true -> aggregation is also included. false -> does not include aggregation.
+  CONSTRAINT pk_task_assignment_api PRIMARY KEY (id)
 );

@@ -1,5 +1,4 @@
 import {combineReducers} from 'redux';
-import cloneDeep from 'clone-deep';
 
 import {actionTypes} from './actions';
 import {getReducer} from 'src/utils/form';
@@ -56,7 +55,6 @@ const genericFormReducer = getReducer(scopes.EXPERIMENTS, {
     abstractPresentationTechnique: 'kh',
     labelOptions: 'ynk',
     hitConfig: {
-      maxAssignments: 10,
       lifetimeInMinutes: 5 * 24 * 60,
       assignmentDurationInMinutes: 20
     },
@@ -68,7 +66,8 @@ const genericFormReducer = getReducer(scopes.EXPERIMENTS, {
     initialTestsMinCorrectAnswersRule: 100,
     votesPerTaskRule: 2,
     expertCostRule: 0.2,
-    crowdsourcingStrategy: 'baseline'
+    crowdsourcingStrategy: 'baseline', // soon to be deprecated
+    taskAssignmentStrategy: 1
   }
 });
 

@@ -197,7 +197,11 @@ const getTaskFromBuffer = (exports.getTaskFromBuffer = async (
       } where job_id = $1 and worker_id = $2 and data ->> 'answered' = 'false' order by random() limit 1`,
       [jobId, workerId]
     );
-    return res.rows[0];
+    let task = res.rows[0];
+    return await updateTask(task.id, {
+      ...task.data,
+      start: new Date()
+    });
   } catch (error) {
     console.error(error);
     throw Boom.badImplementation('Error while trying to fetch the task record');

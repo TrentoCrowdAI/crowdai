@@ -39,7 +39,8 @@ const getTestForWorker = (exports.getTestForWorker = async (
       initial: initialTest,
       item: testRecord.data.item,
       criteria: testRecord.data.criteria,
-      answered: false
+      answered: false,
+      start: new Date()
     }
   });
 });
@@ -78,6 +79,9 @@ const checkWorkerAssignment = (exports.checkWorkerAssignment = async (
     return assignment;
   } catch (error) {
     console.error(error);
+    throw Boom.badImplementation(
+      "Error while trying to check the worker's assignment status"
+    );
   }
 });
 

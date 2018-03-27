@@ -14,7 +14,22 @@ class FilterTask extends React.Component {
    * @return {React.Component}
    */
   render() {
-    if (!this.props.task) {
+    if (this.props.error) {
+      return (
+        <Segment vertical>
+          <Grid>
+            <Grid.Row>
+              <Message style={{marginLeft: 'auto', marginRight: 'auto'}} negative>
+                <Message.Header>Error</Message.Header>
+                <p>Error while trying to fetch the task.</p>
+              </Message>
+            </Grid.Row>
+          </Grid>
+        </Segment>
+      );
+    }
+
+    if (this.props.loading || !this.props.task) {
       return (
         <Segment vertical>
           <Grid>
@@ -199,12 +214,16 @@ FilterTask.propTypes = {
   /** @ignore */
   checkAssignmentStatus: PropTypes.func,
 
-  assignmentStatus: PropTypes.object
+  assignmentStatus: PropTypes.object,
+  error: PropTypes.object,
+  loading: PropTypes.bool
 };
 
 const mapStateToProps = state => ({
   hasAcceptedHit: state.questionForm.hasAcceptedHit,
   task: state.questionForm.task,
+  error: state.questionForm.error,
+  loading: state.questionForm.loading,
   answer: state.questionForm.answer,
   answerSaved: state.questionForm.answerSaved,
   answerSubmitLoading: state.questionForm.answerSubmitLoading,

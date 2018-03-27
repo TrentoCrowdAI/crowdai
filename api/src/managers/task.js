@@ -1,4 +1,5 @@
 const request = require('request');
+const Boom = require('boom');
 
 const delegates = require(__base + 'delegates');
 const jobManager = require('./job');
@@ -34,32 +35,39 @@ const generateTasks = (exports.generateTasks = async (job, worker) => {
  * @param {Object} job
  */
 const getTasksFromApi = (exports.getTasksFromApi = async (job, worker) => {
-  let taskAssignmentApi = await delegates.taskAssignmentApi.getById(
-    job.data.taskAssignmentStrategy
-  );
-
-  let response = await new Promise((resolve, reject) => {
-    request(
-      {
-        url: taskAssignmentApi.url,
-        qs: {
-          jobId: job.id,
-          workerId: worker.id,
-          maxItems: job.data.maxTasksRule
-        }
-      },
-      (err, rsp, body) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(rsp.body);
-        }
-      }
+  try {
+    let taskAssignmentApi = await delegates.taskAssignmentApi.getById(
+      job.data.taskAssignmentStrategy
     );
-  });
 
-  if (typeof response === 'string') {
-    response = JSON.parse(response);
+    let response = await new Promise((resolve, reject) => {
+      request(
+        {
+          url: taskAssignmentApi.url,
+          qs: {
+            jobId: job.id,
+            workerId: worker.id,
+            maxItems: job.data.maxTasksRule
+          }
+        },
+        (err, rsp, body) => {
+          if (err) {
+            reject(err);
+          } else {
+            resolve(rsp.body);
+          }
+        }
+      );
+    });
+
+    if (typeof response === 'string') {
+      response = JSON.parse(response);
+    }
+    return response;
+  } catch (error) {
+    console.error(error);
+    throw Boom.badImplementation(
+      'Error while trying to call generate tasks for worker'
+    );
   }
-  return response;
 });

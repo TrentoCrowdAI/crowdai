@@ -98,6 +98,7 @@ const saveAnswer = (exports.saveAnswer = async (payload, isTest) => {
         c.workerAnswer = answersMap[c.id];
       }
       testTask.data.answered = true;
+      testTask.data.end = new Date();
       return await delegates.testTasks.updateTestTask(
         testTask.id,
         testTask.data
@@ -118,6 +119,7 @@ const saveAnswer = (exports.saveAnswer = async (payload, isTest) => {
         c.workerAnswer = answersMap[c.id];
       }
       task.data.answered = true;
+      task.data.end = new Date();
       return await delegates.tasks.updateTask(task.id, task.data);
     }
   } catch (error) {

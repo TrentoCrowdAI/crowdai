@@ -8,11 +8,11 @@ class Histogram extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      data: this.props.data,
+      data: this.props.data.sort( (a,b) =>
+        (a[this.props.x] > b[this.props.x]) ? 1 : ((b[this.props.x] > a[this.props.x]) ? -1 : 0)),
       clicked: []
     }
     this.buildGraph = this.buildGraph.bind(this);
-    this.handleClick = this.handleClick.bind(this);
   }
 
   buildGraph() {
@@ -20,9 +20,7 @@ class Histogram extends React.Component {
     var x = this.props.x
     var y = this.props.y
 
-    var data = this.props.data.sort( function(a,b) {
-      return (a[x] > b[x]) ? 1 : ((b[x] > a[x]) ? -1 : 0);
-    })
+    var data = this.state.data
 
     var margin = {top: 30, right: 30, bottom: 30, left: 30};
     var width = +svg.attr("width") - margin.left - margin.right;
@@ -31,39 +29,59 @@ class Histogram extends React.Component {
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
     var color = this.props.color
 
-    var bw = Math.floor(width/data.length)-1
-
-    var xscale = d3.scaleLinear()
-        .range([bw/2, width-bw/2])
-    var xAxis = d3.axisBottom(xscale);
-
     var yscale = d3.scaleLinear()
-        .range([height,0])
-    var yAxis = d3.axisLeft(yscale);
+        .rangeRound([height, 0])
+        .domain([0, d3.max(data, d => d[y])])
 
-    var times = g.append("g")
-        .attr("class","times");
+    var xscale = d3.scaleBand()
+        .rangeRound([0, width])
+        .padding(0.1)
+        .domain(data.map(d => d[x]))
 
-    xscale.domain(d3.extent(data, d => d[x]))
-    yscale.domain([0,d3.max(data, d => d[y])])
+    var xAxis = d3.axisBottom(xscale)
 
-    nest = d3.nest()
-        .key(d => d[x])
-        .rollup(v => v.map(d => d[y]))
-        .map(data)
+    var yAxis = d3.axisLeft(yscale)
+        .ticks(10)
+
+    var bar = g.selectAll(".bar")
+        .data(data)
+        .enter().append("g")
+          .attr("class","bar")
+          
+    bar.append("rect")
+          .style("fill", color)
+          .attr("x", d => xscale(d[x]))
+          .attr("y", d => yscale(d[y]))
+          .attr("width", xscale.bandwidth())
+          .attr("height", d => height-yscale(d[y]))
+
+    bar.append("text")
+          .attr("dy", ".75em")
+          .attr("y", d => yscale(d[y])+10 )
+          .attr("x", d => xscale(d[x])+(xscale.bandwidth()/2) )
+          .attr("text-anchor", "middle")
+          .style("fill", "white")
+          .text( d => d[y])
 
     g.append("g")
-        .attr("class", "y axis")
-        .attr("transform","translate("+width+",0)")
+        .attr("class","axis axis--x")
+        .attr("transform","translate(0,"+height+")")
+        .call(xAxis)
+        .append("text")
+          .attr("fill","black")
+          .attr("transform","translate("+(width-15)+",0)")
+          .attr("dy","-1em")
+          .text(this.props.x)
+
+    g.append("g")
+        .attr("class","axis axis--y")
         .call(yAxis)
-      .selectAll("g")
-      .filter( d => !d )
-        .classed("zero", true)
-
-    var time = times.selectAll(".time")
-        .data(d3.range(d3.extent(data, d => d[x])))
-        
-
+        .append("text")
+          .attr("fill","black")
+          .attr("transform","rotate(-90)")
+          .attr("text-anchor","end")
+          .attr("dy","2em")
+          .text(this.props.y)
 
   }
 
@@ -77,14 +95,25 @@ class Histogram extends React.Component {
   }
 
   render() {
-
     return (
       <div>
-      - Histogram -
-        <br />
-        <strong>Clicked data:</strong> <ul></ul>
         <svg className={this.props.selector} width="600" height="400"> </svg>
         <br />
+        <strong>Clicked data:</strong> <ul></ul>
+        <br />
+        <button
+          onClick={(event) => this.setState({
+            data: this.props.data.sort( (a,b) =>
+              (a[this.props.y] > b[this.props.y]) ? 1 : ((b[this.props.y] > a[this.props.y]) ? -1 : 0))
+          })}
+        ><strong>Sort y</strong></button>
+        <button
+          onClick={(event) => this.setState({
+            data: this.props.data.sort( (a,b) =>
+              (a[this.props.x] > b[this.props.x]) ? 1 : ((b[this.props.x] > a[this.props.x]) ? -1 : 0))
+          })}
+        ><strong>Sort x</strong></button>
+        <hr />
         <button>Total Time statistics</button>
         <button>Average Time statistics</button>
         <button>Standard Time statistics</button>

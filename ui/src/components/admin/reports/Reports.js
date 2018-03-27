@@ -74,14 +74,13 @@ class Reports extends React.Component {
 		var arr = Object.values(data);
 		console.log(arr)
 
-
 		this.setState({
 			chart: <React.Fragment>
-						 <ChartWrapper chart='histogram'
-            		x={'total_time'}
-            		y={'task_id'}
+						 <ChartWrapper chart='nest'
+            		x={'task_id'}
+            		y={'total_time'}
             		selector={'chart1'}
-            		color={'green'}
+            		color={'steelblue'}
             		data={arr}
             		/>
 						 </React.Fragment>

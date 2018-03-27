@@ -23,7 +23,7 @@ class Histogram extends React.Component {
     var data = this.props.data.sort( function(a,b) {
       return (a[x] > b[x]) ? 1 : ((b[x] > a[x]) ? -1 : 0);
     })
-    console.log(data)
+    //console.log(data)
 
     var margin = {top: 30, right: 30, bottom: 30, left: 30};
     var width = +svg.attr("width") - margin.left - margin.right;
@@ -67,13 +67,15 @@ class Histogram extends React.Component {
             d3.select(this).style("opacity","1")
           })
           .on("click", (d) => {
+            //reset display state
             this.setState({
               clicked : []
             })
-            console.log(d.x0,d.x1,d.length)
+
+            //console.log(d.x0,d.x1,d.length)
             data.map( (step,i) => {
               if((step[x]>=d.x0 && step[x]<d.x1) || (step[x]>=d.x0 && step[x]==d.x1)) {
-                this.handleClick(step[y])
+                this.handleClick(step)
               }
             })
           })
@@ -117,7 +119,7 @@ class Histogram extends React.Component {
   }
 
   handleClick(d) {
-    console.log(d)
+    //console.log(d)
     var nuovo = this.state.clicked.concat([d])
     this.setState({
       clicked: nuovo
@@ -127,14 +129,13 @@ class Histogram extends React.Component {
 
   render() {
 
-    var stampa = this.state.clicked.map(d => <li key={d}>{this.props.y+" "+d}</li>)
+    var stampa = this.state.clicked.map(d => <li key={d[this.props.y]}>{this.props.y+" "+d[this.props.y]+" => "+this.props.x+" "+d[this.props.x]}</li>)
     return (
       <div>
-      - Histogram -
         <br />
-        <strong>Clicked data:</strong> <ul>{stampa}</ul>
         <svg className={this.props.selector} width="600" height="400"> </svg>
         <br />
+        <strong>Clicked data:</strong> <ul>{stampa}</ul>
         <button>Total Time statistics</button>
         <button>Average Time statistics</button>
         <button>Standard Time statistics</button>

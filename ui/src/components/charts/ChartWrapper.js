@@ -7,8 +7,9 @@ import SimpleLineChart from './SimpleLineChart.js'
 import Histogram from './Histogram.js'
 import HeatMap from './HeatMap.js'
 import AreaChart from './AreaChart.js'
+import NestChart from './NestChart.js'
 
-var chartData = [{
+/*var chartData = [{
   name: "will",
   altezza: 160,
   peso: 92
@@ -40,7 +41,7 @@ var chartData = [{
   name: "dani",
   altezza: 150,
   peso: 55
-}]
+}]*/
 
 var count = 0;
 
@@ -116,6 +117,17 @@ class ChartWrapper extends React.Component {
         return(
           <div>
             <AreaChart
+              handleConcat={this.handleConcat} 
+              handleReduce={this.handleReduce}
+              data={this.state.data}
+              {... this.props}
+            />
+          </div>
+        );
+      case 'nest': 
+        return(
+          <div>
+            <NestChart
               handleConcat={this.handleConcat} 
               handleReduce={this.handleReduce}
               data={this.state.data}

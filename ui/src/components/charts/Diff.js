@@ -73,7 +73,7 @@ class Diff extends React.Component {
           	x={'task_id'}
           	y={'total_time'}
           	selector={'chart3'}v
-          	color={'red'}
+          	color={'steelblue'}
           	data={arr}/>
 			</div>
 		)

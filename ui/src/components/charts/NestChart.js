@@ -34,7 +34,7 @@ class NestChart extends React.Component {
     var height = +svg.attr("height") - margin.top - margin.bottom;
     var g = svg.append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-    var color = "steelblue" //this.props.color
+    var color = this.props.color
 
     var yscale = d3.scaleLinear()
         .rangeRound([height, 0])
@@ -128,8 +128,6 @@ class NestChart extends React.Component {
       <div>
         <svg className={this.props.selector} width="600" height="400"> </svg>
         <br />
-        <strong>Clicked data:</strong> <ul></ul>
-        <br />
 
         <button
           onClick={(event) => this.setState({
@@ -137,7 +135,7 @@ class NestChart extends React.Component {
               (a[this.props.y] > b[this.props.y]) ? 1 : ((b[this.props.y] > a[this.props.y]) ? -1 : 0))
           })}
         ><strong>Sort y</strong></button>
-        
+
         <button
           onClick={(event) => this.setState({
             data: this.props.data.sort( (a,b) =>

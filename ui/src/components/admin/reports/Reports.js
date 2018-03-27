@@ -16,41 +16,7 @@ import {
 import ChartWrapper from 'src/components/charts/ChartWrapper'
 import './reports.css'
 
-var data = [{
-  name: "will",
-  altezza: 160,
-  peso: 92
-},{
-  name: "rob",
-  altezza: 165,
-  peso: 50
-},{
-  name: "july",
-  altezza: 165,
-  peso: 45
-},{
-  name: "fabio",
-  altezza: 177,
-  peso: 112
-},{
-  name: "rocky",
-  altezza: 170,
-  peso: 45
-},{
-  name: "rose",
-  altezza: 160,
-  peso: 55
-},{
-  name: "lola",
-  altezza: 195,
-  peso: 76
-},{
-  name: "dani",
-  altezza: 150,
-  peso: 55
-}]
-
-
+var data = []
 //= {"tasks":{"task1":{"total_time":2.21,"task_id":1},"task2":{"total_time":3.45,"task_id":3},"task3":{"total_time":4.65,"task_id":7},"task4":{"total_time":5.6,"task_id":2},"task5":{"total_time":9.6,"task_id":5},"task6":{"total_time":8.6,"task_id":9},"task7":{"total_time":2.6,"task_id":11},"task8":{"total_time":3.6,"task_id":32},"task9":{"total_time":4.6,"task_id":27},"task10":{"total_time":8.6,"task_id":21},"task11":{"total_time":7.6,"task_id":22}}}
 
 const MetricOptions = [
@@ -177,7 +143,7 @@ class Reports extends React.Component {
             	x={'task_id'}
             	y={'total_time'}
             	selector={'chart1'}
-            	color={'red'}
+            	color={'steelblue'}
             	data={data}
            	/>
 						</React.Fragment>

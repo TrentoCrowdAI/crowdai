@@ -45,7 +45,7 @@ class FilterTask extends React.Component {
 
     if (this.initialTestFailed()) {
       return (
-        <Message icon style={{marginTop: 20}}>
+        <Message icon style={{marginTop: 50}}>
           <Icon name="frown" />
           <Message.Content>
             <Message.Header>Qualification test result</Message.Header>
@@ -58,7 +58,7 @@ class FilterTask extends React.Component {
 
     if (this.finished()) {
       return (
-        <Message icon style={{marginTop: 20}}>
+        <Message icon style={{marginTop: 50}}>
           <Icon name="checkmark box" />
           <Message.Content>
             <Message.Header>Finished</Message.Header>

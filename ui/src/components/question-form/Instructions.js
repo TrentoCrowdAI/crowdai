@@ -1,6 +1,7 @@
 import React from 'react';
-
+import {connect} from 'react-redux';
 import {Accordion, Header, Segment} from 'semantic-ui-react';
+import PropTypes from 'prop-types';
 
 class Instructions extends React.Component {
   state = {open: true};
@@ -12,6 +13,10 @@ class Instructions extends React.Component {
 
   render() {
     const {open} = this.state;
+
+    if (this.props.loading || this.finished()) {
+      return null;
+    }
 
     return (
       <div>
@@ -67,6 +72,27 @@ class Instructions extends React.Component {
   handleClick() {
     this.setState({open: !this.state.open});
   }
+
+  finished() {
+    return (
+      (this.props.task && this.props.task.data.finished) ||
+      (this.props.assignmentStatus && this.props.assignmentStatus.data.finished)
+    );
+  }
 }
 
-export default Instructions;
+Instructions.propTypes = {
+  task: PropTypes.object,
+  assignmentStatus: PropTypes.object,
+  loading: PropTypes.bool
+};
+
+const mapStateToProps = state => ({
+  task: state.questionForm.task,
+  assignmentStatus: state.questionForm.assignmentStatus,
+  loading: state.questionForm.loading
+});
+
+const mapDispatchToProps = dispatch => ({});
+
+export default connect(mapStateToProps, mapDispatchToProps)(Instructions);

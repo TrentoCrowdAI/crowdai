@@ -22,7 +22,13 @@ const generateTasks = (exports.generateTasks = async (job, worker) => {
       buffer = await delegates.tasks.createBuffer(job.id, worker.id, response);
     }
 
+    if (response.items && response.items.length === 0) {
+      // we are done with the worker.
+      return response;
+    }
+
     if (response.done) {
+      // the job is done.
       await jobManager.stop(job);
     }
   }

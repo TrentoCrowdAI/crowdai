@@ -39,6 +39,10 @@ exports.nextTask = async (uuid, turkId, assignmentTurkId) => {
       return workerAssignment;
     }
     let response = await taskManager.generateTasks(job, worker);
+
+    if (response.items.length === 0) {
+      return await stateManager.finishAssignmentByWorkerId(job.uuid, worker.id);
+    }
     const runQuiz = await qualityManager.shouldRunInitialTest(job, worker);
 
     if (runQuiz) {
@@ -56,7 +60,7 @@ exports.nextTask = async (uuid, turkId, assignmentTurkId) => {
         job,
         worker,
         response.criteria,
-        true
+        false
       );
     }
     return await delegates.tasks.getTaskFromBuffer(job.id, worker.id);

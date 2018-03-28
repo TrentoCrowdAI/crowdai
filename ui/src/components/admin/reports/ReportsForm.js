@@ -120,7 +120,9 @@ class ReportsForm extends React.Component {
 
 				<div style={{textAlign: 'center'}}>
 				<Link to={`/admin/reports/${this.state.chosenproject}/${this.state.chosenjob}`}>
-					<Button className='btn primary'>See Charts</Button>
+					<Button className='btn primary' 
+                  disabled={!this.state.activechart}
+                  >See Charts</Button>
 				</Link>
 				</div>
 

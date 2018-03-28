@@ -13,8 +13,9 @@ import {
   Accordion,
   Message
 } from 'semantic-ui-react';
-import ChartWrapper from 'src/components/charts/ChartWrapper'
-import './reports.css'
+import ChartWrapper from 'src/components/charts/ChartWrapper';
+import './reports.css';
+import { actions } from './actions';
 
 var data = []
 //= {"tasks":{"task1":{"total_time":2.21,"task_id":1},"task2":{"total_time":3.45,"task_id":3},"task3":{"total_time":4.65,"task_id":7},"task4":{"total_time":5.6,"task_id":2},"task5":{"total_time":9.6,"task_id":5},"task6":{"total_time":8.6,"task_id":9},"task7":{"total_time":2.6,"task_id":11},"task8":{"total_time":3.6,"task_id":32},"task9":{"total_time":4.6,"task_id":27},"task10":{"total_time":8.6,"task_id":21},"task11":{"total_time":7.6,"task_id":22}}}
@@ -156,15 +157,20 @@ class Reports extends React.Component {
 }
 
 Reports.propTypes = {
-
+  fetchReports: PropTypes.func,
+  error: PropTypes.object,
+  loading: PropTypes.bool,
+  reports: PropTypes.object
 }
 
 const mapDispatchToProps = dispatch => ({
-
+	projects: state.project.list.projects,
+  error: state.project.list.error,
+  loading: state.project.list.loading
 })
 
 const mapStateToProps = state => ({
-
+	fetchReports: (pId,jId) => dispatch(actions.fetchReports(pId,jId))
 })
 
 export default connect(mapStateToProps,mapDispatchToProps)(Reports)

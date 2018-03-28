@@ -1,7 +1,8 @@
 const scopes = {
   EXPERIMENTS: 'experiments',
   PROFILE: 'profile',
-  PROJECTS: 'projects'
+  PROJECTS: 'projects',
+  REPORTS: 'reports'
 };
 
 const FileFormats = {

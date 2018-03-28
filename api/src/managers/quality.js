@@ -195,7 +195,7 @@ const rejectAssignment = async (job, worker, data) => {
     return await delegates.workers.updateAssignment(job.uuid, worker.id, {
       ...data,
       finished: true,
-      assignmentEnd: new Date()
+      end: new Date()
     });
   } catch (error) {
     console.error(error);

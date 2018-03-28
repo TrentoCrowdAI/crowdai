@@ -14,7 +14,12 @@ const getNextTask = (action$, store) =>
       assignmentId: session.assignmentId
     };
     return Observable.defer(() => axios.get(`/jobs/${session.experimentId}/tasks/next`, {params}))
-      .mergeMap(response => Observable.of(actions.getNextTaskSuccess(response.data)))
+      .mergeMap(response =>
+        Observable.concat(
+          Observable.of(actions.getNextTaskSuccess(response.data)),
+          Observable.of(rewardActions.requestReward())
+        )
+      )
       .catch(error => Observable.of(actions.getNextTaskError(error)));
   });
 
@@ -54,7 +59,10 @@ const checkAssignmentStatus = (action$, store) =>
       axios.get(`/jobs/${session.experimentId}/workers/${session.workerId}/assignment-status`)
     )
       .mergeMap(response => {
-        return Observable.of(actions.checkAssignmentStatusSuccess(response.data));
+        return Observable.concat(
+          Observable.of(actions.checkAssignmentStatusSuccess(response.data)),
+          Observable.of(rewardActions.requestReward())
+        );
       })
       .catch(error => Observable.of(actions.checkAssignmentStatusError(error)));
   });

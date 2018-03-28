@@ -19,7 +19,6 @@ import {
 } from 'semantic-ui-react';
 import { actions as projectactions } from '../projects/actions';
 import { actions as expactions } from '../experiments/actions';
-import JobChooser from './JobChooser.js'
 
 var ProjectOptions = { }
 
@@ -62,17 +61,7 @@ class ReportsForm extends React.Component {
     this.props.projects.rows.map( step => {
     	ProjectOptions[step.id] = step.data.name+" ( "+step.created_at+" ) "
     })
-
-    console.log(this.state)
-  }
-
-  componentDidUpdate() {
-  	JobOptions = { }
-  	this.props.fetchExperiments(this.state.chosenproject);
-    this.props.experiments.rows.map( step => {
-      JobOptions[step.id] = step.data.name
-    });
-    console.log(this.state)
+    //console.log(this.state)
   }
 
   chooseProject(e, {value}) {
@@ -82,6 +71,7 @@ class ReportsForm extends React.Component {
 			chosenjob: '',
 			activejob: true
 		})
+  	this.props.fetchExperiments(value);
   }
 
   chooseJob(e, {value}) {
@@ -93,6 +83,12 @@ class ReportsForm extends React.Component {
   }
 
 	render() {
+
+		JobOptions = { }
+    this.props.experiments.rows.map( step => {
+      JobOptions[step.id] = step.data.name
+    });
+
 		return(
 			<div>
 				<DataTable
@@ -103,7 +99,7 @@ class ReportsForm extends React.Component {
       	/>
 
 			<div style={{margin: '20px'}}>
-      	<h3 style={{color: 'steelblue'}}>Choose Project, Job =   {this.state.chosenproject}, {this.state.chosenjob}</h3>
+      	<h3 style={{color: 'steelblue'}}>Chosen Project_id, Job_id =   {this.state.chosenproject}, {this.state.chosenjob}</h3>
 
 				<Form.Select 
 					style={{margin: '10px'}}
@@ -122,10 +118,11 @@ class ReportsForm extends React.Component {
 					onChange={this.chooseJob}
 				/>
 
-				<br />
+				<div style={{textAlign: 'center'}}>
 				<Link to={`/admin/reports/${this.state.chosenproject}/${this.state.chosenjob}`}>
 					<Button className='btn primary'>See Charts</Button>
 				</Link>
+				</div>
 
 				</div>
 			</div>
@@ -138,16 +135,22 @@ ReportsForm.propTypes = {
   error: PropTypes.object,
   loading: PropTypes.bool,
   projects: PropTypes.object,
+
   fetchExperiments: PropTypes.func,
+  eerror: PropTypes.any,
+  eloading: PropTypes.bool,
   experiments: PropTypes.object,
   match: PropTypes.object
 }
 
 const mapStateToProps = state => ({
   projects: state.project.list.projects,
-  experiments: state.experiment.list.experiments,
   error: state.project.list.error,
-  loading: state.project.list.loading
+  loading: state.project.list.loading,
+
+  experiments: state.experiment.list.experiments,
+  eerror: state.experiment.list.error,
+  eloading: state.experiment.list.loading
 })
 
 const mapDispatchToProps = dispatch => ({

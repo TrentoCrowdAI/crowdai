@@ -346,25 +346,25 @@ const reviewAssignments = async (job, mturk) => {
     }
 
     for (assignment of assignments.rows) {
-      console.log(`Reviewing ${assignment.data.assignmentId}`);
+      console.log(`Reviewing ${assignment.data.assignmentTurkId}`);
 
       if (!assignment.data.finished) {
         console.warn(
           `reviewAssignments called even though the assignment ${
-            assignment.data.assignmentId
+            assignment.data.assignmentTurkId
           } did not finish`
         );
         continue;
       }
 
       if (assignment.data.initialTestFailed) {
-        await mturkRejectAssignment(assignment.data.assignmentId, mturk);
+        await mturkRejectAssignment(assignment.data.assignmentTurkId, mturk);
       } else {
-        await mturkApproveAssignment(assignment.data.assignmentId, mturk);
+        await mturkApproveAssignment(assignment.data.assignmentTurkId, mturk);
         await sendBonus(
           job.uuid,
           assignment.worker_id,
-          assignment.data.assignmentId,
+          assignment.data.assignmentTurkId,
           mturk
         );
       }
@@ -420,7 +420,7 @@ const createAdditionalAssignmentsForHIT = async (hitId, mturk) => {
 
 /**
  * Wrapper for Mechanical Turk approveAssignment operation.
- * @param {string} id - Assignment ID
+ * @param {string} id - The assignment's AMT ID
  * @param {Object} mturk
  */
 const mturkApproveAssignment = async (id, mturk) => {
@@ -441,7 +441,7 @@ const mturkApproveAssignment = async (id, mturk) => {
 
 /**
  * Wrapper for Mechanical Turk rejectAssignment operation.
- * @param {string} id - Assignment ID
+ * @param {string} id - The assignment's AMT ID
  * @param {Object} mturk
  */
 const mturkRejectAssignment = async (id, mturk) => {
@@ -470,8 +470,8 @@ const mturkRejectAssignment = async (id, mturk) => {
  * the worker based on the number of answers given.
  *
  * @param {string} uuid - The job's UUID
- * @param {string} workerId -
- * @param {string} assignmentId
+ * @param {string} workerId - The worker's ID.
+ * @param {string} assignmentId - The assignment's AMT ID
  * @param {Object} mturk
  */
 const sendBonus = async (uuid, workerId, assignmentId, mturk) => {

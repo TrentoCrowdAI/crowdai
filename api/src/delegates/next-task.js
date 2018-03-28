@@ -14,7 +14,7 @@ const { TestAnswerStrategy } = testTasksDelegate;
  *
  * @param {string} uuid - Experiment's UUID
  * @param {string} workerTurkId - Worker's Mechanical Turk ID.
- * @param {string} assignmentId
+ * @param {string} assignmentId - The worker_assignment record
  */
 exports.next = async (uuid, workerTurkId, assignmentId) => {
   const experiment = await experimentsDelegate.getByUuid(uuid);

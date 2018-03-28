@@ -4,5 +4,6 @@ let router = new Router();
 require('./experiments').register(router);
 require('./profile').register(router);
 require('./projects').register(router);
+require('./reports').register(router);
 
 module.exports = router.routes();

@@ -5,5 +5,7 @@
   "editor.formatOnSave": true,
   // Enable/disable default JavaScript formatter (For Prettier)
   "javascript.format.enable": false,
-  "editor.tabSize": 2
+  "editor.tabSize": 2,
+  "prettier.singleQuote": true,
+  "prettier.jsxBracketSameLine": true
 }

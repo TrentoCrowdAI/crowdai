@@ -33,27 +33,25 @@ const getWorkerAssignmentStatus = (exports.getWorkerAssignmentStatus = async (
   );
 
   if (answersCount >= job.data.maxTasksRule) {
-    return await finishAssignmentByWorkerId(job.uuid, worker.id, {
-      maxTasks: true
+    return await finishAssignment(job.uuid, worker.id, {
+      finishedByMaxTasksRule: true
     });
   }
   return await qualityManager.checkWorkerAssignment(job, worker, assignment);
 });
 
 /**
- * Finishes the worker's assignment.
+ * A worker chose to finish their assignment.
  *
  * @param {string} uuid - The job UUID
  * @param {string} workerTurkId - The worker's AMT ID
- * @param {Object} data - Extra information to add in data column.
  */
-const finishAssignment = (exports.finishAssignment = async (
-  uuid,
-  workerTurkId,
-  data = {}
-) => {
+const forceFinish = (exports.forceFinish = async (uuid, workerTurkId) => {
   let worker = await delegates.workers.getByTurkId(workerTurkId);
-  return await finishAssignmentByWorkerId(uuid, worker.id, data);
+  await delegates.tasks.cleanBuffer(uuid, worker.id);
+  return await finishAssignment(uuid, worker.id, {
+    finishedByWorker: true
+  });
 });
 
 /**
@@ -63,7 +61,7 @@ const finishAssignment = (exports.finishAssignment = async (
  * @param {string} workerId - The worker's ID
  * @param {Object} data - Extra information to add in data column.
  */
-const finishAssignmentByWorkerId = (exports.finishAssignmentByWorkerId = async (
+const finishAssignment = (exports.finishAssignment = async (
   uuid,
   workerId,
   data = {}

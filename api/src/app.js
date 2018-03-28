@@ -32,7 +32,7 @@ app.use(compress());
 app.use(koaBetterBody());
 
 // google-based authentication protects URLs under /requesters
-app.use(authentication.unless({ path: [/^\/auth/, /^\/workers/] }));
+//app.use(authentication.unless({ path: [/^\/auth/, /^\/workers/] }));
 
 // error-handling middleware
 app.use(async (ctx, next) => {

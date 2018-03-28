@@ -3,31 +3,20 @@ const Boom = require('boom');
 const db = require(__base + 'db');
 
 /**
- * Returns an item record for the worker. It takes into account what (item, criteria)
- * tasks the worker has already answered. It selects the item record randomly.
+ * Returns the items based on the ID list.
  *
- * @param {Number} projectId
- * @param {Number} experimentId
- * @param {Number} workerId
- * @returns {Object} an item record.
+ * @param {Number[]} items - Array of item IDs.
+ * @return {Object[]}
  */
-const getItemForWorker = (exports.getItemForWorker = async (
-  projectId,
-  experimentId,
-  workerId
-) => {
+const getItemsFromIds = (exports.getItemsFromIds = async items => {
   try {
     let res = await db.query(
-      `select i.* from ${
-        db.TABLES.Item
-      } i where i.project_id = $1 and i.id not in (select t.id from ${
-        db.TABLES.Task
-      } t where t.experiment_id = $2 and worker_id = $3) order by random() limit 1`,
-      [projectId, experimentId, workerId]
+      `select * from ${db.TABLES.Item} where id = ANY ($1)`,
+      [items]
     );
-    return res.rows[0];
+    return res.rowCount > 0 ? res.rows : null;
   } catch (error) {
     console.error(error);
-    throw Boom.badImplementation('Error while trying to fetch item record');
+    throw Boom.badImplementation('Error while trying to fetch records');
   }
 });

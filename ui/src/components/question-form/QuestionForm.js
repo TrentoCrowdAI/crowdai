@@ -24,7 +24,7 @@ class QuestionForm extends Component {
 
     let payload = {
       task: this.props.task,
-      session: this.props.session
+      workerTurkId: this.props.session.workerId
     };
     this.props.submitAnswer(payload);
   }

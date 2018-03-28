@@ -14,7 +14,22 @@ class FilterTask extends React.Component {
    * @return {React.Component}
    */
   render() {
-    if (!this.props.task || this.props.assigmentStatusLoading) {
+    if (this.props.error) {
+      return (
+        <Segment vertical>
+          <Grid>
+            <Grid.Row>
+              <Message style={{marginLeft: 'auto', marginRight: 'auto'}} negative>
+                <Message.Header>Error</Message.Header>
+                <p>Error while trying to fetch the task.</p>
+              </Message>
+            </Grid.Row>
+          </Grid>
+        </Segment>
+      );
+    }
+
+    if (this.props.loading || !this.props.task) {
       return (
         <Segment vertical>
           <Grid>
@@ -28,23 +43,22 @@ class FilterTask extends React.Component {
       );
     }
 
-    if (!this.props.assigmentStatusLoading && this.props.task.initialTestFailed) {
+    if (this.initialTestFailed()) {
       return (
-        <Message icon style={{marginTop: 20}}>
+        <Message icon style={{marginTop: 50}}>
           <Icon name="frown" />
           <Message.Content>
             <Message.Header>Qualification test result</Message.Header>
             <p>Thank you for participating, but you failed to pass the qualification test.</p>
-            <p>Please click on the following button to finish.</p>
-            <FinishButton onClick={() => this.finish()} />
+            <p>Please close this tab/window and go back to the HIT page on Amazon Mechanical Turk.</p>
           </Message.Content>
         </Message>
       );
     }
 
-    if (this.props.assignmentStatus && this.props.assignmentStatus.data.finished) {
+    if (this.finished()) {
       return (
-        <Message icon style={{marginTop: 20}}>
+        <Message icon style={{marginTop: 50}}>
           <Icon name="checkmark box" />
           <Message.Content>
             <Message.Header>Finished</Message.Header>
@@ -52,19 +66,6 @@ class FilterTask extends React.Component {
               Thank you for completing the tasks. Please close this tab/window and go back to the HIT page on Amazon
               Mechanical Turk.
             </p>
-          </Message.Content>
-        </Message>
-      );
-    }
-
-    if (!this.props.assigmentStatusLoading && this.props.task.maxTasks) {
-      return (
-        <Message icon style={{marginTop: 20}}>
-          <Icon name="checkmark box" />
-          <Message.Content>
-            <Message.Header>Max tasks reached</Message.Header>
-            <p>Thank you for completing the tasks. Click on the following button to finish.</p>
-            <FinishButton onClick={() => this.finish()} />
           </Message.Content>
         </Message>
       );
@@ -127,13 +128,13 @@ class FilterTask extends React.Component {
 
               {this.props.answerSaved && (
                 <React.Fragment>
-                  <Button type="button" positive style={{marginTop: 40}} onClick={() => window.location.reload()}>
-                    Next task?
-                  </Button>
-
                   {!this.props.task.data.initial && (
                     <FinishButton style={{marginTop: 40}} onClick={() => this.finish()} />
                   )}
+
+                  <Button type="button" positive style={{marginTop: 40}} onClick={() => window.location.reload()}>
+                    Next task
+                  </Button>
                 </React.Fragment>
               )}
 
@@ -155,18 +156,28 @@ class FilterTask extends React.Component {
   }
 
   componentDidMount() {
-    this.props.checkAssignmentStatus();
     this.props.getNextTask();
   }
 
   finish() {
     this.props.finishAssignment();
   }
+
+  initialTestFailed() {
+    return (
+      this.props.task.data.initialTestFailed ||
+      (this.props.assignmentStatus && this.props.assignmentStatus.data.initialTestFailed)
+    );
+  }
+
+  finished() {
+    return this.props.task.data.finished || (this.props.assignmentStatus && this.props.assignmentStatus.data.finished);
+  }
 }
 
 const FinishButton = props => {
   return (
-    <Button type="button" positive {...props}>
+    <Button type="button" color="blue" {...props}>
       Finish
     </Button>
   );
@@ -198,27 +209,26 @@ FilterTask.propTypes = {
   setAnswer: PropTypes.func,
 
   /** @ignore */
-  assignmentStatus: PropTypes.object,
-
-  /** @ignore */
   finishAssignment: PropTypes.func,
 
   /** @ignore */
   checkAssignmentStatus: PropTypes.func,
 
-  /** @ignore */
-  assigmentStatusLoading: PropTypes.bool
+  assignmentStatus: PropTypes.object,
+  error: PropTypes.object,
+  loading: PropTypes.bool
 };
 
 const mapStateToProps = state => ({
   hasAcceptedHit: state.questionForm.hasAcceptedHit,
   task: state.questionForm.task,
+  error: state.questionForm.error,
+  loading: state.questionForm.loading,
   answer: state.questionForm.answer,
   answerSaved: state.questionForm.answerSaved,
   answerSubmitLoading: state.questionForm.answerSubmitLoading,
   answerSubmitError: state.questionForm.answerSubmitError,
-  assignmentStatus: state.questionForm.assignmentStatus,
-  assigmentStatusLoading: state.questionForm.assigmentStatusLoading
+  assignmentStatus: state.questionForm.assignmentStatus
 });
 
 const mapDispatchToProps = dispatch => ({

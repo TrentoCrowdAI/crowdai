@@ -1,21 +1,22 @@
 const delegates = require(__base + 'delegates');
+const managers = require(__base + 'managers');
 
 const getWorkerReward = async ctx => {
-  ctx.response.body = await delegates.workers.getWorkerReward(
+  ctx.response.body = await managers.job.getWorkerReward(
     ctx.params.uuid,
     ctx.params.workerTurkId
   );
 };
 
 const finishAssignment = async ctx => {
-  ctx.response.body = await delegates.workers.finishAssignment(
+  ctx.response.body = await managers.state.finishAssignment(
     ctx.params.uuid,
     ctx.params.workerTurkId
   );
 };
 
 const checkAssignmentStatus = async ctx => {
-  const record = await delegates.workers.checkAssignmentStatus(
+  const record = await delegates.workers.getAssignmentByWorkerTurkId(
     ctx.params.uuid,
     ctx.params.workerTurkId
   );
@@ -24,16 +25,13 @@ const checkAssignmentStatus = async ctx => {
 };
 
 exports.register = router => {
-  router.get(
-    '/experiments/:uuid/workers/:workerTurkId/reward',
-    getWorkerReward
-  );
+  router.get('/jobs/:uuid/workers/:workerTurkId/reward', getWorkerReward);
   router.post(
-    '/experiments/:uuid/workers/:workerTurkId/finish-assignment',
+    '/jobs/:uuid/workers/:workerTurkId/finish-assignment',
     finishAssignment
   );
   router.get(
-    '/experiments/:uuid/workers/:workerTurkId/assignment-status',
+    '/jobs/:uuid/workers/:workerTurkId/assignment-status',
     checkAssignmentStatus
   );
 };

@@ -12,7 +12,10 @@ const requestersDelegate = require('./requesters');
 
 const getByRequester = (exports.getByRequester = async id => {
   try {
-    let res = await db.query(`select * from ${db.TABLES.Project}`);
+    let res = await db.query(
+      `select * from ${db.TABLES.Project} where requester_id = $1`,
+      [id]
+    );
     return { rows: res.rows, meta: { count: res.rowCount } };
   } catch (error) {
     console.error(error);
@@ -130,6 +133,25 @@ const getCriteria = (exports.getCriteria = async id => {
 });
 
 /**
+ * Returns the number of criteria associated with the project
+ *
+ * @param {Number} id - The project's ID
+ * @return {Number}
+ */
+const getCriteriaCount = (exports.getCriteriaCount = async id => {
+  try {
+    let res = await db.query(
+      `select count(*) from ${db.TABLES.Criterion} where project_id = $1`,
+      [id]
+    );
+    return Number(res.rows[0].count);
+  } catch (error) {
+    console.error(error);
+    throw Boom.badImplementation('Error while trying to fetch records');
+  }
+});
+
+/**
  * Returns the criteria for the given criterion ID list.
  *
  * @param {Number[]} criteria - Array of criterion IDs
@@ -138,12 +160,10 @@ const getCriteria = (exports.getCriteria = async id => {
 const getCriteriaFromIds = (exports.getCriteriaFromIds = async criteria => {
   try {
     let res = await db.query(
-      `select * from ${db.TABLES.Criterion} where id in ($1)`,
-      [criteria.join(',')]
+      `select * from ${db.TABLES.Criterion} where id = ANY ($1)`,
+      [criteria]
     );
-    return res.rowCount > 0
-      ? { rows: res.rows, meta: { count: res.rowCount } }
-      : null;
+    return res.rowCount > 0 ? res.rows : null;
   } catch (error) {
     console.error(error);
     throw Boom.badImplementation('Error while trying to fetch records');

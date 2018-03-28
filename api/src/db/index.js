@@ -13,7 +13,7 @@ const pool = new Pool({
 const TABLES = Object.freeze({
   Requester: 'requester',
   Project: 'project',
-  Experiment: 'experiment',
+  Job: 'job',
   Worker: 'worker',
   WorkerAssignment: 'worker_assignment',
   Item: 'item',
@@ -21,7 +21,8 @@ const TABLES = Object.freeze({
   Test: 'test',
   Task: 'task',
   TestTask: 'test_task',
-  TaskAnswer: 'task_answer'
+  TaskAnswer: 'task_answer',
+  TaskAssignmentApi: 'task_assignment_api'
 });
 
 /**

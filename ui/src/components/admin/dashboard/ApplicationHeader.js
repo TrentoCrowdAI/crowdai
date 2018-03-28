@@ -35,7 +35,7 @@ class ApplicationHeader extends React.Component {
               this.logoutSuccess();
               // TODO: google logout
             }}>
-            <Icon name="video camera" />
+            <Icon name="sign out" />
             Logout
           </Menu.Item>
         </Menu.Menu>

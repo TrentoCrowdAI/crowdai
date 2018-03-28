@@ -235,7 +235,7 @@ const publish = (exports.publish = async id => {
     });
     console.log(`HIT created. HITId: ${hit.HITId}`);
     job.data.status = JobStatus.PUBLISHED;
-    job.data.publishedAt = new Date();
+    job.data.start = new Date();
     job.data.hit = { ...hit };
     setupCronForHit(job, hit.HITId, mt);
     return await delegates.jobs.update(id, job.data);
@@ -268,6 +268,7 @@ const stop = (exports.stop = async job => {
         }
       });
     });
+    await finishJob(job.id);
   } catch (error) {
     console.error(error);
     throw Boom.badImplementation('Error while trying to stop the job');
@@ -370,10 +371,7 @@ const reviewAssignments = async (job, mturk) => {
       }
     }
     console.log(`Review assignments for job: ${jobId} done`);
-    await delegates.jobs.update(jobId, {
-      status: JobStatus.DONE,
-      finishedAt: new Date()
-    });
+    await finishJob(jobId);
     return true;
   } catch (error) {
     console.error(error);
@@ -393,6 +391,18 @@ const reviewAssignments = async (job, mturk) => {
 const checkJobDone = async (job, worker) => {
   let response = await taskManager.getTasksFromApi(job, worker);
   return response.done;
+};
+
+/**
+ * Changes the job's status to DONE.
+ *
+ * @param {Number} jobId
+ */
+const finishJob = async jobId => {
+  return await delegates.jobs.update(jobId, {
+    status: JobStatus.DONE,
+    end: new Date()
+  });
 };
 
 /**

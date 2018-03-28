@@ -9,7 +9,7 @@ const getWorkerReward = async ctx => {
 };
 
 const finishAssignment = async ctx => {
-  ctx.response.body = await managers.state.finishAssignment(
+  ctx.response.body = await managers.state.forceFinish(
     ctx.params.uuid,
     ctx.params.workerTurkId
   );

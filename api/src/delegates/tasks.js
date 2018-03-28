@@ -4,6 +4,7 @@ const db = require(__base + 'db');
 const config = require(__base + 'config');
 const projectsDelegate = require('./projects');
 const itemsDelegate = require('./items');
+const jobsDelegate = require('./jobs');
 
 /**
  * Creates a task record.
@@ -205,5 +206,24 @@ const getTaskFromBuffer = (exports.getTaskFromBuffer = async (
   } catch (error) {
     console.error(error);
     throw Boom.badImplementation('Error while trying to fetch the task record');
+  }
+});
+
+/**
+ * Removes (soft) unfinished tasks.
+ *
+ * @param {String} uuid - The job's UUID.
+ * @param {Number} workerId - The worker's ID.
+ */
+const cleanBuffer = (exports.cleanBuffer = async (uuid, workerId) => {
+  try {
+    let job = await jobsDelegate.getByUuid(uuid);
+    await db.query(
+      `update task set deleted_at = now() where job_id = $1 and worker_id = $2 and data ->> 'answered' = 'false'`,
+      [job.id, workerId]
+    );
+  } catch (error) {
+    console.error(error);
+    throw Boom.badImplementation('Error while trying to clean the buffer');
   }
 });

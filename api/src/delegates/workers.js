@@ -130,7 +130,7 @@ const createAssignment = (exports.createAssignment = async assignment => {
     finished: false,
     initialTestFailed: false,
     honeypotFailed: false,
-    assignmentStart: new Date()
+    start: new Date()
   };
 
   try {

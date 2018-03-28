@@ -20,7 +20,12 @@ CREATE TABLE project (
   CONSTRAINT pk_project PRIMARY KEY (id)
 );
 
--- data: {}
+-- data: {
+--   start: <date>,
+--   end: <date>,
+--   status: <string> NOT_PUBLISHED | PUBLISHED | DONE,
+--   ...
+-- }
 CREATE TABLE job (
   id bigserial NOT NULL,
   project_id bigint NOT NULL,
@@ -44,7 +49,15 @@ CREATE TABLE worker (
   CONSTRAINT uniq_turk_id unique (turk_id)
 );
 
--- data: {criteria: [c1_id, c2_id], finished: true, assignmentEnd: ...}
+-- data: {
+--   criteria: [<number>, <number>], 
+--   finished: <boolean>, 
+--   start: <date>, 
+--   end: <date>,
+--   finishedByWorker: <boolean>,
+--   finishedByMaxTasksRule: <boolean>,
+--   ...
+-- }
 CREATE TABLE worker_assignment (
   id bigserial NOT NULL,
   job_id bigint,

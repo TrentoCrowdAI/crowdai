@@ -68,7 +68,7 @@ const finishAssignment = (exports.finishAssignment = async (
 ) => {
   return await delegates.workers.updateAssignment(uuid, workerId, {
     finished: true,
-    assignmentEnd: new Date(),
+    end: new Date(),
     ...data
   });
 });

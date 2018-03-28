@@ -52,8 +52,8 @@ CREATE TABLE worker (
 -- data: {
 --   criteria: [<number>, <number>], 
 --   finished: <boolean>, 
---   assignmentEnd: <date>, 
---   assignmentStart: <date>,
+--   start: <date>, 
+--   end: <date>,
 --   finishedByWorker: <boolean>,
 --   finishedByMaxTasksRule: <boolean>,
 --   ...

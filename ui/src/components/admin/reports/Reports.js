@@ -1,5 +1,6 @@
-import React from 'react'
-import { connect } from 'react-redux'
+import React from 'react';
+import {connect} from 'react-redux';
+import PropTypes from 'prop-types';
 import {
   Step,
   Icon,
@@ -43,27 +44,28 @@ class Reports extends React.Component {
 
 	componentDidMount() {
 		//prova di fetch data da api
-		fetch('https://2mmbyxgwk6.execute-api.eu-central-1.amazonaws.com/reports')
+		/*fetch('https://2mmbyxgwk6.execute-api.eu-central-1.amazonaws.com/reports')
 		.then(response => response.json())
 		.then(json => {
 			//console.log("response:", json)
 			data = Object.values(json.tasks)
-		})
+		})*/
 	}
 
 	displayChart(metric) {
-		this.setState({
+		/*this.setState({
 			chart: metric
-		})
+		})*/
 	}
 
 	activeMetric(event) {
-		this.setState({
+		/*this.setState({
 			activeMetric: event.target.value
 		})
 		//console.log(event.target.value)
 		//event.target.className = 'metrics active'
 		this.displayChart(event.target.value)
+		*/
 	}
 
 	renderMetrics() {
@@ -124,6 +126,8 @@ class Reports extends React.Component {
 	}
 
 	render() {
+		console.log(this.props)
+
 		return(
 			<div style={{margin: '20px'}}>
 				
@@ -164,13 +168,13 @@ Reports.propTypes = {
 }
 
 const mapDispatchToProps = dispatch => ({
-	projects: state.project.list.projects,
-  error: state.project.list.error,
-  loading: state.project.list.loading
+	fetchReports: (pId,jId) => dispatch(actions.fetchReports(pId,jId))
 })
 
 const mapStateToProps = state => ({
-	fetchReports: (pId,jId) => dispatch(actions.fetchReports(pId,jId))
+	reports: state.reports.list.reports,
+  error: state.reports.list.error,
+  loading: state.reports.list.loading
 })
 
 export default connect(mapStateToProps,mapDispatchToProps)(Reports)

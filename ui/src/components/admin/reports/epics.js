@@ -8,10 +8,10 @@ import {flattenError} from 'src/utils';
 const fetchReports = (action$, store) =>
   action$.ofType(actionTypes.FETCH_ITEM).switchMap(action => {
     return Observable.defer(
-      () => (action.isWorker ? axios.get(`experiments/${action.id}`) : requestersApi.get(`experiments/${action.id}`))
+      () => (action.isWorker ? axios.get(`allTasksByJobId/${action.id}`) : requestersApi.get(`experiments/${action.id}`))
     )
       .mergeMap(response => Observable.of(actions.fetchItemSuccess(response.data)))
       .catch(error => Observable.of(actions.fetchItemError(flattenError(error))));
   });
 
-export default combineEpics(getProjects);
+export default combineEpics(getReports);

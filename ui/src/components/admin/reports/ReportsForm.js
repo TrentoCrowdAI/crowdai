@@ -23,7 +23,7 @@ import JobChooser from './JobChooser.js'
 
 var ProjectOptions = { }
 
-//var JobOptions = { }
+var JobOptions = { }
 
 const options = {
   columns: {
@@ -70,10 +70,20 @@ class ReportsForm extends React.Component {
     console.log(this.state)
   }
 
+  componentDidUpdate() {
+  	JobOptions = { }
+  	this.props.fetchExperiments(this.state.chosenproject);
+    this.props.experiments.rows.map( step => {
+      JobOptions[step.id] = step.data.name
+    });
+    console.log(this.state)
+  }
+
   chooseProject(e, {value}) {
   	this.setState({
   		...this.state,
 			chosenproject: value,
+			chosenjob: '',
 			activejob: true
 		})
   }
@@ -107,12 +117,14 @@ class ReportsForm extends React.Component {
 					onChange={this.chooseProject}
 				/>
 
-				<JobChooser 
-					active={!this.state.activejob}
-					value={this.state.chosenjob}
+				<Form.Select 
+					style={{margin: '10px'}}
+					label="Select Project  "
+        	value={this.state.chosenjob}
+					options={Object.entries(JobOptions).map(([key, val]) => ({text: val, value: key}))}
 					onChange={this.chooseJob}
 				/>
-				
+
 				<br />
 				<Link to={`/admin/reports/${this.state.chosenproject}/${this.state.chosenjob}`}>
 					<Button className='btn primary'>See Charts</Button>

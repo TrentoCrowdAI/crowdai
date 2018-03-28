@@ -63,10 +63,6 @@ class ReportsForm extends React.Component {
     	ProjectOptions[step.id] = step.data.name+" ( "+step.created_at+" ) "
     })
 
-    this.setState({
-    	chosenproject: this.props.projects.rows[0].id
-    })
-
     console.log(this.state)
   }
 
@@ -107,7 +103,7 @@ class ReportsForm extends React.Component {
       	/>
 
 			<div style={{margin: '20px'}}>
-      	<h3 style={{color: 'steelblue'}}>Choose a Project  {this.state.chosenproject}, {this.state.chosenjob}</h3>
+      	<h3 style={{color: 'steelblue'}}>Choose Project, Job =   {this.state.chosenproject}, {this.state.chosenjob}</h3>
 
 				<Form.Select 
 					style={{margin: '10px'}}
@@ -118,8 +114,9 @@ class ReportsForm extends React.Component {
 				/>
 
 				<Form.Select 
+					disabled={!this.state.activejob}
 					style={{margin: '10px'}}
-					label="Select Project  "
+					label="Select Job  "
         	value={this.state.chosenjob}
 					options={Object.entries(JobOptions).map(([key, val]) => ({text: val, value: key}))}
 					onChange={this.chooseJob}

@@ -3,7 +3,7 @@ import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
 import {Redirect, Link} from 'react-router-dom';
 import DataTable from 'src/components/core/table/DataTable';
-
+import {ExperimentStatus} from 'src/utils/constants';
 import {
   Step,
   Icon,
@@ -17,11 +17,13 @@ import {
   Accordion,
   Message
 } from 'semantic-ui-react';
-import { actions } from '../projects/actions';
+import { actions as projectactions } from '../projects/actions';
+import { actions as expactions } from '../experiments/actions';
+import JobChooser from './JobChooser.js'
 
-var ProjectOptions = {}
+var ProjectOptions = { }
 
-var JobOptions = { }
+//var JobOptions = { }
 
 const options = {
   columns: {
@@ -37,92 +39,85 @@ const options = {
   }
 }
 
-/*<Link to='/admin/reports/complete_time' ><Button
-					style={{width: '50%', margin: '5px'}}
-					>Time to comlplete a Task</Button></Link>
-				<br />
-				<Link to='/admin/reports/succ_percentage' ><Button
-					style={{width: '50%', margin: '5px'}}
-					>Percentage % of success</Button></Link>
-				<br />
-				<Link to='/admin/reports/agreements' ><Button
-					style={{width: '50%', margin: '5px'}}
-					>Agreement Reports</Button></Link>
-				<br />
-				<Link to='/admin/reports/others' ><Button
-					style={{width: '50%', margin: '5px'}}
-					>...</Button></Link>*/
-
 class ReportsForm extends React.Component {
 
 	constructor(props) {
 		super(props);
 		this.state = {
 			chosenproject : '',
-			chosenjob : 'jid1',
+			chosenjob : '',
 			activejob: false,
 			activechart: false
 		}
+		this.chooseProject = this.chooseProject.bind(this)
+		this.chooseJob = this.chooseJob.bind(this)
 	}
 
 	componentDidMount() {
+		//fetch projects as in the 'Projects' tab
     this.props.fetchProjects();
-    console.log(this.props.projects.rows)
-
+    //console.log(this.props.projects.rows)
+    
+    //map fetched project in option to choose for the reports
     this.props.projects.rows.map( step => {
-    	ProjectOptions[step.id] = step.data.name+" = "+step.created_at
+    	ProjectOptions[step.id] = step.data.name+" ( "+step.created_at+" ) "
     })
 
-    console.log(ProjectOptions)
+    this.setState({
+    	chosenproject: this.props.projects.rows[0].id
+    })
+
+    console.log(this.state)
+  }
+
+  chooseProject(e, {value}) {
+  	this.setState({
+  		...this.state,
+			chosenproject: value,
+			activejob: true
+		})
+  }
+
+  chooseJob(e, {value}) {
+  	this.setState({
+			...this.state, 
+			chosenjob: value,
+			activechart: true
+		})
   }
 
 	render() {
 		return(
 			<div>
-
 				<DataTable
 					title="Reminder of My Projects"
         	options={options}
         	data={this.props.projects.rows}
         	loading={this.props.loading}
       	/>
+
 			<div style={{margin: '20px'}}>
-      	<h3 
-      		style={{color: 'steelblue'}}
-      	>Choose a Project</h3>
+      	<h3 style={{color: 'steelblue'}}>Choose a Project  {this.state.chosenproject}, {this.state.chosenjob}</h3>
 
 				<Form.Select 
 					style={{margin: '10px'}}
 					label="Select Project  "
         	value={this.state.chosenproject}
 					options={Object.entries(ProjectOptions).map(([key, val]) => ({text: val, value: key}))}
-					onChange={(e, {value}) => this.setState({
-						...this.state, 
-						chosenproject: value,
-						activejob: true
-					})
-					//fetch jobs per project selected
-				}
+					onChange={this.chooseProject}
 				/>
 
-				<Form.Select 
-					disabled={!this.state.activejob}
-					style={{margin: '10px'}}
-					label="Select Job  "
-        	value={this.state.chosenjob}
-					options={Object.entries(JobOptions).map(([key, val]) => ({text: val, value: key}))}
-					onChange={(e, {value}) => this.setState({
-						...this.state, 
-						chosenjob: value,
-						activechart: true
-					})}
+				<JobChooser 
+					active={!this.state.activejob}
+					value={this.state.chosenjob}
+					onChange={this.chooseJob}
 				/>
 				
 				<br />
 				<Link to={`/admin/reports/${this.state.chosenproject}/${this.state.chosenjob}`}>
-					<Button 
-					className='btn primary charts'>See Charts</Button>
+					<Button className='btn primary'>See Charts</Button>
 				</Link>
+
 				</div>
 			</div>
 		);
@@ -133,20 +128,22 @@ ReportsForm.propTypes = {
   fetchProjects: PropTypes.func,
   error: PropTypes.object,
   loading: PropTypes.bool,
-  projects: PropTypes.shape({
-    rows: PropTypes.arrayOf(PropTypes.object),
-    meta: PropTypes.object
-  })
+  projects: PropTypes.object,
+  fetchExperiments: PropTypes.func,
+  experiments: PropTypes.object,
+  match: PropTypes.object
 }
 
 const mapStateToProps = state => ({
   projects: state.project.list.projects,
+  experiments: state.experiment.list.experiments,
   error: state.project.list.error,
   loading: state.project.list.loading
 })
 
 const mapDispatchToProps = dispatch => ({
-  fetchProjects: () => dispatch(actions.fetchProjects())
+  fetchProjects: () => dispatch(projectactions.fetchProjects()),
+  fetchExperiments: projectId => dispatch(expactions.fetchExperiments(projectId))
 })
 
 export default connect(mapStateToProps,mapDispatchToProps)(ReportsForm)

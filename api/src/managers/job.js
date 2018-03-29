@@ -301,14 +301,11 @@ const setupCronForHit = (job, hitId, mturk) => {
           });
         });
         console.log(`HIT: ${hitId} is ${hit.HITStatus}`);
+        const stop = await reviewAssignments(job, hit, mturk);
 
-        if (hit.HITStatus === 'Reviewable') {
-          const stop = await reviewAssignments(job, mturk);
-
-          if (stop) {
-            console.log(`Stopping cron job for HIT: ${hitId}`);
-            cronjob.stop();
-          }
+        if (stop) {
+          console.log(`Stopping cron job for HIT: ${hitId}`);
+          cronjob.stop();
         }
       } catch (error) {
         console.error(error);
@@ -324,25 +321,35 @@ const setupCronForHit = (job, hitId, mturk) => {
  * Approves or rejects submitted assignment for a HIT.
  *
  * @param {string} job
+ * @param {Object} hit
  * @param {Object} mturk
  */
-const reviewAssignments = async (job, mturk) => {
+const reviewAssignments = async (job, hit, mturk) => {
   const jobId = job.id;
   console.log(`Review assignments for job: ${jobId}`);
 
   try {
     const assignments = await delegates.jobs.getAssignments(jobId);
+
+    if (!assignments || assignments.rows.length === 0) {
+      return false;
+    }
     // We check if the job is actually done.
     const workerTmp = { id: assignments.rows[0].worker_id };
     const jobDone = await checkJobDone(job, workerTmp);
 
-    if (!jobDone) {
+    if (hit.HITStatus === 'Assignable' && jobDone) {
+      await stop(job);
+      return false;
+    }
+
+    if (hit.HITStatus === 'Reviewable' && !jobDone) {
       console.debug(
         `Job: ${job.id} is not done yet. Adding more Assignments for HIT ${
-          job.data.hit.HITId
+          hit.HITId
         }`
       );
-      await createAdditionalAssignmentsForHIT(job.data.hit.HITId, mturk);
+      await createAdditionalAssignmentsForHIT(hit.HITId, mturk);
       return false;
     }
 
@@ -491,7 +498,7 @@ const sendBonus = async (uuid, workerId, assignmentId, mturk) => {
     AssignmentId: assignmentId,
     BonusAmount: `${reward}`,
     Reason: 'Reward based on the number of answers given',
-    WorkerId: workerId
+    WorkerId: worker.turk_id
   };
   return await new Promise((resolve, reject) => {
     mturk.sendBonus(payload, (err, data) => {

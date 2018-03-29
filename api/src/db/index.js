@@ -2,13 +2,22 @@ const { Pool } = require('pg');
 
 const config = require(__base + 'config');
 
-const pool = new Pool({
+let credentials = {
   database: config.db.database,
   host: config.db.host,
   port: config.db.port,
   user: config.db.user,
   password: config.db.password
-});
+};
+
+if (config.db.url) {
+  // if a db URL is provided, we use it.
+  credentials = {
+    connectionString: config.db.url
+  };
+}
+
+const pool = new Pool(credentials);
 
 const TABLES = Object.freeze({
   Requester: 'requester',

@@ -6,7 +6,9 @@ module.exports = {
     password: process.env.PGPASSWORD,
     host: process.env.PGHOST,
     port: process.env.PGPORT,
-    database: process.env.PGDATABASE
+    database: process.env.PGDATABASE,
+    // heroku postgres adds automatically the following variable.
+    url: process.env.DATABASE_URL
   },
   google: {
     clientId: process.env.GOOGLE_CLIENT_ID,

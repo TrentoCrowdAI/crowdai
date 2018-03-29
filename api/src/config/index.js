@@ -8,16 +8,6 @@ module.exports = {
     port: process.env.PGPORT,
     database: process.env.PGDATABASE
   },
-  rules: {
-    maxTasks: Number(process.env.MAX_TASKS_RULE),
-    taskReward: Number(process.env.TASK_REWARD_RULE),
-    testFrequency: Number(process.env.TEST_FREQUENCY_RULE),
-    initialTests: Number(process.env.INITIAL_TESTS_RULE),
-    initialTestsMinCorrectAnswers: Number(
-      process.env.INITIAL_TEST_MIN_CORRECT_ANSWERS_RULE
-    ),
-    votesPerTask: Number(process.env.VOTES_PER_TASK_RULE)
-  },
   google: {
     clientId: process.env.GOOGLE_CLIENT_ID,
     secret: process.env.GOOGLE_CLIENT_SECRET

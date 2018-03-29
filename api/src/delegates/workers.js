@@ -4,6 +4,24 @@ const db = require(__base + 'db');
 const config = require(__base + 'config');
 
 /**
+ * Returns a worker record for the given ID.
+ *
+ * @param {String} id
+ */
+const getById = (exports.getById = async id => {
+  try {
+    let res = await db.query(
+      `select * from ${db.TABLES.Worker} where id = $1`,
+      [id]
+    );
+    return res.rowCount > 0 ? res.rows[0] : null;
+  } catch (error) {
+    console.error(error);
+    throw Boom.badImplementation('Error while trying to fetch worker');
+  }
+});
+
+/**
  * Returns a worker record for the given AMT ID.
  *
  * @param {String} turkId

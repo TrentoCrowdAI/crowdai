@@ -41,7 +41,7 @@ exports.nextTask = async (uuid, turkId, assignmentTurkId) => {
     let response = await taskManager.generateTasks(job, worker);
 
     if (response.items.length === 0) {
-      return await stateManager.finishAssignmentByWorkerId(job.uuid, worker.id);
+      return await stateManager.finishAssignment(job.uuid, worker.id);
     }
     const runQuiz = await qualityManager.shouldRunInitialTest(job, worker);
 

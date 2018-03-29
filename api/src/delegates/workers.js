@@ -104,6 +104,10 @@ const getAssignmentByWorkerTurkId = (exports.getAssignmentByWorkerTurkId = async
 ) => {
   try {
     let worker = await getByTurkId(workerTurkId);
+
+    if (!worker) {
+      return null;
+    }
     const res = await db.query(
       `select * from ${
         db.TABLES.WorkerAssignment

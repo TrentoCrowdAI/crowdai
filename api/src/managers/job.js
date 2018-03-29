@@ -339,6 +339,7 @@ const reviewAssignments = async (job, hit, mturk) => {
     const jobDone = await checkJobDone(job, workerTmp);
 
     if (hit.HITStatus === 'Assignable' && jobDone) {
+      console.debug(`Job: ${job.id} is done. Running stop logic.`);
       await stop(job);
       return false;
     }

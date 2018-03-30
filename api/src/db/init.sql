@@ -25,8 +25,8 @@ CREATE TABLE project (
 --   end: <date>,
 --   status: <string> NOT_PUBLISHED | PUBLISHED | DONE,
 --   instructions: {
---     C1_ID: {taskInstructionsUrl: '', format: ''},
---     C2_ID: {taskInstructionsUrl: '', format: ''} 
+--     C1_ID: {taskInstructionsUrl: '', format: '', content: ''},
+--     C2_ID: {taskInstructionsUrl: '', format: '', content: ''} 
 --   }
 --   ...
 -- }

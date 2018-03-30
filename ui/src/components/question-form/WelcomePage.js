@@ -3,15 +3,13 @@ import {Grid, Button, Segment, Dimmer, Loader, Message, Accordion, Header, Check
 import {Link} from 'react-router-dom';
 import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
-import showdown from 'showdown';
-import sanitizeHtml from 'sanitize-html';
 
-import Instructions from './Instructions';
+// import Instructions from './Instructions';
 import {actions} from './actions';
 import {actions as experimentActions} from 'src/components/admin/experiments/actions';
 import config from 'src/config/config.json';
 import RewardWidget from 'src/components/reward-widget/RewardWidget';
-import {FileFormats} from 'src/utils/constants';
+import FileRenderer from 'src/components/core/FileRenderer';
 
 class WelcomePage extends React.Component {
   state = {open: true, consentOk: false};
@@ -23,6 +21,7 @@ class WelcomePage extends React.Component {
 
   render() {
     const {open} = this.state;
+    let project = this.props.item.project || {};
 
     return (
       <Grid.Row centered style={{marginBottom: '10px'}}>
@@ -37,21 +36,21 @@ class WelcomePage extends React.Component {
               <Segment>
                 {!this.props.item.id && <p>Loading information...</p>}
                 {this.props.item.id &&
-                  !this.props.item.consent && (
+                  !project.consent && (
                     <p style={{textAlign: 'justify'}}>
                       The information is available{' '}
-                      <a href={this.props.item.consentUrl} target="_blank">
+                      <a href={project.consentUrl} target="_blank">
                         here
                       </a>
                     </p>
                   )}
 
-                {this.props.item.consent && this.renderConsent()}
+                {project.consent && <FileRenderer content={project.consent} format={project.consentFormat} />}
               </Segment>
             </Accordion.Content>
           </Accordion>
         </div>
-        <Instructions />
+        {/* <Instructions /> */}
 
         {this.props.assigmentStatusLoading && (
           <Segment vertical style={{borderBottom: 0}}>
@@ -116,29 +115,6 @@ class WelcomePage extends React.Component {
           <form id="turkForm" method="POST" />
         </React.Fragment>
       );
-    }
-  }
-
-  renderConsent() {
-    const {consent, consentFormat} = this.props.item;
-    let converter = new showdown.Converter();
-    switch (consentFormat) {
-      case FileFormats.MARKDOWN:
-        return <div dangerouslySetInnerHTML={{__html: converter.makeHtml(consent)}} />;
-      case FileFormats.HTML:
-        return (
-          <div
-            dangerouslySetInnerHTML={{
-              __html: sanitizeHtml(consent, {
-                // by default sanitize does not allow h1, h2 and br.
-                allowedTags: [...sanitizeHtml.defaults.allowedTags, 'h1', 'h2', 'br']
-              })
-            }}
-          />
-        );
-      default:
-        // by default we assume PLAIN_TEXT
-        return <p>{consent}</p>;
     }
   }
 

@@ -1,6 +1,5 @@
 import React from 'react';
 import {
-  Container,
   Form,
   Button,
   Grid,
@@ -10,12 +9,14 @@ import {
   Step,
   Segment,
   Radio,
-  Checkbox
+  Checkbox,
+  Header
 } from 'semantic-ui-react';
 import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
 
 import {actions} from './actions';
+import FormContainer from 'src/components/core/form/FormContainer';
 import {
   FileFormats,
   CrowdsourcingStrategies,
@@ -37,68 +38,53 @@ class ExperimentForm extends React.Component {
 
   render() {
     return (
-      <Container>
-        <Grid container centered>
-          <Grid.Row style={{padding: 0}}>
-            <Grid.Column width="4">
-              <h1>New screening</h1>
-            </Grid.Column>
-          </Grid.Row>
-          <Grid.Row>
-            <Grid.Column width="10">
-              <Form
-                error={this.props.error !== undefined}
-                loading={this.props.loading}
-                success={this.props.saved}
-                onSubmit={() => this.props.submit()}>
-                <div style={{marginBottom: 20}}>
-                  <Step.Group attached="top">
-                    <Step active={this.state.activeStep === 'info'} onClick={() => this.setStep('info')}>
-                      <Icon name="setting" />
-                      <Step.Content>
-                        <Step.Title>Screening details</Step.Title>
-                      </Step.Content>
-                    </Step>
+      <FormContainer title="New job">
+        <Form
+          error={this.props.error !== undefined}
+          loading={this.props.loading}
+          success={this.props.saved}
+          onSubmit={() => this.props.submit()}>
+          <div style={{marginBottom: 20}}>
+            <Step.Group attached="top">
+              <Step active={this.state.activeStep === 'info'} onClick={() => this.setStep('info')}>
+                <Icon name="setting" />
+                <Step.Content>
+                  <Step.Title>Job details</Step.Title>
+                </Step.Content>
+              </Step>
 
-                    <Step active={this.state.activeStep === 'criteria'} onClick={() => this.setStep('criteria')}>
-                      <Icon name="filter" />
-                      <Step.Content>
-                        <Step.Title>Criteria knowledge</Step.Title>
-                      </Step.Content>
-                    </Step>
-                  </Step.Group>
+              <Step active={this.state.activeStep === 'criteria'} onClick={() => this.setStep('criteria')}>
+                <Icon name="filter" />
+                <Step.Content>
+                  <Step.Title>Criteria knowledge</Step.Title>
+                </Step.Content>
+              </Step>
+            </Step.Group>
 
-                  <Segment attached>
-                    {this.state.activeStep === 'info'
-                      ? this.renderExperimentInformation()
-                      : this.renderCriteriaKnowledge()}
-                  </Segment>
-                </div>
+            <Segment attached>
+              {this.state.activeStep === 'info' ? this.renderExperimentInformation() : this.renderCriteriaKnowledge()}
+            </Segment>
+          </div>
 
-                {this.props.error && (
-                  <Message
-                    error
-                    header="Error"
-                    content={this.props.error.message || 'Changes not saved. Please try again.'}
-                  />
-                )}
-                {this.props.saved && <Message success header="Success" content="Changes saved!" />}
-                <Button floated="right" positive>
-                  Save
-                </Button>
-                <Button
-                  floated="right"
-                  type="button"
-                  onClick={() =>
-                    this.props.history.push(`/admin/projects/${this.props.match.params.projectId}/screenings`)
-                  }>
-                  Cancel
-                </Button>
-              </Form>
-            </Grid.Column>
-          </Grid.Row>
-        </Grid>
-      </Container>
+          {this.props.error && (
+            <Message
+              error
+              header="Error"
+              content={this.props.error.message || 'Changes not saved. Please try again.'}
+            />
+          )}
+          {this.props.saved && <Message success header="Success" content="Changes saved!" />}
+          <Button floated="right" positive>
+            Save
+          </Button>
+          <Button
+            floated="right"
+            type="button"
+            onClick={() => this.props.history.push(`/admin/projects/${this.props.match.params.projectId}/screenings`)}>
+            Cancel
+          </Button>
+        </Form>
+      </FormContainer>
     );
   }
 
@@ -107,96 +93,75 @@ class ExperimentForm extends React.Component {
 
     return (
       <React.Fragment>
-        <Form.Group>
-          <Form.Input
-            width={6}
-            label="Name"
-            name="data.name"
-            value={item.data.name}
-            placeholder="Screening name"
-            onChange={this.handleChange}
-            required
-          />
+        <Segment>
+          <Header as="h3">Basic information</Header>
 
-          <Form.Input
-            width={5}
-            label="Task instructions URL"
-            name="data.taskInstructionsUrl"
-            value={item.data.taskInstructionsUrl}
-            placeholder="URL to file"
-            onChange={this.handleChange}
-            required
-          />
-
-          <Form.Select
-            width={4}
-            label="Format"
-            name="data.taskInstructionsFormat"
-            value={item.data.taskInstructionsFormat}
-            options={Object.values(FileFormats).map(v => ({text: v, value: v}))}
+          <Form.Group widths="equal">
+            <Form.Input
+              label="Name"
+              name="data.name"
+              value={item.data.name}
+              placeholder="Job name"
+              onChange={this.handleChange}
+              required
+            />
+          </Form.Group>
+          <Form.TextArea
+            label="Description"
+            name="data.description"
+            placeholder="The screening description, as it will appear on Amazon Mechanical Turk"
+            value={item.data.description}
             onChange={this.handleChange}
           />
-        </Form.Group>
-
-        <Form.TextArea
-          label="Description"
-          name="data.description"
-          placeholder="The screening description, as it will appear on Amazon Mechanical Turk"
-          value={item.data.description}
-          onChange={this.handleChange}
-        />
+        </Segment>
 
         {this.renderCriteriaSection()}
 
-        <Form.Field>
-          <Checkbox
-            label="Assist me in criteria quality analysis"
-            name="data.criteriaQualityAnalysis"
-            checked={item.data.criteriaQualityAnalysis}
-            onChange={(e, {name, value}) => this.handleChange(e, {name, value: !item.data.criteriaQualityAnalysis})}
-          />
-        </Form.Field>
+        <Segment>
+          <Header as="h3">Task design</Header>
+          <Form.Group widths="equal">
+            <Form.Select
+              label="Smart abstract presentation technique"
+              name="data.abstractPresentationTechnique"
+              value={item.data.abstractPresentationTechnique}
+              options={Object.entries(AbstractPresentationTechniques).map(([key, val]) => ({text: val, value: key}))}
+              onChange={this.handleChange}
+            />
+            <Form.Select
+              label="Label options"
+              name="data.labelOptions"
+              value={item.data.labelOptions}
+              options={Object.entries(LabelOptions).map(([key, val]) => ({text: val, value: key}))}
+              onChange={this.handleChange}
+            />
+          </Form.Group>
 
-        <Form.Group widths="equal">
-          <Form.Select
-            label="Smart abstract presentation technique"
-            name="data.abstractPresentationTechnique"
-            value={item.data.abstractPresentationTechnique}
-            options={Object.entries(AbstractPresentationTechniques).map(([key, val]) => ({text: val, value: key}))}
-            onChange={this.handleChange}
-          />
-          <Form.Select
-            label="Label options"
-            name="data.labelOptions"
-            value={item.data.labelOptions}
-            options={Object.entries(LabelOptions).map(([key, val]) => ({text: val, value: key}))}
-            onChange={this.handleChange}
-          />
-        </Form.Group>
+          {this.state.expertMode && (
+            <Form.Select
+              label="Task assignment strategy"
+              name="data.crowdsourcingStrategy"
+              value={item.data.crowdsourcingStrategy}
+              options={Object.entries(CrowdsourcingStrategies).map(([key, val]) => ({text: val, value: key}))}
+              onChange={this.handleChange}
+            />
+          )}
+        </Segment>
 
-        <div hidden={!this.state.expertMode}>
-          <Form.Select
-            label="Crowdsourcing strategy"
-            name="data.crowdsourcingStrategy"
-            value={item.data.crowdsourcingStrategy}
-            options={Object.entries(CrowdsourcingStrategies).map(([key, val]) => ({text: val, value: key}))}
-            onChange={this.handleChange}
-          />
-
-          {this.renderParametersSection()}
-        </div>
+        {this.renderParametersSection()}
       </React.Fragment>
     );
   }
 
   renderCriteriaSection() {
     const {item} = this.props;
+    const {criteria} = this.props.project;
 
     return (
-      <div style={{marginBottom: '1em'}}>
-        <h3>Criteria</h3>
+      <Segment>
+        <Header as="h3">Criteria</Header>
         <Form.Field>
           <Radio
+            disabled={criteria && criteria.length === 1}
             label="Ask worker each worker multiple criteria"
             name="data.multipleCriteria"
             value={1}
@@ -205,6 +170,19 @@ class ExperimentForm extends React.Component {
           />
         </Form.Field>
         <div style={{marginBottom: '1em', marginLeft: '2em'}}>
+          {criteria &&
+            criteria.map(c => (
+              <Form.Field key={c.id}>
+                <Checkbox
+                  label={`(${c.data.label}) ${c.data.description}`}
+                  onChange={this.toggle}
+                  checked={this.state.checked}
+                  disabled={!item.data.multipleCriteria}
+                />
+              </Form.Field>
+            ))}
+        </div>
+        {/* <div style={{marginBottom: '1em', marginLeft: '2em'}}>
           <Form.Field>
             <Checkbox
               label="(C1) Check this box"
@@ -229,7 +207,8 @@ class ExperimentForm extends React.Component {
               disabled={!item.data.multipleCriteria}
             />
           </Form.Field>
-        </div>
+        </div> */}
+
         <Form.Field>
           <Radio
             label="Ask each worker one criterion only"
@@ -239,7 +218,45 @@ class ExperimentForm extends React.Component {
             onChange={(e, {name, value}) => this.handleChange(e, {name, value: !!value})}
           />
         </Form.Field>
-      </div>
+
+        <Form.Field style={{marginTop: '2em', marginBottom: '2em'}}>
+          <Checkbox
+            label="Assist me in criteria quality analysis"
+            name="data.criteriaQualityAnalysis"
+            checked={item.data.criteriaQualityAnalysis}
+            onChange={(e, {name, value}) => this.handleChange(e, {name, value: !item.data.criteriaQualityAnalysis})}
+          />
+        </Form.Field>
+
+        {criteria &&
+          criteria.map(c => (
+            <div key={c.id}>
+              <Header as="h5">
+                ({c.data.label}) {c.data.description}
+              </Header>
+              <Form.Group>
+                <Form.Input
+                  width={10}
+                  label="Task instructions URL"
+                  name={`data.instructions[${c.id}].taskInstructionsUrl`}
+                  value={item.data.instructions[c.id] ? item.data.instructions[c.id].taskInstructionsUrl : ''}
+                  placeholder="URL to file"
+                  onChange={this.handleChange}
+                  required
+                />
+
+                <Form.Select
+                  width={6}
+                  label="Format"
+                  name={`data.instructions[${c.id}].format`}
+                  value={item.data.instructions[c.id] ? item.data.instructions[c.id].format : FileFormats.PLAIN_TEXT}
+                  options={Object.values(FileFormats).map(v => ({text: v, value: v}))}
+                  onChange={this.handleChange}
+                />
+              </Form.Group>
+            </div>
+          ))}
+      </Segment>
     );
   }
 
@@ -295,6 +312,10 @@ class ExperimentForm extends React.Component {
 
   renderParametersSection() {
     const {item} = this.props;
+
+    if (!this.state.expertMode) {
+      return;
+    }
     return (
       <Accordion styled style={{width: '100%', marginBottom: 20}}>
         <Accordion.Title active={this.state.showRules} index={0} onClick={this.showRulesClick}>
@@ -413,14 +434,16 @@ ExperimentForm.propTypes = {
   setInputValue: PropTypes.func,
   cleanState: PropTypes.func,
   history: PropTypes.object,
-  match: PropTypes.object
+  match: PropTypes.object,
+  project: PropTypes.object
 };
 
 const mapStateToProps = state => ({
   item: state.experiment.form.item,
   loading: state.experiment.form.loading,
   error: state.experiment.form.error,
-  saved: state.experiment.form.saved
+  saved: state.experiment.form.saved,
+  project: state.project.form.item
 });
 
 const mapDispatchToProps = dispatch => ({

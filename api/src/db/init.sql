@@ -24,6 +24,10 @@ CREATE TABLE project (
 --   start: <date>,
 --   end: <date>,
 --   status: <string> NOT_PUBLISHED | PUBLISHED | DONE,
+--   instructions: {
+--     C1_ID: {taskInstructionsUrl: '', format: '', content: ''},
+--     C2_ID: {taskInstructionsUrl: '', format: '', content: ''} 
+--   }
 --   ...
 -- }
 CREATE TABLE job (

@@ -55,6 +55,10 @@ const checkAssignmentStatus = (action$, store) =>
   action$.ofType(actionTypes.CHECK_ASSIGNMENT_STATUS).switchMap(action => {
     const {session} = store.getState().questionForm;
 
+    if (!session.workerId) {
+      return Observable.of(actions.checkAssignmentStatusSuccess({data: {}}));
+    }
+
     return Observable.defer(() =>
       axios.get(`/jobs/${session.experimentId}/workers/${session.workerId}/assignment-status`)
     )

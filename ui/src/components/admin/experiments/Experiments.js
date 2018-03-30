@@ -69,7 +69,7 @@ class Experiments extends React.Component {
   render() {
     return (
       <DataTable
-        title="My screenings"
+        title="My jobs"
         options={options}
         data={this.props.experiments.rows}
         createUrl={`${this.props.match.url}/new`}

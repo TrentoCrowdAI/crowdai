@@ -1,5 +1,6 @@
 const Boom = require('boom');
 const uuid = require('uuid/v4');
+const request = require('request');
 
 const db = require(__base + 'db');
 
@@ -41,10 +42,44 @@ const getByUuid = (exports.getByUuid = async uuid => {
 });
 
 /**
+ * Download the instructions of the job specified in job.data.instructions property.
+ *
+ * @param {Object} job
+ * @return {Object} -- {C1_ID: {content: '', format: '', taskInstructionsUrl: ''}, C2_ID: {content: '', format: '', taskInstructionsUrl: ''}}
+ */
+const getInstructions = (exports.getInstructions = async job => {
+  let instructions = {};
+  try {
+    for ([criteriaId, e] of Object.entries(job.data.instructions)) {
+      instructions[criteriaId] = {
+        ...e
+      };
+      instructions[criteriaId].content = await new Promise(
+        (resolve, reject) => {
+          request(e.taskInstructionsUrl, (err, rsp, body) => {
+            if (err) {
+              reject(err);
+            } else {
+              resolve(rsp.body);
+            }
+          });
+        }
+      );
+    }
+    return instructions;
+  } catch (error) {
+    console.error(error);
+    throw Boom.badImplementation(
+      'Error while trying to fetch the instructions'
+    );
+  }
+});
+
+/**
  * Get the requester associated with the job.
  *
  * @param {Number} id - The job ID
- * @returns {Object}
+ * @return {Object}
  */
 const getRequester = (exports.getRequester = async id => {
   try {

@@ -27,22 +27,30 @@ const getTestForWorker = (exports.getTestForWorker = async (
     worker.id,
     criteria
   );
+  let testTask;
 
   if (testRecord.test_id) {
-    return testRecord;
+    testTask = testRecord;
+  } else {
+    testTask = await delegates.testTasks.createTestTask({
+      job_id: job.id,
+      worker_id: worker.id,
+      test_id: testRecord.id,
+      data: {
+        initial: initialTest,
+        item: testRecord.data.item,
+        criteria: testRecord.data.criteria,
+        answered: false,
+        start: new Date()
+      }
+    });
   }
-  return await delegates.testTasks.createTestTask({
-    job_id: job.id,
-    worker_id: worker.id,
-    test_id: testRecord.id,
-    data: {
-      initial: initialTest,
-      item: testRecord.data.item,
-      criteria: testRecord.data.criteria,
-      answered: false,
-      start: new Date()
-    }
-  });
+  testTask.instructions = [];
+
+  for (let c of testTask.data.criteria) {
+    testTask.instructions.push(job.data.instructions[c.id]);
+  }
+  return testTask;
 });
 
 /**

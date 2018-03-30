@@ -1,5 +1,5 @@
-import set from 'set-value';
 import cloneDeep from 'clone-deep';
+import set from 'lodash.set';
 
 const getActionTypes = scope => {
   return {

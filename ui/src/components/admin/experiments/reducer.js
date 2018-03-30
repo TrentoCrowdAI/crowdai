@@ -47,8 +47,7 @@ const genericFormReducer = getReducer(scopes.EXPERIMENTS, {
     description: '',
     requesterId: '',
     status: ExperimentStatus.NOT_PUBLISHED,
-    taskInstructionsUrl: '',
-    taskInstructionsFormat: FileFormats.PLAIN_TEXT,
+    instructions: {},
     // True: ask each worker multiple criteria per paper. False: ask one criterion only per paper.
     multipleCriteria: false,
     criteriaQualityAnalysis: false,

@@ -9,8 +9,7 @@ import ReportsForm from './ReportsForm'
 const ReportsRoute = props => (
   <React.Fragment>
     <Route exact path={`${props.match.url}/`} component={ReportsForm} />
-    <Route exact path={`${props.match.url}/:projectid/:jobid`} component={Reports} />
-    <Route exact path={`${props.match.url}/:else`} component={ReportsForm} />
+    <Route exact path={`${props.match.url}/:projectid`} component={Reports} />
   </React.Fragment>
 );
 

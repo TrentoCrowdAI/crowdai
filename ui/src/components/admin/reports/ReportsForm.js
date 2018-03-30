@@ -18,11 +18,8 @@ import {
   Message
 } from 'semantic-ui-react';
 import { actions as projectactions } from '../projects/actions';
-import { actions as expactions } from '../experiments/actions';
 
 var ProjectOptions = { }
-
-var JobOptions = { }
 
 const options = {
   columns: {
@@ -44,51 +41,30 @@ class ReportsForm extends React.Component {
 		super(props);
 		this.state = {
 			chosenproject : '',
-			chosenjob : '',
-			activejob: false,
 			activechart: false
 		}
 		this.chooseProject = this.chooseProject.bind(this)
-		this.chooseJob = this.chooseJob.bind(this)
 	}
 
 	componentDidMount() {
-		//fetch projects as in the 'Projects' tab
     this.props.fetchProjects();
-    //console.log(this.props.projects.rows)
-    
-    //map fetched project in option to choose for the reports
+
     this.props.projects.rows.map( step => {
     	ProjectOptions[step.id] = step.data.name+" ( "+step.created_at+" ) "
     })
-    //console.log(this.state)
   }
 
   chooseProject(e, {value}) {
   	this.setState({
   		...this.state,
 			chosenproject: value,
-			chosenjob: '',
-			activejob: true
-		})
-  	this.props.fetchExperiments(value);
-  }
-
-  chooseJob(e, {value}) {
-  	this.setState({
-			...this.state, 
-			chosenjob: value,
 			activechart: true
 		})
   }
 
 	render() {
-
-		JobOptions = { }
-    this.props.experiments.rows.map( step => {
-      JobOptions[step.id] = step.data.name
-    });
-
+    console.log(this.props)
+    console.log(this.state)
 		return(
 			<div>
 				<DataTable
@@ -99,7 +75,7 @@ class ReportsForm extends React.Component {
       	/>
 
 			<div style={{margin: '20px'}}>
-      	<h3 style={{color: 'steelblue'}}>Chosen Project_id, Job_id =   {this.state.chosenproject}, {this.state.chosenjob}</h3>
+      	<h3 style={{color: 'steelblue'}}>Chosen Project {this.state.chosenproject}</h3>
 
 				<Form.Select 
 					style={{margin: '10px'}}
@@ -109,17 +85,8 @@ class ReportsForm extends React.Component {
 					onChange={this.chooseProject}
 				/>
 
-				<Form.Select 
-					disabled={!this.state.activejob}
-					style={{margin: '10px'}}
-					label="Select Job  "
-        	value={this.state.chosenjob}
-					options={Object.entries(JobOptions).map(([key, val]) => ({text: val, value: key}))}
-					onChange={this.chooseJob}
-				/>
-
 				<div style={{textAlign: 'center'}}>
-				<Link to={`/admin/reports/${this.state.chosenproject}/${this.state.chosenjob}`}>
+				<Link to={`/admin/reports/${this.state.chosenproject}`}>
 					<Button className='btn primary' 
                   disabled={!this.state.activechart}
                   >See Charts</Button>
@@ -136,28 +103,17 @@ ReportsForm.propTypes = {
   fetchProjects: PropTypes.func,
   error: PropTypes.object,
   loading: PropTypes.bool,
-  projects: PropTypes.object,
-
-  fetchExperiments: PropTypes.func,
-  eerror: PropTypes.any,
-  eloading: PropTypes.bool,
-  experiments: PropTypes.object,
-  match: PropTypes.object
+  projects: PropTypes.object
 }
 
 const mapStateToProps = state => ({
   projects: state.project.list.projects,
   error: state.project.list.error,
-  loading: state.project.list.loading,
-
-  experiments: state.experiment.list.experiments,
-  eerror: state.experiment.list.error,
-  eloading: state.experiment.list.loading
+  loading: state.project.list.loading
 })
 
 const mapDispatchToProps = dispatch => ({
-  fetchProjects: () => dispatch(projectactions.fetchProjects()),
-  fetchExperiments: projectId => dispatch(expactions.fetchExperiments(projectId))
+  fetchProjects: () => dispatch(projectactions.fetchProjects())
 })
 
 export default connect(mapStateToProps,mapDispatchToProps)(ReportsForm)

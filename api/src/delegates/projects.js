@@ -39,6 +39,8 @@ const getById = (exports.getById = async id => {
         }
       });
     });
+    res = await getCriteria(id);
+    project.criteria = res.rows;
     return project;
   } catch (error) {
     console.error(error);
@@ -115,7 +117,7 @@ const getItemsCount = (exports.getItemsCount = async projectId => {
  * Returns the criterion list associated with the project
  *
  * @param {Number} id - The project's ID
- * @return {Object[]}
+ * @return {Object}
  */
 const getCriteria = (exports.getCriteria = async id => {
   try {

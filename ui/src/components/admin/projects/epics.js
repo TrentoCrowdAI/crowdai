@@ -2,7 +2,7 @@ import {Observable} from 'rxjs';
 import {combineEpics} from 'redux-observable';
 
 import {actionTypes, actions} from './actions';
-import axios, {requestersApi} from 'src/utils/axios';
+import {requestersApi} from 'src/utils/axios';
 import {flattenError} from 'src/utils';
 
 const getProjects = (action$, store) =>
@@ -27,13 +27,11 @@ const saveProject = (action$, store) =>
       .catch(error => Observable.of(actions.submitError(flattenError(error))));
   });
 
-const fetchExperiment = (action$, store) =>
+const fetchProject = (action$, store) =>
   action$.ofType(actionTypes.FETCH_ITEM).switchMap(action => {
-    return Observable.defer(
-      () => (action.isWorker ? axios.get(`experiments/${action.id}`) : requestersApi.get(`experiments/${action.id}`))
-    )
+    return Observable.defer(() => requestersApi.get(`projects/${action.id}`))
       .mergeMap(response => Observable.of(actions.fetchItemSuccess(response.data)))
       .catch(error => Observable.of(actions.fetchItemError(flattenError(error))));
   });
 
-export default combineEpics(getProjects, saveProject, fetchExperiment);
+export default combineEpics(getProjects, saveProject, fetchProject);

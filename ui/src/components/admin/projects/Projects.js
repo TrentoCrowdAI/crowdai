@@ -9,37 +9,6 @@ import DataTable from 'src/components/core/table/DataTable';
 
 const ACCOUNT_NOT_INITIALIZED = 'Requester account has not been initialized';
 
-// configuration options for our DataTable.
-const options = {
-  columns: {
-    name: {
-      label: 'Name',
-      renderer(item) {
-        return item.data.name;
-      }
-    },
-    created_at: {
-      label: 'Date created'
-    }
-  },
-
-  actions: {
-    label: 'Actions',
-    renderer(item) {
-      return (
-        <React.Fragment>
-          <Button icon color="blue" size="mini" as={Link} to={`/admin/projects/${item.id}/edit`}>
-            <Icon name="edit" />
-          </Button>
-          <Button icon color="blue" size="mini" as={Link} to={`/admin/projects/${item.id}/screenings`}>
-            <Icon name="list layout" />
-          </Button>
-        </React.Fragment>
-      );
-    }
-  }
-};
-
 class Projects extends React.Component {
   render() {
     if (this.props.error && this.props.error.message === ACCOUNT_NOT_INITIALIZED) {
@@ -48,7 +17,7 @@ class Projects extends React.Component {
     return (
       <DataTable
         title="My projects"
-        options={options}
+        options={getOptions(this.props)}
         data={this.props.projects.rows}
         createUrl="/admin/projects/new"
         loading={this.props.loading}
@@ -61,6 +30,52 @@ class Projects extends React.Component {
   }
 }
 
+/**
+ * Returns the configuration options for the DataTable.
+ *
+ * @param {Object} props
+ * @return {Object}
+ */
+const getOptions = props => {
+  return {
+    columns: {
+      name: {
+        label: 'Name',
+        renderer(item) {
+          return item.data.name;
+        }
+      },
+      created_at: {
+        label: 'Date created'
+      }
+    },
+
+    actions: {
+      label: 'Actions',
+      renderer(item) {
+        return (
+          <React.Fragment>
+            <Button icon color="blue" size="mini" as={Link} to={`/admin/projects/${item.id}/edit`}>
+              <Icon name="edit" />
+            </Button>
+            <Button
+              icon
+              color="blue"
+              size="mini"
+              as={Link}
+              to={`/admin/projects/${item.id}/screenings`}
+              onClick={() => {
+                props.fetchItem(item.id);
+              }}>
+              <Icon name="list layout" />
+            </Button>
+          </React.Fragment>
+        );
+      }
+    }
+  };
+};
+
 Projects.propTypes = {
   fetchProjects: PropTypes.func,
   error: PropTypes.object,
@@ -68,7 +83,8 @@ Projects.propTypes = {
   projects: PropTypes.shape({
     rows: PropTypes.arrayOf(PropTypes.object),
     meta: PropTypes.object
-  })
+  }),
+  fetchItem: PropTypes.func
 };
 
 const mapStateToProps = state => ({
@@ -78,7 +94,8 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-  fetchProjects: () => dispatch(actions.fetchProjects())
+  fetchProjects: () => dispatch(actions.fetchProjects()),
+  fetchItem: id => dispatch(actions.fetchItem(id))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Projects);

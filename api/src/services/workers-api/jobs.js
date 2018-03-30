@@ -15,9 +15,11 @@ const getByUuid = async ctx => {
   ctx.response.body = {
     id: job.id,
     uuid: job.uuid,
-    consentUrl: project.data.consentUrl,
-    consentFormat: project.data.consentFormat,
-    consent: project.consent
+    project: {
+      consentUrl: project.data.consentUrl,
+      consentFormat: project.data.consentFormat,
+      consent: project.consent
+    }
   };
 };
 

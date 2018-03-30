@@ -63,7 +63,13 @@ exports.nextTask = async (uuid, turkId, assignmentTurkId) => {
         false
       );
     }
-    return await delegates.tasks.getTaskFromBuffer(job.id, worker.id);
+    let task = await delegates.tasks.getTaskFromBuffer(job.id, worker.id);
+    task.instructions = [];
+
+    for (let c of task.data.criteria) {
+      task.instructions.push(job.data.instructions[c.id]);
+    }
+    return task;
   } catch (error) {
     console.error(error);
 
@@ -198,6 +204,8 @@ const publish = (exports.publish = async id => {
   try {
     let requester = await delegates.jobs.getRequester(id);
     let job = await delegates.jobs.getById(id);
+    // we fetch the instructions and save them.
+    let instructions = await delegates.jobs.getInstructions(job);
     const itemsCount = await delegates.projects.getItemsCount(job.project_id);
     const criteriaCount = await delegates.projects.getCriteriaCount(
       job.project_id
@@ -237,6 +245,7 @@ const publish = (exports.publish = async id => {
     job.data.status = JobStatus.PUBLISHED;
     job.data.start = new Date();
     job.data.hit = { ...hit };
+    job.data.instructions = instructions;
     setupCronForHit(job, hit.HITId, mt);
     return await delegates.jobs.update(id, job.data);
   } catch (error) {

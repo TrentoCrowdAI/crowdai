@@ -25,6 +25,77 @@ import WorkerChooser from './WorkerChooser';
 var data = []
 //= {"tasks":{"task1":{"total_time":2.21,"task_id":1},"task2":{"total_time":3.45,"task_id":3},"task3":{"total_time":4.65,"task_id":7},"task4":{"total_time":5.6,"task_id":2},"task5":{"total_time":9.6,"task_id":5},"task6":{"total_time":8.6,"task_id":9},"task7":{"total_time":2.6,"task_id":11},"task8":{"total_time":3.6,"task_id":32},"task9":{"total_time":4.6,"task_id":27},"task10":{"total_time":8.6,"task_id":21},"task11":{"total_time":7.6,"task_id":22}}}
 
+var wdata = {
+	tasks: {
+		task1: {
+			worker_id: 1, 
+			total_time: 2.21,
+			task_id: 1
+		},
+		task2: {
+			worker_id: 3, 
+			total_time: 3.55,
+			task_id: 1
+		},
+		task3: {
+			worker_id: 12, 
+			total_time: 3.01,
+			task_id: 1
+		},
+		task4: {
+			worker_id: 1, 
+			total_time: 3.45,
+			task_id: 3
+		},
+		task5: {
+			worker_id: 3, 
+			total_time: 6.00,
+			task_id: 3
+		},
+		task6: {
+			worker_id: 22, 
+			total_time: 4.22,
+			task_id: 3
+		},
+		task7: {
+			worker_id: 2, 
+			total_time: 3.30,
+			task_id: 3
+		},
+		task8: {
+			worker_id: 1, 
+			total_time: 5.6,
+			task_id: 7
+		},
+		task9: {
+			worker_id: 22, 
+			total_time: 5.6,
+			task_id: 7
+		},
+		task10: {
+			worker_id: 10, 
+			total_time: 2.6,
+			task_id: 32
+		},
+		task11: {
+			worker_id: 10, 
+			total_time: 4.6,
+			task_id: 27
+		},
+		task11: {
+			worker_id: 1, 
+			total_time: 8.23,
+			task_id: 27
+		},
+		task11: {
+			worker_id: 3, 
+			total_time: 7.54,
+			task_id: 27
+		}
+	}
+}
+
+
 const MetricOptions = [
 	'Time to complete per Task',
 	'Task details per Worker',
@@ -48,12 +119,10 @@ class Reports extends React.Component {
 		super(props);
 		this.state = {
 			activeMetric : '(choose a metric)',
-			chart: '',
 			chosenjob: '',
-			chosenworker: 'all'
+			chosenworker: ''
 		}
 		this.activeMetric = this.activeMetric.bind(this)
-		this.displayChart = this.displayChart.bind(this)
 		this.chooseJob = this.chooseJob.bind(this)
 		this.chooseWorker = this.chooseWorker.bind(this)
 	}
@@ -69,18 +138,21 @@ class Reports extends React.Component {
 		this.props.fetchExperiments(this.props.match.params.projectid);
 	}
 
-	displayChart(metric) {
-		this.setState({
-			chart: metric
-		})
+	componentWillUpdate() {
+		switch(this.state.activeMetric) {
+			case 'W_CompleteTime'	:
+				data = Object.values(wdata.tasks)
+				break;
+			default:
+				break;
+		}		
 	}
 
-	activeMetric(event) {
+	activeMetric(e, {value}) {
 		this.setState({
-			activeMetric: event.target.value
-		})
-		this.displayChart(event.target.value)
-		
+			...this.state,
+			activeMetric: value
+		})		
 	}
 
 	chooseWorker(e, {value}) {
@@ -101,42 +173,49 @@ class Reports extends React.Component {
 		return(
 			<div className="options">
 				<Button 
-					value='completetime'
+					value='T_CompleteTime'
 					className='metrics'
 					style={{marginBottom: '5px'}}
 					onClick={this.activeMetric}
 				>Time to complete per Task</Button>
 				<br />
 				<Button 
-					value='successes'
+					value='W_CompleteTime'
+					className='metrics'
+					style={{marginBottom: '5px'}}
+					onClick={this.activeMetric}
+				>Time to complete per Worker</Button>
+				<br />
+				<Button 
+					value='Successes'
 					className='metrics' 
 					style={{marginBottom: '5px'}}
 					onClick={this.activeMetric}
 				>Percentage % of success</Button>
 				<br />
 				<Button 
-					value='agreements'
+					value='Agreements'
 					className='metrics' 
 					style={{marginBottom: '5px'}}
 					onClick={this.activeMetric}
 				>Agreement metrics</Button>
 				<br />
 				<Button 
-					value='Classification decision and Probabilities'
+					value='Classifications'
 					className='metrics' 
 					style={{marginBottom: '5px'}}
 					onClick={this.activeMetric}
 				>Classification decision and Probabilities</Button>
 				<br />
 				<Button 
-					value='Percentage % of Workers who failed Initial Test'
+					value='InitialTest_Fails'
 					className='metrics' 
 					style={{marginBottom: '5px'}}
 					onClick={this.activeMetric}
 				>Percentage % of Workers who failed Initial Test</Button>
 				<br />
 				<Button 
-					value='Percentage % of Workers who failed Honeypots'
+					value='Honeypots_Fails'
 					className='metrics' 
 					style={{marginBottom: '5px'}}
 					onClick={this.activeMetric}
@@ -147,19 +226,24 @@ class Reports extends React.Component {
 	}
 
 	render() {
+
 		JobOptions = { }
     this.props.experiments.rows.map( step => {
       JobOptions[step.id] = step.data.name
     });
 
-		console.log(this.props)
-		console.log(this.state)
+    console.log("re-render", this.state.activeMetric)
 
 		var optionbutt
 		var chart
+		var x
+		var y
+
 		switch (this.state.activeMetric) {
-			case 'completetime':
+			case 'T_CompleteTime':
 				chart='nest'
+				x='task_id'
+				y='total_time'
 				optionbutt = 
 					<React.Fragment>
 					<JobChooser 
@@ -167,28 +251,20 @@ class Reports extends React.Component {
 						match={this.props.match}
 						onChange={this.chooseJob}
 						chosenjob={this.state.chosenjob}/>
+					</React.Fragment>
+				break;
+			case 'W_CompleteTime': 
+				chart='nest'
+				x='task_id'
+				y='total_time'
+				optionbutt = 
+					<React.Fragment>
 					<WorkerChooser 
 						options={WorkerOptions}
 						match={this.props.match}
 						onChange={this.chooseWorker}
 						chosenworker={this.state.chosenworker}/>
 					</React.Fragment>
-				break;
-			case 'successes':
-				chart='nest'
-				optionbutt = <JobChooser  
-					options={JobOptions}
-					match={this.props.match}
-					onChange={this.chooseJob}
-					chosenjob={this.state.chosenjob}/>
-				break;
-			case 'agreements':
-				chart='linechart'
-				optionbutt = <WorkerChooser 
-					options={WorkerOptions}
-					match={this.props.match}
-					onChange={this.chooseWorker}
-					chosenworker={this.state.chosenworker}/>
 				break;
 			default:
 				optionbutt = ''
@@ -213,8 +289,8 @@ class Reports extends React.Component {
 						{optionbutt}
 						<ChartWrapper 
 							chart={chart}
-            	x={'task_id'}
-            	y={'total_time'}
+            	x={x}
+            	y={y}
             	selector={'chart1'}
             	color={'steelblue'}
             	data={data}

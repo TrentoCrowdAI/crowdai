@@ -19,7 +19,7 @@ const generateTasks = (exports.generateTasks = async (job, worker) => {
     let response = await getTasksFromApi(job, worker);
 
     if (response.items && response.items.length > 0) {
-      buffer = await delegates.tasks.createBuffer(job, worker.id, response);
+      buffer = await delegates.tasks.createBuffer(job.id, worker.id, response);
     }
 
     if (response.items && response.items.length === 0) {

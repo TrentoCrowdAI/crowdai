@@ -21,6 +21,15 @@ class QuestionForm extends Component {
 
   submit(event) {
     event.preventDefault();
+    let isValid = this.props.task.data.criteria.reduce(
+      (condition, criterion) => criterion.workerAnswer !== undefined && condition,
+      true
+    );
+    this.props.setAnswerIsValid(isValid);
+
+    if (!isValid) {
+      return;
+    }
 
     let payload = {
       task: this.props.task,
@@ -35,7 +44,8 @@ QuestionForm.propTypes = {
   hasAcceptedHit: PropTypes.bool,
   submitAnswer: PropTypes.func,
   task: PropTypes.object,
-  session: PropTypes.object
+  session: PropTypes.object,
+  setAnswerIsValid: PropTypes.func
 };
 
 const mapStateToProps = state => ({
@@ -45,7 +55,8 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-  submitAnswer: answer => dispatch(actions.submitAnswer(answer))
+  submitAnswer: answer => dispatch(actions.submitAnswer(answer)),
+  setAnswerIsValid: answerIsValid => dispatch(actions.setAnswerIsValid(answerIsValid))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(withRouter(QuestionForm));

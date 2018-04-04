@@ -20,6 +20,7 @@ const defaultState = {
    */
   answer: undefined,
   answerSaved: undefined,
+  answerIsValid: true,
   answerSubmitError: undefined,
   answerSubmitLoading: false
 };
@@ -53,6 +54,7 @@ const reducer = (state = defaultState, action) => {
       let {criteria} = newState.task.data;
       let criterion = criteria.filter(c => c.label === action.answer.criterion.label)[0];
       criterion.workerAnswer = action.answer.response;
+      newState.answerIsValid = true;
       return newState;
     case actionTypes.SUBMIT_ANSWER:
       return {
@@ -122,6 +124,11 @@ const reducer = (state = defaultState, action) => {
         ...state,
         assignmentStatusError: undefined,
         assigmentStatusLoading: true
+      };
+    case actionTypes.SET_ANSWER_IS_VALID:
+      return {
+        ...state,
+        answerIsValid: action.answerIsValid
       };
     default:
       return state;

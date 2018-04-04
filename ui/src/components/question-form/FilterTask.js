@@ -122,8 +122,16 @@ class FilterTask extends React.Component {
               {this.props.answerSubmitError && (
                 <Message negative>
                   <Message.Header>Error</Message.Header>
-                  <p>Your answer could not be saved.</p>
+                  <p>
+                    {this.props.answerSubmitError.message
+                      ? this.props.answerSubmitError.message
+                      : 'Your answer could not be saved.'}
+                  </p>
                 </Message>
+              )}
+
+              {!this.props.answerIsValid && (
+                <Message header="Warning" content="Please provide an answer." warning visible />
               )}
 
               {this.props.answerSaved && (
@@ -216,7 +224,8 @@ FilterTask.propTypes = {
 
   assignmentStatus: PropTypes.object,
   error: PropTypes.object,
-  loading: PropTypes.bool
+  loading: PropTypes.bool,
+  answerIsValid: PropTypes.bool
 };
 
 const mapStateToProps = state => ({
@@ -228,7 +237,8 @@ const mapStateToProps = state => ({
   answerSaved: state.questionForm.answerSaved,
   answerSubmitLoading: state.questionForm.answerSubmitLoading,
   answerSubmitError: state.questionForm.answerSubmitError,
-  assignmentStatus: state.questionForm.assignmentStatus
+  assignmentStatus: state.questionForm.assignmentStatus,
+  answerIsValid: state.questionForm.answerIsValid
 });
 
 const mapDispatchToProps = dispatch => ({

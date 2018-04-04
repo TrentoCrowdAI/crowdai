@@ -16,7 +16,8 @@ export const actionTypes = {
   CHECK_ASSIGNMENT_STATUS_ERROR: 'C_CHECK_ASSIGNMENT_STATUS_ERROR',
   CHECK_POLLING: 'C_CHECK_POLLING',
   CHECK_POLLING_DONE: 'C_CHECK_POLLING_DONE',
-  CHECK_POLLING_KEEP: 'C_CHECK_POLLING_KEEP'
+  CHECK_POLLING_KEEP: 'C_CHECK_POLLING_KEEP',
+  SET_ANSWER_IS_VALID: 'C_SET_ANSWER_IS_VALID'
 };
 
 export const actions = {
@@ -141,6 +142,13 @@ export const actions = {
   checkPollingKeep() {
     return {
       type: actionTypes.CHECK_POLLING_KEEP
+    };
+  },
+
+  setAnswerIsValid(answerIsValid) {
+    return {
+      type: actionTypes.SET_ANSWER_IS_VALID,
+      answerIsValid
     };
   }
 };

@@ -5,6 +5,7 @@ import {actionTypes, actions} from './actions';
 import {actions as rewardActions} from 'src/components/reward-widget/actions';
 import axios from 'src/utils/axios';
 import config from 'src/config/config.json';
+import {flattenError} from 'src/utils';
 
 const getNextTask = (action$, store) =>
   action$.ofType(actionTypes.NEXT_TASK).switchMap(action => {
@@ -20,7 +21,7 @@ const getNextTask = (action$, store) =>
           Observable.of(rewardActions.requestReward())
         )
       )
-      .catch(error => Observable.of(actions.getNextTaskError(error)));
+      .catch(error => Observable.of(actions.getNextTaskError(flattenError(error))));
   });
 
 const postAnswer = (action$, store) =>
@@ -33,7 +34,7 @@ const postAnswer = (action$, store) =>
           Observable.of(rewardActions.requestReward())
         )
       )
-      .catch(error => Observable.of(actions.submitAnswerError(error)));
+      .catch(error => Observable.of(actions.submitAnswerError(flattenError(error))));
   });
 
 const finishAssignment = (action$, store) =>
@@ -48,7 +49,7 @@ const finishAssignment = (action$, store) =>
           Observable.of(actions.checkAssignmentStatus())
         )
       )
-      .catch(error => Observable.of(actions.finishAssignmentError(error)));
+      .catch(error => Observable.of(actions.finishAssignmentError(flattenError(error))));
   });
 
 const checkAssignmentStatus = (action$, store) =>
@@ -68,7 +69,7 @@ const checkAssignmentStatus = (action$, store) =>
           Observable.of(rewardActions.requestReward())
         );
       })
-      .catch(error => Observable.of(actions.checkAssignmentStatusError(error)));
+      .catch(error => Observable.of(actions.checkAssignmentStatusError(flattenError(error))));
   });
 
 const checkPolling = (action$, store) =>
@@ -88,7 +89,7 @@ const checkPolling = (action$, store) =>
             }
             return Observable.of(actions.checkPollingKeep());
           })
-          .catch(error => Observable.of(actions.checkAssignmentStatusError(error)))
+          .catch(error => Observable.of(actions.checkAssignmentStatusError(flattenError(error))))
       );
   });
 

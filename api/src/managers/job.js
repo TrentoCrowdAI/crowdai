@@ -188,7 +188,7 @@ const getWorkerReward = (exports.getWorkerReward = async (
       job.id,
       worker.id
     );
-    const testCount = await delegates.testTasks.getWorkerTestTasksCount(
+    let testCount = await delegates.testTasks.getWorkerTestTasksCount(
       job.id,
       worker.id
     );
@@ -196,6 +196,11 @@ const getWorkerReward = (exports.getWorkerReward = async (
 
     if (!assignment || assignment.data.initialTestFailed) {
       return { reward: 0 };
+    }
+
+    if (assignment.data.honeypotFailed) {
+      // we do not pay for failed honeypot.
+      --testCount;
     }
     // the total amount that we pay to a worker is HIT reward + bonus. Therefore we
     // should subtract 1 in order to pay the worker using the reward + bonus strategy.

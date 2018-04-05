@@ -10,6 +10,7 @@ import {actions as experimentActions} from 'src/components/admin/experiments/act
 import config from 'src/config/config.json';
 import RewardWidget from 'src/components/reward-widget/RewardWidget';
 import FileRenderer from 'src/components/core/FileRenderer';
+import PaymentInstructions from './PaymentInstructions';
 
 class WelcomePage extends React.Component {
   state = {open: true, consentOk: false};
@@ -50,7 +51,8 @@ class WelcomePage extends React.Component {
             </Accordion.Content>
           </Accordion>
         </div>
-        {/* <Instructions /> */}
+
+        {!this.props.assigmentStatusLoading && <PaymentInstructions job={this.props.item} />}
 
         {this.props.assigmentStatusLoading && (
           <Segment vertical style={{borderBottom: 0}}>

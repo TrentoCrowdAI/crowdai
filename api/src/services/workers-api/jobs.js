@@ -11,6 +11,11 @@ const TaskType = {
 const getByUuid = async ctx => {
   let job = await delegates.jobs.getByUuid(ctx.params.uuid);
   let project = await delegates.projects.getById(job.project_id);
+  const count =
+    job.data.initialTestsRule +
+    job.data.maxTasksRule +
+    Math.floor(job.data.maxTasksRule / job.data.testFrequencyRule);
+  const maxReward = count * job.data.taskRewardRule;
   // just return the necessary information
   ctx.response.body = {
     id: job.id,
@@ -19,7 +24,13 @@ const getByUuid = async ctx => {
       consentUrl: project.data.consentUrl,
       consentFormat: project.data.consentFormat,
       consent: project.consent
-    }
+    },
+    data: {
+      initialTestsRule: job.data.initialTestsRule,
+      maxTasksRule: job.data.maxTasksRule,
+      taskRewardRule: job.data.taskRewardRule
+    },
+    maxReward
   };
 };
 

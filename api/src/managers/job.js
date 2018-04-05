@@ -96,11 +96,16 @@ const saveAnswer = (exports.saveAnswer = async (payload, isTest) => {
       let testTask = await delegates.testTasks.getTestTaskById(payload.task.id);
 
       if (testTask.worker_id !== worker.id) {
-        throw Boom.badRequest('Worker does not match task record');
+        throw Boom.badRequest(
+          'The worker is not associated with the task record'
+        );
       }
       let answersMap = {};
 
       for (c of payload.task.data.criteria) {
+        if (!c.workerAnswer) {
+          throw Boom.badRequest('An answer is required');
+        }
         answersMap[c.id] = c.workerAnswer;
       }
 
@@ -117,11 +122,16 @@ const saveAnswer = (exports.saveAnswer = async (payload, isTest) => {
       let task = await delegates.tasks.getTaskById(payload.task.id);
 
       if (task.worker_id !== worker.id) {
-        throw Boom.badRequest('Worker does not match task record');
+        throw Boom.badRequest(
+          'The worker is not associated with the task record'
+        );
       }
       let answersMap = {};
 
       for (c of payload.task.data.criteria) {
+        if (!c.workerAnswer) {
+          throw Boom.badRequest('An answer is required');
+        }
         answersMap[c.id] = c.workerAnswer;
       }
 

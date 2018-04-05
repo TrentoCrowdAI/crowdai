@@ -38,7 +38,7 @@ class ConnectedApp extends Component {
                   <Grid.Row
                     style={{
                       textAlign: 'right',
-                      marginBottom: '-3rem'
+                      marginBottom: '1rem'
                     }}>
                     <RewardWidget />
                   </Grid.Row>

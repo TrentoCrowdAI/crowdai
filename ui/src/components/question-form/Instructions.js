@@ -23,17 +23,17 @@ class Instructions extends React.Component {
 
     return (
       <div>
-        <Accordion>
+        <Accordion style={{width: '100%'}} styled>
           <Accordion.Title active={open} onClick={this.handleClick}>
             <Header as="h1" style={{display: 'inline'}}>
-              Instructions {open ? '(click to collapse)' : '(click to expand)'}
+              INSTRUCTIONS {open ? '(click to collapse)' : '(click to expand)'}
             </Header>
           </Accordion.Title>
           <Accordion.Content active={open}>
-            <Segment>
+            <div>
               {task.instructions &&
                 task.instructions.map((i, idx) => <FileRenderer key={idx} content={i.content} format={i.format} />)}
-            </Segment>
+            </div>
           </Accordion.Content>
         </Accordion>
       </div>

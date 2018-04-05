@@ -46,22 +46,26 @@ exports.nextTask = async (uuid, turkId, assignmentTurkId) => {
     const runQuiz = await qualityManager.shouldRunInitialTest(job, worker);
 
     if (runQuiz) {
-      return await qualityManager.getTestForWorker(
+      let task = await qualityManager.getTestForWorker(
         job,
         worker,
         response.criteria,
         true
       );
+      task.workerCanFinish = false;
+      return task;
     }
     const runHoneypot = await qualityManager.shouldRunHoneypot(job, worker);
 
     if (runHoneypot) {
-      return await qualityManager.getTestForWorker(
+      let task = await qualityManager.getTestForWorker(
         job,
         worker,
         response.criteria,
         false
       );
+      task.workerCanFinish = await workerCanFinish(job, worker);
+      return task;
     }
     let task = await delegates.tasks.getTaskFromBuffer(job.id, worker.id);
     task.instructions = [];
@@ -69,6 +73,7 @@ exports.nextTask = async (uuid, turkId, assignmentTurkId) => {
     for (let c of task.data.criteria) {
       task.instructions.push(job.data.instructions[c.id]);
     }
+    task.workerCanFinish = await workerCanFinish(job, worker);
     return task;
   } catch (error) {
     console.error(error);
@@ -531,4 +536,16 @@ const sendBonus = async (uuid, workerId, assignmentId, mturk) => {
       }
     });
   });
+};
+
+/**
+ * Checks if the worker can finish their assignment. We expect the worker to answer
+ * at least one task.
+ *
+ * @param {Object} job
+ * @param {Object} worker
+ */
+const workerCanFinish = async (job, worker) => {
+  const count = await delegates.tasks.getWorkerTasksCount(job.id, worker.id);
+  return count >= 1;
 };

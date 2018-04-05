@@ -78,7 +78,7 @@ class FilterTask extends React.Component {
     };
 
     return (
-      <Segment vertical>
+      <Segment style={{marginTop: '2em', marginBottom: '2em'}} color="blue">
         <Grid>
           <Grid.Row>
             <Grid.Column width={9}>
@@ -134,24 +134,19 @@ class FilterTask extends React.Component {
                 <Message header="Warning" content="Please provide an answer." warning visible />
               )}
 
-              {this.props.answerSaved && (
-                <React.Fragment>
-                  {!this.props.task.data.initial && (
-                    <FinishButton style={{marginTop: 40}} onClick={() => this.finish()} />
-                  )}
+              {this.props.answerSaved && <Message header="Success" content="Answer saved!" positive visible />}
 
-                  <Button type="button" positive style={{marginTop: 40}} onClick={() => window.location.reload()}>
-                    Next task
-                  </Button>
-                </React.Fragment>
-              )}
+              {this.props.task.workerCanFinish &&
+                !this.props.answerSaved && (
+                  <FinishButton style={{marginTop: 40, marginRight: '0.6em'}} onClick={() => this.finish()} />
+                )}
 
               {!this.props.answerSaved && (
                 <Button
                   type="submit"
                   loading={this.props.answerSubmitLoading}
                   positive
-                  style={{marginTop: 40}}
+                  style={{marginTop: 40, width: '150px'}}
                   disabled={!this.props.hasAcceptedHit}>
                   Submit
                 </Button>

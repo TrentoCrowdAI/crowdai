@@ -108,10 +108,17 @@ class WelcomePage extends React.Component {
             <RewardWidget style={{marginRight: 20}} />
             <Message.Content>
               <Message.Header>Finished</Message.Header>
-              <p>Please click the following button to submit your work</p>
-              <Button type="button" positive onClick={() => this.submit()}>
-                Submit
-              </Button>
+              {!this.props.assignmentStatus.data.initialTestFailed && (
+                <div>
+                  <p>Please click the following button to submit your work</p>
+                  <Button type="button" positive onClick={() => this.submit()}>
+                    Submit
+                  </Button>
+                </div>
+              )}
+              {this.props.assignmentStatus.data.initialTestFailed && (
+                <p>Thank you for participating, but you failed to pass the qualification test.</p>
+              )}
             </Message.Content>
           </Message>
           <form id="turkForm" method="POST" />

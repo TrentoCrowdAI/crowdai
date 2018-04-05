@@ -4,11 +4,13 @@ import * as d3 from 'd3'
 import PropTypes from 'prop-types'
 import Math from 'math'
 
+import NestChart from './NestChart'
+import ChartWrapper from './ChartWrapper'
+
 class Histogram extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      data: this.props.data,
       clicked: []
     }
     this.buildGraph = this.buildGraph.bind(this);
@@ -23,7 +25,6 @@ class Histogram extends React.Component {
     var data = this.props.data.sort( function(a,b) {
       return (a[x] > b[x]) ? 1 : ((b[x] > a[x]) ? -1 : 0);
     })
-    //console.log(data)
 
     var margin = {top: 30, right: 30, bottom: 30, left: 30};
     var width = +svg.attr("width") - margin.left - margin.right;
@@ -67,7 +68,6 @@ class Histogram extends React.Component {
             d3.select(this).style("opacity","1")
           })
           .on("click", (d) => {
-            //reset display state
             this.setState({
               clicked : []
             })
@@ -119,15 +119,23 @@ class Histogram extends React.Component {
   }
 
   handleClick(d) {
-    //console.log(d)
     var nuovo = this.state.clicked.concat([d])
     this.setState({
       clicked: nuovo
     })
-    console.log(this.state)
   }
 
   render() {
+    var printGraph
+    if(this.state.clicked.length>0)
+      printGraph = <ChartWrapper 
+        {... this.props}
+        x={this.props.y}
+        y={this.props.x}
+        chart='nest'
+        selector={'nestedchart'}
+        data={this.state.clicked}
+        />
 
     var stampa = this.state.clicked.map(d => <li key={d[this.props.y]}>{this.props.y+" "+d[this.props.y]+" => "+this.props.x+" "+d[this.props.x]}</li>)
     return (
@@ -136,9 +144,7 @@ class Histogram extends React.Component {
         <svg className={this.props.selector} width="600" height="400"> </svg>
         <br />
         <strong>Clicked data:</strong> <ul>{stampa}</ul>
-        <button>Total Time statistics</button>
-        <button>Average Time statistics</button>
-        <button>Standard Time statistics</button>
+        {printGraph}
       </div>
     );
   }

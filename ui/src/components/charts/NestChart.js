@@ -8,8 +8,7 @@ class NestChart extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      data: this.props.data.sort( (a,b) =>
-        (a[this.props.x] > b[this.props.x]) ? 1 : ((b[this.props.x] > a[this.props.x]) ? -1 : 0)),
+      data : this.props.data,
       clicked: []
     }
     this.buildGraph = this.buildGraph.bind(this);
@@ -20,7 +19,8 @@ class NestChart extends React.Component {
     var x = this.props.x
     var y = this.props.y
 
-    var data = this.state.data
+    var data = this.props.data.sort( (a,b) =>
+        (a[x] > b[x]) ? 1 : ((b[x] > a[x]) ? -1 : 0))
 
     var sum = 0
     data.map(step => {
@@ -124,33 +124,29 @@ class NestChart extends React.Component {
   }
 
   render() {
+    //console.log(this.state)
     return (
       <div>
         <svg className={this.props.selector} width="600" height="400"> </svg>
         <br />
-
-        <button
-          onClick={(event) => this.setState({
-            data: this.props.data.sort( (a,b) =>
-              (a[this.props.y] > b[this.props.y]) ? 1 : ((b[this.props.y] > a[this.props.y]) ? -1 : 0))
-          })}
-        ><strong>Sort y</strong></button>
-
-        <button
-          onClick={(event) => this.setState({
-            data: this.props.data.sort( (a,b) =>
-              (a[this.props.x] > b[this.props.x]) ? 1 : ((b[this.props.x] > a[this.props.x]) ? -1 : 0))
-          })}
-        ><strong>Sort x</strong></button>
+        // buttons //
       </div>
     );
   }
 }
 
 /*
-        <button>Total Time statistics</button>
-        <button>Average Time statistics</button>
-        <button>Standard Time statistics</button>
+<button
+          onClick={(event) => this.props.data.sort( (a,b) =>
+              (a[this.props.y] > b[this.props.y]) ? 1 : ((b[this.props.y] > a[this.props.y]) ? -1 : 0))
+          }
+        ><strong>Sort y</strong></button>
+
+        <button
+          onClick={(event) => this.props.data.sort( (a,b) =>
+              (a[this.props.x] > b[this.props.x]) ? 1 : ((b[this.props.x] > a[this.props.x]) ? -1 : 0))
+          }
+        ><strong>Sort x</strong></button>
 */
 
 NestChart.propTypes = {

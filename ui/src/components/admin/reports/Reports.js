@@ -107,7 +107,6 @@ const MetricOptions = [
 ]
 
 var WorkerOptions = {
-							all: 'All workers',
 							id1: 'worker 1',
 							id2: 'worker 2',
 							id3: 'worker 3'
@@ -136,16 +135,6 @@ class Reports extends React.Component {
 		})
 
 		this.props.fetchExperiments(this.props.match.params.projectid);
-	}
-
-	componentWillUpdate() {
-		switch(this.state.activeMetric) {
-			case 'W_CompleteTime'	:
-				data = Object.values(wdata.tasks)
-				break;
-			default:
-				break;
-		}		
 	}
 
 	activeMetric(e, {value}) {
@@ -208,7 +197,7 @@ class Reports extends React.Component {
 				>Classification decision and Probabilities</Button>
 				<br />
 				<Button 
-					value='InitialTest_Fails'
+					value='Initial_Fails'
 					className='metrics' 
 					style={{marginBottom: '5px'}}
 					onClick={this.activeMetric}
@@ -226,13 +215,11 @@ class Reports extends React.Component {
 	}
 
 	render() {
-
+		//console.log(this.state)
 		JobOptions = { }
     this.props.experiments.rows.map( step => {
       JobOptions[step.id] = step.data.name
     });
-
-    console.log("re-render", this.state.activeMetric)
 
 		var optionbutt
 		var chart
@@ -241,9 +228,9 @@ class Reports extends React.Component {
 
 		switch (this.state.activeMetric) {
 			case 'T_CompleteTime':
-				chart='nest'
-				x='task_id'
-				y='total_time'
+				chart='histogram'
+				x='total_time'
+				y='task_id'
 				optionbutt = 
 					<React.Fragment>
 					<JobChooser 
@@ -253,17 +240,23 @@ class Reports extends React.Component {
 						chosenjob={this.state.chosenjob}/>
 					</React.Fragment>
 				break;
-			case 'W_CompleteTime': 
+			case 'W_CompleteTime':
 				chart='nest'
 				x='task_id'
 				y='total_time'
-				optionbutt = 
+				optionbutt=
 					<React.Fragment>
+					<JobChooser 
+						options={JobOptions}
+						match={this.props.match}
+						onChange={this.chooseJob}
+						chosenjob={this.state.chosenjob}/>
 					<WorkerChooser 
 						options={WorkerOptions}
 						match={this.props.match}
 						onChange={this.chooseWorker}
-						chosenworker={this.state.chosenworker}/>
+						chosenworker={this.state.chosenworker}
+						/>
 					</React.Fragment>
 				break;
 			default:

@@ -49,14 +49,11 @@ class ChartWrapper extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = {
-      data: this.props.data
-    }
-    this.handleConcat = this.handleConcat.bind(this);
-    this.handleReduce = this.handleReduce.bind(this);
+    //this.handleConcat = this.handleConcat.bind(this);
+    //this.handleReduce = this.handleReduce.bind(this);
   }
 
-  handleConcat() {
+  /*handleConcat() {
     var num = Math.floor(Math.random()*10)+1;
     for(var i=0; i<num; i++) {
       this.setState(prevState => ({
@@ -76,7 +73,7 @@ class ChartWrapper extends React.Component {
       data: []
     }))
     count=0;
-  }
+  }*/
 
   render() {
     switch(this.props.chart) {
@@ -84,9 +81,6 @@ class ChartWrapper extends React.Component {
         return(
           <div>
           <Histogram
-            handleConcat={this.handleConcat}
-            handleReduce={this.handleReduce}
-            data={this.state.data}
             {... this.props}
             />
           </div>
@@ -95,9 +89,6 @@ class ChartWrapper extends React.Component {
         return(
           <div>
           <SimpleLineChart
-            handleConcat={this.handleConcat}
-            handleReduce={this.handleReduce}
-            data={this.state.data}
             {... this.props}
             />
           </div>
@@ -106,9 +97,6 @@ class ChartWrapper extends React.Component {
         return(
           <div>
             <HeatMap 
-              handleConcat={this.handleConcat} 
-              handleReduce={this.handleReduce}
-              data={this.state.data}
               {... this.props}
               />
           </div>
@@ -117,9 +105,6 @@ class ChartWrapper extends React.Component {
         return(
           <div>
             <AreaChart
-              handleConcat={this.handleConcat} 
-              handleReduce={this.handleReduce}
-              data={this.state.data}
               {... this.props}
             />
           </div>
@@ -128,9 +113,6 @@ class ChartWrapper extends React.Component {
         return(
           <div>
             <NestChart
-              handleConcat={this.handleConcat} 
-              handleReduce={this.handleReduce}
-              data={this.state.data}
               {... this.props}
             />
           </div>

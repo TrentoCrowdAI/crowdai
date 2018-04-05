@@ -63,12 +63,13 @@ class ReportsForm extends React.Component {
   }
 
 	render() {
-    console.log(this.props)
-    console.log(this.state)
+    
+    //console.log(this.state)
+
 		return(
 			<div>
 				<DataTable
-					title="Reminder of My Projects"
+					title="My Projects"
         	options={options}
         	data={this.props.projects.rows}
         	loading={this.props.loading}

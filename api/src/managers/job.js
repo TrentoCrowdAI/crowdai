@@ -7,12 +7,7 @@ const stateManager = require('./state');
 const delegates = require(__base + 'delegates');
 const MTurk = require(__base + 'utils/mturk');
 const config = require(__base + 'config');
-
-const JobStatus = Object.freeze({
-  NOT_PUBLISHED: 'NOT_PUBLISHED',
-  PUBLISHED: 'PUBLISHED',
-  DONE: 'DONE'
-});
+const { JobStatus } = require(__base + 'utils/constants');
 
 /**
  * Returns a task for the worker.

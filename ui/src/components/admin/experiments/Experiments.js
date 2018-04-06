@@ -6,7 +6,7 @@ import {Button, Icon, Popup} from 'semantic-ui-react';
 
 import {actions} from './actions';
 import DataTable from 'src/components/core/table/DataTable';
-import {ExperimentStatus} from 'src/utils/constants';
+import {JobStatus} from 'src/utils/constants';
 
 // configuration options for our DataTable.
 const options = {
@@ -25,7 +25,7 @@ const options = {
   },
 
   rowPositive(item) {
-    return item.status === ExperimentStatus.PUBLISHED;
+    return item.status === JobStatus.PUBLISHED;
   },
 
   actions: {
@@ -33,7 +33,7 @@ const options = {
     renderer(item) {
       return (
         <React.Fragment>
-          {item.data.status === ExperimentStatus.NOT_PUBLISHED && (
+          {item.data.status === JobStatus.NOT_PUBLISHED && (
             // <Popup
             //   trigger={
             //     <Button icon color="blue" size="mini" as={Link} to={`/admin/experiments/${item.id}/publish`}>

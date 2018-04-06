@@ -12,8 +12,8 @@ const ExperimentsRoute = props => (
     <Route exact path={`${props.match.path}`} component={Experiments} />
     <Route path={`${props.match.path}/new`} component={ExperimentForm} />
     {/* <Route path={`${props.match.path}/:experimentId/publish`} component={ExperimentPublishPage} /> */}
-    <Route path={`${props.match.path}/:experimentId/edit`} component={ExperimentForm} />
-    <Route path={`${props.match.path}/:experimentId/dashboard`} component={ExperimentDashboard} />
+    <Route path={`${props.match.path}/:jobId/edit`} component={ExperimentForm} />
+    <Route path={`${props.match.path}/:jobId/dashboard`} component={ExperimentDashboard} />
   </React.Fragment>
 );
 

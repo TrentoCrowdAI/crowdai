@@ -65,6 +65,7 @@ const getOptions = props => {
               as={Link}
               to={`/admin/projects/${item.id}/screenings`}
               onClick={() => {
+                // eslint-disable-next-line react/prop-types
                 props.fetchItem(item.id);
               }}>
               <Icon name="list layout" />

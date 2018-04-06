@@ -2,7 +2,7 @@ import {combineReducers} from 'redux';
 
 import {actionTypes} from './actions';
 import {getReducer} from 'src/utils/form';
-import {scopes, FileFormats, ExperimentStatus} from 'src/utils/constants';
+import {scopes, JobStatus} from 'src/utils/constants';
 
 const defaultState = {
   experiments: {
@@ -46,7 +46,7 @@ const genericFormReducer = getReducer(scopes.EXPERIMENTS, {
     name: '',
     description: '',
     requesterId: '',
-    status: ExperimentStatus.NOT_PUBLISHED,
+    status: JobStatus.NOT_PUBLISHED,
     instructions: {},
     // True: ask each worker multiple criteria per paper. False: ask one criterion only per paper.
     multipleCriteria: false,

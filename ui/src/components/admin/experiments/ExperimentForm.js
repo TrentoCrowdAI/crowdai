@@ -318,7 +318,7 @@ class ExperimentForm extends React.Component {
             />
 
             <Form.Input
-              label="#Votes per paper"
+              label="#Votes per task"
               name="data.votesPerTaskRule"
               value={item.data.votesPerTaskRule}
               onChange={this.handleChange}
@@ -386,7 +386,7 @@ class ExperimentForm extends React.Component {
   }
 
   componentDidMount() {
-    // this.props.cleanState();
+    this.props.cleanState();
     this.props.setInputValue('project_id', Number(this.props.match.params.projectId));
 
     const {jobId} = this.props.match.params;

@@ -8,8 +8,7 @@ class NestChart extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      data : this.props.data,
-      clicked: []
+      data : this.props.data
     }
     this.buildGraph = this.buildGraph.bind(this);
   }
@@ -19,8 +18,8 @@ class NestChart extends React.Component {
     var x = this.props.x
     var y = this.props.y
 
-    var data = this.props.data.sort( (a,b) =>
-        (a[x] > b[x]) ? 1 : ((b[x] > a[x]) ? -1 : 0))
+    var data = this.state.data//.sort( (a,b) =>
+        //(a[x] > b[x]) ? 1 : ((b[x] > a[x]) ? -1 : 0))
 
     var sum = 0
     data.map(step => {
@@ -38,7 +37,7 @@ class NestChart extends React.Component {
 
     var yscale = d3.scaleLinear()
         .rangeRound([height, 0])
-        .domain([0, d3.max(data, d => d[y])])
+        .domain([0, d3.max(data, d => d[y]*1.5)])
 
     var xscale = d3.scaleBand()
         .rangeRound([0, width])
@@ -57,13 +56,21 @@ class NestChart extends React.Component {
           
     bar.append("rect")
         .style("fill", d => {
-          if(d[y]>media) return color
+          if(d[y]>=media) return color
             else return "green"
         })
         .attr("x", d => xscale(d[x]))
         .attr("y", d => yscale(d[y]))
         .attr("width", xscale.bandwidth())
         .attr("height", d => height-yscale(d[y]))
+        .on("mouseover", function() {
+          d3.select(this)
+            .style("opacity","0.8")
+        })
+        .on("mouseout", function() {
+          d3.select(this)
+            .style("opacity","1")
+        })
 
     bar.append("text")
         .attr("dy", ".75em")
@@ -115,6 +122,8 @@ class NestChart extends React.Component {
   }
 
   componentDidMount() {
+    this.state.data.sort( (a,b) =>
+        (a[this.props.x] > b[this.props.x]) ? 1 : ((b[this.props.x] > a[this.props.x]) ? -1 : 0))
     this.buildGraph();
   }
 
@@ -124,30 +133,31 @@ class NestChart extends React.Component {
   }
 
   render() {
-    //console.log(this.state)
     return (
       <div>
         <svg className={this.props.selector} width="600" height="400"> </svg>
         <br />
-        // buttons //
+        <button
+          onClick={(event) => this.setState({
+            data: this.state.data.sort( (a,b) =>
+               (a[this.props.y] > b[this.props.y]) ? 1 : ((b[this.props.y] > a[this.props.y]) ? -1 : 0))
+          })
+          }
+        ><strong>Sort y</strong></button>
+
+        <button
+          onClick={(event) => this.setState({
+            data: this.state.data.sort( (a,b) =>
+              (a[this.props.x] > b[this.props.x]) ? 1 : ((b[this.props.x] > a[this.props.x]) ? -1 : 0))
+          })
+          }
+        ><strong>Sort x</strong></button>
       </div>
     );
   }
 }
 
-/*
-<button
-          onClick={(event) => this.props.data.sort( (a,b) =>
-              (a[this.props.y] > b[this.props.y]) ? 1 : ((b[this.props.y] > a[this.props.y]) ? -1 : 0))
-          }
-        ><strong>Sort y</strong></button>
 
-        <button
-          onClick={(event) => this.props.data.sort( (a,b) =>
-              (a[this.props.x] > b[this.props.x]) ? 1 : ((b[this.props.x] > a[this.props.x]) ? -1 : 0))
-          }
-        ><strong>Sort x</strong></button>
-*/
 
 NestChart.propTypes = {
 

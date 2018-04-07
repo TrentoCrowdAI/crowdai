@@ -126,16 +126,17 @@ class Histogram extends React.Component {
   }
 
   render() {
-    var printGraph
-    if(this.state.clicked.length>0)
-      printGraph = <ChartWrapper 
-        {... this.props}
+    var nestedChart
+    if(this.state.clicked.length>1) {
+      nestedChart = <ChartWrapper 
+        color="orange"
         x={this.props.y}
         y={this.props.x}
         chart='nest'
         selector={'nestedchart'}
         data={this.state.clicked}
         />
+      }
 
     var stampa = this.state.clicked.map(d => <li key={d[this.props.y]}>{this.props.y+" "+d[this.props.y]+" => "+this.props.x+" "+d[this.props.x]}</li>)
     return (
@@ -144,7 +145,7 @@ class Histogram extends React.Component {
         <svg className={this.props.selector} width="600" height="400"> </svg>
         <br />
         <strong>Clicked data:</strong> <ul>{stampa}</ul>
-        {printGraph}
+        {nestedChart}
       </div>
     );
   }

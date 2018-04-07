@@ -10,6 +10,7 @@ import {actions as experimentActions} from 'src/components/admin/experiments/act
 import config from 'src/config/config.json';
 import RewardWidget from 'src/components/reward-widget/RewardWidget';
 import FileRenderer from 'src/components/core/FileRenderer';
+import PaymentInstructions from './PaymentInstructions';
 
 class WelcomePage extends React.Component {
   state = {open: true, consentOk: false};
@@ -50,7 +51,8 @@ class WelcomePage extends React.Component {
             </Accordion.Content>
           </Accordion>
         </div>
-        {/* <Instructions /> */}
+
+        {!this.props.assigmentStatusLoading && <PaymentInstructions job={this.props.item} />}
 
         {this.props.assigmentStatusLoading && (
           <Segment vertical style={{borderBottom: 0}}>
@@ -106,10 +108,17 @@ class WelcomePage extends React.Component {
             <RewardWidget style={{marginRight: 20}} />
             <Message.Content>
               <Message.Header>Finished</Message.Header>
-              <p>Please click the following button to submit your work</p>
-              <Button type="button" positive onClick={() => this.submit()}>
-                Submit
-              </Button>
+              {!this.props.assignmentStatus.data.initialTestFailed && (
+                <div>
+                  <p>Please click the following button to submit your work</p>
+                  <Button type="button" positive onClick={() => this.submit()}>
+                    Submit
+                  </Button>
+                </div>
+              )}
+              {this.props.assignmentStatus.data.initialTestFailed && (
+                <p>Thank you for participating, but you failed to pass the qualification test.</p>
+              )}
             </Message.Content>
           </Message>
           <form id="turkForm" method="POST" />

@@ -2,6 +2,7 @@ const Boom = require('boom');
 const uuid = require('uuid/v4');
 const request = require('request');
 
+const { JobStatus } = require(__base + 'utils/constants');
 const db = require(__base + 'db');
 
 const getByProject = (exports.getByProject = async projectId => {
@@ -126,6 +127,11 @@ const create = (exports.create = async job => {
 const update = (exports.update = async (id, jobData) => {
   try {
     let saved = await getById(id);
+
+    if (saved.data.status !== JobStatus.NOT_PUBLISHED) {
+      throw Boom.badRequest('You can only update an unpublished job.');
+    }
+
     let data = {
       ...saved.data,
       ...jobData
@@ -139,6 +145,10 @@ const update = (exports.update = async (id, jobData) => {
     return res.rows[0];
   } catch (error) {
     console.error(error);
+
+    if (error.isBoom) {
+      throw error;
+    }
     throw Boom.badImplementation('Error while trying to update the record');
   }
 });

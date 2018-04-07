@@ -20,7 +20,8 @@ module.exports = {
   mturk: {
     requesterSandboxUrl: process.env.MTURK_REQUESTER_SANDBOX_URL,
     requesterUrl: process.env.MTURK_REQUESTER_URL,
-    region: process.env.MTURK_REGION
+    region: process.env.MTURK_REGION,
+    mode: process.env.MTURK_MODE
   },
   cron: {
     hitStatusPollTime: process.env.HIT_STATUS_POLL_TIME

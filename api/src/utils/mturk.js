@@ -3,7 +3,10 @@ const config = require(__base + 'config');
 
 const getInstance = (exports.getInstance = requester => {
   return new AWS.MTurk({
-    endpoint: config.mturk.requesterSandboxUrl,
+    endpoint:
+      config.mturk.mode === 'development'
+        ? config.mturk.requesterSandboxUrl
+        : config.mturk.requesterUrl,
     accessKeyId: requester.data.accessKeyId,
     secretAccessKey: requester.data.secretAccessKey,
     region: config.mturk.region

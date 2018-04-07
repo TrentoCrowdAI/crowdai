@@ -16,7 +16,7 @@ const saveExperiment = (action$, store) =>
   action$.ofType(actionTypes.SUBMIT).switchMap(action => {
     const {item} = store.getState().experiment.form;
     return Observable.defer(
-      () => (item.id ? requestersApi.put(`/jobs/${item.id}`, item) : requestersApi.post('/jobs', item))
+      () => (item.id ? requestersApi.put(`/jobs/${item.id}`, item.data) : requestersApi.post('/jobs', item))
     )
       .mergeMap(response => Observable.of(actions.submitSuccess()))
       .catch(error => Observable.of(actions.submitError(flattenError(error))));

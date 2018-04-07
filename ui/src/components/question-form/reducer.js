@@ -36,7 +36,11 @@ const reducer = (state = defaultState, action) => {
       return {
         ...state,
         task: action.task,
-        loading: false
+        loading: false,
+        answer: undefined,
+        answerSaved: undefined,
+        answerIsValid: true,
+        answerSubmitError: undefined
       };
     case actionTypes.NEXT_TASK_ERROR:
       return {
@@ -47,6 +51,8 @@ const reducer = (state = defaultState, action) => {
     case actionTypes.NEXT_TASK:
       return {
         ...state,
+        task: undefined,
+        error: undefined,
         loading: true
       };
     case actionTypes.SET_ANSWER:

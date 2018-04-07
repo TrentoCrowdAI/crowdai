@@ -31,7 +31,7 @@ const postAnswer = (action$, store) =>
       .mergeMap(response =>
         Observable.concat(
           Observable.of(actions.submitAnswerSuccess(response.data)),
-          Observable.of(rewardActions.requestReward())
+          Observable.of(actions.getNextTask()).delay(1000)
         )
       )
       .catch(error => Observable.of(actions.submitAnswerError(flattenError(error))));

@@ -10,7 +10,7 @@ const FileFormats = {
   MARKDOWN: 'MARKDOWN'
 };
 
-const ExperimentStatus = {
+const JobStatus = {
   NOT_PUBLISHED: 'NOT_PUBLISHED',
   PUBLISHED: 'PUBLISHED',
   DONE: 'DONE'
@@ -45,7 +45,7 @@ const AggregationStrategies = {
 export {
   scopes,
   FileFormats,
-  ExperimentStatus,
+  JobStatus,
   CrowdsourcingStrategies,
   AbstractPresentationTechniques,
   LabelOptions,

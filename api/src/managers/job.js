@@ -7,12 +7,7 @@ const stateManager = require('./state');
 const delegates = require(__base + 'delegates');
 const MTurk = require(__base + 'utils/mturk');
 const config = require(__base + 'config');
-
-const JobStatus = Object.freeze({
-  NOT_PUBLISHED: 'NOT_PUBLISHED',
-  PUBLISHED: 'PUBLISHED',
-  DONE: 'DONE'
-});
+const { JobStatus } = require(__base + 'utils/constants');
 
 /**
  * Returns a task for the worker.
@@ -46,22 +41,26 @@ exports.nextTask = async (uuid, turkId, assignmentTurkId) => {
     const runQuiz = await qualityManager.shouldRunInitialTest(job, worker);
 
     if (runQuiz) {
-      return await qualityManager.getTestForWorker(
+      let task = await qualityManager.getTestForWorker(
         job,
         worker,
         response.criteria,
         true
       );
+      task.workerCanFinish = false;
+      return task;
     }
     const runHoneypot = await qualityManager.shouldRunHoneypot(job, worker);
 
     if (runHoneypot) {
-      return await qualityManager.getTestForWorker(
+      let task = await qualityManager.getTestForWorker(
         job,
         worker,
         response.criteria,
         false
       );
+      task.workerCanFinish = await workerCanFinish(job, worker);
+      return task;
     }
     let task = await delegates.tasks.getTaskFromBuffer(job.id, worker.id);
     task.instructions = [];
@@ -69,6 +68,7 @@ exports.nextTask = async (uuid, turkId, assignmentTurkId) => {
     for (let c of task.data.criteria) {
       task.instructions.push(job.data.instructions[c.id]);
     }
+    task.workerCanFinish = await workerCanFinish(job, worker);
     return task;
   } catch (error) {
     console.error(error);
@@ -183,7 +183,7 @@ const getWorkerReward = (exports.getWorkerReward = async (
       job.id,
       worker.id
     );
-    const testCount = await delegates.testTasks.getWorkerTestTasksCount(
+    let testCount = await delegates.testTasks.getWorkerTestTasksCount(
       job.id,
       worker.id
     );
@@ -191,6 +191,11 @@ const getWorkerReward = (exports.getWorkerReward = async (
 
     if (!assignment || assignment.data.initialTestFailed) {
       return { reward: 0 };
+    }
+
+    if (assignment.data.honeypotFailed) {
+      // we do not pay for failed honeypot.
+      --testCount;
     }
     // the total amount that we pay to a worker is HIT reward + bonus. Therefore we
     // should subtract 1 in order to pay the worker using the reward + bonus strategy.
@@ -531,4 +536,16 @@ const sendBonus = async (uuid, workerId, assignmentId, mturk) => {
       }
     });
   });
+};
+
+/**
+ * Checks if the worker can finish their assignment. We expect the worker to answer
+ * at least one task.
+ *
+ * @param {Object} job
+ * @param {Object} worker
+ */
+const workerCanFinish = async (job, worker) => {
+  const count = await delegates.tasks.getWorkerTasksCount(job.id, worker.id);
+  return count >= 1;
 };

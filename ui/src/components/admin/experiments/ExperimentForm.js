@@ -14,6 +14,7 @@ import {
 } from 'semantic-ui-react';
 import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
+import {Redirect} from 'react-router-dom';
 
 import {actions} from './actions';
 import FormContainer from 'src/components/core/form/FormContainer';
@@ -21,7 +22,8 @@ import {
   FileFormats,
   CrowdsourcingStrategies,
   AbstractPresentationTechniques,
-  LabelOptions
+  LabelOptions,
+  JobStatus
 } from 'src/utils/constants';
 
 class ExperimentForm extends React.Component {
@@ -37,6 +39,13 @@ class ExperimentForm extends React.Component {
   }
 
   render() {
+    const jobId = this.props.match.params.jobId;
+    const {item} = this.props;
+
+    if (item.id === jobId && item.data.status !== JobStatus.NOT_PUBLISHED) {
+      return <Redirect to={`/admin/projects/${item.project_id}/screenings/`} />;
+    }
+
     return (
       <FormContainer title="New job">
         <Form
@@ -101,7 +110,7 @@ class ExperimentForm extends React.Component {
               label="Name"
               name="data.name"
               value={item.data.name}
-              placeholder="Job name"
+              placeholder="Job name, as it will appear on Amazon Mechanical Turk"
               onChange={this.handleChange}
               required
             />
@@ -182,32 +191,6 @@ class ExperimentForm extends React.Component {
               </Form.Field>
             ))}
         </div>
-        {/* <div style={{marginBottom: '1em', marginLeft: '2em'}}>
-          <Form.Field>
-            <Checkbox
-              label="(C1) Check this box"
-              onChange={this.toggle}
-              checked={this.state.checked}
-              disabled={!item.data.multipleCriteria}
-            />
-          </Form.Field>
-          <Form.Field>
-            <Checkbox
-              label="(C2) Check this box"
-              onChange={this.toggle}
-              checked={this.state.checked}
-              disabled={!item.data.multipleCriteria}
-            />
-          </Form.Field>
-          <Form.Field>
-            <Checkbox
-              label="(C3) Check this box"
-              onChange={this.toggle}
-              checked={this.state.checked}
-              disabled={!item.data.multipleCriteria}
-            />
-          </Form.Field>
-        </div> */}
 
         <Form.Field>
           <Radio
@@ -335,7 +318,7 @@ class ExperimentForm extends React.Component {
             />
 
             <Form.Input
-              label="#Votes per paper"
+              label="#Votes per task"
               name="data.votesPerTaskRule"
               value={item.data.votesPerTaskRule}
               onChange={this.handleChange}
@@ -405,6 +388,12 @@ class ExperimentForm extends React.Component {
   componentDidMount() {
     this.props.cleanState();
     this.props.setInputValue('project_id', Number(this.props.match.params.projectId));
+
+    const {jobId} = this.props.match.params;
+
+    if (jobId) {
+      this.props.fetchItem(jobId);
+    }
   }
 
   handleChange(e, {name, value}) {
@@ -435,7 +424,8 @@ ExperimentForm.propTypes = {
   cleanState: PropTypes.func,
   history: PropTypes.object,
   match: PropTypes.object,
-  project: PropTypes.object
+  project: PropTypes.object,
+  fetchItem: PropTypes.func
 };
 
 const mapStateToProps = state => ({
@@ -449,7 +439,8 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = dispatch => ({
   submit: () => dispatch(actions.submit()),
   cleanState: () => dispatch(actions.cleanState()),
-  setInputValue: (name, value) => dispatch(actions.setInputValue(name, value))
+  setInputValue: (name, value) => dispatch(actions.setInputValue(name, value)),
+  fetchItem: id => dispatch(actions.fetchItem(id))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(ExperimentForm);

@@ -17,7 +17,7 @@ import PropTypes from 'prop-types';
 
 import lossPrice from 'src/images/lossprice.png';
 import {actions} from './actions';
-import {AggregationStrategies, ExperimentStatus} from 'src/utils/constants';
+import {AggregationStrategies, JobStatus} from 'src/utils/constants';
 import ExperimentParameters from './ExperimentParameters';
 
 class ExperimentDashboard extends React.Component {
@@ -114,7 +114,7 @@ class ExperimentDashboard extends React.Component {
               </Statistic.Group>
             </Grid.Column>
           </Grid.Row>
-          {item.data.status === ExperimentStatus.NOT_PUBLISHED && (
+          {item.data.status === JobStatus.NOT_PUBLISHED && (
             <Grid.Row>
               <Grid.Column width="10" style={{marginLeft: 'auto', marginRight: 'auto'}}>
                 <Header content="HIT configuration" />
@@ -161,12 +161,12 @@ class ExperimentDashboard extends React.Component {
           </Grid.Row>
           <Grid.Row>
             <Grid.Column>
-              {item.data.status === ExperimentStatus.NOT_PUBLISHED && (
+              {item.data.status === JobStatus.NOT_PUBLISHED && (
                 <Button onClick={() => this.props.publish()} floated="right" size="large" positive>
                   Run
                 </Button>
               )}
-              {item.data.status === ExperimentStatus.PUBLISHED && (
+              {item.data.status === JobStatus.PUBLISHED && (
                 <Button floated="right" size="large" negative>
                   Stop
                 </Button>
@@ -324,7 +324,7 @@ class ExperimentDashboard extends React.Component {
   }
 
   componentDidMount() {
-    this.props.fetchItem(this.props.match.params.experimentId);
+    this.props.fetchItem(this.props.match.params.jobId);
   }
 
   setStep(activeStep) {

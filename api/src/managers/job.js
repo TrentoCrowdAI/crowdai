@@ -293,6 +293,7 @@ const stop = (exports.stop = async job => {
       });
     });
     await finishJob(job.id);
+    console.debug(`Stopped job ${job.id}.`);
   } catch (error) {
     console.error(error);
     throw Boom.badImplementation('Error while trying to stop the job');

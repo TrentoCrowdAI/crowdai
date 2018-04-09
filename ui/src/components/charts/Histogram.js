@@ -73,11 +73,13 @@ class Histogram extends React.Component {
             })
 
             //console.log(d.x0,d.x1,d.length)
+            var nuovo = []
             data.map( (step,i) => {
               if((step[x]>=d.x0 && step[x]<d.x1) || (step[x]>=d.x0 && step[x]==d.x1)) {
-                this.handleClick(step)
+                nuovo = nuovo.concat([step])
               }
             })
+            this.handleClick(nuovo)
           })
           .transition().duration(700).attr("height", d => height-yscale(d.length))
 
@@ -119,33 +121,33 @@ class Histogram extends React.Component {
   }
 
   handleClick(d) {
-    var nuovo = this.state.clicked.concat([d])
     this.setState({
-      clicked: nuovo
+      clicked: d
     })
   }
 
   render() {
-    var nestedChart
-    if(this.state.clicked.length>1) {
-      nestedChart = <ChartWrapper 
-        color="orange"
-        x={this.props.y}
-        y={this.props.x}
-        chart='nest'
-        selector={'nestedchart'}
-        data={this.state.clicked}
-        />
-      }
 
     var stampa = this.state.clicked.map(d => <li key={d[this.props.y]}>{this.props.y+" "+d[this.props.y]+" => "+this.props.x+" "+d[this.props.x]}</li>)
+    
     return (
       <div>
         <br />
         <svg className={this.props.selector} width="600" height="400"> </svg>
         <br />
         <strong>Clicked data:</strong> <ul>{stampa}</ul>
-        {nestedChart}
+        {
+          this.state.clicked.length ?
+            <ChartWrapper 
+              color="orange"
+              x={this.props.y}
+              y={this.props.x}
+              chart='nest'
+              selector={'nestedchart'}
+              data={this.state.clicked}
+              /> : ''
+      
+        }
       </div>
     );
   }

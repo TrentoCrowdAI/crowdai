@@ -31,14 +31,91 @@ class StackedBar extends React.Component {
     var color = d3.scaleOrdinal()
     		.range(["#f6a580", "#cccccc", "#92c6db"])
 
-    var yscale = d3.scaleOrdinal()
-    		.range([10, 30, 50, 70, 90, 110, 130, 150, 170, 190])
+    var yscale = d3.scaleBand()
+    		.rangeRound([0, height], .3)
 
     var xscale = d3.scaleLinear()
     		.range([0, width])
 
-    var xAxis = d3.axisTop().scale(xscale).tickFormat(d3.format(",%"))
-    var yAxis = d3.axisLeft().scale(yscale).tickSize(0)
+    var xAxis = d3.axisTop().scale(xscale)//.tickFormat(d3.format(",%"))
+    var yAxis = d3.axisLeft().scale(yscale)//.tickSize(0)
+
+    var rateNames = this.props.y
+    console.log("categories", rateNames)
+    var rowsNames = data.map( d => d[x]+','+d['filter_id'])
+    console.log("items", rowsNames)
+    var neutralIndex = Math.floor(rateNames.length/2)
+    console.log(neutralIndex)
+
+    color.domain(rateNames)
+
+    data.forEach( function(row) {
+    		row.total = d3.sum(rateNames.map(name => +row[name]))
+    		rateNames.forEach(name => row['relative'+name]=(row.total!==0 ? +row[name]/row.total : 0))
+
+    		var x0 = -1*d3.sum(rateNames.map((name,i) => i<neutralIndex ? +row['relative'+name] : 0))
+    		if(rateNames.length & 1) { x0 += -1*row['relative'+rateNames[neutralIndex]]/2 }
+    		var idx = 0
+
+    		row.boxes = rateNames.map( function(name) {
+    			return {
+    			name: name,
+    			x0: x0,
+    			x1: x0+=row['relative'+name],
+    			total: row.total,
+    			absolute: row[name]
+    		}})
+    })
+
+    var min = d3.min(data, d => d.boxes['0'].x0)
+    var max = d3.max(data, d => d.boxes[d.boxes.length-1].x1)
+
+    xscale.domain([min, max]).nice()
+    yscale.domain(rowsNames)
+
+    g.append("g")
+    	.attr("class","x axis")
+    	.call(xAxis)
+
+    g.append("g")
+    	.attr("class","y axis")
+    	.call(yAxis)
+
+    var rows = g.selectAll(".row")
+    		.data(data)
+    	.enter().append("g")
+    		.attr("class","bar")
+    		.attr("transform", d => {
+    			console.log(d)
+    			return "translate(0,"+yscale(d[x])+")"})
+
+    var bars = rows.selectAll("rect")
+    		.data(d => d.boxes)
+    	.enter().append("g")
+
+    bars.append("rect")
+    	.attr("height", yscale.bandwidth()-2)
+    	.attr("x", d => xscale(d.x0))
+    	.attr("width", d => xscale(d.x1)-xscale(d.x0))
+    	.style("fill", d => color(d.name))
+
+    	bars.append("text")
+    		.attr("x", d => xscale(d.x0))
+    		.attr("y", yscale.bandwidth()/2)
+    		.attr("dy", "0.5em")
+    		.attr("dx", "0.5em")
+    		.style("text-anchor","begin")
+    		.text(d => d.absolute !==0 && (d.x1-d.x0)>0.04 ? d.absolute : "")
+
+    	g.append("g")
+    			.attr("class", "y axis")
+    		.append("line")
+    			.attr("x1", xscale(0))
+    			.attr("x2", xscale(0))
+    			.attr("y2", height)
+    			.style("stroke", "#000")
+
+
 
     //color.domain(["Disagree", "Neutral", "Agree"])
 	

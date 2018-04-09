@@ -5,7 +5,7 @@ import PropTypes from 'prop-types'
 
 import ChartWrapper from './ChartWrapper'
 
-var data = {
+/*var data = {
 	"task1":
 		{"total_time":2.21,"task_id":1},
 	"task2":
@@ -28,6 +28,74 @@ var data = {
 		{"total_time":8.6,"task_id":21},
 	"task11":
 		{"total_time":7.6,"task_id":22}
+}*/
+
+var data = {
+	tasks : {
+		question1: {
+			item_id: 2,
+			filter_id: 1,
+			c1: 4,
+			c2: 6,
+			c3: 2
+		},
+		question2: {
+			item_id: 2,
+			filter_id: 2,
+			c1: 2,
+			c2: 4,
+			c3: 0
+		},
+		question3: {
+			item_id: 2,
+			filter_id: 3,
+			c1: 6,
+			c2: 0,
+			c3: 2
+		},
+		question4: {
+			item_id: 1,
+			filter_id: 2,
+			c1: 0,
+			c2: 2,
+			c3: 9
+		},
+		question5: {
+			item_id: 3,
+			filter_id: 1,
+			c1: 0,
+			c2: 3,
+			c3: 3
+		},
+		question6: {
+			item_id: 3,
+			filter_id: 4,
+			c1: 1,
+			c2: 1,
+			c3: 4
+		},
+		question7: {
+			item_id: 3,
+			filter_id: 5,
+			c1: 1,
+			c2: 0,
+			c3: 12
+		},
+		question8: {
+			item_id: 3,
+			filter_id: 6,
+			c1: 9,
+			c2: 6,
+			c3: 3
+		},
+		question9: {
+			item_id: 4,
+			filter_id: 3,
+			c1: 2,
+			c2: 5,
+			c3: 0
+		}
+	}
 }
 
 class Diff extends React.Component {
@@ -37,44 +105,16 @@ class Diff extends React.Component {
 	}
 
 	render() {
-		var arr = Object.values(data);
-		console.log(arr);
+		var arr = Object.values(data.tasks);
 		return(
 			<div>
-				<ChartWrapper chart=''
-          x={'total_time'}
-          y={'task_id'}
+				<ChartWrapper 
+          x={'item_id'}
+          y={['c1','c2','c3']}
+          chart={'stacked'}
           selector={'chart1'}
-          color={'blue'}
-          data={arr}/>
-				<hr />
-				<ChartWrapper chart=''
-          x={'task_id'}
-          y={'total_time'}
-          selector={'chart2'}
-          color={'red'}
-          data={arr}/>
-				<hr />
-				<ChartWrapper chart=''
-					x={'task_id'}
-					y={'total_time'}
-					selector={'chart4'}
-					color={'steelblue'}
-					data={arr}/>
-				<hr />
-				<ChartWrapper chart=''
-          x={'task_id'}
-          y={'total_time'}
-          selector={'chart3'}v
-          color={'green'}
-          data={arr}/>
-          <hr />
-          <ChartWrapper chart='nest'
-          	x={'task_id'}
-          	y={'total_time'}
-          	selector={'chart3'}v
-          	color={'steelblue'}
-          	data={arr}/>
+          data={arr}
+				/>
 			</div>
 		)
 	}

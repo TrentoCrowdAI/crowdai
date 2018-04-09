@@ -8,6 +8,7 @@ import Histogram from './Histogram.js'
 import HeatMap from './HeatMap.js'
 import AreaChart from './AreaChart.js'
 import NestChart from './NestChart.js'
+import StackedBar from './StackedBar.js'
 
 /*var chartData = [{
   name: "will",
@@ -117,6 +118,15 @@ class ChartWrapper extends React.Component {
             />
           </div>
         );
+      case 'stacked':
+        return(
+          <div>
+            <StackedBar 
+              {... this.props}
+            />
+          </div>
+        )
+        break;
       default:
         return(
           <div>

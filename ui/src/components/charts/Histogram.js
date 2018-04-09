@@ -146,17 +146,11 @@ class Histogram extends React.Component {
               selector={'nestedchart'}
               data={this.state.clicked}
               /> : ''
-      
         }
       </div>
     );
   }
 }
-
-/*
-<button onClick={this.props.handleConcat}>Concat Data</button>
-        <button onClick={this.props.handleReduce} style={{color: 'red'}}>Reduce Data</button>
-*/
 
 Histogram.propTypes = {
 

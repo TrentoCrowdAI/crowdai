@@ -107,10 +107,10 @@ const MetricOptions = [
 ]
 
 var WorkerOptions = {
-							id1: 'worker 1',
-							id2: 'worker 2',
-							id3: 'worker 3'
-						}
+	id1: 'worker 1',
+	id2: 'worker 2',
+	id3: 'worker 3'
+}
 var JobOptions = { }
 
 class Reports extends React.Component {

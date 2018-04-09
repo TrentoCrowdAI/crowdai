@@ -30,6 +30,7 @@ const generateTasks = (exports.generateTasks = async (job, worker) => {
     if (response.done) {
       // the job is done.
       await jobManager.stop(job);
+      buffer = { items: [] };
     }
   }
   return buffer;

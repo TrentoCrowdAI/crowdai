@@ -128,7 +128,10 @@ const update = (exports.update = async (id, jobData) => {
   try {
     let saved = await getById(id);
 
-    if (saved.data.status !== JobStatus.NOT_PUBLISHED) {
+    if (
+      saved.data.status !== JobStatus.NOT_PUBLISHED &&
+      jobData.status !== JobStatus.DONE
+    ) {
       throw Boom.badRequest('You can only update an unpublished job.');
     }
 

@@ -147,3 +147,19 @@ CREATE TABLE task_assignment_api (
   aggregation boolean, -- true -> aggregation is also included. false -> does not include aggregation.
   CONSTRAINT pk_task_assignment_api PRIMARY KEY (id)
 );
+
+
+-- helper function to compute the number of votes of an item.
+CREATE OR REPLACE FUNCTION compute_item_votes(p_job_id bigint, p_item_id bigint, p_criteria_id bigint) RETURNS int AS $$
+DECLARE v_votes int;
+DECLARE v_criteria_filter text;
+BEGIN
+	v_criteria_filter := '{"criteria" : [{"id": "'||p_criteria_id||'"}]}';
+    select count(t.*) into v_votes from task t
+      where t.job_id = p_job_id
+        and t.item_id = p_item_id
+        and t.data @> v_criteria_filter::jsonb
+        and (t.data ->> 'answered')::boolean = true;
+    RETURN v_votes;
+END;
+$$ LANGUAGE plpgsql;

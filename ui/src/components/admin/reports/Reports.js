@@ -225,6 +225,8 @@ class Reports extends React.Component {
 		var chart
 		var x
 		var y
+		var z
+		var newData
 
 		switch (this.state.activeMetric) {
 			case 'T_CompleteTime':
@@ -259,6 +261,85 @@ class Reports extends React.Component {
 						/>
 					</React.Fragment>
 				break;
+			case 'Agreements':
+				chart='stacked'
+				x='item_id'
+				z='filter_id'
+				y=['c1','c2','c3']
+				optionbutt = 
+					<React.Fragment>
+					<JobChooser 
+						options={JobOptions}
+						match={this.props.match}
+						onChange={this.chooseJob}
+						chosenjob={this.state.chosenjob}/>
+					</React.Fragment>
+				data = Object.values({
+				question1: {
+					item_id: 2,
+					filter_id: 1,
+					c1: 4,
+					c2: 6,
+					c3: 2
+				},
+				question2: {
+					item_id: 2,
+					filter_id: 2,
+					c1: 2,
+					c2: 4,
+					c3: 0
+				},
+				question3: {
+					item_id: 2,
+					filter_id: 3,
+					c1: 6,
+					c2: 0,
+					c3: 2
+				},
+				question4: {
+					item_id: 1,
+					filter_id: 2,
+					c1: 0,
+					c2: 2,
+					c3: 9
+				},
+				question5: {
+					item_id: 3,
+					filter_id: 1,
+					c1: 0,
+					c2: 3,
+					c3: 3
+				},
+				question6: {
+					item_id: 3,
+					filter_id: 4,
+					c1: 1,
+					c2: 1,
+					c3: 4
+				},
+				question7: {
+					item_id: 3,
+					filter_id: 5,
+					c1: 1,
+					c2: 0,
+					c3: 12
+				},
+				question8: {
+					item_id: 3,
+					filter_id: 6,
+					c1: 9,
+					c2: 6,
+					c3: 3
+				},
+				question9: {
+					item_id: 4,
+					filter_id: 3,
+					c1: 2,
+					c2: 5,
+					c3: 0
+				}
+			})
+				break;
 			default:
 				optionbutt = ''
 				break;
@@ -284,6 +365,7 @@ class Reports extends React.Component {
 							chart={chart}
             	x={x}
             	y={y}
+            	z={z}
             	selector={'chart1'}
             	color={'steelblue'}
             	data={data}

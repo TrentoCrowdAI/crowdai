@@ -15,13 +15,17 @@ class StackedBar extends React.Component {
 
   buildGraph() {
   	var svg = d3.select("."+this.props.selector);
-    var c1 = this.props.y[0]
-    var c2 = this.props.y[1]
-    var c3 = this.props.y[2]
+  	
+  	var criteria = this.props.y
+  	/*this.props.y.map( (step,i) => criteria['c'+(i+1)] = step )
+  	console.log("criteria",criteria)*/
 
     var x = this.props.x
+    var z = this.props.z
 
-    var data = this.props.data
+    var data = this.props.data.sort( function(a,b) {
+      return (a[x] > b[x]) ? 1 : ((b[x] > a[x]) ? -1 : 0);
+    })
 
     var margin = {top: 30, right: 30, bottom: 30, left: 30};
     var width = +svg.attr("width") - margin.left - margin.right;
@@ -29,10 +33,10 @@ class StackedBar extends React.Component {
     var g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
     
     var color = d3.scaleOrdinal()
-    		.range(["#f6a580", "#cccccc", "#92c6db"])
+    		.range(["orange", "lightgreen", "steelblue"])
 
     var yscale = d3.scaleBand()
-    		.rangeRound([0, height], .3)
+    		.rangeRound([0, height])
 
     var xscale = d3.scaleLinear()
     		.range([0, width])
@@ -40,24 +44,24 @@ class StackedBar extends React.Component {
     var xAxis = d3.axisTop().scale(xscale)//.tickFormat(d3.format(",%"))
     var yAxis = d3.axisLeft().scale(yscale)//.tickSize(0)
 
-    var rateNames = this.props.y
-    console.log("categories", rateNames)
-    var rowsNames = data.map( d => d[x]+','+d['filter_id'])
-    console.log("items", rowsNames)
-    var neutralIndex = Math.floor(rateNames.length/2)
-    console.log(neutralIndex)
+    /*var rateNames = Object.values(criteria)
+    console.log("categories", criteria)*/
+    var rowsNames = data.map( d => d[x]+','+d[z])
+    //console.log("items", rowsNames)
+    var neutralIndex = Math.floor(Object.values(criteria).length/2)
+    //console.log(neutralIndex)
 
-    color.domain(rateNames)
+    color.domain(criteria)
 
     data.forEach( function(row) {
-    		row.total = d3.sum(rateNames.map(name => +row[name]))
-    		rateNames.forEach(name => row['relative'+name]=(row.total!==0 ? +row[name]/row.total : 0))
+    		row.total = d3.sum(criteria.map(name => +row[name]))
+    		criteria.forEach(name => row['relative'+name]=(row.total!==0 ? +row[name]/row.total : 0))
 
-    		var x0 = -1*d3.sum(rateNames.map((name,i) => i<neutralIndex ? +row['relative'+name] : 0))
-    		if(rateNames.length & 1) { x0 += -1*row['relative'+rateNames[neutralIndex]]/2 }
+    		var x0 = -1*d3.sum(criteria.map((name,i) => i<neutralIndex ? +row['relative'+name] : 0))
+    		if(criteria.length & 1) { x0 += -1*row['relative'+criteria[neutralIndex]]/2 }
     		var idx = 0
 
-    		row.boxes = rateNames.map( function(name) {
+    		row.boxes = criteria.map( function(name) {
     			return {
     			name: name,
     			x0: x0,
@@ -67,7 +71,7 @@ class StackedBar extends React.Component {
     		}})
     })
 
-    var min = d3.min(data, d => d.boxes['0'].x0)
+    var min = d3.min(data, d => d.boxes[0].x0)
     var max = d3.max(data, d => d.boxes[d.boxes.length-1].x1)
 
     xscale.domain([min, max]).nice()
@@ -85,9 +89,17 @@ class StackedBar extends React.Component {
     		.data(data)
     	.enter().append("g")
     		.attr("class","bar")
-    		.attr("transform", d => {
-    			console.log(d)
-    			return "translate(0,"+yscale(d[x])+")"})
+    		.attr("transform", d => "translate(0,"+yscale(d[x]+','+d[z])+")")
+    		.on("mouseover", function(d) {
+    			g.selectAll(".y").selectAll("text").filter( function(text) {
+    				return text === d[x]+','+d[z] })
+    				.transition().duration(100).style('font','15px sans-serif')
+    		})
+    		.on("mouseout", function(d) {
+    			g.selectAll(".y").selectAll("text").filter( function(text) {
+    				return text === d[x]+','+d[z] })
+    				.transition().duration(100).style('font','10px sans-serif')
+    		})
 
     var bars = rows.selectAll("rect")
     		.data(d => d.boxes)
@@ -114,92 +126,6 @@ class StackedBar extends React.Component {
     			.attr("x2", xscale(0))
     			.attr("y2", height)
     			.style("stroke", "#000")
-
-
-
-    //color.domain(["Disagree", "Neutral", "Agree"])
-	
-    /*data.forEach(function(d) {
-    	var sum = d[c1]+d[c2]+d[c3]
-    	//console.log(d)
-    	d['Disagree'] = +d[c1]*100/sum
-    	//console.log(d['Disagree'])
-    	d['Neutral'] = +d[c2]*100/sum
-    	//console.log(d['Neutral'])
-    	d['Agree'] = +d[c3]*100/sum
-    	//console.log(d['Agree'])
-    	var x0 = -1*(d['Neutral']/2+d['Disagree'])
-    	var idx = 0
-    	//console.log(d, x0, idx)
-    	//console.log('------------map---------------')
-    	d.boxes = color.domain().map(function(name) {
-    		return {
-    			name: name,
-    			x0: x0,
-    			x1: x0 += d[name],
-    			N: sum,
-    			n: +d['c'+ (idx += 1)]
-    		}
-    	})
-    	console.log(d)
-    })
-
-    var min = d3.min(data, d => d.boxes['0'].x0 )
-    var max = d3.max(data, d => d.boxes['2'].x1 )
-
-    xscale.domain([min, max]).nice()
-    yscale.domain(data.map(d => [d[x], d['filter_id']]))
-
-    g.append("g")
-    	.attr("class", "x axis")
-    	.call(xAxis)
-
-    g.append("g")
-    	.attr("class", "y axis")
-    	.call(yAxis)
-
-    	console.log(data)
-
-    var vakken = g.selectAll(".items")
-    		.data(data)
-    	.enter().append("g")
-    		.attr("class","bar")
-    		.attr("transform", d => "translate(0,"+yscale(d[x])+")")
-
-    var bars = vakken.selectAll("rect")
-    		.data(d => d.boxes)
-    	.enter().append("g")
-    		.attr("class", "subbar")
-
-    bars.append("rect")
-    	.attr("height", yscale.range())
-    	.attr("x", d => xscale(d.x0))
-    	.attr("width", d => (xscale(d.x1)-xscale(d.x0)) )
-    	.attr("fill", "red")
-
-    bars.append("text")
-    	.attr("x", d => xscale(d.x0))
-    	.attr("y", yscale.range()/2)
-    	.attr("dy", "0.5em")
-    	.attr("dx", "0.5em")
-    	.style("font", "10px sans-serif")
-    	.style("text-anchor", "begin")
-    	.text( function(d) { return d.n !== 0 && (d.x1-d.x0)>3 ? d.n : "" } )
-
-    vakken.insert("rect", ":first-child")
-    	.attr("height", yscale.range())
-    	.attr("x", "1")
-    	.attr("width", width)
-    	.attr("fill-opacity", "0.5")
-    	.style("fill", "red")
-    	.attr("class", (d,i) => i%2==0 ? "even" : "uneven" )
-
-    g.append("g")
-    		.attr("class", "y axis")
-    	.append("line")
-    		.attr("x1", xscale(0))
-    		.attr("x2", xscale(0))
-    		.attr("y2", height)*/
 
   }
 

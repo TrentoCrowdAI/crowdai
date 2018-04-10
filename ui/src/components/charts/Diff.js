@@ -106,11 +106,23 @@ class Diff extends React.Component {
 
 	render() {
 		var arr = Object.values(data.tasks);
+		var x = 'item_id'
+		var z = 'filter_id'
+		var ind = 0
+		var criteria = []
+		Object.keys(data.tasks.question1).map( (step,i) => { 
+			if(step!==x && step!==z) criteria[ind++]=step 
+		})
+
+//they all have the same number of criteria?
+
+		console.log(criteria)
 		return(
 			<div>
 				<ChartWrapper 
-          x={'item_id'}
-          y={['c1','c2','c3']}
+          x={x}
+          z={z}
+          y={criteria}
           chart={'stacked'}
           selector={'chart1'}
           data={arr}

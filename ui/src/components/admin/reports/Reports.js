@@ -175,7 +175,8 @@ class Reports extends React.Component {
 		this.state = {
 			activeMetric : '(choose a metric)',
 			chosenjob: '',
-			chosenworker: ''
+			chosenworker: '',
+			activeworker: false
 		}
 		this.activeMetric = this.activeMetric.bind(this)
 		this.chooseJob = this.chooseJob.bind(this)
@@ -206,17 +207,18 @@ class Reports extends React.Component {
 			chosenworker: value
 		})
 
-		//fetch data of the worker
+		//fetch data of the worker, fill workerData
 
   }
 
 	chooseJob(e, {value}) {
   	this.setState({
 			...this.state, 
-			chosenjob: value
+			chosenjob: value,
+			activeworker: true
 		})
 
-		//fetch data of the job
+		//fetch data of the job, fill WorkerOptions
 
   }
 
@@ -354,6 +356,7 @@ class Reports extends React.Component {
 						onChange={this.chooseJob}
 						chosenjob={this.state.chosenjob}/>
 					<WorkerChooser 
+						disabled={!this.state.activeworker}
 						options={WorkerOptions}
 						match={this.props.match}
 						onChange={this.chooseWorker}
@@ -392,8 +395,6 @@ class Reports extends React.Component {
 				data = []
 				break;
 		}
-
-		console.log(data)
 
 		return(
 			<div style={{margin: '20px'}}>

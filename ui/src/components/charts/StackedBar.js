@@ -44,12 +44,8 @@ class StackedBar extends React.Component {
     var xAxis = d3.axisTop().scale(xscale)//.tickFormat(d3.format(",%"))
     var yAxis = d3.axisLeft().scale(yscale)//.tickSize(0)
 
-    /*var rateNames = Object.values(criteria)
-    console.log("categories", criteria)*/
     var rowsNames = data.map( d => d[x]+','+d[z])
-    //console.log("items", rowsNames)
     var neutralIndex = Math.floor(Object.values(criteria).length/2)
-    //console.log(neutralIndex)
 
     color.domain(criteria)
 
@@ -143,13 +139,11 @@ class StackedBar extends React.Component {
   render() {
     return (
     	<div>
-    		<svg className={this.props.selector} width="600" height="400"> </svg>
+    		<svg className={this.props.selector} width="700" height={this.props.data.length*60}> </svg>
     	</div>
     );
   }
 }
-
-
 
 StackedBar.propTypes = {
 

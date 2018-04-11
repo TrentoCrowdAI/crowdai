@@ -17,8 +17,17 @@ class NestChart extends React.Component {
     var svg = d3.select("."+this.props.selector);
     var x = this.props.x
     var y = this.props.y
+    var z = this.props.z
 
-    var data = this.state.data
+    var data = []
+    switch(this.props.choice) {
+      case 'w':
+        data = this.state.data.filter(d => d[z]==this.props.choice_id)
+        break;
+      default:
+        data = this.state.data
+        break;
+    }
 
     var sum = 0
     data.map(step => {

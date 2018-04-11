@@ -205,6 +205,9 @@ class Reports extends React.Component {
 			...this.state, 
 			chosenworker: value
 		})
+
+		//fetch data of the worker
+
   }
 
 	chooseJob(e, {value}) {
@@ -212,6 +215,9 @@ class Reports extends React.Component {
 			...this.state, 
 			chosenjob: value
 		})
+
+		//fetch data of the job
+
   }
 
 	renderMetrics() {
@@ -270,7 +276,7 @@ class Reports extends React.Component {
 		)
 	}
 
-	renderChart(chart,x,y,z,data) {
+	renderChart(chart,x,y,z,data, choice, choice_id) {
 		return(
 			<React.Fragment>
 			<ChartWrapper 
@@ -280,7 +286,9 @@ class Reports extends React.Component {
         z={z}
         selector={'chart1'}
         color={'steelblue'}
-        data={data}
+				data={data}
+				choice={choice}
+				choice_id={choice_id}
       />
       </React.Fragment>
 		)
@@ -296,14 +304,15 @@ class Reports extends React.Component {
 
     //WorkerOptions should contain all the workers for te selected Job
     Object.values(workerData.tasks).map(d => WorkerOptions[d.worker_id]=d.worker_id)
-    //Object.values(workerData.tasks).filter(d => d.worker_id==this.state.chosenworker)
-    //console.log(data)
 
 		var optionbutt
 		var chart
 		var x
 		var y
 		var z
+
+		var choice
+		var choice_id
 
 		switch (this.state.activeMetric) {
 
@@ -312,6 +321,9 @@ class Reports extends React.Component {
 				x='total_time'
 				y='task_id'
 				z=''
+
+				choice='j'
+				choice_id=this.state.chosenjob
 
 				optionbutt = 
 					<React.Fragment>
@@ -331,6 +343,9 @@ class Reports extends React.Component {
 				//group or filter by z
 				z='worker_id'
 
+				choice='w'
+				choice_id=this.state.chosenworker
+
 				optionbutt=
 					<React.Fragment>
 					<JobChooser 
@@ -345,7 +360,7 @@ class Reports extends React.Component {
 						chosenworker={this.state.chosenworker}
 						/>
 					</React.Fragment>
-				data = Object.values(workerData.tasks).filter(d => d.worker_id==this.state.chosenworker)
+				data = Object.values(workerData.tasks)//.filter(d => d.worker_id==this.state.chosenworker)
 				break;
 
 			case 'Agreements':
@@ -356,6 +371,9 @@ class Reports extends React.Component {
 				y=['c1','c2','c3']
 				//second groupby
 				z='filter_id'
+
+				choice='j'
+				choice_id=this.state.chosenjob
 
 				optionbutt = 
 					<React.Fragment>
@@ -393,7 +411,7 @@ class Reports extends React.Component {
 
 					<div>
 						{optionbutt}
-						{this.renderChart(chart,x,y,z,data)}
+						{this.renderChart(chart,x,y,z,data, choice, choice_id)}
 					</div>
 				</div>
 

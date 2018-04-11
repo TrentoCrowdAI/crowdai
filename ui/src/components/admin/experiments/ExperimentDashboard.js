@@ -114,31 +114,6 @@ class ExperimentDashboard extends React.Component {
               </Statistic.Group>
             </Grid.Column>
           </Grid.Row>
-          {item.data.status === JobStatus.NOT_PUBLISHED && (
-            <Grid.Row>
-              <Grid.Column width="10" style={{marginLeft: 'auto', marginRight: 'auto'}}>
-                <Header content="HIT configuration" />
-
-                <Form.Group widths="equal">
-                  <Form.Input
-                    label="Assignment duration (in minutes)"
-                    name="data.hitConfig.assignmentDurationInMinutes"
-                    value={item.data.hitConfig.assignmentDurationInMinutes}
-                    onChange={this.handleChange}
-                    required
-                  />
-                  <Form.Input
-                    label="Lifetime (in minutes)"
-                    name="data.hitConfig.lifetimeInMinutes"
-                    value={item.data.hitConfig.lifetimeInMinutes}
-                    placeholder="120"
-                    onChange={this.handleChange}
-                    required
-                  />
-                </Form.Group>
-              </Grid.Column>
-            </Grid.Row>
-          )}
           <Grid.Row>
             <Grid.Column width="10" style={{marginLeft: 'auto', marginRight: 'auto'}}>
               {this.props.error && (
@@ -275,7 +250,6 @@ class ExperimentDashboard extends React.Component {
         in: true
       }
     ];
-    const {item} = this.props;
 
     return (
       <Form>

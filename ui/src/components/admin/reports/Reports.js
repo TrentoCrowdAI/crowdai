@@ -175,7 +175,7 @@ class Reports extends React.Component {
 		this.state = {
 			activeMetric : '(choose a metric)',
 			chosenjob: '',
-			chosenworker: '1'
+			chosenworker: ''
 		}
 		this.activeMetric = this.activeMetric.bind(this)
 		this.chooseJob = this.chooseJob.bind(this)
@@ -302,9 +302,9 @@ class Reports extends React.Component {
       JobOptions[step.id] = step.data.name
     });
 
-    //WorkerOptions should contain all the workers for te selected Job
-    Object.values(workerData.tasks).map(d => WorkerOptions[d.worker_id]=d.worker_id)
-
+		//WorkerOptions should contain all the workers for te selected Job
+		Object.values(workerData.tasks).map(d => WorkerOptions[d.worker_id]=d.worker_id)
+		    
 		var optionbutt
 		var chart
 		var x
@@ -344,7 +344,7 @@ class Reports extends React.Component {
 				z='worker_id'
 
 				choice='w'
-				choice_id=this.state.chosenworker
+				choice_id= this.state.chosenworker=='' ? 'all' : this.state.chosenworker
 
 				optionbutt=
 					<React.Fragment>

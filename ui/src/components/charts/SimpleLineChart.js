@@ -114,6 +114,7 @@ class SimpleLineChart extends React.Component {
             }
           })
         })
+        
         //drag modifying data (?)
         /*.call(d3.drag()
           .on("drag", function(d) {
@@ -175,7 +176,7 @@ class SimpleLineChart extends React.Component {
   render() {
     return(
       <div>
-        <svg className={this.props.selector} width="600" height="400"> </svg>
+        <svg className={this.props.selector} width="700" height="400"> </svg>
         <br />
         <strong>Clicked data:</strong> {this.state.clicked}
       </div>

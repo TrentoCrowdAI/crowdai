@@ -30,7 +30,7 @@ class WorkerChooser extends React.Component {
       <div
       style={{textAlign: 'right'}}>
       <Form.Select 
-          disabled={this.props.disabled}
+          
           label="Select Worker  "
           value={this.props.chosenworker}
           options={Object.entries(this.props.options).map(([key, val]) => ({text: val, value: key}))}

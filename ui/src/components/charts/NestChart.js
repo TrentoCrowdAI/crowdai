@@ -18,7 +18,18 @@ class NestChart extends React.Component {
     switch(this.props.choice) {
       case 'w':
         if(this.props.choice_id=='all') {
-          console.log("all workers selected")
+          //console.log("all workers selected")
+          var svg = d3.select("."+this.props.selector)
+
+          //modifica definitivamente l'svg
+          /*svg.attr("width",700)
+             .attr("height",50)*/
+          //d3.select(".nest").selectAll("button").remove()
+          var margin = {top: 30, right: 30, bottom: 30, left: 30};
+          var g = svg.append("g")
+          g.append("text")
+            .text("Choose a worker")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
         } else {
           data = this.state.data.filter(d => d[this.props.z]==this.props.choice_id)
           this.buildGraph(data)
@@ -75,7 +86,7 @@ class NestChart extends React.Component {
     bar.append("rect")
         .style("fill", d => {
           if(d[y]>=media) return color
-            else return "green"
+            else return "lightgreen"
         })
         .attr("x", d => xscale(d[x]))
         .attr("y", d => yscale(d[y]))
@@ -154,8 +165,8 @@ class NestChart extends React.Component {
     //console.log(this.props)
     //console.log(this.state)
     return (
-      <div>
-        <svg className={this.props.selector} width="600" height="400"> </svg>
+      <div className='nest'>
+        <svg className={this.props.selector} width="700" height="400"> </svg>
         <br />
         <button
           onClick={(event) => this.setState({

@@ -21,6 +21,7 @@ import './reports.css';
 import ChartWrapper from 'src/components/charts/ChartWrapper';
 import JobChooser from './JobChooser';
 import WorkerChooser from './WorkerChooser';
+import { Z_UNKNOWN } from 'zlib';
 
 //general data variable
 var data = []
@@ -166,7 +167,9 @@ var workerData = {
 	}
 }
 
-var WorkerOptions = { }
+var WorkerOptions = {
+	all: 'All Workers'
+ }
 var JobOptions = { }
 
 class Reports extends React.Component {
@@ -175,7 +178,7 @@ class Reports extends React.Component {
 		this.state = {
 			activeMetric : '(choose a metric)',
 			chosenjob: '',
-			chosenworker: '',
+			chosenworker: 'all',
 			activeworker: false
 		}
 		this.activeMetric = this.activeMetric.bind(this)
@@ -230,14 +233,14 @@ class Reports extends React.Component {
 					className='metrics'
 					style={{marginBottom: '5px'}}
 					onClick={this.activeMetric}
-				>Time to complete per Task</Button>
+				>Time to complete per Task V</Button>
 				<br />
 				<Button 
 					value='W_CompleteTime'
 					className='metrics'
 					style={{marginBottom: '5px'}}
 					onClick={this.activeMetric}
-				>Time to complete per Worker</Button>
+				>Time to complete per Worker V</Button>
 				<br />
 				<Button 
 					value='Successes'
@@ -251,7 +254,7 @@ class Reports extends React.Component {
 					className='metrics' 
 					style={{marginBottom: '5px'}}
 					onClick={this.activeMetric}
-				>Agreement metrics</Button>
+				>Agreement metrics V</Button>
 				<br />
 				<Button 
 					value='Classifications'
@@ -388,6 +391,33 @@ class Reports extends React.Component {
 					</React.Fragment>
 
 				data = Object.values(agreeData.tasks)
+				break;
+
+			case 'Successes':
+				chart='pie'
+				x=''
+				y=''
+				z=''
+
+				choice='w'
+				choice_id=this.state.chosenworker
+
+				optionbutt=
+					<React.Fragment>
+					<JobChooser 
+						options={JobOptions}
+						match={this.props.match}
+						onChange={this.chooseJob}
+						chosenjob={this.state.chosenjob}/>
+					<WorkerChooser 
+						disabled={!this.state.activeworker}
+						options={WorkerOptions}
+						match={this.props.match}
+						onChange={this.chooseWorker}
+						chosenworker={this.state.chosenworker}
+						/>
+					</React.Fragment>
+					data=[]
 				break;
 
 			default:

@@ -85,10 +85,10 @@ class Histogram extends React.Component {
 
     bar.append("text")
           .attr("dy", ".75em")
-          .attr("y", d => -15)
+          .attr("y", d => 10)
           .attr("x", d => (xscale(d.x1)-xscale(d.x0))/2 )
           .attr("text-anchor", "middle")
-          .style("fill", color)
+          .style("fill", "white")
           .text( d => d.length ? d.length : null)
 
     g.append("g")
@@ -133,7 +133,7 @@ class Histogram extends React.Component {
     return (
       <div>
         <br />
-        <svg className={this.props.selector} width="600" height="400"> </svg>
+        <svg className={this.props.selector} width="700" height="400"> </svg>
         <br />
         <strong>Clicked data:</strong> <ul>{stampa}</ul>
         {

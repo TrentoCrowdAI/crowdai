@@ -18,15 +18,13 @@ class NestChart extends React.Component {
     var x = this.props.x
     var y = this.props.y
 
-    var data = this.state.data//.sort( (a,b) =>
-        //(a[x] > b[x]) ? 1 : ((b[x] > a[x]) ? -1 : 0))
+    var data = this.state.data
 
     var sum = 0
     data.map(step => {
       sum += step[y]
     })
     var media = sum/data.length
-    //console.log(media)
 
     var margin = {top: 30, right: 30, bottom: 30, left: 30};
     var width = +svg.attr("width") - margin.left - margin.right;
@@ -133,6 +131,8 @@ class NestChart extends React.Component {
   }
 
   render() {
+    //console.log(this.props)
+    //console.log(this.state)
     return (
       <div>
         <svg className={this.props.selector} width="600" height="400"> </svg>

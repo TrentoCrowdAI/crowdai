@@ -22,10 +22,81 @@ import ChartWrapper from 'src/components/charts/ChartWrapper';
 import JobChooser from './JobChooser';
 import WorkerChooser from './WorkerChooser';
 
+//general data variable
 var data = []
-//= {"tasks":{"task1":{"total_time":2.21,"task_id":1},"task2":{"total_time":3.45,"task_id":3},"task3":{"total_time":4.65,"task_id":7},"task4":{"total_time":5.6,"task_id":2},"task5":{"total_time":9.6,"task_id":5},"task6":{"total_time":8.6,"task_id":9},"task7":{"total_time":2.6,"task_id":11},"task8":{"total_time":3.6,"task_id":32},"task9":{"total_time":4.6,"task_id":27},"task10":{"total_time":8.6,"task_id":21},"task11":{"total_time":7.6,"task_id":22}}}
 
-var wdata = {
+//fetched in componentDidMount()
+var timeData = []
+
+var agreeData = {
+			tasks: {
+				question1: {
+					item_id: 2,
+					filter_id: 1,
+					c1: 4,
+					c2: 6,
+					c3: 2
+				},
+				question2: {
+					item_id: 2,
+					filter_id: 2,
+					c1: 2,
+					c2: 4,
+					c3: 0
+				},
+				question3: {
+					item_id: 2,
+					filter_id: 3,
+					c1: 6,
+					c2: 0,
+					c3: 2
+				},
+				question4: {
+					item_id: 1,
+					filter_id: 2,
+					c1: 0,
+					c2: 2,
+					c3: 9
+				},
+				question5: {
+					item_id: 3,
+					filter_id: 1,
+					c1: 0,
+					c2: 3,
+					c3: 3
+				},
+				question6: {
+					item_id: 3,
+					filter_id: 4,
+					c1: 1,
+					c2: 1,
+					c3: 4
+				},
+				question7: {
+					item_id: 3,
+					filter_id: 5,
+					c1: 1,
+					c2: 0,
+					c3: 12
+				},
+				question8: {
+					item_id: 3,
+					filter_id: 6,
+					c1: 9,
+					c2: 6,
+					c3: 3
+				},
+				question9: {
+					item_id: 4,
+					filter_id: 3,
+					c1: 2,
+					c2: 5,
+					c3: 0
+				}
+			}
+}
+
+var workerData = {
 	tasks: {
 		task1: {
 			worker_id: 1, 
@@ -82,12 +153,12 @@ var wdata = {
 			total_time: 4.6,
 			task_id: 27
 		},
-		task11: {
+		task12: {
 			worker_id: 1, 
 			total_time: 8.23,
 			task_id: 27
 		},
-		task11: {
+		task13: {
 			worker_id: 3, 
 			total_time: 7.54,
 			task_id: 27
@@ -95,22 +166,7 @@ var wdata = {
 	}
 }
 
-
-const MetricOptions = [
-	'Time to complete per Task',
-	'Task details per Worker',
-	'Percentage % of success',
-	'Agreement metrics',
-	'Classification decision and Probabilities',
-	'Percentage % of Workers who failed Initial Test',
-	'Percentage % of Workers who failed Honeypots'
-]
-
-var WorkerOptions = {
-	id1: 'worker 1',
-	id2: 'worker 2',
-	id3: 'worker 3'
-}
+var WorkerOptions = { }
 var JobOptions = { }
 
 class Reports extends React.Component {
@@ -119,7 +175,7 @@ class Reports extends React.Component {
 		this.state = {
 			activeMetric : '(choose a metric)',
 			chosenjob: '',
-			chosenworker: ''
+			chosenworker: '1'
 		}
 		this.activeMetric = this.activeMetric.bind(this)
 		this.chooseJob = this.chooseJob.bind(this)
@@ -131,7 +187,7 @@ class Reports extends React.Component {
 		fetch('https://2mmbyxgwk6.execute-api.eu-central-1.amazonaws.com/reports')
 		.then(response => response.json())
 		.then(json => {
-			data = Object.values(json.tasks)
+			timeData = Object.values(json.tasks)
 		})
 
 		this.props.fetchExperiments(this.props.match.params.projectid);
@@ -140,7 +196,7 @@ class Reports extends React.Component {
 	activeMetric(e, {value}) {
 		this.setState({
 			...this.state,
-			activeMetric: value
+			activeMetric: value,
 		})		
 	}
 
@@ -214,25 +270,49 @@ class Reports extends React.Component {
 		)
 	}
 
+	renderChart(chart,x,y,z,data) {
+		return(
+			<React.Fragment>
+			<ChartWrapper 
+				chart={chart}
+        x={x}
+        y={y}
+        z={z}
+        selector={'chart1'}
+        color={'steelblue'}
+        data={data}
+      />
+      </React.Fragment>
+		)
+	}
+
 	render() {
-		//console.log(this.state)
+		
+		//JobOptions contains all the jobs for the previously selected project
 		JobOptions = { }
     this.props.experiments.rows.map( step => {
       JobOptions[step.id] = step.data.name
     });
+
+    //WorkerOptions should contain all the workers for te selected Job
+    Object.values(workerData.tasks).map(d => WorkerOptions[d.worker_id]=d.worker_id)
+    //Object.values(workerData.tasks).filter(d => d.worker_id==this.state.chosenworker)
+    //console.log(data)
 
 		var optionbutt
 		var chart
 		var x
 		var y
 		var z
-		var newData
 
 		switch (this.state.activeMetric) {
+
 			case 'T_CompleteTime':
 				chart='histogram'
 				x='total_time'
 				y='task_id'
+				z=''
+
 				optionbutt = 
 					<React.Fragment>
 					<JobChooser 
@@ -241,11 +321,16 @@ class Reports extends React.Component {
 						onChange={this.chooseJob}
 						chosenjob={this.state.chosenjob}/>
 					</React.Fragment>
+				data = timeData
 				break;
+
 			case 'W_CompleteTime':
 				chart='nest'
 				x='task_id'
 				y='total_time'
+				//group or filter by z
+				z='worker_id'
+
 				optionbutt=
 					<React.Fragment>
 					<JobChooser 
@@ -260,12 +345,18 @@ class Reports extends React.Component {
 						chosenworker={this.state.chosenworker}
 						/>
 					</React.Fragment>
+				data = Object.values(workerData.tasks).filter(d => d.worker_id==this.state.chosenworker)
 				break;
+
 			case 'Agreements':
 				chart='stacked'
+				//first groupby
 				x='item_id'
-				z='filter_id'
+				//categories
 				y=['c1','c2','c3']
+				//second groupby
+				z='filter_id'
+
 				optionbutt = 
 					<React.Fragment>
 					<JobChooser 
@@ -274,76 +365,17 @@ class Reports extends React.Component {
 						onChange={this.chooseJob}
 						chosenjob={this.state.chosenjob}/>
 					</React.Fragment>
-				data = Object.values({
-				question1: {
-					item_id: 2,
-					filter_id: 1,
-					c1: 4,
-					c2: 6,
-					c3: 2
-				},
-				question2: {
-					item_id: 2,
-					filter_id: 2,
-					c1: 2,
-					c2: 4,
-					c3: 0
-				},
-				question3: {
-					item_id: 2,
-					filter_id: 3,
-					c1: 6,
-					c2: 0,
-					c3: 2
-				},
-				question4: {
-					item_id: 1,
-					filter_id: 2,
-					c1: 0,
-					c2: 2,
-					c3: 9
-				},
-				question5: {
-					item_id: 3,
-					filter_id: 1,
-					c1: 0,
-					c2: 3,
-					c3: 3
-				},
-				question6: {
-					item_id: 3,
-					filter_id: 4,
-					c1: 1,
-					c2: 1,
-					c3: 4
-				},
-				question7: {
-					item_id: 3,
-					filter_id: 5,
-					c1: 1,
-					c2: 0,
-					c3: 12
-				},
-				question8: {
-					item_id: 3,
-					filter_id: 6,
-					c1: 9,
-					c2: 6,
-					c3: 3
-				},
-				question9: {
-					item_id: 4,
-					filter_id: 3,
-					c1: 2,
-					c2: 5,
-					c3: 0
-				}
-			})
+
+				data = Object.values(agreeData.tasks)
 				break;
+
 			default:
 				optionbutt = ''
+				data = []
 				break;
 		}
+
+		console.log(data)
 
 		return(
 			<div style={{margin: '20px'}}>
@@ -361,15 +393,7 @@ class Reports extends React.Component {
 
 					<div>
 						{optionbutt}
-						<ChartWrapper 
-							chart={chart}
-            	x={x}
-            	y={y}
-            	z={z}
-            	selector={'chart1'}
-            	color={'steelblue'}
-            	data={data}
-           	/>
+						{this.renderChart(chart,x,y,z,data)}
 					</div>
 				</div>
 

@@ -37,15 +37,15 @@ class Histogram extends React.Component {
         .domain([d3.min(data, d => Math.floor(d[x]/10)*10), d3.max(data, d => Math.round((d[x]+4)/10)*10)])
     var xAxis = d3.axisBottom(xscale);
 
-    var yscale = d3.scaleLinear()
-        .domain([0, data.length])
-        .range([height,0])
-    var yAxis = d3.axisLeft(yscale);
-
     var histo = d3.histogram()
         //.domain(d3.extent(data, d => d[x]))
         .thresholds(xscale.ticks(10))
         (data.map(d => d[x]));
+
+    var yscale = d3.scaleLinear()
+      .domain([0, d3.max(histo, d => d.length)])
+      .range([height,0])
+    var yAxis = d3.axisLeft(yscale);
 
     var bar = g.selectAll(".bar")
         .data(histo)

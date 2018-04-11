@@ -168,16 +168,18 @@ var workerData = {
 }
 
 var WorkerOptions = {
-	all: 'All Workers'
- }
-var JobOptions = { }
+	'all' : 'All Workers'
+}
+var JobOptions = {
+	'all' : 'All Jobs'
+}
 
 class Reports extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
 			activeMetric : '(choose a metric)',
-			chosenjob: '',
+			chosenjob: 'all',
 			chosenworker: 'all',
 			activeworker: false
 		}
@@ -187,21 +189,22 @@ class Reports extends React.Component {
 	}
 
 	componentDidMount() {
+		this.props.fetchExperiments(this.props.match.params.projectid);
+	}
 
-		fetch('https://2mmbyxgwk6.execute-api.eu-central-1.amazonaws.com/reports')
+	componentDidUpdate() {
+		/*fetch('https://2mmbyxgwk6.execute-api.eu-central-1.amazonaws.com/reports')
 		.then(response => response.json())
 		.then(json => {
 			timeData = Object.values(json.tasks)
-		})
-
-		this.props.fetchExperiments(this.props.match.params.projectid);
+		})*/
 	}
 
 	activeMetric(e, {value}) {
 		this.setState({
 			...this.state,
-			activeMetric: value,
-		})		
+			activeMetric: value
+		})
 	}
 
 	chooseWorker(e, {value}) {
@@ -215,6 +218,9 @@ class Reports extends React.Component {
   }
 
 	chooseJob(e, {value}) {
+		console.log('job : ', value)
+		this.props.fetchTaskTime(value);
+
   	this.setState({
 			...this.state, 
 			chosenjob: value,
@@ -233,14 +239,14 @@ class Reports extends React.Component {
 					className='metrics'
 					style={{marginBottom: '5px'}}
 					onClick={this.activeMetric}
-				>Time to complete per Task V</Button>
+				>Time to complete per Task</Button>
 				<br />
 				<Button 
 					value='W_CompleteTime'
 					className='metrics'
 					style={{marginBottom: '5px'}}
 					onClick={this.activeMetric}
-				>Time to complete per Worker V</Button>
+				>Time to complete per Worker</Button>
 				<br />
 				<Button 
 					value='Successes'
@@ -254,7 +260,7 @@ class Reports extends React.Component {
 					className='metrics' 
 					style={{marginBottom: '5px'}}
 					onClick={this.activeMetric}
-				>Agreement metrics V</Button>
+				>Agreement metrics</Button>
 				<br />
 				<Button 
 					value='Classifications'
@@ -300,13 +306,16 @@ class Reports extends React.Component {
 	}
 
 	render() {
+
+		timeData = Object.values(this.props.reports.tasks)
 		
-		//JobOptions contains all the jobs for the previously selected project
-		JobOptions = { }
+		JobOptions = {
+			'all' : 'All Jobs'
+		}
     this.props.experiments.rows.map( step => {
       JobOptions[step.id] = step.data.name
     });
-
+		console.log(JobOptions)
 		//WorkerOptions should contain all the workers for te selected Job
 		Object.values(workerData.tasks).map(d => WorkerOptions[d.worker_id]=d.worker_id)
 		    
@@ -338,6 +347,7 @@ class Reports extends React.Component {
 						onChange={this.chooseJob}
 						chosenjob={this.state.chosenjob}/>
 					</React.Fragment>
+
 				data = timeData
 				break;
 
@@ -452,21 +462,29 @@ class Reports extends React.Component {
 }
 
 Reports.propTypes = {
-  fetchExperiments: PropTypes.func,
-  error: PropTypes.any,
-  loading: PropTypes.bool,
-  experiments: PropTypes.object,
-  match: PropTypes.object
+	fetchExperiments: PropTypes.func,
+	fetchTaskTime: PropTypes.func,
+  exp_error: PropTypes.any,
+  exp_loading: PropTypes.bool,
+	experiments: PropTypes.object,
+	match: PropTypes.object,
+	rep_error: PropTypes.any,
+	rep_loading: PropTypes.bool,
+	reports: PropTypes.any
 }
 
 const mapDispatchToProps = dispatch => ({
-  fetchExperiments: projectId => dispatch(expactions.fetchExperiments(projectId))
+	fetchExperiments: projectId => dispatch(expactions.fetchExperiments(projectId)),
+	fetchTaskTime: jobId => dispatch(actions.fetchTaskTime(jobId))
 })
 
 const mapStateToProps = state => ({
   experiments: state.experiment.list.experiments,
-  error: state.experiment.list.error,
-  loading: state.experiment.list.loading
+  exp_error: state.experiment.list.error,
+	exp_loading: state.experiment.list.loading,
+	reports: state.report.list.reports,
+	rep_error: state.report.list.error,
+	rep_loading: state.report.list.loading
 })
 
 export default connect(mapStateToProps,mapDispatchToProps)(Reports)

@@ -1,13 +1,12 @@
 import {combineReducers} from 'redux';
 
-import {actionTypes} from './actions';
 import {getReducer} from 'src/utils/form';
 import {scopes, FileFormats} from 'src/utils/constants';
+import {actionTypes} from './actions';
 
 const defaultState = {
   reports: {
-    rows: [],
-    meta: {}
+    tasks: []
   },
   error: undefined,
   loading: false
@@ -15,19 +14,19 @@ const defaultState = {
 
 const reducer = (state = defaultState, action) => {
   switch (action.type) {
-    case actionTypes.FETCH_REPORTS:
+    case actionTypes.FETCH_TTIME:
       return {
         ...state,
         error: undefined,
         loading: true
       };
-    case actionTypes.FETCH_REPORTS_SUCCESS:
+    case actionTypes.FETCH_TTIME_SUCCESS:
       return {
         ...state,
         reports: action.response,
         loading: false
       };
-    case actionTypes.FETCH_REPORTS_ERROR:
+    case actionTypes.FETCH_TTIME_ERROR:
       return {
         ...state,
         error: action.error,

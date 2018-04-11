@@ -5,4 +5,5 @@ exports.workers = require('./workers');
 exports.requesters = require('./requesters');
 exports.jobs = require('./jobs');
 exports.projects = require('./projects');
+exports.reports = require('./reports');
 exports.taskAssignmentApi = require('./task-assignment-api');

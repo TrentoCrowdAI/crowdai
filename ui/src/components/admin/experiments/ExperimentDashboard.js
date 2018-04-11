@@ -189,7 +189,7 @@ class ExperimentDashboard extends React.Component {
         label="Aggregation strategy"
         value={this.state.aggregationStrategy}
         options={Object.entries(AggregationStrategies).map(([key, val]) => ({text: val, value: key}))}
-        onChange={(e, {value}) => this.setState({...this.state, aggregationStrategy: value})}
+        onChange={(e, {value}) => {this.setState({...this.state, aggregationStrategy: value})}}
       />
     );
   }

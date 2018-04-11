@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node -r dotenv/config src/app.js",
+    "start": "nodemon -r dotenv/config src/app.js",
     "debug": "node -r dotenv/config --inspect src/app.js"
   },
   "dependencies": {
@@ -27,5 +27,8 @@
     "request": "^2.83.0",
     "stream-transform": "^1.0.0",
     "uuid": "^3.2.1"
+  },
+  "devDependencies": {
+    "nodemon": "^1.17.2"
   }
 }

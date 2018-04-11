@@ -5,65 +5,105 @@ import PropTypes from 'prop-types'
 
 import SimpleLineChart from './SimpleLineChart.js'
 import Histogram from './Histogram.js'
+import HeatMap from './HeatMap.js'
+import AreaChart from './AreaChart.js'
+import NestChart from './NestChart.js'
+import StackedBar from './StackedBar.js'
 
-var chartData = [{
-  name: "will",
-  altezza: "160",
-  peso: "69"
-},{
-  name: "rob",
-  altezza: "185",
-  peso: "90"
-},{
-  name: "july",
-  peso: "45",
-  altezza: "165"
-},{
-  name: "fabio",
-  altezza: "177",
-  peso: "65"
-},{
-  name: "rocky",
-  altezza: "170",
-  peso: "88"
-},{
-  name: "rose",
-  altezza: "160",
-  peso: "55"
-},{
-  name: "lola",
-  altezza: "190",
-  peso: "76"
-}]
+var count = 0;
 
 class ChartWrapper extends React.Component {
 
+  constructor(props) {
+    super(props);
+    this.state = {
+      data: this.props.data
+    }
+    //this.handleConcat = this.handleConcat.bind(this);
+    //this.handleReduce = this.handleReduce.bind(this);
+  }
+
+  /*handleConcat() {
+    var num = Math.floor(Math.random()*10)+1;
+    for(var i=0; i<num; i++) {
+      this.setState(prevState => ({
+        data: prevState.data.concat(
+          [{
+            name: "nuovodato"+(count++).toString(),
+            altezza: (Math.floor(Math.random()*60)+150),
+            peso: (Math.floor(Math.random()*80)+40)
+          }]
+        )
+      }))
+    }
+  }
+
+  handleReduce() {
+    this.setState(prevState => ({
+      data: []
+    }))
+    count=0;
+  }*/
+
   render() {
-    return(
-      <div>
-        <SimpleLineChart
-          data={chartData}
-          x={'peso'}
-          y={'altezza'}
-          selector={'chart1'}
-          color={'blue'}/>
-        <hr />
-        <SimpleLineChart
-          data={chartData}
-          x={'altezza'}
-          y={'peso'}
-          selector={'chart2'}
-          color={'black'}/>
-        <hr />
-        <Histogram
-          data={chartData}
-          x={'peso'}
-          y={'altezza'}
-          selector={'chart3'}
-          color={'green'}/>
-        <hr />
-      </div>
-    )
+    switch(this.props.chart) {
+      case 'histogram':
+        return(
+          <div>
+          <Histogram
+            {... this.props}
+            />
+          </div>
+        );
+      case 'linechart':
+        return(
+          <div>
+          <SimpleLineChart
+            {... this.props}
+            />
+          </div>
+        );
+      case 'heatmap':
+        return(
+          <div>
+            <HeatMap 
+              {... this.props}
+              />
+          </div>
+        );
+      case 'area': 
+        return(
+          <div>
+            <AreaChart
+              {... this.props}
+            />
+          </div>
+        );
+      case 'nest': 
+        return(
+          <div>
+            <NestChart
+              {... this.props}
+            />
+          </div>
+        );
+      case 'stacked':
+        return(
+          <div>
+            <StackedBar 
+              {... this.props}
+            />
+          </div>
+        )
+        break;
+      default:
+        return(
+          <div>
+            No data to display yet
+            <svg width="600"></svg>
+          </div>
+        );
+    }
   }
 }
 

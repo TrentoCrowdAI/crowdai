@@ -2,24 +2,27 @@ import React from 'react'
 import { connect } from 'react-redux'
 import * as d3 from 'd3'
 import PropTypes from 'prop-types'
+import Math from 'math'
+
+import NestChart from './NestChart'
+import ChartWrapper from './ChartWrapper'
 
 class Histogram extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      data: this.props.data
+      clicked: []
     }
     this.buildGraph = this.buildGraph.bind(this);
-    this.handleConcat = this.handleConcat.bind(this);
-    this.handleReduce = this.handleReduce.bind(this);
+    this.handleClick = this.handleClick.bind(this);
   }
 
   buildGraph() {
     var svg = d3.select("."+this.props.selector);
     var x = this.props.x
-    //var y = this.props.y
+    var y = this.props.y
 
-    var data = this.state.data.sort( function(a,b) {
+    var data = this.props.data.sort( function(a,b) {
       return (a[x] > b[x]) ? 1 : ((b[x] > a[x]) ? -1 : 0);
     })
 
@@ -31,7 +34,7 @@ class Histogram extends React.Component {
 
     var xscale = d3.scaleLinear()
         .range([0, width])
-        .domain(d3.extent(data, d => d[x]))
+        .domain([d3.min(data, d => Math.floor(d[x]/10)*10), d3.max(data, d => Math.round((d[x]+4)/10)*10)])
     var xAxis = d3.axisBottom(xscale);
 
     var yscale = d3.scaleLinear()
@@ -40,39 +43,53 @@ class Histogram extends React.Component {
     var yAxis = d3.axisLeft(yscale);
 
     var histo = d3.histogram()
-    .domain(d3.extent(data, d => d[x]))
-    (data.map(d => d[x]));
+        //.domain(d3.extent(data, d => d[x]))
+        .thresholds(xscale.ticks(10))
+        (data.map(d => d[x]));
 
     var bar = g.selectAll(".bar")
         .data(histo)
         .enter().append("g")
         .attr("class", "bar")
         .attr("transform", function(d) {
-          console.log(d.x0,d.x1,d.length)
-          return "translate(" + xscale(d.x0) + "," + yscale(d.length) + ")"; });
+          //console.log(d.x0,d.x1,d.length)
+          return "translate(" + xscale(d.x0) + "," + yscale(d.length) + ")";
+        })
 
     bar.append("rect")
           .style("fill", color)
           .attr("x", 1)
-          .attr("width", function(d) { return xscale(d.x1)-xscale(d.x0)-1 })
-          .attr("height", function(d) { return height - yscale(d.length); })
+          .attr("width", d => xscale(d.x1)-xscale(d.x0)-1 )
+          .attr("height", d => height-yscale(d.length) )
           .on("mouseover", function() {
             d3.select(this).style("opacity","0.8")
           })
           .on("mouseout", function() {
             d3.select(this).style("opacity","1")
           })
-          .on("click", function(d) {
-            //console.log elements of the selection
+          .on("click", (d) => {
+            this.setState({
+              clicked : []
+            })
+
+            //console.log(d.x0,d.x1,d.length)
+            var nuovo = []
+            data.map( (step,i) => {
+              if((step[x]>=d.x0 && step[x]<d.x1) || (step[x]>=d.x0 && step[x]==d.x1)) {
+                nuovo = nuovo.concat([step])
+              }
+            })
+            this.handleClick(nuovo)
           })
+          .transition().duration(700).attr("height", d => height-yscale(d.length))
 
     bar.append("text")
           .attr("dy", ".75em")
-          .attr("y", function(d) { return d.length+5 })
-          .attr("x", function(d) { return (xscale(d.x1)-xscale(d.x0))/2 })
+          .attr("y", d => -15)
+          .attr("x", d => (xscale(d.x1)-xscale(d.x0))/2 )
           .attr("text-anchor", "middle")
-          .style("fill","white")
-          .text(function(d) { return d.length })
+          .style("fill", color)
+          .text( d => d.length ? d.length : null)
 
     g.append("g")
        .attr("class","x axis")
@@ -103,34 +120,33 @@ class Histogram extends React.Component {
     this.buildGraph();
   }
 
-  handleConcat() {
-    this.setState(prevState => ({
-      data: prevState.data.concat([{
-        name: "rollo",
-        altezza: "150",
-        peso: "80"
-      },{
-        name: "faramir",
-        peso: "40",
-        altezza: "145"
-      }])
-    }))
-  }
-
-  handleReduce() {
-    this.setState(prevState => ({
-      data: prevState.data.splice(1,1)
-    }))
+  handleClick(d) {
+    this.setState({
+      clicked: d
+    })
   }
 
   render() {
-    console.log(this.state)
+
+    var stampa = this.state.clicked.map(d => <li key={d[this.props.y]}>{this.props.y+" "+d[this.props.y]+" => "+this.props.x+" "+d[this.props.x]}</li>)
+    
     return (
       <div>
-      - Histogram -
+        <br />
         <svg className={this.props.selector} width="600" height="400"> </svg>
-        <button onClick={this.handleConcat}>Concat Data</button>
-        <button onClick={this.handleReduce} style={{'backgroundColor': 'red'}}>Reduce Data</button>
+        <br />
+        <strong>Clicked data:</strong> <ul>{stampa}</ul>
+        {
+          this.state.clicked.length ?
+            <ChartWrapper 
+              color="orange"
+              x={this.props.y}
+              y={this.props.x}
+              chart='nest'
+              selector={'nestedchart'}
+              data={this.state.clicked}
+              /> : ''
+        }
       </div>
     );
   }

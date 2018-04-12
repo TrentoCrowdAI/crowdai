@@ -340,7 +340,11 @@ const reviewAssignments = async (job, hit, mturk) => {
   try {
     const assignments = await delegates.jobs.getAssignments(jobId);
 
-    if (!assignments || assignments.rows.length === 0) {
+    if (
+      !assignments ||
+      assignments.rows.length === 0 ||
+      hit.HITStatus === 'Unassignable'
+    ) {
       return false;
     }
     // We check if the job is actually done.
@@ -356,7 +360,7 @@ const reviewAssignments = async (job, hit, mturk) => {
     }
 
     if (
-      (hit.HITStatus === 'Reviewable' || hit.HITStatus === 'Unassignable') &&
+      hit.HITStatus === 'Reviewable' &&
       !job.data.hitConfig.limitWorkers &&
       !jobDone
     ) {
@@ -373,11 +377,6 @@ const reviewAssignments = async (job, hit, mturk) => {
       console.log(`Reviewing ${assignment.data.assignmentTurkId}`);
 
       if (!assignment.data.finished) {
-        console.warn(
-          `reviewAssignments called even though the assignment ${
-            assignment.data.assignmentTurkId
-          } did not finish`
-        );
         continue;
       }
 

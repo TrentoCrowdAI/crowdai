@@ -455,14 +455,20 @@ const createAdditionalAssignmentsForHIT = async (job, hit, mturk) => {
         reject(err);
       } else {
         console.debug(
-          `Added ${records.meta.count} assignments to HIT: ${hitId}`
+          `Added ${records.meta.count} assignments to HIT: ${hit.HITId}`
         );
         resolve(data);
       }
     });
   });
+  let expiration = moment(hit.Expiration, 'YYYY-MM-DDTHH:mm:ss.S Z');
+  let now = moment();
 
-  if (hit.HITStatus === 'Reviewable') {
+  if (hit.HITStatus === 'Reviewable' && expiration.isBefore(now)) {
+    console.debug(
+      `HIT ${hit.HITId} is Reviewable and has expired. Changing the expiration 
+      to make it Assignable again.`
+    );
     let expireAt = moment()
       .add(job.data.lifetimeInMinutes, 'm')
       .unix();
@@ -605,6 +611,7 @@ const updateExpirationForHIT = async (hitId, expireAt, mturk) => {
       if (err) {
         reject(err);
       } else {
+        console.debug(`Expiration for HIT: ${hitId} updated`);
         resolve(data);
       }
     });

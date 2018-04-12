@@ -378,6 +378,7 @@ class ExperimentForm extends React.Component {
           <Form.Input
             label="Assignment duration (in minutes)"
             name="data.hitConfig.assignmentDurationInMinutes"
+            type="number"
             value={item.data.hitConfig.assignmentDurationInMinutes}
             onChange={this.handleChange}
             required
@@ -387,6 +388,7 @@ class ExperimentForm extends React.Component {
             name="data.hitConfig.lifetimeInMinutes"
             value={item.data.hitConfig.lifetimeInMinutes}
             placeholder="120"
+            type="number"
             onChange={this.handleChange}
             required
           />
@@ -435,8 +437,8 @@ class ExperimentForm extends React.Component {
     }
   }
 
-  handleChange(e, {name, value}) {
-    this.props.setInputValue(name, value);
+  handleChange(e, {type, name, value}) {
+    this.props.setInputValue(name, type === 'number' ? Number(value) : value);
   }
 
   setStep(activeStep) {

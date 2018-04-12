@@ -375,12 +375,20 @@ const reviewAssignments = async (job, hit, mturk) => {
     for (assignment of assignments.rows) {
       console.log(`Reviewing assignment: ${assignment.data.assignmentTurkId}`);
 
-      if (!assignment.data.finished) {
+      if (
+        !assignment.data.finished ||
+        assignment.data.assignmentRejected ||
+        assignment.data.assignmentApproved
+      ) {
         continue;
       }
+      let data;
 
       if (assignment.data.initialTestFailed) {
         await mturkRejectAssignment(assignment.data.assignmentTurkId, mturk);
+        data = {
+          assignmentRejected: true
+        };
       } else {
         await mturkApproveAssignment(assignment.data.assignmentTurkId, mturk);
         await sendBonus(
@@ -389,7 +397,15 @@ const reviewAssignments = async (job, hit, mturk) => {
           assignment.data.assignmentTurkId,
           mturk
         );
+        data = {
+          assignmentApproved: true
+        };
       }
+      await delegates.workers.updateAssignment(
+        job.uuid,
+        assignment.worker_id,
+        data
+      );
     }
     console.log(`Review assignments for job: ${jobId} done`);
     await finishJob(jobId);

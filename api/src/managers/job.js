@@ -345,6 +345,7 @@ const reviewAssignments = async (job, hit, mturk) => {
       assignments.rows.length === 0 ||
       hit.HITStatus === 'Unassignable'
     ) {
+      console.debug(`Skipping assignments review for job: ${jobId}`);
       return false;
     }
     // We check if the job is actually done.
@@ -374,7 +375,7 @@ const reviewAssignments = async (job, hit, mturk) => {
     }
 
     for (assignment of assignments.rows) {
-      console.log(`Reviewing ${assignment.data.assignmentTurkId}`);
+      console.log(`Reviewing assignment: ${assignment.data.assignmentTurkId}`);
 
       if (!assignment.data.finished) {
         continue;
@@ -482,7 +483,9 @@ const mturkApproveAssignment = async (id, mturk) => {
         reject(err);
       } else {
         console.log(
-          `Approve assignment response for ${id} is: ${JSON.stringify(data)}`
+          `Approve assignment done. Response for ${id} is: ${JSON.stringify(
+            data
+          )}`
         );
         resolve(data);
       }
@@ -531,7 +534,7 @@ const sendBonus = async (job, workerId, assignmentId, mturk) => {
   const payload = {
     AssignmentId: assignmentId,
     BonusAmount: `${reward}`,
-    Reason: `Reward based on the answers given in ${job.data.hit.Title}`,
+    Reason: `Reward based on the answers given in "${job.data.hit.Title}"`,
     WorkerId: worker.turk_id
   };
   return await new Promise((resolve, reject) => {
@@ -576,8 +579,11 @@ const computeMaxAssignments = async job => {
   let maxAssignments = Math.ceil(totalCount / job.data.maxTasksRule);
 
   if (maxAssignments < 10) {
-    // see this https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/MTurk.html#createAdditionalAssignmentsForHIT-property
-    maxAssignments = 10;
+    console.warn(
+      `Job ${job.id}. Max assignments: ${maxAssignments}. The job manager 
+      would be able to create additional assignments up to 9 assignments in total.
+      See: https://docs.aws.amazon.com/AWSMechTurk/latest/AWSMturkAPI/ApiReference_CreateAdditionalAssignmentsForHITOperation.html`
+    );
   }
   return maxAssignments;
 };

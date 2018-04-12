@@ -117,7 +117,10 @@ class WelcomePage extends React.Component {
                 </div>
               )}
               {this.props.assignmentStatus.data.initialTestFailed && (
-                <p>Thank you for participating, but you failed to pass the qualification test.</p>
+                <p>
+                  Thank you for participating, but you failed to pass the qualification test. Please return the HIT to
+                  finish.
+                </p>
               )}
             </Message.Content>
           </Message>

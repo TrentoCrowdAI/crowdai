@@ -273,9 +273,7 @@ const publish = (exports.publish = async id => {
  */
 const stop = (exports.stop = async job => {
   try {
-    let requester = await delegates.jobs.getRequester(job.id);
-    const mturk = MTurk.getInstance(requester);
-    await updateExpirationForHIT(job.data.hit.HITId, 0, mturk);
+    await expireHIT(job);
     await finishJob(job.id);
     console.debug(`Stopped job ${job.id}.`);
   } catch (error) {
@@ -354,8 +352,8 @@ const reviewAssignments = async (job, hit, mturk) => {
 
     if (hit.HITStatus === 'Assignable') {
       if (jobDone) {
-        console.debug(`Job: ${job.id} is done. Running stop logic.`);
-        await stop(job);
+        console.debug(`Job: ${job.id} is done.`);
+        await expireHIT(job);
       }
       return false;
     }
@@ -592,6 +590,18 @@ const computeMaxAssignments = async job => {
     );
   }
   return maxAssignments;
+};
+
+/**
+ * Helper function to expire a HIT.
+ *
+ * @param {Object} job
+ */
+const expireHIT = async job => {
+  console.debug(`Expiring HIT: ${job.data.hit.HITId}.`);
+  let requester = await delegates.jobs.getRequester(job.id);
+  const mturk = MTurk.getInstance(requester);
+  await updateExpirationForHIT(job.data.hit.HITId, 0, mturk);
 };
 
 /**

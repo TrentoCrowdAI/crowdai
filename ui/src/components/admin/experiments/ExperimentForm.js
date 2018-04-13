@@ -1,17 +1,5 @@
 import React from 'react';
-import {
-  Form,
-  Button,
-  Grid,
-  Message,
-  Accordion,
-  Icon,
-  Step,
-  Segment,
-  Radio,
-  Checkbox,
-  Header
-} from 'semantic-ui-react';
+import {Form, Button, Grid, Message, Icon, Step, Segment, Radio, Checkbox, Header} from 'semantic-ui-react';
 import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
 import {Redirect} from 'react-router-dom';
@@ -30,9 +18,7 @@ class ExperimentForm extends React.Component {
   constructor(props) {
     super(props);
     this.handleChange = this.handleChange.bind(this);
-    this.showRulesClick = this.showRulesClick.bind(this);
     this.state = {
-      showRules: true,
       expertMode: true,
       activeStep: 'info'
     };
@@ -157,6 +143,7 @@ class ExperimentForm extends React.Component {
         </Segment>
 
         {this.renderParametersSection()}
+        {this.renderHitSection()}
       </React.Fragment>
     );
   }
@@ -300,88 +287,142 @@ class ExperimentForm extends React.Component {
       return;
     }
     return (
-      <Accordion styled style={{width: '100%', marginBottom: 20}}>
-        <Accordion.Title active={this.state.showRules} index={0} onClick={this.showRulesClick}>
-          <Icon name="dropdown" />
-          Parameters
-        </Accordion.Title>
-        <Accordion.Content active={this.state.showRules}>
-          <Form.Group widths="equal">
-            <Form.Input
-              label="Max. tasks per worker"
-              name="data.maxTasksRule"
-              value={item.data.maxTasksRule}
-              onChange={this.handleChange}
-              type="number"
-              min="1"
-              required
-            />
+      <Segment>
+        <Header as="h3">Parameters</Header>
+        <Form.Group widths="equal">
+          <Form.Input
+            label="Max. tasks per worker"
+            name="data.maxTasksRule"
+            value={item.data.maxTasksRule}
+            onChange={this.handleChange}
+            type="number"
+            min="1"
+            required
+          />
 
-            <Form.Input
-              label="#Votes per task"
-              name="data.votesPerTaskRule"
-              value={item.data.votesPerTaskRule}
-              onChange={this.handleChange}
-              type="number"
-              min="1"
-              required
-            />
+          <Form.Input
+            label="#Votes per task"
+            name="data.votesPerTaskRule"
+            value={item.data.votesPerTaskRule}
+            onChange={this.handleChange}
+            type="number"
+            min="1"
+            required
+          />
 
+          <Form.Input
+            label="Task reward (in USD)"
+            name="data.taskRewardRule"
+            value={item.data.taskRewardRule}
+            onChange={this.handleChange}
+            type="number"
+            required
+          />
+        </Form.Group>
+
+        <Form.Group widths="equal">
+          <Form.Input
+            width={4}
+            label="Test frequency"
+            name="data.testFrequencyRule"
+            value={item.data.testFrequencyRule}
+            onChange={this.handleChange}
+            type="number"
+            min="1"
+            required
+          />
+          <Form.Input
+            width={2}
+            label="Initial tests"
+            name="data.initialTestsRule"
+            value={item.data.initialTestsRule}
+            onChange={this.handleChange}
+            type="number"
+            min="1"
+            required
+          />
+
+          <Form.Input
+            width={4}
+            label="Initial Tests min score (%)"
+            name="data.initialTestsMinCorrectAnswersRule"
+            value={item.data.initialTestsMinCorrectAnswersRule}
+            onChange={this.handleChange}
+            type="number"
+            min="1"
+            max="100"
+            required
+          />
+
+          <Form.Input
+            width={4}
+            label="Expert cost (in USD)"
+            name="data.expertCostRule"
+            value={item.data.expertCostRule}
+            onChange={this.handleChange}
+            type="number"
+          />
+        </Form.Group>
+      </Segment>
+    );
+  }
+
+  renderHitSection() {
+    const {item} = this.props;
+
+    return (
+      <Segment>
+        <Header as="h3">HIT configuration</Header>
+
+        <Form.Group widths="equal">
+          <Form.Input
+            label="Assignment duration (in minutes)"
+            name="data.hitConfig.assignmentDurationInMinutes"
+            type="number"
+            value={item.data.hitConfig.assignmentDurationInMinutes}
+            onChange={this.handleChange}
+            required
+          />
+          <Form.Input
+            label="Lifetime (in minutes)"
+            name="data.hitConfig.lifetimeInMinutes"
+            value={item.data.hitConfig.lifetimeInMinutes}
+            placeholder="120"
+            type="number"
+            onChange={this.handleChange}
+            required
+          />
+        </Form.Group>
+
+        <Form.Field style={{marginTop: '2em', marginBottom: '2em'}}>
+          <Checkbox
+            label="Limit the number of workers?"
+            name="data.hitConfig.limitWorkers"
+            checked={item.data.hitConfig.limitWorkers}
+            onChange={(e, {name, checked}) => {
+              if (!checked) {
+                this.props.setInputValue('data.hitConfig.maxAssignments', 0);
+              }
+              this.handleChange(e, {name, value: checked});
+            }}
+          />
+        </Form.Field>
+
+        {item.data.hitConfig.limitWorkers && (
+          <Form.Group style={{marginLeft: '2em'}}>
             <Form.Input
-              label="Task reward (in USD)"
-              name="data.taskRewardRule"
-              value={item.data.taskRewardRule}
+              label="Max. number of assignments"
+              name="data.hitConfig.maxAssignments"
+              value={item.data.hitConfig.maxAssignments}
               onChange={this.handleChange}
+              width="8"
               type="number"
+              min="0"
               required
             />
           </Form.Group>
-
-          <Form.Group widths="equal">
-            <Form.Input
-              width={4}
-              label="Test frequency"
-              name="data.testFrequencyRule"
-              value={item.data.testFrequencyRule}
-              onChange={this.handleChange}
-              type="number"
-              min="1"
-              required
-            />
-            <Form.Input
-              width={2}
-              label="Initial tests"
-              name="data.initialTestsRule"
-              value={item.data.initialTestsRule}
-              onChange={this.handleChange}
-              type="number"
-              min="1"
-              required
-            />
-
-            <Form.Input
-              width={4}
-              label="Initial Tests min score (%)"
-              name="data.initialTestsMinCorrectAnswersRule"
-              value={item.data.initialTestsMinCorrectAnswersRule}
-              onChange={this.handleChange}
-              type="number"
-              min="1"
-              max="100"
-              required
-            />
-
-            <Form.Input
-              width={4}
-              label="Expert cost (in USD)"
-              name="data.expertCostRule"
-              value={item.data.expertCostRule}
-              onChange={this.handleChange}
-              type="number"
-            />
-          </Form.Group>
-        </Accordion.Content>
-      </Accordion>
+        )}
+      </Segment>
     );
   }
 
@@ -396,14 +437,8 @@ class ExperimentForm extends React.Component {
     }
   }
 
-  handleChange(e, {name, value}) {
-    this.props.setInputValue(name, value);
-  }
-
-  showRulesClick() {
-    this.setState({
-      showRules: !this.state.showRules
-    });
+  handleChange(e, {type, name, value}) {
+    this.props.setInputValue(name, type === 'number' ? Number(value) : value);
   }
 
   setStep(activeStep) {

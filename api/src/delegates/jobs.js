@@ -175,3 +175,29 @@ const getAssignments = (exports.getAssignments = async jobId => {
     );
   }
 });
+
+/**
+ * Retrieves the worker_assignment records associated with the given job. This record
+ * corresponds to those where a worker clicked on the finish button.
+ *
+ * @param {string} jobId
+ */
+const getAssignmentsFinishedByWorkers = (exports.getAssignmentsFinishedByWorkers = async jobId => {
+  try {
+    let res = await db.query(
+      `select * from ${db.TABLES.WorkerAssignment} 
+        where job_id = $1
+          and (data ->> 'finished')::boolean = true 
+          and (data ->> 'initialTestFailed')::boolean = false
+          and (data ->> 'finishedByWorker')::boolean = true
+      `,
+      [jobId]
+    );
+    return { rows: res.rows, meta: { count: res.rowCount } };
+  } catch (error) {
+    console.error(error);
+    throw Boom.badImplementation(
+      "Error while trying to fetch the job's assignments"
+    );
+  }
+});

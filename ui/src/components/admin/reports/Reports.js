@@ -196,9 +196,20 @@ class Reports extends React.Component {
 	}
 
 	activeMetric(e, {value}) {
+		switch(value) {
+			case 'T_CompleteTime':
+				this.props.fetchTaskTime(this.state.chosenjob)
+				break;
+			case 'W_CompleteTime':
+				this.props.fetchWorkerTime(this.state.chosenworker)
+				break;
+		}
+
 		this.setState({
 			...this.state,
-			activeMetric: value
+			activeMetric: value,
+			activeworker: value=='T_CompleteTime' ? false : true,
+			chosenworker: value=='T_CompleteTime' ? 'all' : this.state.chosenworker
 		})
 	}
 
@@ -212,15 +223,27 @@ class Reports extends React.Component {
   }
 
 	chooseJob(e, {value}) {
-		this.props.fetchTaskTime(value);
+		if(this.state.activeMetric=='W_CompleteTime') {
+			this.props.reports.tasks = []
+		} else {
+			this.props.fetchTaskTime(value);
+		}
 		this.props.fetchWorkers(value);
 		
-  	this.setState({
-			...this.state, 
-			chosenjob: value,
-			chosenworker: 'all',
-			activeworker: true
-		})
+		if(this.state.activeMetric=='W_CompleteTime') {
+			this.setState({
+				...this.state,
+				chosenjob: value,
+				chosenworker: 'all'
+			})
+		} else {
+			this.setState({
+				...this.state, 
+				chosenjob: value,
+				chosenworker: 'all',
+				activeworker: this.state.activeMetric=='T_CompleteTime' ? false : true
+			})
+	}
   }
 
 	renderMetrics() {
@@ -279,7 +302,7 @@ class Reports extends React.Component {
 		)
 	}
 
-	renderChart(chart,x,y,z,data, choice, choice_id) {
+	renderChart(chart,x,y,z,choice,choice_id) {
 		return(
 			<React.Fragment>
 			<ChartWrapper 
@@ -299,7 +322,7 @@ class Reports extends React.Component {
 
 	render() {
 		//data = Object.values(this.props.reports.tasks)
-		console.log(this.props)
+		console.log(this.props.reports.tasks)
 
 		JobOptions = { 'all' : 'All Jobs' }
 		WorkerOptions = { 'all' : 'All Workers' }
@@ -311,7 +334,6 @@ class Reports extends React.Component {
       WorkerOptions[step.worker_id] = step.worker_name
 		});
 
-		var optionbutt
 		var chart
 		var x
 		var y
@@ -324,22 +346,13 @@ class Reports extends React.Component {
 		switch (this.state.activeMetric) {
 
 			case 'T_CompleteTime':
-				chart='nest'
+				chart='histogram'
 				x='total_time'
 				y='task_id'
 				z=''
 
 				choice='j'
 				choice_id=this.state.chosenjob
-
-				optionbutt = 
-					<React.Fragment>
-					<JobChooser 
-						options={JobOptions}
-						match={this.props.match}
-						onChange={this.chooseJob}
-						chosenjob={this.state.chosenjob}/>
-					</React.Fragment>
 				break;
 
 			case 'W_CompleteTime':
@@ -350,21 +363,6 @@ class Reports extends React.Component {
 
 				choice='w'
 				choice_id= this.state.chosenworker=='' ? 'all' : this.state.chosenworker
-
-				optionbutt=
-					<React.Fragment>
-					<JobChooser 
-						options={JobOptions}
-						match={this.props.match}
-						onChange={this.chooseJob}
-						chosenjob={this.state.chosenjob}/>
-					<WorkerChooser 
-						disabled={(!this.state.activeworker) || (this.state.chosenjob=='all')}
-						options={WorkerOptions}
-						match={this.props.match}
-						onChange={this.chooseWorker}
-						chosenworker={this.state.chosenworker}/>
-					</React.Fragment>
 				break;
 
 			case 'Agreements':
@@ -378,17 +376,6 @@ class Reports extends React.Component {
 
 				choice='j'
 				choice_id=this.state.chosenjob
-
-				optionbutt = 
-					<React.Fragment>
-					<JobChooser 
-						options={JobOptions}
-						match={this.props.match}
-						onChange={this.chooseJob}
-						chosenjob={this.state.chosenjob}/>
-					</React.Fragment>
-
-				//data = Object.values(agreeData.tasks)
 				break;
 
 			case 'Successes':
@@ -399,27 +386,10 @@ class Reports extends React.Component {
 
 				choice='w'
 				choice_id=this.state.chosenworker
-
-				optionbutt=
-					<React.Fragment>
-					<JobChooser 
-						options={JobOptions}
-						match={this.props.match}
-						onChange={this.chooseJob}
-						chosenjob={this.state.chosenjob}/>
-					<WorkerChooser 
-						disabled={(!this.state.activeworker) || (this.state.chosenjob=='all')}
-						options={WorkerOptions}
-						match={this.props.match}
-						onChange={this.chooseWorker}
-						chosenworker={this.state.chosenworker}
-						/>
-					</React.Fragment>
-					data=[]
+				data=[]
 				break;
 
 			default:
-				optionbutt = ''
 				data = []
 				break;
 		}
@@ -428,19 +398,28 @@ class Reports extends React.Component {
 			<div style={{margin: '20px'}}>
 				
 				<h3 style={{color: 'steelblue'}}>
-					Selected Project: <i>{this.props.match.params.projectid}</i><br />
-					Selected Job: <i>{this.state.chosenjob}</i><br />
-					Selected Worker: <i>{this.state.chosenworker}</i>
+					Selected Project_id: <i>{this.props.match.params.projectid}</i><br />
+					Selected Job_id: <i>{this.state.chosenjob}</i><br />
+					Selected Worker_id: <i>{this.state.chosenworker}</i>
 				</h3>
 				<hr />
 				<h4>Available metrics:</h4>
 
 				<div className="rowC">
 					{this.renderMetrics()}
-
 					<div>
-						{optionbutt}
-						{this.renderChart(chart,x,y,z,data, choice, choice_id)}
+						<JobChooser 
+							options={JobOptions}
+							onChange={this.chooseJob}
+							chosenjob={this.state.chosenjob}
+							/>
+						<WorkerChooser 
+							disabled={(!this.state.activeworker) || (this.state.chosenjob=='all')}
+							options={WorkerOptions}
+							onChange={this.chooseWorker}
+							chosenworker={this.state.chosenworker}
+							/>
+						{this.renderChart(chart,x,y,z,choice,choice_id)}
 					</div>
 				</div>
 

@@ -8,18 +8,22 @@ class NestChart extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      data : this.props.data
+      order: this.props.x
     }
+    this.dataWrapper = this.dataWrapper.bind(this)
     this.buildGraph = this.buildGraph.bind(this);
   }
 
   dataWrapper() {
-    var data = this.state.data
-    console.log(data)
+    var data = this.props.data
+    data.sort( (a,b) =>
+      (a[this.state.order] > b[this.state.order]) ? 1 : ((b[this.state.order] > a[this.state.order]) ? -1 : 0))
+    
+    //console.log(data)
     //switch(this.props.choice) {
       //case 'w':
         //if(this.props.choice_id=='all') {
-          if(this.props.data.length<1) {
+          if(data.length==0) {
           var svg = d3.select("."+this.props.selector)
 
           //no perchè modifica definitivamente l'svg
@@ -75,7 +79,7 @@ class NestChart extends React.Component {
         .domain(data.map(d => d[x]))
 
     var xAxis = d3.axisBottom(xscale)
-
+    //var y2Axis = d3.axisTop(xscale)
     var yAxis = d3.axisLeft(yscale)
         .ticks(10)
 
@@ -122,11 +126,13 @@ class NestChart extends React.Component {
           total_time : media,
           task_id : data[data.length-1][x]
         }])
-        .attr("class","original")
-        .attr("transform","translate("+(xscale.bandwidth()/2)+",0)")
+        //.attr("class","axis axis--y2")
+        .attr("transform","translate("+xscale.bandwith()+","+yscale(media)+")")
+        .attr("stroke", "red")
+        //.attr("path", "red")
         .attr("d", line)
-        .style("stroke", "red")
-        .style("fill","none")
+        //.call(y2Axis)
+        .style("fill","red")
         .style("stroke-width",1)
 
     g.append("g")
@@ -171,17 +177,15 @@ class NestChart extends React.Component {
         <br />
         <button
           onClick={(event) => this.setState({
-            data: this.state.data.sort( (a,b) =>
-               (a[this.props.y] > b[this.props.y]) ? 1 : ((b[this.props.y] > a[this.props.y]) ? -1 : 0))
-          })
+              order: this.props.y
+            })
           }
         ><strong>Sort y</strong></button>
 
         <button
           onClick={(event) => this.setState({
-            data: this.state.data.sort( (a,b) =>
-              (a[this.props.x] > b[this.props.x]) ? 1 : ((b[this.props.x] > a[this.props.x]) ? -1 : 0))
-          })
+              order: this.props.x
+            })
           }
         ><strong>Sort x</strong></button>
       </div>

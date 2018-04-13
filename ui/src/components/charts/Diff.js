@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
 
 import ChartWrapper from './ChartWrapper'
-import HeatMap from './HeatMap';
+
 
 class Diff extends React.Component {
 

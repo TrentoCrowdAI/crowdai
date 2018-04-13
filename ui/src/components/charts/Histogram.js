@@ -18,7 +18,7 @@ class Histogram extends React.Component {
   }
 
   buildGraph() {
-    console.log(this.props.data)
+    //console.log(this.props.data)
     var svg = d3.select("."+this.props.selector);
     var x = this.props.x
     var y = this.props.y

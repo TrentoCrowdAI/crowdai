@@ -152,11 +152,9 @@ if(parseInt(id, 10)>4) {
     case 1:
       return(tasks = {
         tasks: {
-          tasks: {
-            task1: { total_time: 2.21, task_id: 1 },
-            task2: { total_time: 3.45, task_id: 3 },
-            task3: { total_time: 4.65, task_id: 7 }
-          }
+          task1: { total_time: 2.21, task_id: 1 },
+          task2: { total_time: 3.45, task_id: 3 },
+          task3: { total_time: 4.65, task_id: 7 }
         }
       })
       break;

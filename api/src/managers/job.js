@@ -283,6 +283,31 @@ const stop = (exports.stop = async job => {
 });
 
 /**
+ * Returns the state of the job. This function returns:
+ *
+ *   - Information about the associated HIT.
+ *
+ * @param {Number} jobId
+ */
+const getState = (exports.getState = async jobId => {
+  try {
+    let job = await delegates.jobs.getById(jobId);
+    let requester = await delegates.jobs.getRequester(job.id);
+    const mturk = MTurk.getInstance(requester);
+    let hit = await getHIT(job.data.hit.HITId, mturk);
+    // TODO: return information about the workers.
+    return {
+      hit
+    };
+  } catch (error) {
+    console.error(error);
+    throw Boom.badImplementation(
+      'Error while trying to get the state of the job'
+    );
+  }
+});
+
+/**
  * Set a cron job that polls the HIT status in order to know when
  * the approval/rejection logic should run.
  *
@@ -298,15 +323,7 @@ const setupCronForHit = (job, hitId, mturk) => {
       console.log(`Checking HIT: ${hitId} status`);
 
       try {
-        let hit = await new Promise((resolve, reject) => {
-          mturk.getHIT({ HITId: hitId }, function(err, data) {
-            if (err) {
-              reject(err);
-            } else {
-              resolve(data.HIT);
-            }
-          });
-        });
+        let hit = await getHIT(hitId, mturk);
         console.log(`HIT: ${hitId} is ${hit.HITStatus}`);
         const stop = await reviewAssignments(job, hit, mturk);
 
@@ -322,6 +339,24 @@ const setupCronForHit = (job, hitId, mturk) => {
   });
 
   cronjob.start();
+};
+
+/**
+ * Helper wrapper to call the getHIT method on AMT.
+ *
+ * @param {String} hitId
+ * @param {Object} mturk
+ */
+const getHIT = async (hitId, mturk) => {
+  return new Promise((resolve, reject) => {
+    mturk.getHIT({ HITId: hitId }, (err, data) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(data.HIT);
+      }
+    });
+  });
 };
 
 /**

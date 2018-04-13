@@ -4,6 +4,7 @@ import {combineEpics} from 'redux-observable';
 import {actionTypes, actions} from './actions';
 import axios, {requestersApi} from 'src/utils/axios';
 import {flattenError} from 'src/utils';
+import config from 'src/config/config.json';
 
 const getExperiments = (action$, store) =>
   action$.ofType(actionTypes.FETCH_EXPERIMENTS).switchMap(action => {
@@ -40,4 +41,28 @@ const publishExperiment = (action$, store) =>
       .catch(error => Observable.of(actions.publishError(flattenError(error))));
   });
 
-export default combineEpics(getExperiments, saveExperiment, fetchExperiment, publishExperiment);
+const fetchJobState = (action$, store) =>
+  action$.ofType(actionTypes.FETCH_JOB_STATE).switchMap(action => {
+    return Observable.defer(() => requestersApi.get(`jobs/${action.id}/state`))
+      .mergeMap(response => Observable.of(actions.fetchJobStateSuccess(response.data)))
+      .catch(error => Observable.of(actions.fetchJobStateError(flattenError(error))));
+  });
+
+const pollJobState = (action$, store) =>
+  action$.ofType(actionTypes.FETCH_JOB_STATE_POLLED).switchMap(action => {
+    return Observable.concat(
+      Observable.of(actions.fetchJobState(action.id)),
+      Observable.interval(config.polling.jobState)
+        .takeUntil(action$.ofType(actionTypes.FETCH_JOB_STATE_POLLED_DONE))
+        .mergeMap(() => Observable.of(actions.fetchJobState(action.id)))
+    );
+  });
+
+export default combineEpics(
+  getExperiments,
+  saveExperiment,
+  fetchExperiment,
+  publishExperiment,
+  fetchJobState,
+  pollJobState
+);

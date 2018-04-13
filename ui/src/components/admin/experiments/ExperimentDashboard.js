@@ -19,6 +19,7 @@ import lossPrice from 'src/images/lossprice.png';
 import {actions} from './actions';
 import {AggregationStrategies, JobStatus} from 'src/utils/constants';
 import ExperimentParameters from './ExperimentParameters';
+import HitInformation from './HitInformation';
 
 class ExperimentDashboard extends React.Component {
   constructor(props) {
@@ -134,6 +135,19 @@ class ExperimentDashboard extends React.Component {
                 )}
             </Grid.Column>
           </Grid.Row>
+
+          {this.props.jobState.hit && (
+            <Grid.Row centered>
+              <Grid.Column width="10">
+                <HitInformation
+                  hit={this.props.jobState.hit}
+                  loading={this.props.jobStateLoading}
+                  showMeta={item.data.status !== JobStatus.DONE}
+                />
+              </Grid.Column>
+            </Grid.Row>
+          )}
+
           <Grid.Row>
             <Grid.Column>
               {item.data.status === JobStatus.NOT_PUBLISHED && (
@@ -301,6 +315,24 @@ class ExperimentDashboard extends React.Component {
     this.props.fetchItem(this.props.match.params.jobId);
   }
 
+  componentDidUpdate(prevProps, prevState, snapshot) {
+    const {item} = this.props;
+
+    if (item.data.status === JobStatus.PUBLISHED && !this.props.polling) {
+      this.props.pollJobState(item.id);
+    }
+
+    if (item.data.status === JobStatus.DONE && !this.props.jobState.hit) {
+      this.props.fetchJobState(item.id);
+    }
+  }
+
+  componentWillUnmount() {
+    this.props.pollJobStateDone();
+    this.props.cleanJobState();
+    this.props.cleanState();
+  }
+
   setStep(activeStep) {
     this.setState({
       ...this.state,
@@ -330,14 +362,25 @@ ExperimentDashboard.propTypes = {
   loading: PropTypes.bool,
   saved: PropTypes.bool,
   error: PropTypes.object,
-  setInputValue: PropTypes.func
+  setInputValue: PropTypes.func,
+  pollJobState: PropTypes.func,
+  polling: PropTypes.bool,
+  jobState: PropTypes.object,
+  pollJobStateDone: PropTypes.func,
+  fetchJobState: PropTypes.func,
+  cleanJobState: PropTypes.func,
+  jobStateLoading: PropTypes.bool,
+  cleanState: PropTypes.func
 };
 
 const mapStateToProps = state => ({
   item: state.experiment.form.item,
   loading: state.experiment.form.loading,
   error: state.experiment.form.error,
-  saved: state.experiment.form.saved
+  saved: state.experiment.form.saved,
+  polling: state.experiment.state.polling,
+  jobState: state.experiment.state.item,
+  jobStateLoading: state.experiment.state.loading
 });
 
 const mapDispatchToProps = dispatch => ({
@@ -345,7 +388,11 @@ const mapDispatchToProps = dispatch => ({
   cleanState: () => dispatch(actions.cleanState()),
   setInputValue: (name, value) => dispatch(actions.setInputValue(name, value)),
   fetchItem: id => dispatch(actions.fetchItem(id)),
-  publish: () => dispatch(actions.publish())
+  publish: () => dispatch(actions.publish()),
+  fetchJobState: id => dispatch(actions.fetchJobState(id)),
+  pollJobState: id => dispatch(actions.pollJobState(id)),
+  pollJobStateDone: () => dispatch(actions.pollJobStateDone()),
+  cleanJobState: () => dispatch(actions.cleanJobState())
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(ExperimentDashboard);

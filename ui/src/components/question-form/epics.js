@@ -76,7 +76,7 @@ const checkPolling = (action$, store) =>
   action$.ofType(actionTypes.CHECK_POLLING).switchMap(action => {
     const {session} = store.getState().questionForm;
 
-    return Observable.interval(config.pollingInterval)
+    return Observable.interval(config.polling.workerAssignment)
       .takeUntil(action$.ofType(actionTypes.CHECK_POLLING_DONE))
       .mergeMap(() =>
         Observable.defer(() => axios.get(`/jobs/${session.experimentId}/workers/${session.workerId}/assignment-status`))

@@ -1,5 +1,17 @@
 import React from 'react';
-import {Grid, Button, Segment, Dimmer, Loader, Message, Accordion, Header, Checkbox, Form} from 'semantic-ui-react';
+import {
+  Grid,
+  Button,
+  Segment,
+  Dimmer,
+  Loader,
+  Message,
+  Accordion,
+  Header,
+  Checkbox,
+  Form,
+  Container
+} from 'semantic-ui-react';
 import {Link} from 'react-router-dom';
 import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
@@ -25,50 +37,52 @@ class WelcomePage extends React.Component {
     let project = this.props.item.project || {};
 
     return (
-      <Grid.Row centered style={{marginBottom: '10px'}}>
-        <div>
-          <Accordion>
-            <Accordion.Title active={open} onClick={() => this.setState({open: !this.state.open})}>
-              <Header as="h1" style={{display: 'inline'}}>
-                Informed Consent {open ? '(click to collapse)' : '(click to expand)'}
-              </Header>
-            </Accordion.Title>
-            <Accordion.Content active={open}>
-              <Segment>
-                {!this.props.item.id && <p>Loading information...</p>}
-                {this.props.item.id &&
-                  !project.consent && (
-                    <p style={{textAlign: 'justify'}}>
-                      The information is available{' '}
-                      <a href={project.consentUrl} target="_blank">
-                        here
-                      </a>
-                    </p>
-                  )}
+      <Container>
+        <Grid.Row centered style={{marginBottom: '10px'}}>
+          <div>
+            <Accordion>
+              <Accordion.Title active={open} onClick={() => this.setState({open: !this.state.open})}>
+                <Header as="h1" style={{display: 'inline'}}>
+                  Informed Consent {open ? '(click to collapse)' : '(click to expand)'}
+                </Header>
+              </Accordion.Title>
+              <Accordion.Content active={open}>
+                <Segment>
+                  {!this.props.item.id && <p>Loading information...</p>}
+                  {this.props.item.id &&
+                    !project.consent && (
+                      <p style={{textAlign: 'justify'}}>
+                        The information is available{' '}
+                        <a href={project.consentUrl} target="_blank">
+                          here
+                        </a>
+                      </p>
+                    )}
 
-                {project.consent && <FileRenderer content={project.consent} format={project.consentFormat} />}
-              </Segment>
-            </Accordion.Content>
-          </Accordion>
-        </div>
+                  {project.consent && <FileRenderer content={project.consent} format={project.consentFormat} />}
+                </Segment>
+              </Accordion.Content>
+            </Accordion>
+          </div>
 
-        {!this.props.assigmentStatusLoading && <PaymentInstructions job={this.props.item} />}
+          {!this.props.assigmentStatusLoading && <PaymentInstructions job={this.props.item} />}
 
-        {this.props.assigmentStatusLoading && (
-          <Segment vertical style={{borderBottom: 0}}>
-            <Grid>
-              <Grid.Row>
-                <Dimmer active inverted>
-                  <Loader inverted>Loading</Loader>
-                </Dimmer>
-              </Grid.Row>
-            </Grid>
-          </Segment>
-        )}
+          {this.props.assigmentStatusLoading && (
+            <Segment vertical style={{borderBottom: 0}}>
+              <Grid>
+                <Grid.Row>
+                  <Dimmer active inverted>
+                    <Loader inverted>Loading</Loader>
+                  </Dimmer>
+                </Grid.Row>
+              </Grid>
+            </Segment>
+          )}
 
-        {this.renderRedirectBtn()}
-        {this.renderFinalStep()}
-      </Grid.Row>
+          {this.renderRedirectBtn()}
+          {this.renderFinalStep()}
+        </Grid.Row>
+      </Container>
     );
   }
 

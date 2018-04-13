@@ -11,6 +11,10 @@ const getById = async ctx => {
   ctx.response.body = await delegates.jobs.getById(ctx.params.id);
 };
 
+const getState = async ctx => {
+  ctx.response.body = await managers.job.getState(ctx.params.id);
+};
+
 const post = async ctx => {
   ctx.response.body = await delegates.jobs.create(ctx.request.fields);
 };
@@ -32,4 +36,5 @@ exports.register = router => {
   router.put('/jobs/:id', put);
   router.get('/jobs/:id', getById);
   router.post('/jobs/:id/publish', publish);
+  router.get('/jobs/:id/state', getState);
 };

@@ -193,11 +193,6 @@ class Reports extends React.Component {
 	}
 
 	componentDidUpdate() {
-		/*fetch('https://2mmbyxgwk6.execute-api.eu-central-1.amazonaws.com/reports')
-		.then(response => response.json())
-		.then(json => {
-			timeData = Object.values(json.tasks)
-		})*/
 	}
 
 	activeMetric(e, {value}) {
@@ -208,27 +203,24 @@ class Reports extends React.Component {
 	}
 
 	chooseWorker(e, {value}) {
-  	this.setState({
+		this.props.fetchWorkerTime(value);
+
+		this.setState({
 			...this.state, 
 			chosenworker: value
 		})
-
-		//fetch data of the worker, fill workerData
-
   }
 
 	chooseJob(e, {value}) {
-		console.log('job : ', value)
 		this.props.fetchTaskTime(value);
-
+		this.props.fetchWorkers(value);
+		
   	this.setState({
 			...this.state, 
 			chosenjob: value,
+			chosenworker: 'all',
 			activeworker: true
 		})
-
-		//fetch data of the job, fill WorkerOptions
-
   }
 
 	renderMetrics() {
@@ -297,7 +289,7 @@ class Reports extends React.Component {
         z={z}
         selector={'chart1'}
         color={'steelblue'}
-				data={data}
+				data={Object.values(this.props.reports.tasks)}
 				choice={choice}
 				choice_id={choice_id}
       />
@@ -306,23 +298,24 @@ class Reports extends React.Component {
 	}
 
 	render() {
+		//data = Object.values(this.props.reports.tasks)
+		console.log(this.props)
 
-		timeData = Object.values(this.props.reports.tasks)
-		
-		JobOptions = {
-			'all' : 'All Jobs'
-		}
+		JobOptions = { 'all' : 'All Jobs' }
+		WorkerOptions = { 'all' : 'All Workers' }
+
     this.props.experiments.rows.map( step => {
       JobOptions[step.id] = step.data.name
     });
-		console.log(JobOptions)
-		//WorkerOptions should contain all the workers for te selected Job
-		Object.values(workerData.tasks).map(d => WorkerOptions[d.worker_id]=d.worker_id)
-		    
+		Object.values(this.props.workers.workers).map( step => {
+      WorkerOptions[step.worker_id] = step.worker_name
+		});
+
 		var optionbutt
 		var chart
 		var x
 		var y
+		//group or filter by z
 		var z
 
 		var choice
@@ -331,7 +324,7 @@ class Reports extends React.Component {
 		switch (this.state.activeMetric) {
 
 			case 'T_CompleteTime':
-				chart='histogram'
+				chart='nest'
 				x='total_time'
 				y='task_id'
 				z=''
@@ -347,16 +340,13 @@ class Reports extends React.Component {
 						onChange={this.chooseJob}
 						chosenjob={this.state.chosenjob}/>
 					</React.Fragment>
-
-				data = timeData
 				break;
 
 			case 'W_CompleteTime':
 				chart='nest'
 				x='task_id'
 				y='total_time'
-				//group or filter by z
-				z='worker_id'
+				z=''
 
 				choice='w'
 				choice_id= this.state.chosenworker=='' ? 'all' : this.state.chosenworker
@@ -369,14 +359,12 @@ class Reports extends React.Component {
 						onChange={this.chooseJob}
 						chosenjob={this.state.chosenjob}/>
 					<WorkerChooser 
-						disabled={!this.state.activeworker}
+						disabled={(!this.state.activeworker) || (this.state.chosenjob=='all')}
 						options={WorkerOptions}
 						match={this.props.match}
 						onChange={this.chooseWorker}
-						chosenworker={this.state.chosenworker}
-						/>
+						chosenworker={this.state.chosenworker}/>
 					</React.Fragment>
-				data = Object.values(workerData.tasks)//.filter(d => d.worker_id==this.state.chosenworker)
 				break;
 
 			case 'Agreements':
@@ -400,7 +388,7 @@ class Reports extends React.Component {
 						chosenjob={this.state.chosenjob}/>
 					</React.Fragment>
 
-				data = Object.values(agreeData.tasks)
+				//data = Object.values(agreeData.tasks)
 				break;
 
 			case 'Successes':
@@ -420,7 +408,7 @@ class Reports extends React.Component {
 						onChange={this.chooseJob}
 						chosenjob={this.state.chosenjob}/>
 					<WorkerChooser 
-						disabled={!this.state.activeworker}
+						disabled={(!this.state.activeworker) || (this.state.chosenjob=='all')}
 						options={WorkerOptions}
 						match={this.props.match}
 						onChange={this.chooseWorker}
@@ -464,27 +452,42 @@ class Reports extends React.Component {
 Reports.propTypes = {
 	fetchExperiments: PropTypes.func,
 	fetchTaskTime: PropTypes.func,
+	fetchWorkers: PropTypes.func,
+	fetchWorkerTime: PropTypes.func,
+
   exp_error: PropTypes.any,
   exp_loading: PropTypes.bool,
-	experiments: PropTypes.object,
+	experiments: PropTypes.any,
 	match: PropTypes.object,
+
 	rep_error: PropTypes.any,
 	rep_loading: PropTypes.bool,
-	reports: PropTypes.any
+	reports: PropTypes.any,
+
+	worker_error: PropTypes.any,
+	worker_loading: PropTypes.bool,
+	workers: PropTypes.any
 }
 
 const mapDispatchToProps = dispatch => ({
 	fetchExperiments: projectId => dispatch(expactions.fetchExperiments(projectId)),
-	fetchTaskTime: jobId => dispatch(actions.fetchTaskTime(jobId))
+	fetchTaskTime: jobId => dispatch(actions.fetchTaskTime(jobId)),
+	fetchWorkerTime: workerId => dispatch(actions.fetchWorkerTime(workerId)),
+	fetchWorkers: jobId => dispatch(actions.fetchWorkers(jobId))
 })
 
 const mapStateToProps = state => ({
   experiments: state.experiment.list.experiments,
   exp_error: state.experiment.list.error,
 	exp_loading: state.experiment.list.loading,
+
 	reports: state.report.list.reports,
 	rep_error: state.report.list.error,
-	rep_loading: state.report.list.loading
+	rep_loading: state.report.list.loading,
+
+	workers: state.report.wlist.workers,
+	worker_error: state.report.wlist.error,
+	worker_loading: state.report.wlist.loading,
 })
 
 export default connect(mapStateToProps,mapDispatchToProps)(Reports)

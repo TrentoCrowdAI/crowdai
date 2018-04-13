@@ -14,33 +14,34 @@ class NestChart extends React.Component {
   }
 
   dataWrapper() {
-    var data = []
-    switch(this.props.choice) {
-      case 'w':
-        if(this.props.choice_id=='all') {
-          //console.log("all workers selected")
+    var data = this.state.data
+    console.log(data)
+    //switch(this.props.choice) {
+      //case 'w':
+        //if(this.props.choice_id=='all') {
+          if(this.props.data.length<1) {
           var svg = d3.select("."+this.props.selector)
 
-          //modifica definitivamente l'svg
+          //no perchè modifica definitivamente l'svg
           /*svg.attr("width",700)
              .attr("height",50)*/
           //d3.select(".nest").selectAll("button").remove()
+
           var margin = {top: 30, right: 30, bottom: 30, left: 30};
           var g = svg.append("g")
           g.append("text")
             .text("Choose a worker")
-        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
         } else {
-          data = this.state.data.filter(d => d[this.props.z]==this.props.choice_id)
           this.buildGraph(data)
         }
-        break;
+/*        break;
 
       default:
-        data = this.state.data
         this.buildGraph(data)
         break;
-    }
+    }*/
   }
 
   buildGraph(ndata) {
@@ -151,8 +152,8 @@ class NestChart extends React.Component {
   }
 
   componentDidMount() {
-    this.state.data.sort( (a,b) =>
-        (a[this.props.x] > b[this.props.x]) ? 1 : ((b[this.props.x] > a[this.props.x]) ? -1 : 0))
+    /*this.state.data.sort( (a,b) =>
+        (a[this.props.x] > b[this.props.x]) ? 1 : ((b[this.props.x] > a[this.props.x]) ? -1 : 0))*/
     this.dataWrapper();
   }
 

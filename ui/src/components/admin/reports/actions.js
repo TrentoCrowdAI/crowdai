@@ -14,6 +14,9 @@ const actionTypes = {
   FETCH_PERCENTAGE: 'C_FETCH_PERCENTAGE',
   FETCH_PERCENTAGE_SUCCESS: 'C_FETCH_PERCENTAGE_SUCCESS',
   FETCH_PERCENTAGE_ERROR: 'C_FETCH_PERCENTAGE_ERROR',
+  FETCH_WORKERS: 'C_FETCH_WORKERS',
+  FETCH_WORKERS_SUCCESS: 'C_FETCH_WORKERS_SUCCESS',
+  FETCH_WORKERS_ERROR: 'C_FETCH_WORKERS_ERROR',
   ...getActionTypes(scopes.REPORTS)
 };
 
@@ -37,11 +40,10 @@ const actions = {
     };
   },
 
-  fetchWorkerTime(workerId, jobId) {
+  fetchWorkerTime(workerId) {
     return {
       type: actionTypes.FETCH_WTIME,
-      workerId,
-      jobId
+      workerId
     };
   },
   fetchWorkerTimeSuccess(response) {
@@ -95,6 +97,25 @@ const actions = {
     };
   },
   
+  fetchWorkers(jobId) {
+    return {
+      type: actionTypes.FETCH_WORKERS,
+      jobId
+    };
+  },
+  fetchWorkersSuccess(response) {
+    return {
+      type: actionTypes.FETCH_WORKERS_SUCCESS,
+      response
+    };
+  },
+  fetchWorkersError(error) {
+    return {
+      type: actionTypes.FETCH_WORKERS_ERROR,
+      error
+    };
+  },
+
   ...getActions(scopes.REPORTS),
 };
 

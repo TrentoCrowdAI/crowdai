@@ -12,6 +12,14 @@ const defaultState = {
   loading: false
 };
 
+const wdefaultState = {
+  workers: {
+    workers: []
+  },
+  error: undefined,
+  loading: false
+};
+
 const reducer = (state = defaultState, action) => {
   switch (action.type) {
     case actionTypes.FETCH_TTIME:
@@ -32,6 +40,50 @@ const reducer = (state = defaultState, action) => {
         error: action.error,
         loading: false
       };
+
+    case actionTypes.FETCH_WTIME:
+      return {
+        ...state,
+        error: undefined,
+        loading: true
+      };
+    case actionTypes.FETCH_WTIME_SUCCESS:
+      return {
+        ...state,
+        reports: action.response,
+        loading: false
+      };
+    case actionTypes.FETCH_WTIME_ERROR:
+      return {
+        ...state,
+        error: action.error,
+        loading: false
+      };
+    default:
+      return state;
+  }
+};
+
+const wreducer = (state = wdefaultState, action) => {
+  switch(action.type) {
+    case actionTypes.FETCH_WORKERS:
+      return {
+        ...state,
+        error: undefined,
+        loading: true
+      };
+    case actionTypes.FETCH_WORKERS_SUCCESS:
+      return {
+        ...state,
+        workers: action.response,
+        loading: false
+      };
+    case actionTypes.FETCH_WORKERS_ERROR:
+      return {
+        ...state,
+        error: action.error,
+        loading: false
+      };
     default:
       return state;
   }
@@ -39,16 +91,5 @@ const reducer = (state = defaultState, action) => {
 
 export default combineReducers({
   list: reducer,
-  form: getReducer(scopes.REPORTS, {
-    id: undefined,
-    requester_id: undefined,
-    data: {
-      name: '',
-      consentUrl: '',
-      consentFormat: FileFormats.PLAIN_TEXT,
-      itemsUrl: '',
-      filtersUrl: '',
-      testsUrl: ''
-    }
-  })
+  wlist: wreducer
 });

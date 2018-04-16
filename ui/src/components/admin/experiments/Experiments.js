@@ -8,72 +8,15 @@ import {actions} from './actions';
 import DataTable from 'src/components/core/table/DataTable';
 import {JobStatus} from 'src/utils/constants';
 
-// configuration options for our DataTable.
-const options = {
-  columns: {
-    uuid: {
-      label: 'UUID'
-    },
-    name: {
-      label: 'Name',
-      key: 'data.name'
-    },
-    status: {
-      label: 'Status',
-      key: 'data.status'
-    }
-  },
-
-  rowPositive(item) {
-    return item.status === JobStatus.PUBLISHED;
-  },
-
-  actions: {
-    label: 'Actions',
-    renderer(item) {
-      return (
-        <React.Fragment>
-          {item.data.status === JobStatus.NOT_PUBLISHED && (
-            // <Popup
-            //   trigger={
-            //     <Button icon color="blue" size="mini" as={Link} to={`/admin/experiments/${item.id}/publish`}>
-            //       <Icon name="play" />
-            //     </Button>
-            //   }
-            //   content="Publish your experiment on Mechanical Turk"
-            // />
-            <Button
-              icon
-              color="blue"
-              size="mini"
-              as={Link}
-              to={`/admin/projects/${item.project_id}/screenings/${item.id}/edit`}>
-              <Icon name="edit" />
-            </Button>
-          )}
-          <Button
-            icon
-            color="blue"
-            size="mini"
-            as={Link}
-            to={`/admin/projects/${item.project_id}/screenings/${item.id}/dashboard`}>
-            <Icon name="play" />
-          </Button>
-        </React.Fragment>
-      );
-    }
-  }
-};
-
 class Experiments extends React.Component {
   render() {
     return (
       <DataTable
         title="My jobs"
-        options={options}
+        options={getOptions(this.props)}
         data={this.props.experiments.rows}
         createUrl={`${this.props.match.url}/new`}
-        loading={this.props.loading}
+        loading={this.props.loading || this.props.copyJobLoading}
       />
     );
   }
@@ -83,22 +26,97 @@ class Experiments extends React.Component {
   }
 }
 
+/**
+ * Returns the configuration options for the DataTable.
+ *
+ * @param {Object} props
+ * @return {Object}
+ */
+const getOptions = props => {
+  return {
+    columns: {
+      uuid: {
+        label: 'UUID'
+      },
+      name: {
+        label: 'Name',
+        key: 'data.name'
+      },
+      status: {
+        label: 'Status',
+        key: 'data.status'
+      }
+    },
+
+    rowPositive(item) {
+      return item.status === JobStatus.PUBLISHED;
+    },
+
+    actions: {
+      label: 'Actions',
+      renderer(item) {
+        return (
+          <React.Fragment>
+            {item.data.status === JobStatus.NOT_PUBLISHED && (
+              <Button
+                icon
+                color="blue"
+                size="mini"
+                as={Link}
+                to={`/admin/projects/${item.project_id}/screenings/${item.id}/edit`}>
+                <Icon name="edit" />
+              </Button>
+            )}
+            <Button
+              icon
+              color="blue"
+              size="mini"
+              as={Link}
+              to={`/admin/projects/${item.project_id}/screenings/${item.id}/dashboard`}>
+              <Icon name="play" />
+            </Button>
+            <Popup
+              trigger={
+                <Button
+                  icon
+                  color="blue"
+                  size="mini"
+                  onClick={() => {
+                    // eslint-disable-next-line react/prop-types
+                    props.copyJob(item.id);
+                  }}>
+                  <Icon name="copy" />
+                </Button>
+              }
+              content="Copy this job"
+            />
+          </React.Fragment>
+        );
+      }
+    }
+  };
+};
+
 Experiments.propTypes = {
   fetchExperiments: PropTypes.func,
   error: PropTypes.any,
   loading: PropTypes.bool,
   experiments: PropTypes.object,
-  match: PropTypes.object
+  match: PropTypes.object,
+  copyJob: PropTypes.func,
+  copyJobLoading: PropTypes.bool
 };
 
 const mapStateToProps = state => ({
   experiments: state.experiment.list.experiments,
   error: state.experiment.list.error,
-  loading: state.experiment.list.loading
+  loading: state.experiment.list.loading,
+  copyJobLoading: state.experiment.copy.loading
 });
 
 const mapDispatchToProps = dispatch => ({
-  fetchExperiments: projectId => dispatch(actions.fetchExperiments(projectId))
+  fetchExperiments: projectId => dispatch(actions.fetchExperiments(projectId)),
+  copyJob: jobId => dispatch(actions.copyJob(jobId))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Experiments);

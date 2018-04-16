@@ -201,3 +201,36 @@ const getAssignmentsFinishedByWorkers = (exports.getAssignmentsFinishedByWorkers
     );
   }
 });
+
+/**
+ * Creates a copy of the given job.
+ *
+ * @param {Number} id - The job's ID we want to copy.
+ */
+const copy = (exports.copy = async id => {
+  try {
+    let sourceJob = await getById(id);
+
+    if (!sourceJob) {
+      throw Boom.badRequest(`The job with id ${id} does not exist.`);
+    }
+
+    let copy = {
+      ...sourceJob
+    };
+    delete copy.id;
+    delete copy.uuid;
+    copy.data.status = JobStatus.NOT_PUBLISHED;
+    copy.data.name = `${copy.data.name} (copy)`;
+
+    let createdCopy = await create(copy);
+    return createdCopy;
+  } catch (error) {
+    console.error(error);
+
+    if (error.isBoom) {
+      throw error;
+    }
+    throw Boom.badImplementation('Error while trying to copy the job');
+  }
+});

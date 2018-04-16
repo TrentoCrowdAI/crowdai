@@ -14,6 +14,9 @@ const actionTypes = {
   FETCH_JOB_STATE_POLLED: 'C_FETCH_JOB_STATE_POLLED',
   FETCH_JOB_STATE_POLLED_DONE: 'C_FETCH_JOB_STATE_POLLED_DONE',
   CLEAN_JOB_STATE: 'C_CLEAN_JOB_STATE',
+  COPY_JOB: 'C_COPY_JOB',
+  COPY_JOB_SUCCESS: 'C_COPY_JOB_SUCCESS',
+  COPY_JOB_ERROR: 'C_COPY_JOB_ERROR',
   ...getActionTypes(scopes.EXPERIMENTS)
 };
 
@@ -106,6 +109,27 @@ const actions = {
   pollJobStateDone() {
     return {
       type: actionTypes.FETCH_JOB_STATE_POLLED_DONE
+    };
+  },
+
+  copyJob(id) {
+    return {
+      type: actionTypes.COPY_JOB,
+      id
+    };
+  },
+
+  copyJobSuccess(copiedJob) {
+    return {
+      type: actionTypes.COPY_JOB_SUCCESS,
+      copiedJob
+    };
+  },
+
+  copyJobError(error) {
+    return {
+      type: actionTypes.COPY_JOB_ERROR,
+      error
     };
   }
 };

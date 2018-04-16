@@ -5,6 +5,9 @@ import {actionTypes, actions} from './actions';
 import axios, {requestersApi} from 'src/utils/axios';
 import {flattenError} from 'src/utils';
 import config from 'src/config/config.json';
+import {actions as historyActions} from 'src/components/core/history/actions';
+import {actions as toastActions} from 'src/components/core/toast/actions';
+import ToastTypes from 'src/components/core/toast/types';
 
 const getExperiments = (action$, store) =>
   action$.ofType(actionTypes.FETCH_EXPERIMENTS).switchMap(action => {
@@ -58,11 +61,28 @@ const pollJobState = (action$, store) =>
     );
   });
 
+const copyJob = (action$, store) =>
+  action$.ofType(actionTypes.COPY_JOB).switchMap(action => {
+    return Observable.defer(() => requestersApi.post(`jobs/${action.id}/copy`))
+      .mergeMap(response =>
+        Observable.concat(
+          Observable.of(toastActions.show({message: 'Copy created!', type: ToastTypes.SUCCESS})),
+          Observable.of(actions.copyJobSuccess(response.data)),
+          Observable.of(actions.fetchItem(response.data.id)),
+          Observable.of(
+            historyActions.push(`/admin/projects/${response.data.project_id}/screenings/${response.data.id}/edit`)
+          ) // .delay(1000)
+        )
+      )
+      .catch(error => Observable.of(actions.copyJobError(flattenError(error))));
+  });
+
 export default combineEpics(
   getExperiments,
   saveExperiment,
   fetchExperiment,
   publishExperiment,
   fetchJobState,
-  pollJobState
+  pollJobState,
+  copyJob
 );

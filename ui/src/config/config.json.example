@@ -22,6 +22,7 @@
   "localStorageKey": "crowdaiAuth",
   "axios": {
     "timeout": 15000
-  }
+  },
+  "toastDismissTimeout": 2000
 }
 

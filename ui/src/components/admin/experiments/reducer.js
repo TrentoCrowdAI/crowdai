@@ -149,6 +149,38 @@ const stateReducer = (state = defaultJobState, action) => {
   }
 };
 
+const defaultCopyState = {
+  item: {},
+  error: undefined,
+  loading: false
+};
+
+const copyReducer = (state = defaultCopyState, action) => {
+  switch (action.type) {
+    case actionTypes.COPY_JOB:
+      return {
+        ...state,
+        item: {},
+        loading: true,
+        error: undefined
+      };
+    case actionTypes.COPY_JOB_SUCCESS:
+      return {
+        ...state,
+        loading: false,
+        item: action.copiedJob
+      };
+    case actionTypes.COPY_JOB_ERROR:
+      return {
+        ...state,
+        loading: false,
+        error: action.error
+      };
+    default:
+      return state;
+  }
+};
+
 export default combineReducers({
   list: reducer,
   // finally we combine generic and formReducer that handles
@@ -157,5 +189,6 @@ export default combineReducers({
     let outputState = genericFormReducer(state, action);
     return formReducer(outputState, action);
   },
-  state: stateReducer
+  state: stateReducer,
+  copy: copyReducer
 });

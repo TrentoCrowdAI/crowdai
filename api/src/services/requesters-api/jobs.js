@@ -26,6 +26,10 @@ const put = async ctx => {
   );
 };
 
+const copy = async ctx => {
+  ctx.response.body = await delegates.jobs.copy(ctx.params.id);
+};
+
 const publish = async ctx => {
   ctx.response.body = await managers.job.publish(ctx.params.id);
 };
@@ -37,4 +41,5 @@ exports.register = router => {
   router.get('/jobs/:id', getById);
   router.post('/jobs/:id/publish', publish);
   router.get('/jobs/:id/state', getState);
+  router.post('/jobs/:id/copy', copy);
 };

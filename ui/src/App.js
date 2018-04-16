@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {Container, Grid, Divider} from 'semantic-ui-react';
 import {Provider, connect} from 'react-redux';
-import {HashRouter as Router, Route, withRouter, Switch} from 'react-router-dom';
+import {Router, Route, withRouter, Switch} from 'react-router-dom';
 import queryString from 'query-string';
 
 import './App.css';
@@ -14,6 +14,7 @@ import {actions} from 'src/components/question-form/actions';
 import RewardWidget from 'src/components/reward-widget/RewardWidget';
 import DashboardContainer from 'src/components/admin/dashboard/DashboardContainer';
 import Login from 'src/components/admin/login/Login';
+import {history} from 'src/components/core/history';
 
 /**
  * Main component.
@@ -103,7 +104,7 @@ class App extends Component {
   render() {
     return (
       <Provider store={store}>
-        <Router>
+        <Router history={history}>
           <Route path={'/'} component={ConnectedAppWrapper} />
         </Router>
       </Provider>

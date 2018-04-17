@@ -119,21 +119,26 @@ class NestChart extends React.Component {
         .y( (d) => {return yscale(d[y])} )
 
     g.append("path")
-        .datum([{
-          total_time : media,
-          task_id : data[0][x]
-        },{
-          total_time : media,
-          task_id : data[data.length-1][x]
-        }])
-        //.attr("class","axis axis--y2")
-        .attr("transform","translate("+xscale.bandwith()+","+yscale(media)+")")
-        .attr("stroke", "red")
-        //.attr("path", "red")
-        .attr("d", line)
-        //.call(y2Axis)
-        .style("fill","red")
-        .style("stroke-width",1)
+      .datum([{
+        total_time : media,
+        task_id : data[0][x]
+      },{
+        total_time : media,
+        task_id : data[data.length-1][x]
+      }])
+      .attr("class","original")
+      .attr("transform","translate("+(xscale.bandwidth()/2)+",0)")
+      .attr("d", line)
+      .style("stroke", "red")
+      .style("fill","none")
+      .style("stroke-width",1)
+      
+    g.append("text")
+        .attr("fill", "red")
+        .attr("transform", "translate("+width/2+","+yscale(media)+")")
+        .attr("text-anchor","middle")
+        .attr("dy","-0.5em")
+        .text("media ~ "+media+" min")
 
     g.append("g")
         .attr("class","axis axis--x")

@@ -11,7 +11,8 @@ const getWorkerReward = async ctx => {
 const finishAssignment = async ctx => {
   ctx.response.body = await managers.state.forceFinish(
     ctx.params.uuid,
-    ctx.params.workerTurkId
+    ctx.params.workerTurkId,
+    ctx.request.fields.finishedWithError
   );
 };
 

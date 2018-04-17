@@ -41,14 +41,20 @@ const finishAssignment = (action$, store) =>
   action$.ofType(actionTypes.FINISH_ASSIGNMENT).switchMap(action => {
     const {session} = store.getState().questionForm;
     return Observable.defer(() =>
-      axios.post(`/jobs/${session.experimentId}/workers/${session.workerId}/finish-assignment`)
+      axios.post(`/jobs/${session.experimentId}/workers/${session.workerId}/finish-assignment`, {
+        finishedWithError: action.finishedWithError
+      })
     )
-      .mergeMap(response =>
-        Observable.concat(
-          Observable.of(actions.finishAssignmentSuccess()),
-          Observable.of(actions.checkAssignmentStatus())
-        )
-      )
+      .mergeMap(response => {
+        let actionsToCall = [Observable.of(actions.finishAssignmentSuccess())];
+
+        if (action.finishedWithError) {
+          actionsToCall.push(Observable.of(actions.getNextTaskSuccess(response.data)));
+        } else {
+          actionsToCall.push(Observable.of(actions.checkAssignmentStatus()));
+        }
+        return Observable.concat(...actionsToCall);
+      })
       .catch(error => Observable.of(actions.finishAssignmentError(flattenError(error))));
   });
 

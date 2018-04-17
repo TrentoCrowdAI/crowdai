@@ -19,10 +19,22 @@ class FilterTask extends React.Component {
         <Segment vertical>
           <Grid>
             <Grid.Row>
-              <Message style={{marginLeft: 'auto', marginRight: 'auto'}} negative>
-                <Message.Header>Error</Message.Header>
-                <p>Error while trying to fetch the task.</p>
-              </Message>
+              <Grid.Column>
+                <Message style={{marginLeft: 'auto', marginRight: 'auto'}} negative>
+                  <Message.Header>Error</Message.Header>
+                  <p>
+                    An error occurred while trying to fetch the task. Please refresh the page to retry. If the problem
+                    persists, click on the following button to submit your progress. We will look into the problem and
+                    contact you if needed.
+                  </p>
+                  <FinishButton
+                    style={{marginTop: 40, marginRight: '0.6em'}}
+                    onClick={() => {
+                      this.finish(true);
+                    }}
+                  />
+                </Message>
+              </Grid.Column>
             </Grid.Row>
           </Grid>
         </Segment>
@@ -34,9 +46,11 @@ class FilterTask extends React.Component {
         <Segment vertical>
           <Grid>
             <Grid.Row>
-              <Dimmer active inverted>
-                <Loader inverted>Loading</Loader>
-              </Dimmer>
+              <Grid.Column>
+                <Dimmer active inverted>
+                  <Loader inverted>Loading</Loader>
+                </Dimmer>
+              </Grid.Column>
             </Grid.Row>
           </Grid>
         </Segment>
@@ -162,19 +176,22 @@ class FilterTask extends React.Component {
     this.props.getNextTask();
   }
 
-  finish() {
-    this.props.finishAssignment();
+  finish(finishedWithError = false) {
+    this.props.finishAssignment(finishedWithError);
   }
 
   initialTestFailed() {
     return (
-      this.props.task.data.initialTestFailed ||
+      (this.props.task.data && this.props.task.data.initialTestFailed) ||
       (this.props.assignmentStatus && this.props.assignmentStatus.data.initialTestFailed)
     );
   }
 
   finished() {
-    return this.props.task.data.finished || (this.props.assignmentStatus && this.props.assignmentStatus.data.finished);
+    return (
+      (this.props.task.data && this.props.task.data.finished) ||
+      (this.props.assignmentStatus && this.props.assignmentStatus.data.finished)
+    );
   }
 }
 
@@ -187,36 +204,16 @@ const FinishButton = props => {
 };
 
 FilterTask.propTypes = {
-  /** @ignore */
   task: PropTypes.object,
-
-  /** @ignore */
   answer: PropTypes.object,
-
-  /** @ignore */
   answerSaved: PropTypes.object,
-
-  /** @ignore */
   answerSubmitError: PropTypes.object,
-
-  /** @ignore */
   hasAcceptedHit: PropTypes.bool,
-
-  /** @ignore */
   answerSubmitLoading: PropTypes.bool,
-
-  /** @ignore */
   getNextTask: PropTypes.func,
-
-  /** @ignore */
   setAnswer: PropTypes.func,
-
-  /** @ignore */
   finishAssignment: PropTypes.func,
-
-  /** @ignore */
   checkAssignmentStatus: PropTypes.func,
-
   assignmentStatus: PropTypes.object,
   error: PropTypes.object,
   loading: PropTypes.bool,
@@ -239,7 +236,7 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = dispatch => ({
   getNextTask: _ => dispatch(actions.getNextTask()),
   setAnswer: (taskId, response) => dispatch(actions.setAnswer(taskId, response)),
-  finishAssignment: () => dispatch(actions.finishAssignment()),
+  finishAssignment: finishedWithError => dispatch(actions.finishAssignment(finishedWithError)),
   checkAssignmentStatus: () => dispatch(actions.checkAssignmentStatus())
 });
 

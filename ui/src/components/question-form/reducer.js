@@ -40,7 +40,8 @@ const reducer = (state = defaultState, action) => {
         answer: undefined,
         answerSaved: undefined,
         answerIsValid: true,
-        answerSubmitError: undefined
+        answerSubmitError: undefined,
+        error: undefined
       };
     case actionTypes.NEXT_TASK_ERROR:
       return {

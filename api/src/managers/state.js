@@ -41,17 +41,29 @@ const getWorkerAssignmentStatus = (exports.getWorkerAssignmentStatus = async (
 });
 
 /**
- * A worker chose to finish their assignment.
+ * A worker choses to finish their assignment.
  *
  * @param {string} uuid - The job UUID
  * @param {string} workerTurkId - The worker's AMT ID
+ * @param {Boolean} finishedWithError - An error occurred and the worker clicked the finish button
  */
-const forceFinish = (exports.forceFinish = async (uuid, workerTurkId) => {
+const forceFinish = (exports.forceFinish = async (
+  uuid,
+  workerTurkId,
+  finishedWithError = false
+) => {
+  let data = {
+    finishedByWorker: true
+  };
   let worker = await delegates.workers.getByTurkId(workerTurkId);
   await delegates.tasks.cleanBuffer(uuid, worker.id);
-  return await finishAssignment(uuid, worker.id, {
-    finishedByWorker: true
-  });
+
+  if (finishedWithError) {
+    data = {
+      finishedWithError: true
+    };
+  }
+  return await finishAssignment(uuid, worker.id, data);
 });
 
 /**

@@ -417,6 +417,18 @@ const reviewAssignments = async (job, hit, mturk) => {
       ) {
         continue;
       }
+
+      if (assignment.data.finishedWithError) {
+        // if an error ocurred and the worker did not finish initial quiz
+        // we just skip it.
+        let quizPending = await qualityManager.shouldRunInitialTest(job, {
+          id: assignment.worker_id
+        });
+
+        if (quizPending) {
+          continue;
+        }
+      }
       let data;
 
       if (assignment.data.initialTestFailed) {

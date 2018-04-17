@@ -94,6 +94,7 @@ const checkWorkerAssignment = (exports.checkWorkerAssignment = async (
 });
 
 /**
+ * Checks if the worker needs to do initial quiz.
  *
  * @param {Object} job
  * @param {Object} worker

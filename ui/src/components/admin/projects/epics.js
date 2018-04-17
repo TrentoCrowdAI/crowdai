@@ -18,7 +18,7 @@ const saveProject = (action$, store) =>
     const profile = store.getState().profile.item;
     item.requester_id = profile.id;
     // this is temporary. We should improve for large files.
-    const config = {timeout: 10000};
+    const config = {timeout: 50000};
     return Observable.defer(
       () =>
         item.id ? requestersApi.put(`projects/${item.id}`, item, config) : requestersApi.post('projects', item, config)

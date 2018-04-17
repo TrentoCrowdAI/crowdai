@@ -31,3 +31,5 @@ tests.csv
 .env
 .env.dev
 .env.prod
+coverage
+.env.test

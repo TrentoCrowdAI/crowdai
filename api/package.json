@@ -2,7 +2,8 @@
   "name": "crowdai-api",
   "version": "0.1.0",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest",
+    "test:coverage": "jest --coverage",
     "start": "node -r dotenv/config src/app.js",
     "debug": "node -r dotenv/config --inspect src/app.js"
   },
@@ -24,8 +25,12 @@
     "koa2-cors": "^2.0.5",
     "pg": "^7.4.1",
     "pg-query-stream": "^1.1.1",
+    "promise-retry": "^1.1.1",
     "request": "^2.83.0",
     "stream-transform": "^1.0.0",
     "uuid": "^3.2.1"
+  },
+  "devDependencies": {
+    "jest": "^22.4.3"
   }
 }

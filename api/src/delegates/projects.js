@@ -6,7 +6,6 @@ const transform = require('stream-transform');
 const QueryStream = require('pg-query-stream');
 
 const db = require(__base + 'db');
-const config = require(__base + 'config');
 const tasksDelegate = require('./tasks');
 const requestersDelegate = require('./requesters');
 

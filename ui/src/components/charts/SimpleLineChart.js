@@ -7,54 +7,51 @@ class SimpleLineChart extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      data: this.props.data,
       clicked: []
     }
     this.buildGraph = this.buildGraph.bind(this);
+    this.dataWrapper = this.dataWrapper.bind(this);
+  }
+
+  dataWrapper() {
+    if(this.props.data.length==0) {
+      var svg = d3.select("."+this.props.selector)
+      var margin = {top: 30, right: 30, bottom: 30, left: 30};
+      var g = svg.append("g")
+
+      g.append("text")
+        .text("Choose a ...")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+    } else {
+      this.buildGraph()
+    }
   }
 
   buildGraph() {
-    //console.log(this.props.color+' chart STATE: ',this.state)
-    //console.log(this.props.color+' chart PROPS: ',this.state)
-
-    //selector necessary when displaying more different graphs on the same page,
-    //to append them to different canvas/svg
     var svg = d3.select("."+this.props.selector);
-
     var margin = {top: 30, right: 30, bottom: 30, left: 30};
     var width = +svg.attr("width") - margin.left - margin.right;
     var height = +svg.attr("height") - margin.top - margin.bottom;
     var g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-    //we can choose on which parameters base our graph,
-    //x and y coordinates are passe as props parameters
-    var x = this.props.x
-    var y = this.props.y
-
-    //to order data basing on x-coordinate, to display a ordered line
-    var data = this.props.data.sort( function(a,b) {
-      return (a[x] > b[x]) ? 1 : ((b[x] > a[x]) ? -1 : 0);
-      //return (a[y] > b[y]) ? 1 : ((b[y] > a[y]) ? -1 : 0);
-    })
-    //console.log(data)
-    //if we want to display different lines on the same graph,
-    //to specify different colors
     var color = this.props.color
 
-    //define x axis
+    var x = this.props.x
+    var y = this.props.y
+    
+    var data = this.props.data.sort( function(a,b) {
+      return (a[x] > b[x]) ? 1 : ((b[x] > a[x]) ? -1 : 0);
+    })
+    
     var xscale = d3.scaleLinear()
         .domain(d3.extent(data, d => d[x] ))
         .range([0, width]);
     var xAxis = d3.axisBottom(xscale);
 
-    //define y axis
     var yscale = d3.scaleLinear()
         .domain(d3.extent(data, d => d[y] ))
-        //.domain([0, d3.max(data, d => d[y] )])
         .range([height, 0]);
     var yAxis = d3.axisLeft(yscale);
 
-    //add axis
     g.append("g")
        .attr("class","x axis")
        .attr("transform","translate(0,"+height+")")
@@ -64,6 +61,7 @@ class SimpleLineChart extends React.Component {
           .attr("transform","translate("+(width-10)+",0)")
           .attr("dy","-1em")
           .text(this.props.x);
+
     g.append("g")
        .attr("class","y axis")
        .call(yAxis)
@@ -74,11 +72,10 @@ class SimpleLineChart extends React.Component {
           .attr("dy","2em")
           .text(this.props.y);
 
-    //define line
+    //deploy data to be dispalyed on a line
     var line = d3.line()
         .x( (d) => {return xscale(d[x])} )
         .y( (d) => {return yscale(d[y])} )
-        //to make the line curved and not segmented
         .curve(d3.curveMonotoneX);
 
     g.append("path")
@@ -98,13 +95,11 @@ class SimpleLineChart extends React.Component {
         .attr("cy", d => yscale(d[y]) )
         .attr("r",5)
         .on("click", (d) => {
-          //console.log("points on clicked data: ")
           this.setState({
             clicked: []
           })
           data.map(step => {
             if(step[x] === d[x] && step[y] === d[y]) {
-              //console.log(step)
               var nuovo = this.state.clicked.concat([
                 this.props.x+" : "+d[x]+",   "+this.props.y+" : "+d[y]
                 ])
@@ -115,7 +110,7 @@ class SimpleLineChart extends React.Component {
           })
         })
         
-        //drag modifying data (?)
+        //drag modifying data
         /*.call(d3.drag()
           .on("drag", function(d) {
             d[x] = Math.round(xscale.invert(d3.event.x))
@@ -165,18 +160,18 @@ class SimpleLineChart extends React.Component {
   }
 
   componentDidMount() {
-    this.buildGraph();
+    this.dataWrapper();
   }
 
   componentDidUpdate() {
     d3.select("."+this.props.selector).selectAll("g").remove();
-    this.buildGraph();
+    this.dataWrapper();
   }
 
   render() {
     return(
       <div>
-        <svg className={this.props.selector} width="700" height="400"> </svg>
+        <svg className={this.props.selector} width="800" height="400"> </svg>
         <br />
         <strong>Clicked data:</strong> {this.state.clicked}
       </div>
@@ -184,14 +179,8 @@ class SimpleLineChart extends React.Component {
   }
 }
 
-/*
-<button onClick={this.props.handleConcat}>Concat Data</button>
-<button onClick={this.props.handleReduce} style={{color: 'red'}}>Reduce Data</button>
-<button style={{color: 'green'}}>Apply Change</button>
-*/
-
 SimpleLineChart.propTypes = {
-  data : PropTypes.array
+
 }
 
 const mapStateToProps = state => ({

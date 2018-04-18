@@ -1,33 +1,15 @@
 import React from 'react';
 import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
-import { actions } from './actions';
-import { actions as expactions } from '../experiments/actions';
-import {
-  Step,
-  Icon,
-  Segment,
-  Grid,
-  Form,
-  Button,
-  Statistic,
-  Header,
-  Image,
-  Accordion,
-  Message
-} from 'semantic-ui-react';
-import './reports.css';
 
 import ChartWrapper from 'src/components/charts/ChartWrapper';
 import JobChooser from './JobChooser';
 import WorkerChooser from './WorkerChooser';
-import { Z_UNKNOWN } from 'zlib';
+import { Button, Dimmer, Loader } from 'semantic-ui-react';
+import './reports.css';
 
-//general data variable
-var data = []
-
-//fetched in componentDidMount()
-var timeData = []
+import { actions } from './actions';
+import { actions as expactions } from '../experiments/actions';
 
 var agreeData = {
 			tasks: {
@@ -203,47 +185,74 @@ class Reports extends React.Component {
 			case 'W_CompleteTime':
 				this.props.fetchWorkerTime(this.state.chosenworker)
 				break;
+			case 'Votes':
+				this.props.fetchWorkerTime(this.state.chosenworker)
+				break;
+			case 'Agreements':
+				this.props.reports.tasks = Object.values(agreeData.tasks)
+				break;
+			default: 
+				console.log('Metric to implement: ', value)
+				break;
 		}
 
 		this.setState({
 			...this.state,
 			activeMetric: value,
-			activeworker: value=='T_CompleteTime' ? false : true,
-			chosenworker: value=='T_CompleteTime' ? 'all' : this.state.chosenworker
+			activeworker: value=='T_CompleteTime'||value=='Agreements' ? false : true,
+			chosenworker: value=='T_CompleteTime'||value=='Agreements' ? 'all' : this.state.chosenworker
 		})
 	}
 
 	chooseWorker(e, {value}) {
-		this.props.fetchWorkerTime(value);
+		switch(this.state.activeMetric) {
+			case 'Agreements':
+				this.props.reports.tasks = Object.values(agreeData.tasks)
+				break;
+			default:
+				this.props.fetchWorkerTime(value)		
+				break;
+		}
 
 		this.setState({
 			...this.state, 
 			chosenworker: value
 		})
-  }
+}
 
 	chooseJob(e, {value}) {
-		if(this.state.activeMetric=='W_CompleteTime') {
-			this.props.reports.tasks = []
-		} else {
-			this.props.fetchTaskTime(value);
+		switch(this.state.activeMetric) {
+			case 'W_CompleteTime':
+			case 'Votes':
+				this.props.reports.tasks = []
+				break;
+			case 'Agreements':
+				this.props.reports.tasks = Object.values(agreeData.tasks)
+				break;
+			default:
+				this.props.fetchTaskTime(value);
+				break;
 		}
 		this.props.fetchWorkers(value);
 		
-		if(this.state.activeMetric=='W_CompleteTime') {
-			this.setState({
-				...this.state,
-				chosenjob: value,
-				chosenworker: 'all'
-			})
-		} else {
-			this.setState({
-				...this.state, 
-				chosenjob: value,
-				chosenworker: 'all',
-				activeworker: this.state.activeMetric=='T_CompleteTime' ? false : true
-			})
-	}
+		switch(this.state.activeMetric) {
+			case 'W_CompleteTime':
+			case 'Votes' :
+				this.setState({
+					...this.state,
+					chosenjob: value,
+					chosenworker: 'all'
+				})
+				break;
+			default:
+				this.setState({
+					...this.state, 
+					chosenjob: value,
+					chosenworker: 'all',
+					activeworker: this.state.activeMetric=='T_CompleteTime'||this.state.activeMetric=='Agreements' ? false : true
+				})
+				break;
+		}
   }
 
 	renderMetrics() {
@@ -264,11 +273,11 @@ class Reports extends React.Component {
 				>Time to complete per Worker</Button>
 				<br />
 				<Button 
-					value='Successes'
+					value='Votes'
 					className='metrics' 
 					style={{marginBottom: '5px'}}
 					onClick={this.activeMetric}
-				>Percentage % of success</Button>
+				>Percentage % of votes</Button>
 				<br />
 				<Button 
 					value='Agreements'
@@ -302,9 +311,12 @@ class Reports extends React.Component {
 		)
 	}
 
-	renderChart(chart,x,y,z,choice,choice_id) {
+	renderChart(chart,x,y,z) {
 		return(
 			<React.Fragment>
+			<Dimmer active={this.props.rep_loading} inline="centered" inverted>
+          <Loader indeterminate>Loading data...</Loader>
+      </Dimmer>
 			<ChartWrapper 
 				chart={chart}
         x={x}
@@ -313,8 +325,6 @@ class Reports extends React.Component {
         selector={'chart1'}
         color={'steelblue'}
 				data={Object.values(this.props.reports.tasks)}
-				choice={choice}
-				choice_id={choice_id}
       />
       </React.Fragment>
 		)
@@ -323,7 +333,7 @@ class Reports extends React.Component {
 	render() {
 		//data = Object.values(this.props.reports.tasks)
 		console.log(this.props.reports.tasks)
-
+		console.log(this.state)
 		JobOptions = { 'all' : 'All Jobs' }
 		WorkerOptions = { 'all' : 'All Workers' }
 
@@ -335,14 +345,12 @@ class Reports extends React.Component {
 		});
 
 		var chart
+		//first groupby
 		var x
+		//categories
 		var y
-		//group or filter by z
+		//second groupby if necessary
 		var z
-
-		var choice
-		var choice_id
-
 		switch (this.state.activeMetric) {
 
 			case 'T_CompleteTime':
@@ -350,9 +358,6 @@ class Reports extends React.Component {
 				x='total_time'
 				y='task_id'
 				z=''
-
-				choice='j'
-				choice_id=this.state.chosenjob
 				break;
 
 			case 'W_CompleteTime':
@@ -360,37 +365,23 @@ class Reports extends React.Component {
 				x='task_id'
 				y='total_time'
 				z=''
-
-				choice='w'
-				choice_id= this.state.chosenworker=='' ? 'all' : this.state.chosenworker
 				break;
 
 			case 'Agreements':
 				chart='stacked'
-				//first groupby
 				x='item_id'
-				//categories
 				y=['c1','c2','c3']
-				//second groupby
 				z='filter_id'
-
-				choice='j'
-				choice_id=this.state.chosenjob
 				break;
 
-			case 'Successes':
+			case 'Votes':
 				chart='pie'
-				x=''
-				y=''
+				x='task_id'
+				y='answer'
 				z=''
-
-				choice='w'
-				choice_id=this.state.chosenworker
-				data=[]
 				break;
 
 			default:
-				data = []
 				break;
 		}
 
@@ -419,7 +410,7 @@ class Reports extends React.Component {
 							onChange={this.chooseWorker}
 							chosenworker={this.state.chosenworker}
 							/>
-						{this.renderChart(chart,x,y,z,choice,choice_id)}
+						{this.renderChart(chart,x,y,z)}
 					</div>
 				</div>
 

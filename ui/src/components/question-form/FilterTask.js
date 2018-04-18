@@ -65,6 +65,15 @@ class FilterTask extends React.Component {
             <Message.Header>Qualification test result</Message.Header>
             <p>Thank you for participating, but you failed to pass the qualification test.</p>
             <p>Please close this tab/window and go back to the HIT page on Amazon Mechanical Turk.</p>
+            <p>
+              If you want to leave your anonymous feedback on the task, please click{' '}
+              <a
+                href="https://docs.google.com/forms/d/e/1FAIpQLScUZPQ2d_awSlNAWsiOJ8uDF9CKeZsqrLnwKMbqC3dWOlF12Q/viewform?usp=sf_link"
+                rel="noopener noreferrer"
+                target="_blank">
+                here.
+              </a>
+            </p>
           </Message.Content>
         </Message>
       );

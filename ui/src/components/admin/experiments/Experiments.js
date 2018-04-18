@@ -7,6 +7,7 @@ import {Button, Icon, Popup} from 'semantic-ui-react';
 import {actions} from './actions';
 import DataTable from 'src/components/core/table/DataTable';
 import {JobStatus} from 'src/utils/constants';
+import {datetimeFormatter} from 'src/utils';
 
 class Experiments extends React.Component {
   render() {
@@ -35,8 +36,11 @@ class Experiments extends React.Component {
 const getOptions = props => {
   return {
     columns: {
-      uuid: {
-        label: 'UUID'
+      date: {
+        label: 'Created at',
+        renderer(item) {
+          return datetimeFormatter(item.created_at);
+        }
       },
       name: {
         label: 'Name',

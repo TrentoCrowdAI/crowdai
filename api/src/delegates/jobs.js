@@ -221,8 +221,6 @@ const copy = (exports.copy = async id => {
     delete copy.id;
     delete copy.uuid;
     copy.data.status = JobStatus.NOT_PUBLISHED;
-    copy.data.name = `${copy.data.name} (copy)`;
-
     let createdCopy = await create(copy);
     return createdCopy;
   } catch (error) {

@@ -6,6 +6,7 @@ import {Button, Icon} from 'semantic-ui-react';
 
 import {actions} from './actions';
 import DataTable from 'src/components/core/table/DataTable';
+import {datetimeFormatter} from 'src/utils';
 
 const ACCOUNT_NOT_INITIALIZED = 'Requester account has not been initialized';
 
@@ -46,7 +47,10 @@ const getOptions = props => {
         }
       },
       created_at: {
-        label: 'Date created'
+        label: 'Date created',
+        renderer(item) {
+          return datetimeFormatter(item.created_at);
+        }
       }
     },
 

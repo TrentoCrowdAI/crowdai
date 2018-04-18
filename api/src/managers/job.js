@@ -598,9 +598,10 @@ const mturkRejectAssignment = async (id, mturk) => {
 const sendBonus = async (job, workerId, assignmentId, mturk) => {
   const worker = await delegates.workers.getById(workerId);
   const { reward } = await getWorkerReward(job.uuid, worker.turk_id, true);
+  const bonusAmount = reward.toFixed(2);
   const payload = {
     AssignmentId: assignmentId,
-    BonusAmount: `${reward}`,
+    BonusAmount: bonusAmount,
     Reason: `Reward based on the answers given in "${job.data.hit.Title}"`,
     WorkerId: worker.turk_id
   };

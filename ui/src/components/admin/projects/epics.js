@@ -27,7 +27,13 @@ const saveProject = (action$, store) =>
     )
       .mergeMap(response =>
         Observable.concat(
-          Observable.of(toastActions.show({message: 'Project created!', type: ToastTypes.SUCCESS})),
+          Observable.of(
+            toastActions.show({
+              header: 'Project created',
+              message: 'The CSV files are now being processed.',
+              type: ToastTypes.SUCCESS
+            })
+          ),
           Observable.of(actions.submitSuccess()),
           Observable.of(actions.pollProject(response.data.id)),
           Observable.of(historyActions.push('/admin/projects'))

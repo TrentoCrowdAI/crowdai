@@ -30,7 +30,7 @@ class ProjectForm extends React.Component {
                 onSubmit={() => this.props.submit()}>
                 <div style={{marginBottom: 20}}>{this.renderForm()}</div>
 
-                {this.props.error && (
+                {/* {this.props.error && (
                   <Message
                     error
                     header="Error"
@@ -38,7 +38,7 @@ class ProjectForm extends React.Component {
                   />
                 )}
 
-                {this.props.saved && <Message success header="Success" content="Changes saved!" />}
+                {this.props.saved && <Message success header="Success" content="Changes saved!" />} */}
 
                 <Button floated="right" positive>
                   Save

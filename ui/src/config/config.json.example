@@ -10,8 +10,12 @@
 
   // polling intervals configuration
   "polling": {
+    // interval for checking the worker assignment status
     "workerAssignment": 10000,
-    "jobState": 10000
+    // interval for checking the job state
+    "jobState": 10000,
+    // interval for checking the project state (after creating it)
+    "project": 10000
   },
 
   "google": {

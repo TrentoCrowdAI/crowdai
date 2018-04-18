@@ -71,7 +71,7 @@ const copyJob = (action$, store) =>
           Observable.of(actions.fetchItem(response.data.id)),
           Observable.of(
             historyActions.push(`/admin/projects/${response.data.project_id}/screenings/${response.data.id}/edit`)
-          ) // .delay(1000)
+          )
         )
       )
       .catch(error => Observable.of(actions.copyJobError(flattenError(error))));

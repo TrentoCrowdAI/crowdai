@@ -412,8 +412,9 @@ const reviewAssignments = async (job, hit, mturk) => {
 
       if (
         !assignment.data.finished ||
-        assignment.data.assignmentRejected ||
-        assignment.data.assignmentApproved
+        assignment.data.initialTestFailed ||
+        (assignment.data.assignmentApproved &&
+          assignment.data.assignmentBonusSent)
       ) {
         continue;
       }
@@ -429,30 +430,41 @@ const reviewAssignments = async (job, hit, mturk) => {
           continue;
         }
       }
-      let data;
 
-      if (assignment.data.initialTestFailed) {
-        await mturkRejectAssignment(assignment.data.assignmentTurkId, mturk);
-        data = {
-          assignmentRejected: true
-        };
-      } else {
-        await mturkApproveAssignment(assignment.data.assignmentTurkId, mturk);
-        await sendBonus(
-          job,
-          assignment.worker_id,
-          assignment.data.assignmentTurkId,
-          mturk
-        );
-        data = {
-          assignmentApproved: true
-        };
+      if (!assignment.data.initialTestFailed) {
+        try {
+          await mturkApproveAssignment(assignment.data.assignmentTurkId, mturk);
+          await delegates.workers.updateAssignment(
+            job.uuid,
+            assignment.worker_id,
+            {
+              assignmentApproved: true
+            }
+          );
+        } catch (error) {
+          console.error('Approve assignment failed.', error);
+          return;
+        }
+
+        try {
+          await sendBonus(
+            job,
+            assignment.worker_id,
+            assignment.data.assignmentTurkId,
+            mturk
+          );
+          await delegates.workers.updateAssignment(
+            job.uuid,
+            assignment.worker_id,
+            {
+              assignmentBonusSent: true
+            }
+          );
+        } catch (error) {
+          console.error('sendBonus failed.', error);
+          return;
+        }
       }
-      await delegates.workers.updateAssignment(
-        job.uuid,
-        assignment.worker_id,
-        data
-      );
     }
     console.log(`Review assignments for job: ${jobId} done`);
     await finishJob(jobId);

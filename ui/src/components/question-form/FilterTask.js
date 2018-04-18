@@ -80,6 +80,15 @@ class FilterTask extends React.Component {
               Thank you for completing the tasks. Please close this tab/window and go back to the HIT page on Amazon
               Mechanical Turk.
             </p>
+            <p>
+              If you want to leave your anonymous feedback on the task, please click{' '}
+              <a
+                href="https://docs.google.com/forms/d/e/1FAIpQLScUZPQ2d_awSlNAWsiOJ8uDF9CKeZsqrLnwKMbqC3dWOlF12Q/viewform?usp=sf_link"
+                rel="noopener noreferrer"
+                target="_blank">
+                here.
+              </a>
+            </p>
           </Message.Content>
         </Message>
       );

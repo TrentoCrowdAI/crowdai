@@ -114,7 +114,8 @@ class StackedBar extends React.Component {
     		.attr("y", yscale.bandwidth()/2)
     		.attr("dy", "0.5em")
     		.attr("dx", "0.5em")
-    		.style("text-anchor","begin")
+				.style("text-anchor","begin")
+				.attr("fill","white")
     		.text(d => d.absolute !==0 && (d.x1-d.x0)>0.04 ? d.absolute : "")
 
     	g.append("g")

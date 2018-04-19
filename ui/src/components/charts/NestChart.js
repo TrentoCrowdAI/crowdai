@@ -8,38 +8,38 @@ class NestChart extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      data : this.props.data
+      order: this.props.x,
+      clicked: []
     }
+    this.dataWrapper = this.dataWrapper.bind(this)
     this.buildGraph = this.buildGraph.bind(this);
   }
 
   dataWrapper() {
-    var data = []
-    switch(this.props.choice) {
-      case 'w':
-        if(this.props.choice_id=='all') {
-          console.log("all workers selected")
-        } else {
-          data = this.state.data.filter(d => d[this.props.z]==this.props.choice_id)
-          this.buildGraph(data)
-        }
-        break;
+    this.props.data.sort( (a,b) =>
+      (a[this.state.order] > b[this.state.order]) ? 1 : ((b[this.state.order] > a[this.state.order]) ? -1 : 0))
+    
+    if(this.props.data.length==0) {
+      var svg = d3.select("."+this.props.selector)
+      var margin = {top: 30, right: 30, bottom: 30, left: 30};
+      var g = svg.append("g")
 
-      default:
-        data = this.state.data
-        this.buildGraph(data)
-        break;
+      g.append("text")
+        .text("Choose a worker")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+    } else {
+      this.buildGraph()
     }
   }
 
-  buildGraph(ndata) {
+  buildGraph() {
+    var data = this.props.data
     var svg = d3.select("."+this.props.selector);
     var x = this.props.x
     var y = this.props.y
     var z = this.props.z
 
-    var data = ndata
-
+    //computing average data to display on chart
     var sum = 0
     data.map(step => {
       sum += step[y]
@@ -63,9 +63,7 @@ class NestChart extends React.Component {
         .domain(data.map(d => d[x]))
 
     var xAxis = d3.axisBottom(xscale)
-
-    var yAxis = d3.axisLeft(yscale)
-        .ticks(10)
+    var yAxis = d3.axisLeft(yscale).ticks(10)
 
     var bar = g.selectAll(".bar")
         .data(data)
@@ -75,7 +73,7 @@ class NestChart extends React.Component {
     bar.append("rect")
         .style("fill", d => {
           if(d[y]>=media) return color
-            else return "green"
+            else return "lightgreen"
         })
         .attr("x", d => xscale(d[x]))
         .attr("y", d => yscale(d[y]))
@@ -89,7 +87,10 @@ class NestChart extends React.Component {
           d3.select(this)
             .style("opacity","1")
         })
-
+        /*.on("click", function() {
+            //add onClick here
+        })*/
+        
     bar.append("text")
         .attr("dy", ".75em")
         .attr("y", d => yscale(d[y])+10 )
@@ -102,21 +103,33 @@ class NestChart extends React.Component {
         .x( (d) => {return xscale(d[x])} )
         .y( (d) => {return yscale(d[y])} )
 
+    //average value as a line that crosses the chart, to refine
     g.append("path")
-        .datum([{
-          total_time : media,
-          task_id : data[0][x]
-        },{
-          total_time : media,
-          task_id : data[data.length-1][x]
-        }])
-        .attr("class","original")
-        .attr("transform","translate("+(xscale.bandwidth()/2)+",0)")
-        .attr("d", line)
-        .style("stroke", "red")
-        .style("fill","none")
-        .style("stroke-width",1)
+      .datum([{
+        total_time : media,
+        task_id : data[0][x]
+      },{
+        total_time : media,
+        task_id : data[data.length-1][x]
+      }])
+      .attr("class","average")
+      .attr("transform","translate("+(xscale.bandwidth()/2)+",0)")
+      .attr("d", line)
+      .style("stroke", "red")
+      .style("fill","none")
+      .style("stroke-width",1)
+    
+    //display average value only of there are more than 1 elements
+    if(data.length>1) {
+      g.append("text")
+          .attr("fill", "red")
+          .attr("transform", "translate("+width/2+","+yscale(media)+")")
+          .attr("text-anchor","middle")
+          .attr("dy","-0.5em")
+          .text("media ~ "+media+" min")
+    }
 
+    //axis
     g.append("g")
         .attr("class","axis axis--x")
         .attr("transform","translate(0,"+height+")")
@@ -140,8 +153,6 @@ class NestChart extends React.Component {
   }
 
   componentDidMount() {
-    this.state.data.sort( (a,b) =>
-        (a[this.props.x] > b[this.props.x]) ? 1 : ((b[this.props.x] > a[this.props.x]) ? -1 : 0))
     this.dataWrapper();
   }
 
@@ -154,31 +165,32 @@ class NestChart extends React.Component {
     //console.log(this.props)
     //console.log(this.state)
     return (
-      <div>
-        <svg className={this.props.selector} width="600" height="400"> </svg>
+      <div className='nest'>
+        <svg className={this.props.selector} width="800" height="400"> </svg>
         <br />
+      { this.props.data.length ? 
+        <React.Fragment>
         <button
           onClick={(event) => this.setState({
-            data: this.state.data.sort( (a,b) =>
-               (a[this.props.y] > b[this.props.y]) ? 1 : ((b[this.props.y] > a[this.props.y]) ? -1 : 0))
-          })
+              order: this.props.y
+            })
           }
         ><strong>Sort y</strong></button>
 
         <button
           onClick={(event) => this.setState({
-            data: this.state.data.sort( (a,b) =>
-              (a[this.props.x] > b[this.props.x]) ? 1 : ((b[this.props.x] > a[this.props.x]) ? -1 : 0))
-          })
+              order: this.props.x
+            })
           }
         ><strong>Sort x</strong></button>
+        </React.Fragment> : " "
+      }
       </div>
     );
   }
 }
 
-
-
+//to fill if necessary
 NestChart.propTypes = {
 
 }

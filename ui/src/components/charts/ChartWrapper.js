@@ -9,6 +9,7 @@ import HeatMap from './HeatMap.js'
 import AreaChart from './AreaChart.js'
 import NestChart from './NestChart.js'
 import StackedBar from './StackedBar.js'
+import DonutChart from './DonutChart.js';
 
 var count = 0;
 
@@ -71,10 +72,10 @@ class ChartWrapper extends React.Component {
               />
           </div>
         );
-      case 'area': 
+      case 'pie': 
         return(
           <div>
-            <AreaChart
+            <DonutChart
               {... this.props}
             />
           </div>
@@ -100,7 +101,7 @@ class ChartWrapper extends React.Component {
         return(
           <div>
             No data to display yet
-            <svg width="600"></svg>
+            <svg width="700"></svg>
           </div>
         );
     }

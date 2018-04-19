@@ -9,6 +9,7 @@ import experimentEpics from 'src/components/admin/experiments/epics';
 import profileEpics from 'src/components/admin/profile/epics';
 import projectEpics from 'src/components/admin/projects/epics';
 import toastEpics from 'src/components/core/toast/epics';
+import reportEpics from 'src/components/admin/reports/epics';
 
 // reducers
 import questionForm from 'src/components/question-form/reducer';
@@ -18,6 +19,7 @@ import experiment from 'src/components/admin/experiments/reducer';
 import profile from 'src/components/admin/profile/reducer';
 import project from 'src/components/admin/projects/reducer';
 import toast from 'src/components/core/toast/reducer';
+import report from 'src/components/admin/reports/reducer';
 
 const rootReducer = combineReducers({
   questionForm,
@@ -27,6 +29,8 @@ const rootReducer = combineReducers({
   profile,
   project,
   toast
+  project,
+  report
 });
 
 const rootEpic = combineEpics(
@@ -38,5 +42,6 @@ const rootEpic = combineEpics(
   projectEpics,
   toastEpics
 );
+const rootEpic = combineEpics(questionFormEpics, rewardEpics, loginEpics, experimentEpics, profileEpics, projectEpics, reportEpics);
 
 export {rootReducer, rootEpic};

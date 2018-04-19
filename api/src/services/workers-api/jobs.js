@@ -30,7 +30,7 @@ const getByUuid = async ctx => {
       maxTasksRule: job.data.maxTasksRule,
       taskRewardRule: job.data.taskRewardRule
     },
-    maxReward
+    maxReward: maxReward.toFixed(2)
   };
 };
 

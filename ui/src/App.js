@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {Container, Grid, Divider} from 'semantic-ui-react';
 import {Provider, connect} from 'react-redux';
-import {HashRouter as Router, Route, withRouter, Switch} from 'react-router-dom';
+import {Router, Route, withRouter, Switch} from 'react-router-dom';
 import queryString from 'query-string';
 
 import './App.css';
@@ -14,6 +14,7 @@ import {actions} from 'src/components/question-form/actions';
 import RewardWidget from 'src/components/reward-widget/RewardWidget';
 import DashboardContainer from 'src/components/admin/dashboard/DashboardContainer';
 import Login from 'src/components/admin/login/Login';
+import {history} from 'src/components/core/history';
 
 import Diff from 'src/components/charts/Diff'
 
@@ -28,46 +29,40 @@ class ConnectedApp extends Component {
         <Switch>
           <Route path="/login" component={Login} />
           <Route path="/admin" component={DashboardContainer} />
+          <Route path={'/welcome/:experimentId'} component={WelcomePage} />
+          <Route
+            path={'/task/:experimentId'}
+            render={props => (
+              <Container>
+                <Grid.Row
+                  style={{
+                    textAlign: 'right',
+                    marginBottom: '1rem'
+                  }}>
+                  <RewardWidget />
+                </Grid.Row>
+                <Grid.Row centered>
+                  <Instructions />
+                </Grid.Row>
+
+                <Grid.Row>
+                  {props.hasAcceptedHit && ( // eslint-disable-line react/prop-types
+                    <Divider
+                      as="h4"
+                      className="header"
+                      horizontal
+                      style={{textTransform: 'uppercase', marginTop: 20}}>
+                      Task
+                    </Divider>
+                  )}
+                  <QuestionForm>
+                    <FilterTask />
+                  </QuestionForm>
+                </Grid.Row>
+              </Container>
+            )}
+          />
         </Switch>
-
-        <Container>
-          <Switch>
-            <Route path={'/charting'} component={Diff} />
-            <Route path={'/welcome/:experimentId'} component={WelcomePage} />
-            <Route
-              path={'/task/:experimentId'}
-              render={props => (
-                <React.Fragment>
-                  <Grid.Row
-                    style={{
-                      textAlign: 'right',
-                      marginBottom: '1rem'
-                    }}>
-                    <RewardWidget />
-                  </Grid.Row>
-                  <Grid.Row centered>
-                    <Instructions />
-                  </Grid.Row>
-
-                  <Grid.Row>
-                    {props.hasAcceptedHit && ( // eslint-disable-line react/prop-types
-                      <Divider
-                        as="h4"
-                        className="header"
-                        horizontal
-                        style={{textTransform: 'uppercase', marginTop: 20}}>
-                        Task
-                      </Divider>
-                    )}
-                    <QuestionForm>
-                      <FilterTask />
-                    </QuestionForm>
-                  </Grid.Row>
-                </React.Fragment>
-              )}
-            />
-          </Switch>
-        </Container>
       </React.Fragment>
     );
   }
@@ -111,7 +106,7 @@ class App extends Component {
   render() {
     return (
       <Provider store={store}>
-        <Router>
+        <Router history={history}>
           <Route path={'/'} component={ConnectedAppWrapper} />
         </Router>
       </Provider>

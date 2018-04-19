@@ -15,7 +15,7 @@ const ExperimentParameters = props => (
           </List.Item>
           <List.Item>
             <List.Content>
-              <List.Header as="h4">#Votes per paper</List.Header>
+              <List.Header as="h4">#Votes per task</List.Header>
               <List.Description as="p">{props.item.data.votesPerTaskRule}</List.Description>
             </List.Content>
           </List.Item>

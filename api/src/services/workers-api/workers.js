@@ -2,16 +2,20 @@ const delegates = require(__base + 'delegates');
 const managers = require(__base + 'managers');
 
 const getWorkerReward = async ctx => {
-  ctx.response.body = await managers.job.getWorkerReward(
+  let res = await managers.job.getWorkerReward(
     ctx.params.uuid,
     ctx.params.workerTurkId
   );
+  ctx.response.body = {
+    reward: res.reward.toFixed(2)
+  };
 };
 
 const finishAssignment = async ctx => {
   ctx.response.body = await managers.state.forceFinish(
     ctx.params.uuid,
-    ctx.params.workerTurkId
+    ctx.params.workerTurkId,
+    ctx.request.fields.finishedWithError
   );
 };
 

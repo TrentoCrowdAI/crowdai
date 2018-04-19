@@ -8,6 +8,15 @@ const actionTypes = {
   PUBLISH_EXPERIMENT: 'C_PUBLISH_EXPERIMENT',
   PUBLISH_EXPERIMENT_SUCCESS: 'C_PUBLISH_EXPERIMENT_SUCCESS',
   PUBLISH_EXPERIMENT_ERROR: 'C_PUBLISH_EXPERIMENT_ERROR',
+  FETCH_JOB_STATE: 'C_FETCH_JOB_STATE',
+  FETCH_JOB_STATE_SUCCESS: 'C_FETCH_JOB_STATE_SUCCESS',
+  FETCH_JOB_STATE_ERROR: 'C_FETCH_JOB_STATE_ERROR',
+  FETCH_JOB_STATE_POLLED: 'C_FETCH_JOB_STATE_POLLED',
+  FETCH_JOB_STATE_POLLED_DONE: 'C_FETCH_JOB_STATE_POLLED_DONE',
+  CLEAN_JOB_STATE: 'C_CLEAN_JOB_STATE',
+  COPY_JOB: 'C_COPY_JOB',
+  COPY_JOB_SUCCESS: 'C_COPY_JOB_SUCCESS',
+  COPY_JOB_ERROR: 'C_COPY_JOB_ERROR',
   ...getActionTypes(scopes.EXPERIMENTS)
 };
 
@@ -60,6 +69,67 @@ const actions = {
       type: actionTypes.FETCH_ITEM,
       id,
       isWorker
+    };
+  },
+
+  cleanJobState() {
+    return {
+      type: actionTypes.CLEAN_JOB_STATE
+    };
+  },
+
+  fetchJobState(id) {
+    return {
+      type: actionTypes.FETCH_JOB_STATE,
+      id
+    };
+  },
+
+  fetchJobStateSuccess(state) {
+    return {
+      type: actionTypes.FETCH_JOB_STATE_SUCCESS,
+      state
+    };
+  },
+
+  fetchJobStateError(error) {
+    return {
+      type: actionTypes.FETCH_JOB_STATE_ERROR,
+      error
+    };
+  },
+
+  pollJobState(id) {
+    return {
+      type: actionTypes.FETCH_JOB_STATE_POLLED,
+      id
+    };
+  },
+
+  pollJobStateDone() {
+    return {
+      type: actionTypes.FETCH_JOB_STATE_POLLED_DONE
+    };
+  },
+
+  copyJob(id) {
+    return {
+      type: actionTypes.COPY_JOB,
+      id
+    };
+  },
+
+  copyJobSuccess(copiedJob) {
+    return {
+      type: actionTypes.COPY_JOB_SUCCESS,
+      copiedJob
+    };
+  },
+
+  copyJobError(error) {
+    return {
+      type: actionTypes.COPY_JOB_ERROR,
+      error
     };
   }
 };

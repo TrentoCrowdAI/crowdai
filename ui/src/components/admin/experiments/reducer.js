@@ -61,7 +61,7 @@ const genericFormReducer = getReducer(scopes.EXPERIMENTS, {
     },
     // parameters
     maxTasksRule: 3,
-    taskRewardRule: 0.5,
+    taskRewardRule: 0.1,
     testFrequencyRule: 2,
     initialTestsRule: 2,
     initialTestsMinCorrectAnswersRule: 100,
@@ -103,6 +103,84 @@ const formReducer = (state = defaultFormState, action) => {
   }
 };
 
+const defaultJobState = {
+  item: {},
+  error: undefined,
+  loading: false,
+  polling: false
+};
+
+const stateReducer = (state = defaultJobState, action) => {
+  switch (action.type) {
+    case actionTypes.FETCH_JOB_STATE:
+      return {
+        ...state,
+        loading: true,
+        error: undefined
+      };
+    case actionTypes.FETCH_JOB_STATE_SUCCESS:
+      return {
+        ...state,
+        loading: false,
+        item: {
+          ...action.state
+        }
+      };
+    case actionTypes.FETCH_JOB_STATE_ERROR:
+      return {
+        ...state,
+        loading: false,
+        error: action.error
+      };
+    case actionTypes.FETCH_JOB_STATE_POLLED:
+      return {
+        ...state,
+        polling: true
+      };
+    case actionTypes.FETCH_JOB_STATE_POLLED_DONE:
+      return {
+        ...state,
+        polling: false
+      };
+    case actionTypes.CLEAN_JOB_STATE:
+      return defaultJobState;
+    default:
+      return state;
+  }
+};
+
+const defaultCopyState = {
+  item: {},
+  error: undefined,
+  loading: false
+};
+
+const copyReducer = (state = defaultCopyState, action) => {
+  switch (action.type) {
+    case actionTypes.COPY_JOB:
+      return {
+        ...state,
+        item: {},
+        loading: true,
+        error: undefined
+      };
+    case actionTypes.COPY_JOB_SUCCESS:
+      return {
+        ...state,
+        loading: false,
+        item: action.copiedJob
+      };
+    case actionTypes.COPY_JOB_ERROR:
+      return {
+        ...state,
+        loading: false,
+        error: action.error
+      };
+    default:
+      return state;
+  }
+};
+
 export default combineReducers({
   list: reducer,
   // finally we combine generic and formReducer that handles
@@ -110,5 +188,7 @@ export default combineReducers({
   form: (state = defaultFormState, action) => {
     let outputState = genericFormReducer(state, action);
     return formReducer(outputState, action);
-  }
+  },
+  state: stateReducer,
+  copy: copyReducer
 });

@@ -33,7 +33,7 @@ class ExperimentForm extends React.Component {
     }
 
     return (
-      <FormContainer title="New job">
+      <FormContainer title={item.id ? 'Edit job' : 'New job'}>
         <Form
           error={this.props.error !== undefined}
           loading={this.props.loading}

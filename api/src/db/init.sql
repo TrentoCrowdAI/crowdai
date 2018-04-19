@@ -60,8 +60,9 @@ CREATE TABLE worker (
 --   end: <date>,
 --   finishedByWorker: <boolean>,
 --   finishedByMaxTasksRule: <boolean>,
---   assignmentApproved: <boolean>,  means we approved the worker assignment and paid them.
---   assignmentRejected: <boolean>
+--   assignmentApproved: <boolean>,  means we approved the worker assignment.
+--   assignmentBonusSent: <boolean>, means we paid the worker.
+--   finishedWithError: <boolean>, means an error occurred and the worker clicked the finish button.
 -- }
 CREATE TABLE worker_assignment (
   id bigserial NOT NULL,

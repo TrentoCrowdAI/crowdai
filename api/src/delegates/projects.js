@@ -1,12 +1,10 @@
 const Boom = require('boom');
 const uuid = require('uuid/v4');
 const request = require('request');
-const parse = require('csv-parse');
-const transform = require('stream-transform');
+const csv = require('csv-parser');
 const QueryStream = require('pg-query-stream');
 
 const db = require(__base + 'db');
-const config = require(__base + 'config');
 const tasksDelegate = require('./tasks');
 const requestersDelegate = require('./requesters');
 
@@ -40,7 +38,10 @@ const getById = (exports.getById = async id => {
       });
     });
     res = await getCriteria(id);
-    project.criteria = res.rows;
+
+    if (res) {
+      project.criteria = res.rows;
+    }
     return project;
   } catch (error) {
     console.error(error);
@@ -48,10 +49,16 @@ const getById = (exports.getById = async id => {
   }
 });
 
-const create = (exports.create = async project => {
+const create = (exports.create = async (project, createCSV = true) => {
   if (!project) {
     throw Boom.badRequest('Project attributes are required');
   }
+  let data = {
+    ...project.data,
+    itemsCreated: false,
+    filtersCreated: false,
+    testsCreated: false
+  };
 
   try {
     await db.query('BEGIN');
@@ -59,14 +66,15 @@ const create = (exports.create = async project => {
       `insert into ${
         db.TABLES.Project
       }(requester_id, created_at, data) values($1, $2, $3) returning *`,
-      [project.requester_id, new Date(), project.data]
+      [project.requester_id, new Date(), data]
     );
-    const saved = res.rows[0];
-    await createItems(saved);
-    await createCriteria(saved);
-    await createTests(saved);
+    const created = res.rows[0];
     await db.query('COMMIT');
-    return saved;
+
+    if (createCSV) {
+      createRecordsFromCSVs(created);
+    }
+    return created;
   } catch (error) {
     console.error(error);
     await db.query('ROLLBACK');
@@ -172,129 +180,191 @@ const getCriteriaFromIds = (exports.getCriteriaFromIds = async criteria => {
   }
 });
 
+/**
+ * Returns the tests associated with the project
+ *
+ * @param {Number} id - The project's ID
+ * @return {Object}
+ */
+const getTests = (exports.getTests = async id => {
+  try {
+    let res = await db.query(
+      `select * from ${db.TABLES.Test} where project_id = $1`,
+      [id]
+    );
+    return res.rowCount > 0
+      ? { rows: res.rows, meta: { count: res.rowCount } }
+      : null;
+  } catch (error) {
+    console.error(error);
+    throw Boom.badImplementation('Error while trying to fetch records');
+  }
+});
+
+/**
+ * Returns the number of tests associated with the project
+ *
+ * @param {Number} id - The project's ID
+ * @return {Number}
+ */
+const getTestsCount = (exports.getTestsCount = async id => {
+  try {
+    let res = await db.query(
+      `select count(*) from ${db.TABLES.Test} where project_id = $1`,
+      [id]
+    );
+    return Number(res.rows[0].count);
+  } catch (error) {
+    console.error(error);
+    throw Boom.badImplementation('Error while trying to fetch records');
+  }
+});
+
+const createRecordsFromCSVs = (exports.createRecordsFromCSVs = async project => {
+  try {
+    await createItems(project);
+    await createCriteria(project);
+    await createTests(project);
+    return true;
+  } catch (error) {
+    console.error(error);
+  }
+});
+
 const createItems = async project => {
-  let parser = parse({ delimiter: ',', columns: true });
-  let items = [];
-  const transformer = transform(
-    item =>
+  try {
+    console.log(`Creating items for project: ${project.id}`);
+    let items = [];
+    const transformer = item =>
       items.push({
         title: item.itemTitle,
         description: item.itemDescription
-      }),
-    { parallel: 10 }
-  );
+      });
 
-  request(project.data.itemsUrl)
-    .pipe(parser)
-    .pipe(transformer);
-
-  await new Promise((resolve, reject) => {
-    transformer.on('finish', () => {
-      resolve();
+    await new Promise((resolve, reject) => {
+      request(project.data.itemsUrl)
+        .on('error', err => reject(err))
+        .pipe(csv())
+        .on('data', transformer)
+        .on('end', () => resolve())
+        .on('error', err => reject(err));
     });
+    await db.query('BEGIN');
 
-    transformer.on('error', err => {
-      reject(err);
-    });
-  });
+    for (item of items) {
+      await db.query(
+        `insert into ${
+          db.TABLES.Item
+        }(created_at, project_id, data) values($1, $2, $3)`,
+        [new Date(), project.id, item]
+      );
+    }
 
-  for (item of items) {
     await db.query(
-      `insert into ${
-        db.TABLES.Item
-      }(created_at, project_id, data) values($1, $2, $3)`,
-      [new Date(), project.id, item]
+      `update ${db.TABLES.Project} 
+       set data = jsonb_set(data, '{itemsCreated}', 'true'::jsonb)
+       where id = ${project.id}`
     );
+    await db.query('COMMIT');
+  } catch (error) {
+    console.error(error);
+    await db.query('ROLLBACK');
   }
 };
 
 const createCriteria = async project => {
-  let parser = parse({ delimiter: ',', columns: true });
-  let criteria = [];
-  let labelCount = 1;
+  console.log(`Creating filters for project: ${project.id}`);
+  try {
+    let criteria = [];
+    let labelCount = 1;
 
-  const transformer = transform(
-    criterion =>
+    const transformer = criterion =>
       criteria.push({
         label: `C${labelCount++}`,
         description: criterion.filterDescription
-      }),
-    {
-      parallel: 10
+      });
+
+    await new Promise((resolve, reject) => {
+      request(project.data.filtersUrl)
+        .on('error', err => reject(err))
+        .pipe(csv())
+        .on('data', transformer)
+        .on('end', () => resolve())
+        .on('error', err => reject(err));
+    });
+    await db.query('BEGIN');
+
+    for (criterion of criteria) {
+      await db.query(
+        `insert into ${
+          db.TABLES.Criterion
+        }(created_at, project_id, data) values($1, $2, $3)`,
+        [new Date(), project.id, criterion]
+      );
     }
-  );
-
-  request(project.data.filtersUrl)
-    .pipe(parser)
-    .pipe(transformer);
-
-  await new Promise((resolve, reject) => {
-    transformer.on('finish', () => {
-      resolve();
-    });
-
-    transformer.on('error', err => {
-      reject(err);
-    });
-  });
-
-  for (criterion of criteria) {
     await db.query(
-      `insert into ${
-        db.TABLES.Criterion
-      }(created_at, project_id, data) values($1, $2, $3)`,
-      [new Date(), project.id, criterion]
+      `update ${db.TABLES.Project} 
+       set data = jsonb_set(data, '{filtersCreated}', 'true'::jsonb)
+       where id = ${project.id}`
     );
+    await db.query('COMMIT');
+  } catch (error) {
+    console.error(error);
+    await db.query('ROLLBACK');
   }
 };
 
 const createTests = async project => {
-  let parser = parse({ delimiter: ',', columns: true });
-  let tests = [];
-  const transformer = transform(test => tests.push(test), {
-    parallel: 10
-  });
+  console.log(`Creating tests for project: ${project.id}`);
+  try {
+    let tests = [];
+    const transformer = test => tests.push(test);
 
-  request(project.data.testsUrl)
-    .pipe(parser)
-    .pipe(transformer);
-
-  await new Promise((resolve, reject) => {
-    transformer.on('finish', () => {
-      resolve();
+    await new Promise((resolve, reject) => {
+      request(project.data.testsUrl)
+        .on('error', err => reject(err))
+        .pipe(csv())
+        .on('data', transformer)
+        .on('end', () => resolve())
+        .on('error', err => reject(err));
     });
 
-    transformer.on('error', err => {
-      reject(err);
-    });
-  });
+    let criteria = await getCriteria(project.id);
+    let descriptionMap = {};
 
-  let criteria = await getCriteria(project.id);
-  let descriptionMap = {};
+    for (c of criteria.rows) {
+      descriptionMap[c.data.description.trim()] = c;
+    }
+    await db.query('BEGIN');
 
-  for (c of criteria.rows) {
-    descriptionMap[c.data.description.trim()] = c;
-  }
-
-  for (test of tests) {
-    let criterion = descriptionMap[test.filterDescription.trim()];
-    let data = {
-      item: { title: test.itemTitle, description: test.itemDescription },
-      criteria: [
-        {
-          id: criterion.id,
-          label: criterion.data.label,
-          description: test.filterDescription.trim(),
-          answer: test.answer
-        }
-      ]
-    };
-
+    for (test of tests) {
+      let criterion = descriptionMap[test.filterDescription.trim()];
+      let data = {
+        item: { title: test.itemTitle, description: test.itemDescription },
+        criteria: [
+          {
+            id: criterion.id,
+            label: criterion.data.label,
+            description: test.filterDescription.trim(),
+            answer: test.answer
+          }
+        ]
+      };
+      await db.query(
+        `insert into ${
+          db.TABLES.Test
+        }(created_at, project_id, data) values($1, $2, $3)`,
+        [new Date(), project.id, data]
+      );
+    }
     await db.query(
-      `insert into ${
-        db.TABLES.Test
-      }(created_at, project_id, data) values($1, $2, $3)`,
-      [new Date(), project.id, data]
+      `update ${db.TABLES.Project} 
+       set data = jsonb_set(data, '{testsCreated}', 'true'::jsonb)
+       where id = ${project.id}`
     );
+    await db.query('COMMIT');
+  } catch (error) {
+    console.error(error);
+    await db.query('ROLLBACK');
   }
 };

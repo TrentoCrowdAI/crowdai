@@ -17,7 +17,7 @@ class Instructions extends React.Component {
     const {open} = this.state;
     const task = this.props.task || {};
 
-    if (this.props.loading || this.finished()) {
+    if (this.props.loading || this.finished() || !task.instructions) {
       return null;
     }
 
@@ -31,8 +31,7 @@ class Instructions extends React.Component {
           </Accordion.Title>
           <Accordion.Content active={open}>
             <div>
-              {task.instructions &&
-                task.instructions.map((i, idx) => <FileRenderer key={idx} content={i.content} format={i.format} />)}
+              {task.instructions.map((i, idx) => <FileRenderer key={idx} content={i.content} format={i.format} />)}
             </div>
           </Accordion.Content>
         </Accordion>
@@ -46,7 +45,7 @@ class Instructions extends React.Component {
 
   finished() {
     return (
-      (this.props.task && this.props.task.data.finished) ||
+      (this.props.task && this.props.task.data && this.props.task.data.finished) ||
       (this.props.assignmentStatus && this.props.assignmentStatus.data.finished)
     );
   }

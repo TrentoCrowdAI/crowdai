@@ -88,9 +88,10 @@ export const actions = {
     };
   },
 
-  finishAssignment() {
+  finishAssignment(finishedWithError) {
     return {
-      type: actionTypes.FINISH_ASSIGNMENT
+      type: actionTypes.FINISH_ASSIGNMENT,
+      finishedWithError
     };
   },
 

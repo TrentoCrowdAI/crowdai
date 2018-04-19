@@ -42,6 +42,7 @@ const routes = [
   {path: '/admin/projects/:projectId/screenings', breadcrumb: 'Jobs'},
   {path: '/admin/projects/:projectId/screenings/new', breadcrumb: 'New'},
   {path: '/admin/projects/:projectId/screenings/:experimentId/dashboard', breadcrumb: 'Dashboard'},
+  {path: '/admin/projects/:projectId/screenings/:experimentId/edit', breadcrumb: 'Edit'},
   {path: '/admin/profile', breadcrumb: 'Personal Information'}
 ];
 

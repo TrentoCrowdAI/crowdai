@@ -283,6 +283,31 @@ const stop = (exports.stop = async job => {
 });
 
 /**
+ * Returns the state of the job. This function returns:
+ *
+ *   - Information about the associated HIT.
+ *
+ * @param {Number} jobId
+ */
+const getState = (exports.getState = async jobId => {
+  try {
+    let job = await delegates.jobs.getById(jobId);
+    let requester = await delegates.jobs.getRequester(job.id);
+    const mturk = MTurk.getInstance(requester);
+    let hit = await getHIT(job.data.hit.HITId, mturk);
+    // TODO: return information about the workers.
+    return {
+      hit
+    };
+  } catch (error) {
+    console.error(error);
+    throw Boom.badImplementation(
+      'Error while trying to get the state of the job'
+    );
+  }
+});
+
+/**
  * Set a cron job that polls the HIT status in order to know when
  * the approval/rejection logic should run.
  *
@@ -298,15 +323,7 @@ const setupCronForHit = (job, hitId, mturk) => {
       console.log(`Checking HIT: ${hitId} status`);
 
       try {
-        let hit = await new Promise((resolve, reject) => {
-          mturk.getHIT({ HITId: hitId }, function(err, data) {
-            if (err) {
-              reject(err);
-            } else {
-              resolve(data.HIT);
-            }
-          });
-        });
+        let hit = await getHIT(hitId, mturk);
         console.log(`HIT: ${hitId} is ${hit.HITStatus}`);
         const stop = await reviewAssignments(job, hit, mturk);
 
@@ -322,6 +339,24 @@ const setupCronForHit = (job, hitId, mturk) => {
   });
 
   cronjob.start();
+};
+
+/**
+ * Helper wrapper to call the getHIT method on AMT.
+ *
+ * @param {String} hitId
+ * @param {Object} mturk
+ */
+const getHIT = async (hitId, mturk) => {
+  return new Promise((resolve, reject) => {
+    mturk.getHIT({ HITId: hitId }, (err, data) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(data.HIT);
+      }
+    });
+  });
 };
 
 /**
@@ -377,35 +412,59 @@ const reviewAssignments = async (job, hit, mturk) => {
 
       if (
         !assignment.data.finished ||
-        assignment.data.assignmentRejected ||
-        assignment.data.assignmentApproved
+        assignment.data.initialTestFailed ||
+        (assignment.data.assignmentApproved &&
+          assignment.data.assignmentBonusSent)
       ) {
         continue;
       }
-      let data;
 
-      if (assignment.data.initialTestFailed) {
-        await mturkRejectAssignment(assignment.data.assignmentTurkId, mturk);
-        data = {
-          assignmentRejected: true
-        };
-      } else {
-        await mturkApproveAssignment(assignment.data.assignmentTurkId, mturk);
-        await sendBonus(
-          job,
-          assignment.worker_id,
-          assignment.data.assignmentTurkId,
-          mturk
-        );
-        data = {
-          assignmentApproved: true
-        };
+      if (assignment.data.finishedWithError) {
+        // if an error ocurred and the worker did not finish initial quiz
+        // we just skip it.
+        let quizPending = await qualityManager.shouldRunInitialTest(job, {
+          id: assignment.worker_id
+        });
+
+        if (quizPending) {
+          continue;
+        }
       }
-      await delegates.workers.updateAssignment(
-        job.uuid,
-        assignment.worker_id,
-        data
-      );
+
+      if (!assignment.data.initialTestFailed) {
+        try {
+          await mturkApproveAssignment(assignment.data.assignmentTurkId, mturk);
+          await delegates.workers.updateAssignment(
+            job.uuid,
+            assignment.worker_id,
+            {
+              assignmentApproved: true
+            }
+          );
+        } catch (error) {
+          console.error('Approve assignment failed.', error);
+          return;
+        }
+
+        try {
+          await sendBonus(
+            job,
+            assignment.worker_id,
+            assignment.data.assignmentTurkId,
+            mturk
+          );
+          await delegates.workers.updateAssignment(
+            job.uuid,
+            assignment.worker_id,
+            {
+              assignmentBonusSent: true
+            }
+          );
+        } catch (error) {
+          console.error('sendBonus failed.', error);
+          return;
+        }
+      }
     }
     console.log(`Review assignments for job: ${jobId} done`);
     await finishJob(jobId);
@@ -551,9 +610,10 @@ const mturkRejectAssignment = async (id, mturk) => {
 const sendBonus = async (job, workerId, assignmentId, mturk) => {
   const worker = await delegates.workers.getById(workerId);
   const { reward } = await getWorkerReward(job.uuid, worker.turk_id, true);
+  const bonusAmount = reward.toFixed(2);
   const payload = {
     AssignmentId: assignmentId,
-    BonusAmount: `${reward}`,
+    BonusAmount: bonusAmount,
     Reason: `Reward based on the answers given in "${job.data.hit.Title}"`,
     WorkerId: worker.turk_id
   };

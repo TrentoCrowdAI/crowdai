@@ -101,3 +101,83 @@ describe('projects.create', async () => {
     jest.setTimeout(5000);
   });
 });
+
+describe('projects.copy', async () => {
+  let requester;
+  let project;
+
+  beforeAll(async () => {
+    requester = await requestersDelegate.create({
+      gid: '121212121212',
+      name: 'Linus',
+      email: 'linus@linux.com'
+    });
+
+    project = await projectsDelegate.create(
+      {
+        requester_id: requester.id,
+        data: {
+          name: 'test project',
+          itemsUrl:
+            'https://drive.google.com/uc?id=1WT14VQtGfXzPRbSbMx2ImnKbIC9kivup',
+          filtersUrl:
+            'https://drive.google.com/uc?id=1qemeQ7Gv0iV5NpHI20TaxXwFQTZuNSU2',
+          testsUrl:
+            'https://drive.google.com/uc?id=1jcssgjpCf1stRXO9LepMNGJyB7a5HAVR',
+          consentUrl:
+            'https://drive.google.com/uc?id=1NvaymonTzcPgt3jmTIG5BRu-Pp9XF3T9',
+          consentFormat: 'MARKDOWN'
+        }
+      },
+      false
+    );
+  });
+
+  test('copy should throw if ID is not specified', async () => {
+    let ok = true;
+
+    try {
+      await projectsDelegate.copy();
+    } catch (error) {
+      if (error.message === 'ID must be specified') {
+        ok = false;
+      }
+    }
+    expect(ok).toBe(false);
+  });
+
+  test('copy should throw if source does not exists', async () => {
+    let ok = true;
+    let id = 1000;
+
+    try {
+      await projectsDelegate.copy(id);
+    } catch (error) {
+      console.log(error.message);
+      if (error.message === `The project with id ${id} does not exist.`) {
+        ok = false;
+      }
+    }
+    expect(ok).toBe(false);
+  });
+
+  test('copy should clone the record and give it a different ID', async () => {
+    let copiedProject = await projectsDelegate.copy(project.id, false);
+    expect(copiedProject).toMatchObject({
+      requester_id: project.requester_id,
+      data: {
+        name: project.data.name,
+        itemsUrl: project.data.itemsUrl,
+        testsUrl: project.data.testsUrl,
+        consentUrl: project.data.consentUrl,
+        filtersUrl: project.data.filtersUrl,
+        consentFormat: project.data.consentFormat,
+        itemsCreated: false,
+        testsCreated: false,
+        filtersCreated: false
+      }
+    });
+
+    expect(copiedProject.id).not.toBe(project.id);
+  });
+});

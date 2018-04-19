@@ -28,6 +28,11 @@ const getById = (exports.getById = async id => {
       [id]
     );
     const project = res.rows[0];
+
+    if (!project) {
+      throw Boom.badRequest(`The project with id ${id} does not exist.`);
+    }
+
     project.consent = await new Promise((resolve, reject) => {
       request(project.data.consentUrl, (err, rsp, body) => {
         if (err) {
@@ -45,6 +50,10 @@ const getById = (exports.getById = async id => {
     return project;
   } catch (error) {
     console.error(error);
+
+    if (error.isBoom) {
+      throw error;
+    }
     throw Boom.badImplementation('Error while trying to fetch the record');
   }
 });
@@ -53,7 +62,7 @@ const getById = (exports.getById = async id => {
  * Creates a new project record.
  *
  * @param {Object} - The project to create
- * @param {Boolean} - Whether we want to skip the CSV creation.
+ * @param {Boolean} createCSV - Whether we want to skip the CSV creation.
  */
 const create = (exports.create = async (project, createCSV = true) => {
   if (!project) {
@@ -153,6 +162,46 @@ const update = (exports.update = async (id, projectData) => {
       throw error;
     }
     throw Boom.badImplementation('Error while trying to update the record');
+  }
+});
+
+/**
+ * Creates a copy of the given project.
+ *
+ * @param {Number} id - The project ID we want to copy.
+ * @param {Boolean} - Whether we want to skip the CSV creation.
+ * @return {Object}
+ */
+const copy = (exports.copy = async (id, createCSV = true) => {
+  if (!id) {
+    throw Boom.badRequest('ID must be specified');
+  }
+  let sourceProject;
+
+  try {
+    sourceProject = await getById(id);
+  } catch (error) {
+    console.error(error);
+  }
+
+  if (!sourceProject) {
+    throw Boom.badRequest(`The project with id ${id} does not exist.`);
+  }
+
+  try {
+    let copy = {
+      ...sourceProject
+    };
+    delete copy.id;
+    let createdCopy = await create(copy, createCSV);
+    return createdCopy;
+  } catch (error) {
+    console.error(error);
+
+    if (error.isBoom) {
+      throw error;
+    }
+    throw Boom.badImplementation('Error while trying to copy the job');
   }
 });
 

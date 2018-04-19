@@ -10,6 +10,9 @@ const actionTypes = {
   FETCH_PROJECT_STATE_ERROR: 'C_FETCH_PROJECT_STATE_ERROR',
   POLL_PROJECT: 'C_POLL_PROJECT',
   POLL_PROJECT_DONE: 'C_POLL_PROJECT_DONE',
+  COPY_PROJECT: 'C_COPY_PROJECT',
+  COPY_PROJECT_SUCCESS: 'C_COPY_PROJECT_SUCCESS',
+  COPY_PROJECT_ERROR: 'C_COPY_PROJECT_ERROR',
   ...getActionTypes(scopes.PROJECTS)
 };
 
@@ -64,6 +67,27 @@ const actions = {
     return {
       type: actionTypes.POLL_PROJECT_DONE,
       id
+    };
+  },
+
+  copyProject(id) {
+    return {
+      type: actionTypes.COPY_PROJECT,
+      id
+    };
+  },
+
+  copyProjectSuccess(copiedProject) {
+    return {
+      type: actionTypes.COPY_PROJECT_SUCCESS,
+      copiedProject
+    };
+  },
+
+  copyProjectError(error) {
+    return {
+      type: actionTypes.COPY_PROJECT_ERROR,
+      error
     };
   },
 

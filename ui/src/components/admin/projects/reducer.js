@@ -38,6 +38,38 @@ const reducer = (state = defaultState, action) => {
   }
 };
 
+const defaultCopyState = {
+  item: {},
+  error: undefined,
+  loading: false
+};
+
+const copyReducer = (state = defaultCopyState, action) => {
+  switch (action.type) {
+    case actionTypes.COPY_PROJECT:
+      return {
+        ...state,
+        item: {},
+        loading: true,
+        error: undefined
+      };
+    case actionTypes.COPY_PROJECT_SUCCESS:
+      return {
+        ...state,
+        loading: false,
+        item: action.copiedProject
+      };
+    case actionTypes.COPY_PROJECT_ERROR:
+      return {
+        ...state,
+        loading: false,
+        error: action.error
+      };
+    default:
+      return state;
+  }
+};
+
 export default combineReducers({
   list: reducer,
   form: getReducer(scopes.PROJECTS, {
@@ -51,5 +83,6 @@ export default combineReducers({
       filtersUrl: '',
       testsUrl: ''
     }
-  })
+  }),
+  copy: copyReducer
 });

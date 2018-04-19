@@ -55,7 +55,7 @@ class Histogram extends React.Component {
           d3.max(data, d => Math.round((d[x]+4)/10)*10)
         ])
     var xAxis = d3.axisBottom(xscale);
-
+    //console.log(width/xscale.ticks().length)
     //deploy data to fill an histogram
     var histo = d3.histogram()
         .thresholds(xscale.ticks(10))
@@ -86,9 +86,12 @@ class Histogram extends React.Component {
               .style("opacity","1")
           })
           .on("click", (d) => {
+            //console.log(d.x0, d.x1)
+            //console.log(d.x1+" - "+(Math.floor(d.x1/10)*10)+" = "+xscale(d.x1-(Math.floor(d.x1/10)*10)))
             this.setState({
               clicked : []
             })
+            //console.log(d.x0,d.x1)
             var nuovo = []
             data.map( (step,i) => {
               if((step[x]>=d.x0 && step[x]<d.x1) || (step[x]>=d.x0 && step[x]==d.x1)) {
@@ -101,7 +104,7 @@ class Histogram extends React.Component {
     bar.append("text")
           .attr("dy", ".75em")
           .attr("y", d => 10)
-          .attr("x", d => (xscale(d.x1)-xscale(d.x0))/2 )
+          .attr("x", d => (xscale(d.x1)-xscale(d.x0)-1)/2 )
           .attr("text-anchor", "middle")
           .style("fill", "white")
           .text( d => d.length ? d.length : null)
@@ -151,7 +154,7 @@ class Histogram extends React.Component {
     return (
       <div>
         <br />
-        <svg className={this.props.selector} width="800" height="500"> </svg>
+        <svg className={this.props.selector} width="800" height="400"> </svg>
         <br />
         {this.props.data.length ? <strong>Clicked data:</strong> : " "} <ul>{stampa}</ul>
 

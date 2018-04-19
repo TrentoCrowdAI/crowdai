@@ -71,7 +71,7 @@ const getAllTasksByJobId = (exports.getAllTasksByJobId = async id => {
           task6: { total_time: 32.6, task_id: 90, answer: 'yes' },
           task7: { total_time: 12.66, task_id: 88, answer: 'yes' },
           task8: { total_time: 23.6, task_id: 32, answer: 'yes' },
-          task9: { total_time: 76.5, task_id: 27, answer: 'yes' },
+          task9: { total_time: 75.560, task_id: 27, answer: 'yes' },
           task10: { total_time: 34.8, task_id: 21, answer: 'no' },
           task11: { total_time: 43.6, task_id: 22, answer: 'no' }
         }

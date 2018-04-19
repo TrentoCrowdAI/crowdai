@@ -79,76 +79,6 @@ var agreeData = {
 			}
 }
 
-var workerData = {
-	tasks: {
-		task1: {
-			worker_id: 1, 
-			total_time: 2.21,
-			task_id: 1
-		},
-		task2: {
-			worker_id: 3, 
-			total_time: 3.55,
-			task_id: 1
-		},
-		task3: {
-			worker_id: 12, 
-			total_time: 3.01,
-			task_id: 1
-		},
-		task4: {
-			worker_id: 1, 
-			total_time: 3.45,
-			task_id: 3
-		},
-		task5: {
-			worker_id: 3, 
-			total_time: 6.00,
-			task_id: 3
-		},
-		task6: {
-			worker_id: 22, 
-			total_time: 4.22,
-			task_id: 3
-		},
-		task7: {
-			worker_id: 2, 
-			total_time: 3.30,
-			task_id: 3
-		},
-		task8: {
-			worker_id: 1, 
-			total_time: 5.6,
-			task_id: 7
-		},
-		task9: {
-			worker_id: 22, 
-			total_time: 5.6,
-			task_id: 7
-		},
-		task10: {
-			worker_id: 10, 
-			total_time: 2.6,
-			task_id: 32
-		},
-		task11: {
-			worker_id: 10, 
-			total_time: 4.6,
-			task_id: 27
-		},
-		task12: {
-			worker_id: 1, 
-			total_time: 8.23,
-			task_id: 27
-		},
-		task13: {
-			worker_id: 3, 
-			total_time: 7.54,
-			task_id: 27
-		}
-	}
-}
-
 var WorkerOptions = {
 	'all' : 'All Workers'
 }
@@ -332,8 +262,8 @@ class Reports extends React.Component {
 
 	render() {
 		//data = Object.values(this.props.reports.tasks)
-		console.log(this.props.reports.tasks)
-		console.log(this.state)
+		//console.log(this.props.reports.tasks)
+		//console.log(this.state)
 		JobOptions = { 'all' : 'All Jobs' }
 		WorkerOptions = { 'all' : 'All Workers' }
 

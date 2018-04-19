@@ -166,7 +166,7 @@ class NestChart extends React.Component {
     //console.log(this.state)
     return (
       <div className='nest'>
-        <svg className={this.props.selector} width="800" height="500"> </svg>
+        <svg className={this.props.selector} width="800" height="400"> </svg>
         <br />
       { this.props.data.length ? 
         <React.Fragment>

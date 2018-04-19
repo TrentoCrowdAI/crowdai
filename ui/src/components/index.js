@@ -28,7 +28,7 @@ const rootReducer = combineReducers({
   experiment,
   profile,
   project,
-  toast
+  toast,
   project,
   report
 });
@@ -42,6 +42,5 @@ const rootEpic = combineEpics(
   projectEpics,
   toastEpics
 );
-const rootEpic = combineEpics(questionFormEpics, rewardEpics, loginEpics, experimentEpics, profileEpics, projectEpics, reportEpics);
 
 export {rootReducer, rootEpic};

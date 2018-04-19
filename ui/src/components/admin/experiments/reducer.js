@@ -54,8 +54,7 @@ const genericFormReducer = getReducer(scopes.EXPERIMENTS, {
     abstractPresentationTechnique: 'kh',
     labelOptions: 'ynk',
     hitConfig: {
-      limitWorkers: false,
-      maxAssignments: 0, // limitWorkers = false, then maxAssignments is 0.
+      maxAssignments: 0, // if maxAssignments is > 0, then we limit the number of workers.
       lifetimeInMinutes: 5 * 24 * 60,
       assignmentDurationInMinutes: 20
     },

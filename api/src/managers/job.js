@@ -395,7 +395,7 @@ const reviewAssignments = async (job, hit, mturk) => {
 
     if (
       hit.HITStatus === 'Reviewable' &&
-      !job.data.hitConfig.limitWorkers &&
+      job.data.hitConfig.maxAssignments === 0 &&
       !jobDone
     ) {
       console.debug(
@@ -652,7 +652,7 @@ const workerCanFinish = async (job, worker) => {
  * @return {Number}
  */
 const computeMaxAssignments = async job => {
-  if (job.data.hitConfig.limitWorkers) {
+  if (job.data.hitConfig.maxAssignments > 0) {
     return job.data.hitConfig.maxAssignments;
   }
   const itemsCount = await delegates.projects.getItemsCount(job.project_id);

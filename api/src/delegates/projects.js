@@ -49,6 +49,12 @@ const getById = (exports.getById = async id => {
   }
 });
 
+/**
+ * Creates a new project record.
+ *
+ * @param {Object} - The project to create
+ * @param {Boolean} - Whether we want to skip the CSV creation.
+ */
 const create = (exports.create = async (project, createCSV = true) => {
   if (!project) {
     throw Boom.badRequest('Project attributes are required');
@@ -79,6 +85,93 @@ const create = (exports.create = async (project, createCSV = true) => {
     console.error(error);
     await db.query('ROLLBACK');
     throw Boom.badImplementation('Error while trying to persist the record');
+  }
+});
+
+/**
+ * Updates the given project record.
+ *
+ * @param {Number} id - The project ID.
+ * @param {Object} projectData - The project data property with values updated.
+ * @param {Boolean} createCSV - Whether we want to skip the CSV creation.
+ */
+const update = (exports.update = async (id, projectData) => {
+  if (!projectData) {
+    throw Boom.badRequest('Project attributes are required');
+  }
+
+  if (!id) {
+    throw Boom.badRequest('Project must have an ID');
+  }
+
+  try {
+    let saved = await getById(id);
+    let genCSV = false;
+    let data = {
+      ...saved.data,
+      ...projectData
+    };
+
+    if (
+      saved.data.itemsUrl !== projectData.itemsUrl ||
+      saved.data.filtersUrl !== projectData.filtersUrl ||
+      saved.data.testsUrl !== projectData.testsUrl
+    ) {
+      let count = await getJobsCount(id);
+
+      if (count > 0) {
+        throw Boom.badRequest(
+          'You can not update any of the CSV files. The project already has at least one job.'
+        );
+      }
+
+      genCSV = true;
+      data = {
+        ...data,
+        itemsCreated: false,
+        filtersCreated: false,
+        testsCreated: false
+      };
+    }
+
+    let res = await db.query(
+      `update ${
+        db.TABLES.Project
+      } set updated_at = $1, data = $2 where id = $3 returning *`,
+      [new Date(), data, id]
+    );
+    let updated = res.rows[0];
+
+    if (genCSV) {
+      createRecordsFromCSVs(updated, true);
+    }
+    return updated;
+  } catch (error) {
+    console.error(error);
+
+    if (error.isBoom) {
+      throw error;
+    }
+    throw Boom.badImplementation('Error while trying to update the record');
+  }
+});
+
+/**
+ * Returns the number of jobs associated with the given project.
+ *
+ * @param {Number} id - The project ID.
+ * @return {Number}
+ */
+const getJobsCount = (exports.getJobsCount = async id => {
+  try {
+    let res = await db.query(
+      `select count(*) as count from  ${db.TABLES.Job} where project_id = $1`,
+      [id]
+    );
+    return res.rows[0].count;
+  } catch (error) {
+    console.error(error);
+    throw Boom.badImplementation('Error while trying to fetch the count');
   }
 });
 
@@ -220,8 +313,20 @@ const getTestsCount = (exports.getTestsCount = async id => {
   }
 });
 
-const createRecordsFromCSVs = (exports.createRecordsFromCSVs = async project => {
+/**
+ * Creates the items, filters and tests records for the given project.
+ *
+ * @param {Object} project
+ * @param {Boolean} truncate - if true, remove all items, filters and tests associated with the project.
+ */
+const createRecordsFromCSVs = (exports.createRecordsFromCSVs = async (
+  project,
+  truncate = false
+) => {
   try {
+    if (truncate) {
+      await truncateProject(project.id);
+    }
     await createItems(project);
     await createCriteria(project);
     await createTests(project);
@@ -230,6 +335,28 @@ const createRecordsFromCSVs = (exports.createRecordsFromCSVs = async project => 
     console.error(error);
   }
 });
+
+/**
+ * Removes all the items, filters and tests records for the given project.
+ *
+ * @param {Number} id
+ */
+const truncateProject = async id => {
+  try {
+    console.debug(`Truncate project: ${id}`);
+    await db.query('BEGIN');
+    await db.query(`delete from ${db.TABLES.Item} where project_id = $1`, [id]);
+    await db.query(`delete from ${db.TABLES.Criterion} where project_id = $1`, [
+      id
+    ]);
+    await db.query(`delete from ${db.TABLES.Test} where project_id = $1`, [id]);
+    await db.query('COMMIT');
+  } catch (error) {
+    await db.query('ROLLBACK');
+    console.error(error);
+    throw error;
+  }
+};
 
 const createItems = async project => {
   try {

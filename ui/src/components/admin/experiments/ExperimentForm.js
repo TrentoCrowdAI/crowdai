@@ -25,7 +25,7 @@ class ExperimentForm extends React.Component {
   }
 
   render() {
-    const jobId = this.props.match.params.jobId;
+    const {jobId} = this.props.match.params;
     const {item} = this.props;
 
     if (item.id === jobId && item.data.status !== JobStatus.NOT_PUBLISHED) {
@@ -33,7 +33,7 @@ class ExperimentForm extends React.Component {
     }
 
     return (
-      <FormContainer title={item.id ? 'Edit job' : 'New job'}>
+      <FormContainer title={jobId ? 'Edit job' : 'New job'}>
         <Form
           error={this.props.error !== undefined}
           loading={this.props.loading}

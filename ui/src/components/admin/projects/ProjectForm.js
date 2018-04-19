@@ -1,10 +1,11 @@
 import React from 'react';
-import {Container, Form, Button, Grid, Message} from 'semantic-ui-react';
+import {Container, Form, Button, Grid} from 'semantic-ui-react';
 import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
 
 import {actions} from './actions';
 import {FileFormats} from 'src/utils/constants';
+import FormContainer from 'src/components/core/form/FormContainer';
 
 class ProjectForm extends React.Component {
   constructor(props) {
@@ -13,44 +14,25 @@ class ProjectForm extends React.Component {
   }
 
   render() {
+    const {projectId} = this.props.match.params;
+
     return (
-      <Container>
-        <Grid container centered>
-          <Grid.Row style={{padding: 0}}>
-            <Grid.Column width="4">
-              <h1>New project</h1>
-            </Grid.Column>
-          </Grid.Row>
-          <Grid.Row>
-            <Grid.Column width="10">
-              <Form
-                error={this.props.error !== undefined}
-                loading={this.props.loading}
-                success={this.props.saved}
-                onSubmit={() => this.props.submit()}>
-                <div style={{marginBottom: 20}}>{this.renderForm()}</div>
+      <FormContainer title={projectId ? 'Edit project' : 'New project'}>
+        <Form
+          error={this.props.error !== undefined}
+          loading={this.props.loading}
+          success={this.props.saved}
+          onSubmit={() => this.props.submit()}>
+          <div style={{marginBottom: 20}}>{this.renderForm()}</div>
 
-                {/* {this.props.error && (
-                  <Message
-                    error
-                    header="Error"
-                    content={this.props.error.message || 'Changes not saved. Please try again.'}
-                  />
-                )}
-
-                {this.props.saved && <Message success header="Success" content="Changes saved!" />} */}
-
-                <Button floated="right" positive>
-                  Save
-                </Button>
-                <Button floated="right" type="button" onClick={() => this.props.history.push('/admin/projects')}>
-                  Cancel
-                </Button>
-              </Form>
-            </Grid.Column>
-          </Grid.Row>
-        </Grid>
-      </Container>
+          <Button floated="right" positive>
+            Save
+          </Button>
+          <Button floated="right" type="button" onClick={() => this.props.history.push('/admin/projects')}>
+            Cancel
+          </Button>
+        </Form>
+      </FormContainer>
     );
   }
 
@@ -123,6 +105,11 @@ class ProjectForm extends React.Component {
 
   componentDidMount() {
     this.props.cleanState();
+    const {projectId} = this.props.match.params;
+
+    if (projectId) {
+      this.props.fetchItem(projectId);
+    }
   }
 
   handleChange(e, {name, value}) {
@@ -138,7 +125,9 @@ ProjectForm.propTypes = {
   submit: PropTypes.func,
   setInputValue: PropTypes.func,
   cleanState: PropTypes.func,
-  history: PropTypes.object
+  history: PropTypes.object,
+  match: PropTypes.object,
+  fetchItem: PropTypes.func
 };
 
 const mapStateToProps = state => ({
@@ -151,7 +140,8 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = dispatch => ({
   submit: () => dispatch(actions.submit()),
   cleanState: () => dispatch(actions.cleanState()),
-  setInputValue: (name, value) => dispatch(actions.setInputValue(name, value))
+  setInputValue: (name, value) => dispatch(actions.setInputValue(name, value)),
+  fetchItem: id => dispatch(actions.fetchItem(id))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(ProjectForm);

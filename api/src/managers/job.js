@@ -608,6 +608,7 @@ const mturkRejectAssignment = async (id, mturk) => {
  * @param {Object} mturk
  */
 const sendBonus = async (job, workerId, assignmentId, mturk) => {
+  console.log(`Sending bonus assignment ${assignmentId}...`);
   const worker = await delegates.workers.getById(workerId);
   const { reward } = await getWorkerReward(job.uuid, worker.turk_id, true);
   const bonusAmount = reward.toFixed(2);
@@ -622,6 +623,9 @@ const sendBonus = async (job, workerId, assignmentId, mturk) => {
       if (err) {
         reject(err);
       } else {
+        console.log(
+          `Bonus sent. Response for ${assignmentId} is: ${JSON.stringify(data)}`
+        );
         resolve(data);
       }
     });

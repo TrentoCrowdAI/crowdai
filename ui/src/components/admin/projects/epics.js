@@ -23,22 +23,34 @@ const saveProject = (action$, store) =>
     item.requester_id = profile.id;
 
     return Observable.defer(
-      () => (item.id ? requestersApi.put(`projects/${item.id}`, item) : requestersApi.post('projects', item))
+      () => (item.id ? requestersApi.put(`projects/${item.id}`, item.data) : requestersApi.post('projects', item))
     )
-      .mergeMap(response =>
-        Observable.concat(
+      .mergeMap(response => {
+        let msg = 'The CSV files are now being processed.';
+        let actionsToConcat = [Observable.of(actions.submitSuccess())];
+        let updatedProject = response.data;
+
+        if (
+          updatedProject.data.itemsCreated &&
+          updatedProject.data.filtersCreated &&
+          updatedProject.data.testsCreated
+        ) {
+          msg = 'The project was saved correctly.';
+        } else {
+          actionsToConcat.push(Observable.of(actions.pollProject(updatedProject.id)));
+        }
+        actionsToConcat.push(
           Observable.of(
             toastActions.show({
-              header: 'Project created',
-              message: 'The CSV files are now being processed.',
+              header: 'Project saved',
+              message: msg,
               type: ToastTypes.SUCCESS
             })
-          ),
-          Observable.of(actions.submitSuccess()),
-          Observable.of(actions.pollProject(response.data.id)),
-          Observable.of(historyActions.push('/admin/projects'))
-        )
-      )
+          )
+        );
+        actionsToConcat.push(Observable.of(historyActions.push('/admin/projects')));
+        return Observable.concat(...actionsToConcat);
+      })
       .catch(error => {
         let err = flattenError(error);
         let msg = err.message || 'Changes not saved. Please try again.';

@@ -7,6 +7,8 @@ const QueryStream = require('pg-query-stream');
 const db = require(__base + 'db');
 const tasksDelegate = require('./tasks');
 const requestersDelegate = require('./requesters');
+const { emit } = require(__base + 'events/emitter');
+const { EventTypes } = require(__base + 'events/projects');
 
 const getByRequester = (exports.getByRequester = async id => {
   try {
@@ -32,7 +34,6 @@ const getById = (exports.getById = async id => {
     if (!project) {
       throw Boom.badRequest(`The project with id ${id} does not exist.`);
     }
-
     project.consent = await new Promise((resolve, reject) => {
       request(project.data.consentUrl, (err, rsp, body) => {
         if (err) {
@@ -62,9 +63,8 @@ const getById = (exports.getById = async id => {
  * Creates a new project record.
  *
  * @param {Object} - The project to create
- * @param {Boolean} createCSV - Whether we want to skip the CSV creation.
  */
-const create = (exports.create = async (project, createCSV = true) => {
+const create = (exports.create = async project => {
   if (!project) {
     throw Boom.badRequest('Project attributes are required');
   }
@@ -85,10 +85,7 @@ const create = (exports.create = async (project, createCSV = true) => {
     );
     const created = res.rows[0];
     await db.query('COMMIT');
-
-    if (createCSV) {
-      createRecordsFromCSVs(created);
-    }
+    emit(EventTypes.PROCESS_CSV, created, false);
     return created;
   } catch (error) {
     console.error(error);
@@ -102,7 +99,6 @@ const create = (exports.create = async (project, createCSV = true) => {
  *
  * @param {Number} id - The project ID.
  * @param {Object} projectData - The project data property with values updated.
- * @param {Boolean} createCSV - Whether we want to skip the CSV creation.
  */
 const update = (exports.update = async (id, projectData) => {
   if (!projectData) {
@@ -152,7 +148,7 @@ const update = (exports.update = async (id, projectData) => {
     let updated = res.rows[0];
 
     if (genCSV) {
-      createRecordsFromCSVs(updated, true);
+      emit(EventTypes.PROCESS_CSV, updated, true);
     }
     return updated;
   } catch (error) {
@@ -169,10 +165,9 @@ const update = (exports.update = async (id, projectData) => {
  * Creates a copy of the given project.
  *
  * @param {Number} id - The project ID we want to copy.
- * @param {Boolean} - Whether we want to skip the CSV creation.
  * @return {Object}
  */
-const copy = (exports.copy = async (id, createCSV = true) => {
+const copy = (exports.copy = async id => {
   if (!id) {
     throw Boom.badRequest('ID must be specified');
   }
@@ -193,7 +188,7 @@ const copy = (exports.copy = async (id, createCSV = true) => {
       ...sourceProject
     };
     delete copy.id;
-    let createdCopy = await create(copy, createCSV);
+    let createdCopy = await create(copy);
     return createdCopy;
   } catch (error) {
     console.error(error);

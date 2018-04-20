@@ -9,6 +9,8 @@ const delegates = require(__base + 'delegates');
 const MTurk = require(__base + 'utils/mturk');
 const config = require(__base + 'config');
 const { JobStatus } = require(__base + 'utils/constants');
+const { EventTypes } = require(__base + 'events/jobs');
+const { emit } = require(__base + 'events/emitter');
 
 /**
  * Returns a task for the worker.
@@ -252,7 +254,7 @@ const publish = (exports.publish = async id => {
     job.data.start = new Date();
     job.data.hit = { ...hit };
     job.data.instructions = instructions;
-    setupCronForHit(job, hit.HITId, mt);
+    emit(EventTypes.START_CRON_FOR_HIT, job, hit.HITId, mt);
     return await delegates.jobs.update(id, job.data);
   } catch (error) {
     console.error(error);
@@ -308,46 +310,12 @@ const getState = (exports.getState = async jobId => {
 });
 
 /**
- * Set a cron job that polls the HIT status in order to know when
- * the approval/rejection logic should run.
- *
- * @param {string} job
- * @param {string} hitId
- * @param {Object} mturk
- */
-const setupCronForHit = (job, hitId, mturk) => {
-  const jobId = job.id;
-  const cronjob = new CronJob({
-    cronTime: `0 */${config.cron.hitStatusPollTime} * * * *`,
-    onTick: async () => {
-      console.log(`Checking HIT: ${hitId} status`);
-
-      try {
-        let hit = await getHIT(hitId, mturk);
-        console.log(`HIT: ${hitId} is ${hit.HITStatus}`);
-        const stop = await reviewAssignments(job, hit, mturk);
-
-        if (stop) {
-          console.log(`Stopping cron job for HIT: ${hitId}`);
-          cronjob.stop();
-        }
-      } catch (error) {
-        console.error(error);
-      }
-    },
-    start: false
-  });
-
-  cronjob.start();
-};
-
-/**
  * Helper wrapper to call the getHIT method on AMT.
  *
  * @param {String} hitId
  * @param {Object} mturk
  */
-const getHIT = async (hitId, mturk) => {
+const getHIT = (exports.getHIT = async (hitId, mturk) => {
   return new Promise((resolve, reject) => {
     mturk.getHIT({ HITId: hitId }, (err, data) => {
       if (err) {
@@ -357,7 +325,7 @@ const getHIT = async (hitId, mturk) => {
       }
     });
   });
-};
+});
 
 /**
  * Approves or rejects the submitted assignments for a HIT.
@@ -366,7 +334,11 @@ const getHIT = async (hitId, mturk) => {
  * @param {Object} hit
  * @param {Object} mturk
  */
-const reviewAssignments = async (job, hit, mturk) => {
+const reviewAssignments = (exports.reviewAssignments = async (
+  job,
+  hit,
+  mturk
+) => {
   const jobId = job.id;
   console.log(`Review assignments for job: ${jobId}`);
 
@@ -475,31 +447,7 @@ const reviewAssignments = async (job, hit, mturk) => {
       'Error while trying to review the assignments'
     );
   }
-};
-
-/**
- * Check if the job is actually done by calling the task assignment API.
- *
- * @param {Object} job
- * @param {Object} worker
- * @return {Boolean} true if the job is done, false otherwise.
- */
-const checkJobDone = async (job, worker) => {
-  let response = await taskManager.getTasksFromApi(job, worker);
-  return response.done;
-};
-
-/**
- * Changes the job's status to DONE.
- *
- * @param {Number} jobId
- */
-const finishJob = async jobId => {
-  return await delegates.jobs.update(jobId, {
-    status: JobStatus.DONE,
-    end: new Date()
-  });
-};
+});
 
 /**
  * Creates additional assignments for the HIT.
@@ -516,7 +464,11 @@ const finishJob = async jobId => {
  * @param {Object} hit
  * @param {Object} mturk - Mechanical Turk instance
  */
-const createAdditionalAssignmentsForHIT = async (job, hit, mturk) => {
+const createAdditionalAssignmentsForHIT = (exports.createAdditionalAssignmentsForHIT = async (
+  job,
+  hit,
+  mturk
+) => {
   const records = await delegates.jobs.getAssignmentsFinishedByWorkers(job.id);
   let params = {
     HITId: hit.HITId,
@@ -547,14 +499,17 @@ const createAdditionalAssignmentsForHIT = async (job, hit, mturk) => {
       .unix();
     await updateExpirationForHIT(hit.HITId, expireAt, mturk);
   }
-};
+});
 
 /**
  * Wrapper for Mechanical Turk approveAssignment operation.
  * @param {string} id - The assignment's AMT ID
  * @param {Object} mturk
  */
-const mturkApproveAssignment = async (id, mturk) => {
+const mturkApproveAssignment = (exports.mturkApproveAssignment = async (
+  id,
+  mturk
+) => {
   console.log(`Approving assignment ${id}...`);
   return await new Promise((resolve, reject) => {
     mturk.approveAssignment({ AssignmentId: id }, function(err, data) {
@@ -570,14 +525,17 @@ const mturkApproveAssignment = async (id, mturk) => {
       }
     });
   });
-};
+});
 
 /**
  * Wrapper for Mechanical Turk rejectAssignment operation.
  * @param {string} id - The assignment's AMT ID
  * @param {Object} mturk
  */
-const mturkRejectAssignment = async (id, mturk) => {
+const mturkRejectAssignment = (exports.mturkRejectAssignment = async (
+  id,
+  mturk
+) => {
   console.log(`Rejecting assignment ${id}...`);
   const payload = {
     AssignmentId: id,
@@ -596,7 +554,7 @@ const mturkRejectAssignment = async (id, mturk) => {
       }
     });
   });
-};
+});
 
 /**
  * Wrapper for Mechanical Turk sendBonus operation. Here we pay
@@ -607,7 +565,12 @@ const mturkRejectAssignment = async (id, mturk) => {
  * @param {string} assignmentId - The assignment's AMT ID
  * @param {Object} mturk
  */
-const sendBonus = async (job, workerId, assignmentId, mturk) => {
+const sendBonus = (exports.sendBonus = async (
+  job,
+  workerId,
+  assignmentId,
+  mturk
+) => {
   console.log(`Sending bonus assignment ${assignmentId}...`);
   const worker = await delegates.workers.getById(workerId);
   const { reward } = await getWorkerReward(job.uuid, worker.turk_id, true);
@@ -629,6 +592,70 @@ const sendBonus = async (job, workerId, assignmentId, mturk) => {
         resolve(data);
       }
     });
+  });
+});
+
+/**
+ * Helper function to expire a HIT.
+ *
+ * @param {Object} job
+ */
+const expireHIT = (exports.expireHIT = async job => {
+  console.debug(`Expiring HIT: ${job.data.hit.HITId}.`);
+  let requester = await delegates.jobs.getRequester(job.id);
+  const mturk = MTurk.getInstance(requester);
+  await updateExpirationForHIT(job.data.hit.HITId, 0, mturk);
+});
+
+/**
+ * Updates the expiration for a HIT.
+ *
+ * @param {String} hitId
+ * @param {Number} expireAt - timestamp or 0 (meaning expire immediately)
+ * @param {Object} mturk
+ */
+const updateExpirationForHIT = (exports.updateExpirationForHIT = async (
+  hitId,
+  expireAt,
+  mturk
+) => {
+  let params = {
+    ExpireAt: expireAt,
+    HITId: hitId
+  };
+  await new Promise((resolve, reject) => {
+    mturk.updateExpirationForHIT(params, (err, data) => {
+      if (err) {
+        reject(err);
+      } else {
+        console.debug(`Expiration for HIT: ${hitId} updated`);
+        resolve(data);
+      }
+    });
+  });
+});
+
+/**
+ * Check if the job is actually done by calling the task assignment API.
+ *
+ * @param {Object} job
+ * @param {Object} worker
+ * @return {Boolean} true if the job is done, false otherwise.
+ */
+const checkJobDone = async (job, worker) => {
+  let response = await taskManager.getTasksFromApi(job, worker);
+  return response.done;
+};
+
+/**
+ * Changes the job's status to DONE.
+ *
+ * @param {Number} jobId
+ */
+const finishJob = async jobId => {
+  return await delegates.jobs.update(jobId, {
+    status: JobStatus.DONE,
+    end: new Date()
   });
 };
 
@@ -670,40 +697,4 @@ const computeMaxAssignments = async job => {
     );
   }
   return maxAssignments;
-};
-
-/**
- * Helper function to expire a HIT.
- *
- * @param {Object} job
- */
-const expireHIT = async job => {
-  console.debug(`Expiring HIT: ${job.data.hit.HITId}.`);
-  let requester = await delegates.jobs.getRequester(job.id);
-  const mturk = MTurk.getInstance(requester);
-  await updateExpirationForHIT(job.data.hit.HITId, 0, mturk);
-};
-
-/**
- * Updates the expiration for a HIT.
- *
- * @param {String} hitId
- * @param {Number} expireAt - timestamp or 0 (meaning expire immediately)
- * @param {Object} mturk
- */
-const updateExpirationForHIT = async (hitId, expireAt, mturk) => {
-  let params = {
-    ExpireAt: expireAt,
-    HITId: hitId
-  };
-  await new Promise((resolve, reject) => {
-    mturk.updateExpirationForHIT(params, (err, data) => {
-      if (err) {
-        reject(err);
-      } else {
-        console.debug(`Expiration for HIT: ${hitId} updated`);
-        resolve(data);
-      }
-    });
-  });
 };

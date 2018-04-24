@@ -40,6 +40,7 @@ const rootEpic = combineEpics(
   experimentEpics,
   profileEpics,
   projectEpics,
+  reportEpics,
   toastEpics
 );
 

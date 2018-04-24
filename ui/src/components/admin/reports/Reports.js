@@ -243,7 +243,7 @@ class Reports extends React.Component {
 
 	renderChart(chart,x,y,z) {
 		return(
-			<React.Fragment>
+			<div>
 			<Dimmer active={this.props.rep_loading} inline="centered" inverted>
           <Loader indeterminate>Loading data...</Loader>
       </Dimmer>
@@ -256,7 +256,7 @@ class Reports extends React.Component {
         color={'steelblue'}
 				data={Object.values(this.props.reports.tasks)}
       />
-      </React.Fragment>
+      </div>
 		)
 	}
 
@@ -317,31 +317,37 @@ class Reports extends React.Component {
 
 		return(
 			<div style={{margin: '20px'}}>
-				
+
+				<div className="rowC">
 				<h3 style={{color: 'steelblue'}}>
 					Selected Project_id: <i>{this.props.match.params.projectid}</i><br />
 					Selected Job_id: <i>{this.state.chosenjob}</i><br />
 					Selected Worker_id: <i>{this.state.chosenworker}</i>
 				</h3>
+
+				<div style={{width: "20%"}}></div>
+
+				<div>
+				<JobChooser 
+					options={JobOptions}
+					onChange={this.chooseJob}
+					chosenjob={this.state.chosenjob}
+				/>
+				<WorkerChooser 
+					disabled={(!this.state.activeworker) || (this.state.chosenjob=='all')}
+					options={WorkerOptions}
+					onChange={this.chooseWorker}
+					chosenworker={this.state.chosenworker}
+				/>
+				</div>
+				</div>
+
 				<hr />
 				<h4>Available metrics:</h4>
 
 				<div className="rowC">
-					{this.renderMetrics()}
-					<div>
-						<JobChooser 
-							options={JobOptions}
-							onChange={this.chooseJob}
-							chosenjob={this.state.chosenjob}
-							/>
-						<WorkerChooser 
-							disabled={(!this.state.activeworker) || (this.state.chosenjob=='all')}
-							options={WorkerOptions}
-							onChange={this.chooseWorker}
-							chosenworker={this.state.chosenworker}
-							/>
-						{this.renderChart(chart,x,y,z)}
-					</div>
+				{this.renderMetrics()}
+				{this.renderChart(chart,x,y,z)}
 				</div>
 
 			</div>

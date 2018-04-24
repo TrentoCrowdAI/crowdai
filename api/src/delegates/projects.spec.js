@@ -1,9 +1,11 @@
-const request = require('request');
+//jest.mock('request');
 const csv = require('csv-parser');
 
 const projectsDelegate = require('./projects');
 const requestersDelegate = require('./requesters');
 const config = require(__base + 'config');
+const projectsEvent = require(__base + 'events/projects');
+const { EventTypes } = projectsEvent;
 
 test('projects module should be defined', () => {
   expect(projectsDelegate).toBeDefined();
@@ -16,6 +18,7 @@ test('getByRequester for undefined requester returns 0 rows', async () => {
 
 describe('projects.create', async () => {
   let requester;
+  let methodCalled = false;
 
   beforeAll(async () => {
     requester = await requestersDelegate.create({
@@ -23,6 +26,10 @@ describe('projects.create', async () => {
       name: 'Linus',
       email: 'linus@linux.com'
     });
+
+    projectsDelegate.createRecordsFromCSVs = jest.fn(
+      () => (methodCalled = true)
+    );
   });
 
   test('create should throw an error if requester is not set', async () => {
@@ -37,20 +44,19 @@ describe('projects.create', async () => {
   });
 
   test('created project should set itemsCreated, filtersCreated and testsCreated to false', async () => {
-    let project = await projectsDelegate.create(
-      {
-        requester_id: requester.id,
-        data: {
-          itemsUrl:
-            'https://drive.google.com/uc?id=1WT14VQtGfXzPRbSbMx2ImnKbIC9kivup',
-          filtersUrl:
-            'https://drive.google.com/uc?id=1qemeQ7Gv0iV5NpHI20TaxXwFQTZuNSU2',
-          testsUrl:
-            'https://drive.google.com/uc?id=1jcssgjpCf1stRXO9LepMNGJyB7a5HAVR'
-        }
-      },
-      false
-    );
+    methodCalled = false;
+
+    let project = await projectsDelegate.create({
+      requester_id: requester.id,
+      data: {
+        name: 'test',
+        itemsUrl: 'http://url-items',
+        filtersUrl: 'http://url-filters',
+        testsUrl: 'http://url-tests',
+        consentUrl: 'http://url-consent',
+        consentFormat: 'MARKDOWN'
+      }
+    });
     expect(project.data).toMatchObject({
       itemsCreated: false,
       filtersCreated: false,
@@ -58,46 +64,86 @@ describe('projects.create', async () => {
     });
   });
 
-  test('3 items, 1 filter and 3 tests records should be created', async () => {
-    let project = await projectsDelegate.create(
-      {
-        requester_id: requester.id,
-        data: {
-          itemsUrl:
-            'https://drive.google.com/uc?id=1WT14VQtGfXzPRbSbMx2ImnKbIC9kivup',
-          filtersUrl:
-            'https://drive.google.com/uc?id=1qemeQ7Gv0iV5NpHI20TaxXwFQTZuNSU2',
-          testsUrl:
-            'https://drive.google.com/uc?id=1jcssgjpCf1stRXO9LepMNGJyB7a5HAVR'
-        }
-      },
-      false
-    );
-    let res = await projectsDelegate.createRecordsFromCSVs(project);
-    expect(res).toBe(true);
-    let ic = await projectsDelegate.getItemsCount(project.id);
-    expect(ic).toBe(3);
-    let cc = await projectsDelegate.getCriteriaCount(project.id);
-    expect(cc).toBe(1);
-    let tc = await projectsDelegate.getTestsCount(project.id);
-    expect(tc).toBe(3);
+  test(`create should emit ${EventTypes.PROCESS_CSV}`, async () => {
+    methodCalled = false;
+
+    await projectsDelegate.create({
+      requester_id: requester.id,
+      data: {
+        name: 'test',
+        itemsUrl: 'http://url-items',
+        filtersUrl: 'http://url-filters',
+        testsUrl: 'http://url-tests',
+        consentUrl: 'http://url-consent',
+        consentFormat: 'MARKDOWN'
+      }
+    });
+
+    expect(methodCalled).toBe(true);
+  });
+});
+
+describe('projects.copy', async () => {
+  let requester;
+  let project;
+
+  beforeAll(async () => {
+    projectsDelegate.createRecordsFromCSVs = jest.fn();
+
+    requester = await requestersDelegate.create({
+      gid: '121212121212',
+      name: 'Linus',
+      email: 'linus@linux.com'
+    });
+
+    project = await projectsDelegate.create({
+      requester_id: requester.id,
+      data: {
+        name: 'test',
+        itemsUrl: 'http://url-items',
+        filtersUrl: 'http://url-filters',
+        testsUrl: 'http://url-tests',
+        consentUrl: 'http://url-consent',
+        consentFormat: 'MARKDOWN'
+      }
+    });
   });
 
-  test('download 200-tests csv', async () => {
-    jest.setTimeout(10000);
-    let tests = [];
+  test('copy should throw if ID is not specified', async () => {
+    try {
+      await projectsDelegate.copy();
+    } catch (error) {
+      expect(error.message).toBe('ID must be specified');
+    }
+  });
 
-    await new Promise((resolve, reject) => {
-      request(
-        'https://drive.google.com/uc?id=1m1lwuiU6u9UBdjPvwa5powbyTAXRKcBR'
-      )
-        .on('error', err => reject(err))
-        .pipe(csv())
-        .on('data', test => tests.push(test))
-        .on('end', () => resolve())
-        .on('error', err => reject(err));
+  test('copy should throw if source does not exists', async () => {
+    let id = 1000;
+
+    try {
+      await projectsDelegate.copy(id);
+    } catch (error) {
+      expect(error.message).toBe(`The project with id ${id} does not exist.`);
+    }
+  });
+
+  test('copy should clone the record and give it a different ID', async () => {
+    let copiedProject = await projectsDelegate.copy(project.id);
+    expect(copiedProject).toMatchObject({
+      requester_id: project.requester_id,
+      data: {
+        name: project.data.name,
+        itemsUrl: project.data.itemsUrl,
+        testsUrl: project.data.testsUrl,
+        consentUrl: project.data.consentUrl,
+        filtersUrl: project.data.filtersUrl,
+        consentFormat: project.data.consentFormat,
+        itemsCreated: false,
+        testsCreated: false,
+        filtersCreated: false
+      }
     });
-    expect(tests.length).toBe(200);
-    jest.setTimeout(5000);
+
+    expect(copiedProject.id).not.toBe(project.id);
   });
 });

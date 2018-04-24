@@ -29,9 +29,14 @@ const put = async ctx => {
   );
 };
 
+const copy = async ctx => {
+  ctx.response.body = await delegates.projects.copy(ctx.params.id, true);
+};
+
 exports.register = router => {
   router.get('/projects', getRequesterProjects);
   router.post('/projects', post);
   router.put('/projects/:id', put);
   router.get('/projects/:id', getById);
+  router.post('/projects/:id/copy', copy);
 };

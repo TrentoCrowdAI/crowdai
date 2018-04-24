@@ -114,4 +114,23 @@ const pollProject = (action$, store) =>
     );
   });
 
-export default combineEpics(getProjects, saveProject, fetchProject, pollProject, fetchProjectState);
+const copyProject = (action$, store) =>
+  action$.ofType(actionTypes.COPY_PROJECT).switchMap(action => {
+    console.log(`projects/${action.id}/copy`);
+    return Observable.defer(() => requestersApi.post(`projects/${action.id}/copy`)).mergeMap(response =>
+      Observable.concat(
+        Observable.of(
+          toastActions.show({
+            header: 'Project copy created',
+            message: 'The CSV files are now being processed.',
+            type: ToastTypes.SUCCESS
+          })
+        ),
+        Observable.of(actions.copyProjectSuccess(response.data)),
+        Observable.of(actions.pollProject(response.data.id)),
+        Observable.of(actions.fetchProjects())
+      ).catch(error => Observable.of(actions.copyProjectError(flattenError(error))))
+    );
+  });
+
+export default combineEpics(getProjects, saveProject, fetchProject, pollProject, fetchProjectState, copyProject);

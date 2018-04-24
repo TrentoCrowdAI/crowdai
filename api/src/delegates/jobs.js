@@ -208,13 +208,19 @@ const getAssignmentsFinishedByWorkers = (exports.getAssignmentsFinishedByWorkers
  * @param {Number} id - The job's ID we want to copy.
  */
 const copy = (exports.copy = async id => {
+  let sourceJob;
+
   try {
-    let sourceJob = await getById(id);
+    sourceJob = await getById(id);
+  } catch (error) {
+    console.error(error);
+  }
 
-    if (!sourceJob) {
-      throw Boom.badRequest(`The job with id ${id} does not exist.`);
-    }
+  if (!sourceJob) {
+    throw Boom.badRequest(`The job with id ${id} does not exist.`);
+  }
 
+  try {
     let copy = {
       ...sourceJob
     };

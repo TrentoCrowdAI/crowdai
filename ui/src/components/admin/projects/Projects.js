@@ -2,7 +2,7 @@ import React from 'react';
 import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
 import {Redirect, Link} from 'react-router-dom';
-import {Button, Icon} from 'semantic-ui-react';
+import {Button, Icon, Popup} from 'semantic-ui-react';
 
 import {actions} from './actions';
 import DataTable from 'src/components/core/table/DataTable';
@@ -74,6 +74,21 @@ const getOptions = props => {
               }}>
               <Icon name="list layout" />
             </Button>
+            <Popup
+              trigger={
+                <Button
+                  icon
+                  color="blue"
+                  size="mini"
+                  onClick={() => {
+                    // eslint-disable-next-line react/prop-types
+                    props.copyProject(item.id);
+                  }}>
+                  <Icon name="copy" />
+                </Button>
+              }
+              content="Copy this project"
+            />
           </React.Fragment>
         );
       }
@@ -89,7 +104,8 @@ Projects.propTypes = {
     rows: PropTypes.arrayOf(PropTypes.object),
     meta: PropTypes.object
   }),
-  fetchItem: PropTypes.func
+  fetchItem: PropTypes.func,
+  copyProject: PropTypes.func
 };
 
 const mapStateToProps = state => ({
@@ -100,7 +116,8 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = dispatch => ({
   fetchProjects: () => dispatch(actions.fetchProjects()),
-  fetchItem: id => dispatch(actions.fetchItem(id))
+  fetchItem: id => dispatch(actions.fetchItem(id)),
+  copyProject: id => dispatch(actions.copyProject(id))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Projects);

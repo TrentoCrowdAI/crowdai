@@ -394,34 +394,19 @@ class ExperimentForm extends React.Component {
           />
         </Form.Group>
 
-        <Form.Field style={{marginTop: '2em', marginBottom: '2em'}}>
-          <Checkbox
-            label="Limit the number of workers?"
-            name="data.hitConfig.limitWorkers"
-            checked={item.data.hitConfig.limitWorkers}
-            onChange={(e, {name, checked}) => {
-              if (!checked) {
-                this.props.setInputValue('data.hitConfig.maxAssignments', 0);
-              }
-              this.handleChange(e, {name, value: checked});
-            }}
-          />
-        </Form.Field>
-
-        {item.data.hitConfig.limitWorkers && (
-          <Form.Group style={{marginLeft: '2em'}}>
+        <Form.Group>
+          <Form.Field width="8">
             <Form.Input
-              label="Max. number of assignments"
+              label="Max. number of workers"
               name="data.hitConfig.maxAssignments"
               value={item.data.hitConfig.maxAssignments}
               onChange={this.handleChange}
-              width="8"
               type="number"
               min="0"
-              required
             />
-          </Form.Group>
-        )}
+            <span style={{fontSize: '0.9em'}}>A value greater than 0 will limit the number of workers.</span>
+          </Form.Field>
+        </Form.Group>
       </Segment>
     );
   }

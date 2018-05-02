@@ -510,8 +510,16 @@ const createTests = async project => {
 
     for (test of tests) {
       let criterion = descriptionMap[test.filterDescription.trim()];
+
+      if (!criterion) {
+        // there are tests for other filters not present in the project's filters file.
+        continue;
+      }
       let data = {
-        item: { title: test.itemTitle, description: test.itemDescription },
+        item: {
+          title: test.itemTitle.trim(),
+          description: test.itemDescription.trim()
+        },
         criteria: [
           {
             id: criterion.id,

@@ -12,10 +12,8 @@ CREATE TABLE requester (
 
 -- data: {
 --   itemsUrl: <string>,
---   filtersUrl: <string>,
 --   testsUrl: <string>,
 --   itemsCreated: <boolean>,
---   filtersCreated: <boolean>,
 --   testsCreated: <boolean>
 -- }
 CREATE TABLE project (

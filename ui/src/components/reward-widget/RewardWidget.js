@@ -20,7 +20,7 @@ class RewardWidget extends React.Component {
 
 RewardWidget.propTypes = {
   style: PropTypes.object,
-  reward: PropTypes.number,
+  reward: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   requestReward: PropTypes.func,
   loading: PropTypes.bool
 };

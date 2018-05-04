@@ -48,7 +48,7 @@ const getTestForWorker = (exports.getTestForWorker = async (
   testTask.instructions = [];
 
   for (let c of testTask.data.criteria) {
-    testTask.instructions.push(job.data.instructions[c.id]);
+    testTask.instructions.push(job.data.instructions[c.label]);
   }
   return testTask;
 });

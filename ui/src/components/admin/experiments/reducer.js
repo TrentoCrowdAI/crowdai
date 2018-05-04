@@ -2,7 +2,7 @@ import {combineReducers} from 'redux';
 
 import {actionTypes} from './actions';
 import {getReducer} from 'src/utils/form';
-import {scopes, JobStatus} from 'src/utils/constants';
+import {scopes, JobStatus, FileFormats} from 'src/utils/constants';
 
 const defaultState = {
   experiments: {
@@ -41,6 +41,7 @@ const reducer = (state = defaultState, action) => {
 const genericFormReducer = getReducer(scopes.EXPERIMENTS, {
   id: undefined,
   project_id: undefined,
+  requester_id: undefined,
   uuid: '',
   data: {
     name: '',
@@ -48,6 +49,8 @@ const genericFormReducer = getReducer(scopes.EXPERIMENTS, {
     requesterId: '',
     status: JobStatus.NOT_PUBLISHED,
     instructions: {},
+    consentUrl: '',
+    consentFormat: FileFormats.PLAIN_TEXT,
     // True: ask each worker multiple criteria per paper. False: ask one criterion only per paper.
     multipleCriteria: false,
     criteriaQualityAnalysis: false,
@@ -67,8 +70,19 @@ const genericFormReducer = getReducer(scopes.EXPERIMENTS, {
     votesPerTaskRule: 2,
     expertCostRule: 0.2,
     crowdsourcingStrategy: 'baseline', // soon to be deprecated
-    taskAssignmentStrategy: 1
-  }
+    taskAssignmentStrategy: 1,
+    // information related to the underlying project.
+    itemsUrl: '',
+    filtersUrl: '',
+    testsUrl: ''
+  },
+  // when we fetch a job by its ID, in the criteria property
+  // the API returns the list of criterion associated with the job.
+  // When we create a job, after filling the filtersCSV this field
+  // gets populated with the content of the CSV.
+  criteria: [],
+  criteriaLoading: false,
+  criteriaError: undefined
 });
 
 // hacky way to get the whole state of the form
@@ -96,6 +110,34 @@ const formReducer = (state = defaultFormState, action) => {
         ...state,
         error: action.error,
         loading: false
+      };
+    case actionTypes.FETCH_FILTERS_CSV:
+      return {
+        ...state,
+        item: {
+          ...state.item,
+          criteria: [],
+          criteriaError: undefined,
+          criteriaLoading: true
+        }
+      };
+    case actionTypes.FETCH_FILTERS_CSV_SUCCESS:
+      return {
+        ...state,
+        item: {
+          ...state.item,
+          criteria: action.filters,
+          criteriaLoading: false
+        }
+      };
+    case actionTypes.FETCH_FILTERS_CSV_ERROR:
+      return {
+        ...state,
+        item: {
+          ...state.item,
+          criteriaError: action.error,
+          criteriaLoading: false
+        }
       };
     default:
       return state;

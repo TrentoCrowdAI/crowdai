@@ -69,7 +69,7 @@ exports.nextTask = async (uuid, turkId, assignmentTurkId) => {
     task.instructions = [];
 
     for (let c of task.data.criteria) {
-      task.instructions.push(job.data.instructions[c.id]);
+      task.instructions.push(job.data.instructions[c.label]);
     }
     task.workerCanFinish = await workerCanFinish(job, worker);
     return task;
@@ -220,8 +220,8 @@ const getWorkerReward = (exports.getWorkerReward = async (
  */
 const publish = (exports.publish = async id => {
   try {
-    let requester = await delegates.jobs.getRequester(id);
     let job = await delegates.jobs.getById(id);
+    let requester = await delegates.requesters.getById(job.requester_id);
     // we fetch the instructions and save them.
     let instructions = await delegates.jobs.getInstructions(job);
     const maxAssignments = await computeMaxAssignments(job);
@@ -294,7 +294,7 @@ const stop = (exports.stop = async job => {
 const getState = (exports.getState = async jobId => {
   try {
     let job = await delegates.jobs.getById(jobId);
-    let requester = await delegates.jobs.getRequester(job.id);
+    let requester = await delegates.requesters.getById(job.requester_id);
     const mturk = MTurk.getInstance(requester);
     let hit = await getHIT(job.data.hit.HITId, mturk);
     // TODO: return information about the workers.

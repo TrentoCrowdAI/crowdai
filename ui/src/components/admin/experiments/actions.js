@@ -17,6 +17,13 @@ const actionTypes = {
   COPY_JOB: 'C_COPY_JOB',
   COPY_JOB_SUCCESS: 'C_COPY_JOB_SUCCESS',
   COPY_JOB_ERROR: 'C_COPY_JOB_ERROR',
+  CHECK_CSV_CREATION: 'C_CHECK_CSV_CREATION',
+  CHECK_CSV_CREATION_SUCCESS: 'C_CHECK_CSV_CREATION_SUCCESS',
+  CHECK_CSV_CREATION_ERROR: 'C_CHECK_CSV_CREATION_ERROR',
+  CHECK_CSV_CREATION_DONE: 'C_CHECK_CSV_CREATION_DONE',
+  FETCH_FILTERS_CSV: 'C_FETCH_FILTERS_CSV',
+  FETCH_FILTERS_CSV_SUCCESS: 'C_FETCH_FILTERS_CSV_SUCCESS',
+  FETCH_FILTERS_CSV_ERROR: 'C_FETCH_FILTERS_CSV_ERROR',
   ...getActionTypes(scopes.EXPERIMENTS)
 };
 
@@ -129,6 +136,61 @@ const actions = {
   copyJobError(error) {
     return {
       type: actionTypes.COPY_JOB_ERROR,
+      error
+    };
+  },
+
+  /**
+   * This action triggers the polling to check the creation status of the CSV files
+   * associated with the job.
+   *
+   * @param {Number} job
+   * @return {Object}
+   */
+  checkCSVCreation(job) {
+    return {
+      type: actionTypes.CHECK_CSV_CREATION,
+      job
+    };
+  },
+
+  checkCSVCreationSuccess(status) {
+    return {
+      type: actionTypes.CHECK_CSV_CREATION_SUCCESS,
+      status
+    };
+  },
+
+  checkCSVCreationError(error) {
+    return {
+      type: actionTypes.CHECK_CSV_CREATION_ERROR,
+      error
+    };
+  },
+
+  checkCSVCreationDone() {
+    return {
+      type: actionTypes.CHECK_CSV_CREATION_DONE
+    };
+  },
+
+  fetchFiltersCSV(url) {
+    return {
+      type: actionTypes.FETCH_FILTERS_CSV,
+      url
+    };
+  },
+
+  fetchFiltersCSVSuccess(filters) {
+    return {
+      type: actionTypes.FETCH_FILTERS_CSV_SUCCESS,
+      filters
+    };
+  },
+
+  fetchFiltersCSVError(error) {
+    return {
+      type: actionTypes.FETCH_FILTERS_CSV_ERROR,
       error
     };
   }

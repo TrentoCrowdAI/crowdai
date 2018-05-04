@@ -34,7 +34,7 @@ class WelcomePage extends React.Component {
 
   render() {
     const {open} = this.state;
-    let project = this.props.item.project || {};
+    const {item} = this.props;
 
     return (
       <Container>
@@ -48,18 +48,18 @@ class WelcomePage extends React.Component {
               </Accordion.Title>
               <Accordion.Content active={open}>
                 <Segment>
-                  {!this.props.item.id && <p>Loading information...</p>}
-                  {this.props.item.id &&
-                    !project.consent && (
+                  {!item.id && <p>Loading information...</p>}
+                  {item.id &&
+                    !item.data.consent && (
                       <p style={{textAlign: 'justify'}}>
                         The information is available{' '}
-                        <a href={project.consentUrl} target="_blank">
+                        <a href={item.data.consentUrl} target="_blank">
                           here
                         </a>
                       </p>
                     )}
 
-                  {project.consent && <FileRenderer content={project.consent} format={project.consentFormat} />}
+                  {item.data.consent && <FileRenderer content={item.data.consent} format={item.data.consentFormat} />}
                 </Segment>
               </Accordion.Content>
             </Accordion>

@@ -3,6 +3,6 @@ let router = new Router();
 
 require('./jobs').register(router);
 require('./profile').register(router);
-require('./projects').register(router);
+require('./csv-preview').register(router);
 
 module.exports = router.routes();

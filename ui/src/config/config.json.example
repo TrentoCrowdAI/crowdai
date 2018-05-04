@@ -14,8 +14,8 @@
     "workerAssignment": 10000,
     // interval for checking the job state
     "jobState": 10000,
-    // interval for checking the project state (after creating it)
-    "project": 10000
+    // interval for checking the progress of the CSV processing after creation a job.
+    "jobCheckCSV": 10000
   },
 
   "google": {

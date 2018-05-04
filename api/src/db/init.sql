@@ -10,9 +10,16 @@ CREATE TABLE requester (
   CONSTRAINT pk_requester PRIMARY KEY (id)
 );
 
+-- data: {
+--   itemsUrl: <string>,
+--   filtersUrl: <string>,
+--   testsUrl: <string>,
+--   itemsCreated: <boolean>,
+--   filtersCreated: <boolean>,
+--   testsCreated: <boolean>
+-- }
 CREATE TABLE project (
   id bigserial NOT NULL,
-  requester_id bigint NOT NULL,
   created_at timestamp,
   updated_at timestamp,
   deleted_at timestamp,
@@ -25,13 +32,14 @@ CREATE TABLE project (
 --   end: <date>,
 --   status: <string> NOT_PUBLISHED | PUBLISHED | DONE,
 --   instructions: {
---     C1_ID: {taskInstructionsUrl: '', format: '', content: ''},
---     C2_ID: {taskInstructionsUrl: '', format: '', content: ''} 
+--     C1_LABEL: {taskInstructionsUrl: <string>, format: <string>, content: <string>},
+--     C2_LABEL: {taskInstructionsUrl: <string>, format: <string>, content: <string>} 
 --   }
 --   ...
 -- }
 CREATE TABLE job (
   id bigserial NOT NULL,
+  requester_id bigint NOT NULL,
   project_id bigint NOT NULL,
   uuid varchar(255) NOT NULL,
   created_at timestamp,
@@ -86,7 +94,10 @@ CREATE TABLE item (
   CONSTRAINT pk_item PRIMARY KEY (id)
 );
 
--- data: {description: ''}
+-- data: {
+--   description: <string>, 
+--   label: <string>
+-- }
 CREATE TABLE criterion (
   id bigserial NOT NULL,
   project_id bigint NOT NULL,

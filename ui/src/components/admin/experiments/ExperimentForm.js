@@ -1,8 +1,22 @@
 import React from 'react';
-import {Form, Button, Grid, Message, Icon, Step, Segment, Radio, Checkbox, Header} from 'semantic-ui-react';
+import {
+  Form,
+  Button,
+  Grid,
+  Message,
+  Icon,
+  Step,
+  Segment,
+  Radio,
+  Checkbox,
+  Header,
+  Dimmer,
+  Loader
+} from 'semantic-ui-react';
 import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
 import {Redirect} from 'react-router-dom';
+import validUrl from 'valid-url';
 
 import {actions} from './actions';
 import FormContainer from 'src/components/core/form/FormContainer';
@@ -29,7 +43,7 @@ class ExperimentForm extends React.Component {
     const {item} = this.props;
 
     if (item.id === jobId && item.data.status !== JobStatus.NOT_PUBLISHED) {
-      return <Redirect to={`/admin/projects/${item.project_id}/screenings/`} />;
+      return <Redirect to={'/admin/screenings/'} />;
     }
 
     return (
@@ -72,10 +86,7 @@ class ExperimentForm extends React.Component {
           <Button floated="right" positive>
             Save
           </Button>
-          <Button
-            floated="right"
-            type="button"
-            onClick={() => this.props.history.push(`/admin/projects/${this.props.match.params.projectId}/screenings`)}>
+          <Button floated="right" type="button" onClick={() => this.props.history.push('/admin/screenings')}>
             Cancel
           </Button>
         </Form>
@@ -108,6 +119,29 @@ class ExperimentForm extends React.Component {
             value={item.data.description}
             onChange={this.handleChange}
           />
+
+          <Form.Group>
+            <Form.Input
+              width={12}
+              label="Informed Consent URL"
+              name="data.consentUrl"
+              value={item.data.consentUrl}
+              placeholder="URL to consent file"
+              onChange={this.handleChange}
+              required
+            />
+
+            <Form.Select
+              width={6}
+              label="Format"
+              name="data.consentFormat"
+              value={item.data.consentFormat}
+              options={Object.values(FileFormats).map(v => ({text: v, value: v}))}
+              onChange={this.handleChange}
+            />
+          </Form.Group>
+
+          {this.renderProjecInformation()}
         </Segment>
 
         {this.renderCriteriaSection()}
@@ -148,17 +182,56 @@ class ExperimentForm extends React.Component {
     );
   }
 
+  renderProjecInformation() {
+    const {item} = this.props;
+
+    return (
+      <React.Fragment>
+        <Form.Group widths="equal">
+          <Form.Input
+            label="Items URL"
+            name="data.itemsUrl"
+            value={item.data.itemsUrl}
+            placeholder="URL to items CSV file"
+            onChange={this.handleChange}
+            required
+          />
+          <Form.Input
+            label="Filters URL"
+            name="data.filtersUrl"
+            value={item.data.filtersUrl}
+            placeholder="URL to filters CSV file"
+            onChange={this.handleChange}
+            required
+          />
+
+          <Form.Input
+            label="Tests URL"
+            name="data.testsUrl"
+            value={item.data.testsUrl}
+            placeholder="URL to tests CSV file"
+            onChange={this.handleChange}
+            required
+          />
+        </Form.Group>
+      </React.Fragment>
+    );
+  }
+
   renderCriteriaSection() {
     const {item} = this.props;
-    const {criteria} = this.props.project;
+    const {criteria} = item;
 
     return (
       <Segment>
+        <Dimmer active={item.criteriaLoading} inverted>
+          <Loader>Loading criteria from CSV...</Loader>
+        </Dimmer>
         <Header as="h3">Criteria</Header>
         <Form.Field>
           <Radio
-            disabled={criteria && criteria.length === 1}
-            label="Ask worker each worker multiple criteria"
+            disabled={(criteria && criteria.length === 1) || true}
+            label="Ask to each worker multiple criteria"
             name="data.multipleCriteria"
             value={1}
             checked={item.data.multipleCriteria}
@@ -167,10 +240,10 @@ class ExperimentForm extends React.Component {
         </Form.Field>
         <div style={{marginBottom: '1em', marginLeft: '2em'}}>
           {criteria &&
-            criteria.map(c => (
-              <Form.Field key={c.id}>
+            criteria.map((c, idx) => (
+              <Form.Field key={c.id || idx}>
                 <Checkbox
-                  label={`(${c.data.label}) ${c.data.description}`}
+                  label={`(${c.label || c.data.label}) ${c.description || c.data.description}`}
                   onChange={this.toggle}
                   checked={this.state.checked}
                   disabled={!item.data.multipleCriteria}
@@ -181,7 +254,7 @@ class ExperimentForm extends React.Component {
 
         <Form.Field>
           <Radio
-            label="Ask each worker one criterion only"
+            label="Ask to each worker one criterion only"
             name="data.multipleCriteria"
             value={0}
             checked={!item.data.multipleCriteria}
@@ -199,33 +272,39 @@ class ExperimentForm extends React.Component {
         </Form.Field>
 
         {criteria &&
-          criteria.map(c => (
-            <div key={c.id}>
-              <Header as="h5">
-                ({c.data.label}) {c.data.description}
-              </Header>
-              <Form.Group>
-                <Form.Input
-                  width={10}
-                  label="Task instructions URL"
-                  name={`data.instructions[${c.id}].taskInstructionsUrl`}
-                  value={item.data.instructions[c.id] ? item.data.instructions[c.id].taskInstructionsUrl : ''}
-                  placeholder="URL to file"
-                  onChange={this.handleChange}
-                  required
-                />
+          criteria.map((c, idx) => {
+            let label = c.label || c.data.label;
+            return (
+              <div key={idx}>
+                <Header as="h5">
+                  ({label}) {c.description || c.data.description}
+                </Header>
 
-                <Form.Select
-                  width={6}
-                  label="Format"
-                  name={`data.instructions[${c.id}].format`}
-                  value={item.data.instructions[c.id] ? item.data.instructions[c.id].format : FileFormats.PLAIN_TEXT}
-                  options={Object.values(FileFormats).map(v => ({text: v, value: v}))}
-                  onChange={this.handleChange}
-                />
-              </Form.Group>
-            </div>
-          ))}
+                <Form.Group>
+                  <Form.Input
+                    width={10}
+                    label="Task instructions URL"
+                    name={`data.instructions[${label}].taskInstructionsUrl`}
+                    value={item.data.instructions[label] ? item.data.instructions[label].taskInstructionsUrl : ''}
+                    placeholder="URL to file"
+                    onChange={this.handleChange}
+                    required
+                  />
+
+                  <Form.Select
+                    width={6}
+                    label="Format"
+                    name={`data.instructions[${label}].format`}
+                    value={
+                      item.data.instructions[label] ? item.data.instructions[label].format : FileFormats.PLAIN_TEXT
+                    }
+                    options={Object.values(FileFormats).map(v => ({text: v, value: v}))}
+                    onChange={this.handleChange}
+                  />
+                </Form.Group>
+              </div>
+            );
+          })}
       </Segment>
     );
   }
@@ -423,6 +502,14 @@ class ExperimentForm extends React.Component {
   }
 
   handleChange(e, {type, name, value}) {
+    if (name === 'data.filtersUrl') {
+      this.props.setInputValue('data.instructions', {});
+      this.props.setInputValue('criteria', []);
+
+      if (value.length > 0 && validUrl.isWebUri(value)) {
+        this.props.fetchFiltersCSV(value);
+      }
+    }
     this.props.setInputValue(name, type === 'number' ? Number(value) : value);
   }
 
@@ -444,23 +531,23 @@ ExperimentForm.propTypes = {
   cleanState: PropTypes.func,
   history: PropTypes.object,
   match: PropTypes.object,
-  project: PropTypes.object,
-  fetchItem: PropTypes.func
+  fetchItem: PropTypes.func,
+  fetchFiltersCSV: PropTypes.func
 };
 
 const mapStateToProps = state => ({
   item: state.experiment.form.item,
   loading: state.experiment.form.loading,
   error: state.experiment.form.error,
-  saved: state.experiment.form.saved,
-  project: state.project.form.item
+  saved: state.experiment.form.saved
 });
 
 const mapDispatchToProps = dispatch => ({
   submit: () => dispatch(actions.submit()),
   cleanState: () => dispatch(actions.cleanState()),
   setInputValue: (name, value) => dispatch(actions.setInputValue(name, value)),
-  fetchItem: id => dispatch(actions.fetchItem(id))
+  fetchItem: id => dispatch(actions.fetchItem(id)),
+  fetchFiltersCSV: url => dispatch(actions.fetchFiltersCSV(url))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(ExperimentForm);

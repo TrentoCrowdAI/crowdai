@@ -602,7 +602,7 @@ const sendBonus = (exports.sendBonus = async (
  */
 const expireHIT = (exports.expireHIT = async job => {
   console.debug(`Expiring HIT: ${job.data.hit.HITId}.`);
-  let requester = await delegates.jobs.getRequester(job.id);
+  let requester = await delegates.requesters.getById(job.requester_id);
   const mturk = MTurk.getInstance(requester);
   await updateExpirationForHIT(job.data.hit.HITId, 0, mturk);
 });

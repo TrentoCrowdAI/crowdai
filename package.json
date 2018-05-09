@@ -1,0 +1,19 @@
+{
+  "name": "crowdai",
+  "version": "1.0.0",
+  "description": "A platform for crowd-based screening of literature reviews.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nicobell/crowdai.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/nicobell/crowdai/issues"
+  },
+  "homepage": "https://github.com/nicobell/crowdai#readme"
+}

@@ -68,5 +68,9 @@
       "node_modules/.bin/eslint --fix",
       "git add"
     ]
-  }
+  },
+  "description": "User interface for CrowdRev.\r This project was bootstrapped with [Create React App](https://github.com/facebookincubator/create-react-app).\r You can find the most recent version of this guide [here](https://github.com/facebookincubator/create-react-app/blob/master/packages/react-scripts/template/README.md).",
+  "main": "index.js",
+  "author": "",
+  "license": "ISC"
 }

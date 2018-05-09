@@ -14,8 +14,8 @@
     "koa-jwt": "^3.3.0",
     "lodash.get": "^4.4.2",
     "lodash.set": "^4.3.2",
+    "papaparse": "^4.4.0",
     "math": "0.0.3",
-    "papaparse": "^4.3.7",
     "query-string": "^5.0.1",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
@@ -31,7 +31,8 @@
     "sanitize-html": "^1.17.0",
     "semantic-ui-css": "^2.2.14",
     "semantic-ui-react": "^0.77.2",
-    "showdown": "^1.8.6"
+    "showdown": "^1.8.6",
+    "valid-url": "^1.0.9"
   },
   "scripts": {
     "start": "react-scripts start",

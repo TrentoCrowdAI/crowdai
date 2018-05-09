@@ -1,27 +1,17 @@
+/**
+ * Internal module that manage the project table. We use this table
+ * to keep a single reference to items, tests and filters records. So
+ * that we can related them across multiple jobs.
+ */
 const Boom = require('boom');
-const uuid = require('uuid/v4');
 const request = require('request');
 const csv = require('csv-parser');
 const QueryStream = require('pg-query-stream');
 
 const db = require(__base + 'db');
 const tasksDelegate = require('./tasks');
-const requestersDelegate = require('./requesters');
 const { emit } = require(__base + 'events/emitter');
 const { EventTypes } = require(__base + 'events/projects');
-
-const getByRequester = (exports.getByRequester = async id => {
-  try {
-    let res = await db.query(
-      `select * from ${db.TABLES.Project} where requester_id = $1`,
-      [id]
-    );
-    return { rows: res.rows, meta: { count: res.rowCount } };
-  } catch (error) {
-    console.error(error);
-    throw Boom.badImplementation('Error while trying to fetch records');
-  }
-});
 
 const getById = (exports.getById = async id => {
   try {
@@ -33,20 +23,6 @@ const getById = (exports.getById = async id => {
 
     if (!project) {
       throw Boom.badRequest(`The project with id ${id} does not exist.`);
-    }
-    project.consent = await new Promise((resolve, reject) => {
-      request(project.data.consentUrl, (err, rsp, body) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(rsp.body);
-        }
-      });
-    });
-    res = await getCriteria(id);
-
-    if (res) {
-      project.criteria = res.rows;
     }
     return project;
   } catch (error) {
@@ -62,16 +38,18 @@ const getById = (exports.getById = async id => {
 /**
  * Creates a new project record.
  *
- * @param {Object} - The project to create
+ * @param {String} itemsUrl - The URL to a CSV file containing the items to create.
+ * @param {String} testsUrl - The URL to a CSV file containing the tests to create.
+ * @param {Object[]} criteria - An array of criterion.
  */
-const create = (exports.create = async project => {
-  if (!project) {
-    throw Boom.badRequest('Project attributes are required');
+const create = (exports.create = async (itemsUrl, testsUrl, criteria) => {
+  if (!itemsUrl || !testsUrl || !criteria || !criteria.length > 0) {
+    throw Boom.badRequest('All parameters are required');
   }
   let data = {
-    ...project.data,
+    itemsUrl,
+    testsUrl,
     itemsCreated: false,
-    filtersCreated: false,
     testsCreated: false
   };
 
@@ -80,10 +58,19 @@ const create = (exports.create = async project => {
     let res = await db.query(
       `insert into ${
         db.TABLES.Project
-      }(requester_id, created_at, data) values($1, $2, $3) returning *`,
-      [project.requester_id, new Date(), data]
+      }(created_at, data) values($1, $2) returning *`,
+      [new Date(), data]
     );
     const created = res.rows[0];
+
+    for (criterion of criteria) {
+      await db.query(
+        `insert into ${
+          db.TABLES.Criterion
+        }(created_at, project_id, data) values($1, $2, $3)`,
+        [new Date(), created.id, criterion]
+      );
+    }
     await db.query('COMMIT');
     emit(EventTypes.PROCESS_CSV, created, false);
     return created;
@@ -91,112 +78,6 @@ const create = (exports.create = async project => {
     console.error(error);
     await db.query('ROLLBACK');
     throw Boom.badImplementation('Error while trying to persist the record');
-  }
-});
-
-/**
- * Updates the given project record.
- *
- * @param {Number} id - The project ID.
- * @param {Object} projectData - The project data property with values updated.
- */
-const update = (exports.update = async (id, projectData) => {
-  if (!projectData) {
-    throw Boom.badRequest('Project attributes are required');
-  }
-
-  if (!id) {
-    throw Boom.badRequest('Project must have an ID');
-  }
-
-  try {
-    let saved = await getById(id);
-    let genCSV = false;
-    let data = {
-      ...saved.data,
-      ...projectData
-    };
-
-    if (
-      saved.data.itemsUrl !== projectData.itemsUrl ||
-      saved.data.filtersUrl !== projectData.filtersUrl ||
-      saved.data.testsUrl !== projectData.testsUrl
-    ) {
-      let count = await getJobsCount(id);
-
-      if (count > 0) {
-        throw Boom.badRequest(
-          'You can not update any of the CSV files. The project already has at least one job.'
-        );
-      }
-
-      genCSV = true;
-      data = {
-        ...data,
-        itemsCreated: false,
-        filtersCreated: false,
-        testsCreated: false
-      };
-    }
-
-    let res = await db.query(
-      `update ${
-        db.TABLES.Project
-      } set updated_at = $1, data = $2 where id = $3 returning *`,
-      [new Date(), data, id]
-    );
-    let updated = res.rows[0];
-
-    if (genCSV) {
-      emit(EventTypes.PROCESS_CSV, updated, true);
-    }
-    return updated;
-  } catch (error) {
-    console.error(error);
-
-    if (error.isBoom) {
-      throw error;
-    }
-    throw Boom.badImplementation('Error while trying to update the record');
-  }
-});
-
-/**
- * Creates a copy of the given project.
- *
- * @param {Number} id - The project ID we want to copy.
- * @return {Object}
- */
-const copy = (exports.copy = async id => {
-  if (!id) {
-    throw Boom.badRequest('ID must be specified');
-  }
-  let sourceProject;
-
-  try {
-    sourceProject = await getById(id);
-  } catch (error) {
-    console.error(error);
-  }
-
-  if (!sourceProject) {
-    throw Boom.badRequest(`The project with id ${id} does not exist.`);
-  }
-
-  try {
-    let copy = {
-      ...sourceProject
-    };
-    delete copy.id;
-    let createdCopy = await create(copy);
-    return createdCopy;
-  } catch (error) {
-    console.error(error);
-
-    if (error.isBoom) {
-      throw error;
-    }
-    throw Boom.badImplementation('Error while trying to copy the job');
   }
 });
 
@@ -358,6 +239,26 @@ const getTestsCount = (exports.getTestsCount = async id => {
 });
 
 /**
+ * Deletes the project and its relationships only if there is no job pointing to it.
+ *
+ * @param {Number} id
+ */
+const safeDelete = (exports.safeDelete = async id => {
+  try {
+    let count = await getJobsCount(id);
+
+    if (count > 0) {
+      return;
+    }
+    await truncateProject(id);
+    await db.query(`delete from ${db.TABLES.Project} where id = $1`, [id]);
+  } catch (error) {
+    console.error(error);
+    throw Boom.badImplementation('Error while trying to remove the project');
+  }
+});
+
+/**
  * Creates the items, filters and tests records for the given project.
  *
  * @param {Object} project
@@ -372,7 +273,6 @@ const createRecordsFromCSVs = (exports.createRecordsFromCSVs = async (
       await truncateProject(project.id);
     }
     await createItems(project);
-    await createCriteria(project);
     await createTests(project);
     return true;
   } catch (error) {
@@ -434,48 +334,6 @@ const createItems = async project => {
     await db.query(
       `update ${db.TABLES.Project} 
        set data = jsonb_set(data, '{itemsCreated}', 'true'::jsonb)
-       where id = ${project.id}`
-    );
-    await db.query('COMMIT');
-  } catch (error) {
-    console.error(error);
-    await db.query('ROLLBACK');
-  }
-};
-
-const createCriteria = async project => {
-  console.log(`Creating filters for project: ${project.id}`);
-  try {
-    let criteria = [];
-    let labelCount = 1;
-
-    const transformer = criterion =>
-      criteria.push({
-        label: `C${labelCount++}`,
-        description: criterion.filterDescription
-      });
-
-    await new Promise((resolve, reject) => {
-      request(project.data.filtersUrl)
-        .on('error', err => reject(err))
-        .pipe(csv())
-        .on('data', transformer)
-        .on('end', () => resolve())
-        .on('error', err => reject(err));
-    });
-    await db.query('BEGIN');
-
-    for (criterion of criteria) {
-      await db.query(
-        `insert into ${
-          db.TABLES.Criterion
-        }(created_at, project_id, data) values($1, $2, $3)`,
-        [new Date(), project.id, criterion]
-      );
-    }
-    await db.query(
-      `update ${db.TABLES.Project} 
-       set data = jsonb_set(data, '{filtersCreated}', 'true'::jsonb)
        where id = ${project.id}`
     );
     await db.query('COMMIT');

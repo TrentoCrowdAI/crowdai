@@ -62,21 +62,11 @@ const getOptions = props => {
         return (
           <React.Fragment>
             {item.data.status === JobStatus.NOT_PUBLISHED && (
-              <Button
-                icon
-                color="blue"
-                size="mini"
-                as={Link}
-                to={`/admin/projects/${item.project_id}/screenings/${item.id}/edit`}>
+              <Button icon color="blue" size="mini" as={Link} to={`/admin/screenings/${item.id}/edit`}>
                 <Icon name="edit" />
               </Button>
             )}
-            <Button
-              icon
-              color="blue"
-              size="mini"
-              as={Link}
-              to={`/admin/projects/${item.project_id}/screenings/${item.id}/dashboard`}>
+            <Button icon color="blue" size="mini" as={Link} to={`/admin/screenings/${item.id}/dashboard`}>
               <Icon name="play" />
             </Button>
             <Popup
@@ -119,7 +109,7 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-  fetchExperiments: projectId => dispatch(actions.fetchExperiments(projectId)),
+  fetchExperiments: jobId => dispatch(actions.fetchExperiments(jobId)),
   copyJob: jobId => dispatch(actions.copyJob(jobId))
 });
 

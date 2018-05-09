@@ -69,7 +69,7 @@ exports.nextTask = async (uuid, turkId, assignmentTurkId) => {
     task.instructions = [];
 
     for (let c of task.data.criteria) {
-      task.instructions.push(job.data.instructions[c.id]);
+      task.instructions.push(job.data.instructions[c.label]);
     }
     task.workerCanFinish = await workerCanFinish(job, worker);
     return task;
@@ -220,8 +220,8 @@ const getWorkerReward = (exports.getWorkerReward = async (
  */
 const publish = (exports.publish = async id => {
   try {
-    let requester = await delegates.jobs.getRequester(id);
     let job = await delegates.jobs.getById(id);
+    let requester = await delegates.requesters.getById(job.requester_id);
     // we fetch the instructions and save them.
     let instructions = await delegates.jobs.getInstructions(job);
     const maxAssignments = await computeMaxAssignments(job);
@@ -255,7 +255,7 @@ const publish = (exports.publish = async id => {
     job.data.hit = { ...hit };
     job.data.instructions = instructions;
     emit(EventTypes.START_CRON_FOR_HIT, job, hit.HITId, mt);
-    return await delegates.jobs.update(id, job.data);
+    return await delegates.jobs.update(id, job);
   } catch (error) {
     console.error(error);
     throw Boom.badImplementation('Error while trying to publish the job');
@@ -276,7 +276,7 @@ const publish = (exports.publish = async id => {
 const stop = (exports.stop = async job => {
   try {
     await expireHIT(job);
-    await finishJob(job.id);
+    await finishJob(job);
     console.debug(`Stopped job ${job.id}.`);
   } catch (error) {
     console.error(error);
@@ -294,7 +294,7 @@ const stop = (exports.stop = async job => {
 const getState = (exports.getState = async jobId => {
   try {
     let job = await delegates.jobs.getById(jobId);
-    let requester = await delegates.jobs.getRequester(job.id);
+    let requester = await delegates.requesters.getById(job.requester_id);
     const mturk = MTurk.getInstance(requester);
     let hit = await getHIT(job.data.hit.HITId, mturk);
     // TODO: return information about the workers.
@@ -439,7 +439,7 @@ const reviewAssignments = (exports.reviewAssignments = async (
       }
     }
     console.log(`Review assignments for job: ${jobId} done`);
-    await finishJob(jobId);
+    await finishJob(job);
     return true;
   } catch (error) {
     console.error(error);
@@ -602,7 +602,7 @@ const sendBonus = (exports.sendBonus = async (
  */
 const expireHIT = (exports.expireHIT = async job => {
   console.debug(`Expiring HIT: ${job.data.hit.HITId}.`);
-  let requester = await delegates.jobs.getRequester(job.id);
+  let requester = await delegates.requesters.getById(job.requester_id);
   const mturk = MTurk.getInstance(requester);
   await updateExpirationForHIT(job.data.hit.HITId, 0, mturk);
 });
@@ -650,13 +650,12 @@ const checkJobDone = async (job, worker) => {
 /**
  * Changes the job's status to DONE.
  *
- * @param {Number} jobId
+ * @param {Object} job
  */
-const finishJob = async jobId => {
-  return await delegates.jobs.update(jobId, {
-    status: JobStatus.DONE,
-    end: new Date()
-  });
+const finishJob = async job => {
+  job.data.status = JobStatus.DONE;
+  job.data.end = new Date();
+  return await delegates.jobs.update(job.id, job);
 };
 
 /**

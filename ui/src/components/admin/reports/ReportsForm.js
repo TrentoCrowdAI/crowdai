@@ -17,7 +17,7 @@ import {
   Accordion,
   Message
 } from 'semantic-ui-react';
-import { actions as projectactions } from '../projects/actions';
+import { actions as projectactions } from '../experiments/actions';
 
 var ProjectOptions = { }
 
@@ -47,7 +47,7 @@ class ReportsForm extends React.Component {
 	}
 
 	componentDidMount() {
-    this.props.fetchProjects();
+    this.props.fetchExperiments();
 
     this.props.projects.rows.map( step => {
     	ProjectOptions[step.id] = step.data.name+" ( "+step.created_at+" ) "
@@ -108,13 +108,13 @@ ReportsForm.propTypes = {
 }
 
 const mapStateToProps = state => ({
-  projects: state.project.list.projects,
-  error: state.project.list.error,
-  loading: state.project.list.loading
+  projects: state.experiment.list.experiments,
+  error: state.experiment.list.error,
+  loading: state.experiment.list.loading
 })
 
 const mapDispatchToProps = dispatch => ({
-  fetchProjects: () => dispatch(projectactions.fetchProjects())
+  fetchExperiments: () => dispatch(projectactions.fetchExperiments())
 })
 
 export default connect(mapStateToProps,mapDispatchToProps)(ReportsForm)

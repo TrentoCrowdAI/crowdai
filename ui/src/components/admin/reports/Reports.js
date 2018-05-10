@@ -286,7 +286,7 @@ class Reports extends React.Component {
 			case 'T_CompleteTime':
 				chart='histogram'
 				x='total_time'
-				y='task_id'
+				y='item_id'
 				z=''
 				break;
 

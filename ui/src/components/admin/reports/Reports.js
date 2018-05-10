@@ -9,7 +9,7 @@ import { Button, Dimmer, Loader } from 'semantic-ui-react';
 import './reports.css';
 
 import { actions } from './actions';
-import { actions as expactions } from '../experiments/actions';
+//import { actions as expactions } from '../experiments/actions';
 
 var agreeData = {
 			tasks: {
@@ -82,35 +82,37 @@ var agreeData = {
 var WorkerOptions = {
 	'all' : 'All Workers'
 }
-var JobOptions = {
+/*var JobOptions = {
 	'all' : 'All Jobs'
-}
+}*/
 
 class Reports extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
 			activeMetric : '(choose a metric)',
-			chosenjob: 'all',
+			//chosenjob: this.props.match.params.jobid,
 			chosenworker: 'all',
 			activeworker: false
 		}
 		this.activeMetric = this.activeMetric.bind(this)
-		this.chooseJob = this.chooseJob.bind(this)
+		//this.chooseJob = this.chooseJob.bind(this)
 		this.chooseWorker = this.chooseWorker.bind(this)
 	}
 
 	componentDidMount() {
-		this.props.fetchExperiments(this.props.match.params.projectid);
+		this.props.fetchWorkers(this.props.match.params.jobid);
+		//console.log(this.props.workers)
 	}
 
 	componentDidUpdate() {
+		console.log(this.props.reports.tasks)
 	}
 
 	activeMetric(e, {value}) {
 		switch(value) {
 			case 'T_CompleteTime':
-				this.props.fetchTaskTime(this.state.chosenjob)
+				this.props.fetchTaskTime(this.props.match.params.jobid)
 				break;
 			case 'W_CompleteTime':
 				this.props.fetchWorkerTime(this.state.chosenworker)
@@ -150,7 +152,7 @@ class Reports extends React.Component {
 		})
 }
 
-	chooseJob(e, {value}) {
+	/*chooseJob(e, {value}) {
 		switch(this.state.activeMetric) {
 			case 'W_CompleteTime':
 			case 'Votes':
@@ -184,7 +186,7 @@ class Reports extends React.Component {
 				break;
 		}
   }
-
+*/
 	renderMetrics() {
 		return(
 			<div className="options">
@@ -261,25 +263,24 @@ class Reports extends React.Component {
 	}
 
 	render() {
-		//data = Object.values(this.props.reports.tasks)
-		//console.log(this.props.reports.tasks)
-		//console.log(this.state)
-		JobOptions = { 'all' : 'All Jobs' }
+
+		console.log(this.props)
+		///JobOptions = { 'all' : 'All Jobs' }
 		WorkerOptions = { 'all' : 'All Workers' }
 
-    this.props.experiments.rows.map( step => {
+    /*this.props.experiments.rows.map( step => {
       JobOptions[step.id] = step.data.name
-    });
+    });*/
 		Object.values(this.props.workers.workers).map( step => {
       WorkerOptions[step.worker_id] = step.worker_name
 		});
 
 		var chart
-		//first groupby
+		//first group_by
 		var x
 		//categories
 		var y
-		//second groupby if necessary
+		//second group_by if necessary
 		var z
 		switch (this.state.activeMetric) {
 
@@ -287,14 +288,14 @@ class Reports extends React.Component {
 				chart='histogram'
 				x='total_time'
 				y='item_id'
-				z=''
+				z='criteria_id'
 				break;
 
 			case 'W_CompleteTime':
 				chart='nest'
 				x='task_id'
 				y='total_time'
-				z=''
+				z='criteria_id'
 				break;
 
 			case 'Agreements':
@@ -315,26 +316,29 @@ class Reports extends React.Component {
 				break;
 		}
 
+/**
+ * <JobChooser 
+					options={JobOptions}
+					onChange={this.chooseJob}
+					chosenjob={this.state.chosenjob}
+				/>
+				
+ */
+
 		return(
 			<div style={{margin: '20px'}}>
 
 				<div className="rowC">
 				<h3 style={{color: 'steelblue'}}>
-					Selected Project_id: <i>{this.props.match.params.projectid}</i><br />
-					Selected Job_id: <i>{this.state.chosenjob}</i><br />
+					Selected Job_id: <i>{this.props.match.params.jobid}</i><br />
 					Selected Worker_id: <i>{this.state.chosenworker}</i>
 				</h3>
 
 				<div style={{width: "20%"}}></div>
 
 				<div>
-				<JobChooser 
-					options={JobOptions}
-					onChange={this.chooseJob}
-					chosenjob={this.state.chosenjob}
-				/>
 				<WorkerChooser 
-					disabled={(!this.state.activeworker) || (this.state.chosenjob=='all')}
+					disabled={(!this.state.activeworker)}//|| (this.state.chosenjob=='all')}
 					options={WorkerOptions}
 					onChange={this.chooseWorker}
 					chosenworker={this.state.chosenworker}
@@ -356,14 +360,14 @@ class Reports extends React.Component {
 }
 
 Reports.propTypes = {
-	fetchExperiments: PropTypes.func,
+	//fetchExperiments: PropTypes.func,
 	fetchTaskTime: PropTypes.func,
 	fetchWorkers: PropTypes.func,
 	fetchWorkerTime: PropTypes.func,
 
-  exp_error: PropTypes.any,
-  exp_loading: PropTypes.bool,
-	experiments: PropTypes.any,
+  //exp_error: PropTypes.any,
+  //exp_loading: PropTypes.bool,
+	//experiments: PropTypes.any,
 	match: PropTypes.object,
 
 	rep_error: PropTypes.any,
@@ -376,16 +380,16 @@ Reports.propTypes = {
 }
 
 const mapDispatchToProps = dispatch => ({
-	fetchExperiments: projectId => dispatch(expactions.fetchExperiments(projectId)),
+	//fetchExperiments: projectId => dispatch(expactions.fetchExperiments(projectId)),
 	fetchTaskTime: jobId => dispatch(actions.fetchTaskTime(jobId)),
 	fetchWorkerTime: workerId => dispatch(actions.fetchWorkerTime(workerId)),
 	fetchWorkers: jobId => dispatch(actions.fetchWorkers(jobId))
 })
 
 const mapStateToProps = state => ({
-  experiments: state.experiment.list.experiments,
-  exp_error: state.experiment.list.error,
-	exp_loading: state.experiment.list.loading,
+  //experiments: state.experiment.list.experiments,
+  //exp_error: state.experiment.list.error,
+	//exp_loading: state.experiment.list.loading,
 
 	reports: state.report.list.reports,
 	rep_error: state.report.list.error,

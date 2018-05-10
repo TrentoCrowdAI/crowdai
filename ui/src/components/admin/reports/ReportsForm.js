@@ -17,9 +17,9 @@ import {
   Accordion,
   Message
 } from 'semantic-ui-react';
-import { actions as projectactions } from '../experiments/actions';
+import { actions as expactions } from '../experiments/actions';
 
-var ProjectOptions = { }
+var ExperimentOptions = { }
 
 const options = {
   columns: {
@@ -40,54 +40,51 @@ class ReportsForm extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			chosenproject : '',
+			chosenexp : '',
 			activechart: false
 		}
-		this.chooseProject = this.chooseProject.bind(this)
+		this.chooseExp = this.chooseExp.bind(this)
 	}
 
 	componentDidMount() {
     this.props.fetchExperiments();
 
-    this.props.projects.rows.map( step => {
-    	ProjectOptions[step.id] = step.data.name+" ( "+step.created_at+" ) "
+    this.props.experiments.rows.map( step => {
+    	ExperimentOptions[step.id] = step.data.name+" ( "+step.created_at+" ) "
     })
   }
 
-  chooseProject(e, {value}) {
+  chooseExp(e, {value}) {
   	this.setState({
   		...this.state,
-			chosenproject: value,
+			chosenexp: value,
 			activechart: true
 		})
   }
 
 	render() {
-    
-    //console.log(this.state)
-
 		return(
 			<div>
 				<DataTable
-					title="My Projects"
+					title="My Jobs"
         	options={options}
-        	data={this.props.projects.rows}
+        	data={this.props.experiments.rows}
         	loading={this.props.loading}
       	/>
 
 			<div style={{margin: '20px'}}>
-      	<h3 style={{color: 'steelblue'}}>Chosen Project_id : {this.state.chosenproject}</h3>
+      	<h3 style={{color: 'steelblue'}}>Chosen Job_id : {this.state.chosenexp}</h3>
 
 				<Form.Select 
 					style={{margin: '10px'}}
 					label="Select Project  "
-        	value={this.state.chosenproject}
-					options={Object.entries(ProjectOptions).map(([key, val]) => ({text: val, value: key}))}
-					onChange={this.chooseProject}
+        	value={this.state.chosenexp}
+					options={Object.entries(ExperimentOptions).map(([key, val]) => ({text: val, value: key}))}
+					onChange={this.chooseExp}
 				/>
 
 				<div style={{textAlign: 'center'}}>
-				<Link to={`/admin/reports/${this.state.chosenproject}`}>
+				<Link to={`/admin/reports/${this.state.chosenexp}`}>
 					<Button className='btn primary' 
                   disabled={!this.state.activechart}
                   >See Charts</Button>
@@ -101,20 +98,20 @@ class ReportsForm extends React.Component {
 }
 
 ReportsForm.propTypes = {
-  fetchProjects: PropTypes.func,
+  fetchExperiments: PropTypes.func,
   error: PropTypes.object,
   loading: PropTypes.bool,
-  projects: PropTypes.object
+  experiments: PropTypes.object
 }
 
 const mapStateToProps = state => ({
-  projects: state.experiment.list.experiments,
+  experiments: state.experiment.list.experiments,
   error: state.experiment.list.error,
   loading: state.experiment.list.loading
 })
 
 const mapDispatchToProps = dispatch => ({
-  fetchExperiments: () => dispatch(projectactions.fetchExperiments())
+  fetchExperiments: () => dispatch(expactions.fetchExperiments())
 })
 
 export default connect(mapStateToProps,mapDispatchToProps)(ReportsForm)

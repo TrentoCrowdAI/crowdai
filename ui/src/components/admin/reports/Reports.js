@@ -106,13 +106,13 @@ class Reports extends React.Component {
 	}
 
 	componentDidUpdate() {
-		console.log(this.props.reports.tasks)
+//		console.log(this.props.reports)
 	}
 
 	activeMetric(e, {value}) {
 		switch(value) {
 			case 'T_CompleteTime':
-				this.props.fetchTaskTime(this.props.match.params.jobid)
+				this.props.fetchTaskTime(Number(this.props.match.params.jobid))
 				break;
 			case 'W_CompleteTime':
 				this.props.fetchWorkerTime(this.state.chosenworker)

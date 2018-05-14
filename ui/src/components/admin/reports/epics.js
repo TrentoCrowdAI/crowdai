@@ -14,7 +14,8 @@ const getTaskTime = (action$, store) =>
 
 const fetchTaskTime = (action$, store) =>
   action$.ofType(actionTypes.FETCH_ITEM).switchMap(action => {
-    return Observable.defer(() => requestersApi.get(`allTasksByJobId/`+action.jobId))
+    return Observable.defer(
+      () => requestersApi.get(`allTasksByJobId/`+action.jobId))
       .mergeMap(response => Observable.of(actions.fetchItemSuccess(response.data)))
       .catch(error => Observable.of(actions.fetchItemError(flattenError(error))));
   });

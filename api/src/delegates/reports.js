@@ -16,6 +16,19 @@ const db = require(__base + 'db');
 // });
 
 //test function
+
+const getAllTasksByJobId = (exports.getTaskById = async id => {
+  try {
+    let res = await db.query(`select * from ${db.TABLES.Task} where item_id = $1`, [
+      id
+    ]);
+    return res.rowCount > 0 ? res.rows[0] : null;
+  } catch (error) {
+    console.error(error);
+    throw Boom.badImplementation('Error while trying to fetch record');
+  }
+});
+/*
 const getAllTasksByJobId = (exports.getAllTasksByJobId = async id => {
   if(parseInt(id, 10)<1 || parseInt(id, 10)>7) {
     return (tasks = {
@@ -94,7 +107,7 @@ const getAllTasksByJobId = (exports.getAllTasksByJobId = async id => {
     }
   }
 });
-
+*/
 const getAllWorkersByJobId = (exports.getAllWorkersByJobId = async id => {
   if(parseInt(id, 10)<3 || parseInt(id, 10)>7) {
     return(workers = {

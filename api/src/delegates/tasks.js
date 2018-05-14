@@ -32,6 +32,7 @@ const getTaskById = (exports.getTaskById = async id => {
     let res = await db.query(`select * from ${db.TABLES.Task} where id = $1`, [
       id
     ]);
+    //console.log(res)
     return res.rowCount > 0 ? res.rows[0] : null;
   } catch (error) {
     console.error(error);

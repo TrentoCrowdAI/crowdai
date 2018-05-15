@@ -59,6 +59,25 @@ const reducer = (state = defaultState, action) => {
         error: action.error,
         loading: false
       };
+
+    case actionTypes.FETCH_WANSWERS:
+      return {
+        ...state,
+        error: undefined,
+        loading: true
+      };
+    case actionTypes.FETCH_WANSWERS_SUCCESS:
+      return {
+        ...state,
+        reports: action.response,
+        loading: false
+      };
+    case actionTypes.FETCH_WANSWERS_ERROR:
+      return {
+        ...state,
+        error: action.error,
+        loading: false
+      };
     default:
       return state;
   }

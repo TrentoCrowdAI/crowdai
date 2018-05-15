@@ -29,6 +29,7 @@ items.csv
 filters.csv
 tests.csv
 
+.env
 .env.dev
 .env.prod
 coverage

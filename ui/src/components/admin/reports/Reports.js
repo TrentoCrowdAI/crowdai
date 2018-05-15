@@ -110,20 +110,21 @@ class Reports extends React.Component {
 	}
 
 	activeMetric(e, {value}) {
+		this.props.reports.tasks=[]
 		switch(value) {
 			case 'T_CompleteTime':
 				this.props.fetchTaskTime(Number(this.props.match.params.jobid))
 				break;
 			case 'W_CompleteTime':
-				this.props.fetchWorkerTime(this.state.chosenworker)
+				this.props.fetchWorkerTime(Number(this.state.chosenworker))
 				break;
 			case 'Votes':
-				this.props.fetchWorkerTime(this.state.chosenworker)
+				this.props.fetchAnswers(Number(this.state.chosenworker))
 				break;
 			case 'Agreements':
 				this.props.reports.tasks = Object.values(agreeData.tasks)
 				break;
-			default: 
+			default:
 				console.log('Metric to implement: ', value)
 				break;
 		}
@@ -140,6 +141,9 @@ class Reports extends React.Component {
 		switch(this.state.activeMetric) {
 			case 'Agreements':
 				this.props.reports.tasks = Object.values(agreeData.tasks)
+				break;
+			case 'Votes':
+				this.props.fetchAnswers(Number(value))
 				break;
 			default:
 				this.props.fetchWorkerTime(value)		
@@ -264,7 +268,7 @@ class Reports extends React.Component {
 
 	render() {
 
-		console.log(this.props)
+		console.log(this.props.reports)
 		///JobOptions = { 'all' : 'All Jobs' }
 		WorkerOptions = { 'all' : 'All Workers' }
 
@@ -286,15 +290,15 @@ class Reports extends React.Component {
 
 			case 'T_CompleteTime':
 				chart='histogram'
-				x='total_time'
-				y='item_id'
+				x='item_id'
+				y='num_tasks'
 				z='criteria_id'
 				break;
 
 			case 'W_CompleteTime':
 				chart='nest'
-				x='task_id'
-				y='total_time'
+				x='item_id'
+				y='num_tasks'
 				z='criteria_id'
 				break;
 
@@ -307,7 +311,7 @@ class Reports extends React.Component {
 
 			case 'Votes':
 				chart='pie'
-				x='task_id'
+				x='id'
 				y='answer'
 				z=''
 				break;
@@ -363,6 +367,7 @@ Reports.propTypes = {
 	//fetchExperiments: PropTypes.func,
 	fetchTaskTime: PropTypes.func,
 	fetchWorkers: PropTypes.func,
+	fetchAnswers: PropTypes.func,
 	fetchWorkerTime: PropTypes.func,
 
   //exp_error: PropTypes.any,
@@ -383,6 +388,7 @@ const mapDispatchToProps = dispatch => ({
 	//fetchExperiments: projectId => dispatch(expactions.fetchExperiments(projectId)),
 	fetchTaskTime: jobId => dispatch(actions.fetchTaskTime(jobId)),
 	fetchWorkerTime: workerId => dispatch(actions.fetchWorkerTime(workerId)),
+	fetchAnswers: workerId => dispatch(actions.fetchAnswers(workerId)),
 	fetchWorkers: jobId => dispatch(actions.fetchWorkers(jobId))
 })
 

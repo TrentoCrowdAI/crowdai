@@ -2,8 +2,12 @@ const Boom = require('boom');
 
 const delegates = require(__base + 'delegates');
 
-const workerAnswerIsYes = async ctx => {
-  ctx.response.body = await delegates.testAgreement.workerAnswerIsYes();
+const workerAnswers = async ctx => {
+  ctx.response.body = await delegates.testAgreement.workerAnswers(ctx.params.id);
+};
+
+const getWorkersByJob = async ctx => {
+  ctx.response.body = await delegates.testAgreement.getWorkersByJob(ctx.params.id);
 };
 
 const allPossibleCouplesOfWorkersAndNumberOfCommonTask = async ctx => {
@@ -23,9 +27,10 @@ const getTaskByWorkerId = async ctx => {
 };
 
 exports.register = router => {
-  router.get('/workerAnswerIsYes', workerAnswerIsYes);
+  router.get('/workerAnswers/:id', workerAnswers);
   router.get('/allPossibleCouplesOfWorkersAndNumberOfCommonTask', allPossibleCouplesOfWorkersAndNumberOfCommonTask);
   router.get('/forASelectedWorkerShowAllWorkers', forASelectedWorkerShowAllWorkers);
   router.get('/getByJobId/:id', getByJobId);
   router.get('/getTaskByWorkerId/:id', getTaskByWorkerId);
+  router.get('/getWorkersByJob/:id', getWorkersByJob);
 };

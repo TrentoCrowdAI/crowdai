@@ -11,6 +11,9 @@ const actionTypes = {
   FETCH_AGREEMENT: 'C_FETCH_AGREEMENT',
   FETCH_AGREEMENT_SUCCESS: 'C_FETCH_AGREEMENT_SUCCESS',
   FETCH_AGREEMENT_ERROR: 'C_FETCH_AGREEMENT_ERROR',
+  FETCH_WANSWERS: 'C_FETCH_WANSERS',
+  FETCH_WANSWERS_SUCCESS: 'C_FETCH_WANSERS_SUCCESS',
+  FETCH_WANSWERS_ERROR: 'C_FETCH_WANSERS_ERROR',
   FETCH_PERCENTAGE: 'C_FETCH_PERCENTAGE',
   FETCH_PERCENTAGE_SUCCESS: 'C_FETCH_PERCENTAGE_SUCCESS',
   FETCH_PERCENTAGE_ERROR: 'C_FETCH_PERCENTAGE_ERROR',
@@ -74,6 +77,25 @@ const actions = {
   fetchAgreementError(error) {
     return {
       type: actionTypes.FETCH_AGREEMENT_ERROR,
+      error
+    };
+  },
+
+  fetchAnswers(workerId) {
+    return {
+      type: actionTypes.FETCH_WANSWERS,
+      workerId
+    };
+  },
+  fetchAnswersSuccess(response) {
+    return {
+      type: actionTypes.FETCH_WANSWERS_SUCCESS,
+      response
+    };
+  },
+  fetchAnswersError(error) {
+    return {
+      type: actionTypes.FETCH_WANSWERS_ERROR,
       error
     };
   },

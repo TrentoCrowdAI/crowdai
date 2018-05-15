@@ -4,13 +4,16 @@ const db = require(__base + 'db');
 
 const getByJobId = (exports.getByJobId = async id => {
   try {
-    let res = await db.query(`
+    let res = await db.query(
+      `
     select item_id, (data->'criteria')::json#>>'{0,id}' as criteria_id, count(*) as num_tasks
     from ${db.TABLES.Task_7500} 
     where job_id=$1
     group by item_id,(data->'criteria')::json#>>'{0,id}'
-    order by item_id,(data->'criteria')::json#>>'{0,id}'`, [id]);
-    return tasks = { tasks: res.rows };
+    order by item_id,(data->'criteria')::json#>>'{0,id}'`,
+      [id]
+    );
+    return (tasks = { tasks: res.rows });
   } catch (error) {
     console.error(error);
     throw Boom.badImplementation('Error while trying to fetch the record');
@@ -19,10 +22,13 @@ const getByJobId = (exports.getByJobId = async id => {
 
 const getTaskByWorkerId = (exports.getTaskByWorkerId = async id => {
   try {
-    let res = await db.query(`select item_id, count(*) as num_tasks
+    let res = await db.query(
+      `select item_id, count(*) as num_tasks
     from ${db.TABLES.Task_7500} where worker_id=$1 
-    group by item_id`, [id]);
-    return tasks = { tasks: res.rows };
+    group by item_id`,
+      [id]
+    );
+    return (tasks = { tasks: res.rows });
   } catch (error) {
     console.error(error);
     throw Boom.badImplementation('Error while trying to fetch the record');
@@ -32,10 +38,12 @@ const getTaskByWorkerId = (exports.getTaskByWorkerId = async id => {
 const workerAnswers = (exports.workerAnswers = async id => {
   try {
     let res = await db.query(
-    `select id, item_id, (data->'criteria')::json#>>'{0,id}' as criteria_id, (data->'criteria')::json#>>'{0,workerAnswer}' as answer
+      `select id, item_id, (data->'criteria')::json#>>'{0,id}' as criteria_id, (data->'criteria')::json#>>'{0,workerAnswer}' as answer
     from ${db.TABLES.Task_7500} 
-    where worker_id=$1`, [id]);
-    return tasks = { tasks: res.rows };
+    where worker_id=$1`,
+      [id]
+    );
+    return (tasks = { tasks: res.rows });
   } catch (error) {
     console.error(error);
     throw Boom.badImplementation('Error while trying to fetch record');
@@ -45,10 +53,12 @@ const workerAnswers = (exports.workerAnswers = async id => {
 const getWorkersByJob = (exports.workerAnswers = async id => {
   try {
     let res = await db.query(
-    `select disticnt t.worker_id, w.turk_id
+      `select disticnt t.worker_id, w.turk_id
     from ${db.TABLES.Task_7500} t join ${db.TABLES.Worker} w on t.worker_id=w.id
-    where t.job_id=$1`, [id]);
-    return tasks = { tasks: res.rows };
+    where t.job_id=$1`,
+      [id]
+    );
+    return (tasks = { tasks: res.rows });
   } catch (error) {
     console.error(error);
     throw Boom.badImplementation('Error while trying to fetch record');
@@ -80,5 +90,35 @@ const forASelectedWorkerShowAllWorkers = (exports.forASelectedWorkerShowAllWorke
   } catch (error) {
     console.error(error);
     throw Boom.badImplementation('Error while trying to fetch record');
+  }
+});
+
+const getTaskAverageTimeInMillisecond = (exports.getTaskAverageTimeInMillisecond = async () => {
+  try {
+    let res = await db.query(` SELECT
+    times_table.item_id,
+    times_table.criteria_id,
+    AVG (
+    ( EXTRACT ( EPOCH FROM times_table.time_end ) * 1000 - EXTRACT ( EPOCH FROM times_table.time_start ) * 1000 )) AS avgTimeInMilliseconds 
+  FROM
+    (
+  SELECT
+    item_id,
+    ( DATA -> 'criteria' ) :: json #>> '{0,id}' AS criteria_id,
+    ( DATA ->> 'end' ) :: TIMESTAMP WITHOUT TIME ZONE AS time_end,
+    ( DATA ->> 'start' ) :: TIMESTAMP WITHOUT TIME ZONE AS time_start 
+  FROM
+   ${db.TABLES.Task_7500}
+    ) AS times_table 
+  GROUP BY
+    times_table.item_id,
+    times_table.criteria_id 
+  ORDER BY
+    times_table.item_id,
+    times_table.criteria_id`);
+    return res.rows;
+  } catch (error) {
+    console.error(error);
+    throw Boom.badImplementation('Error while trying to fetch the record');
   }
 });

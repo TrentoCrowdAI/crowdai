@@ -51,14 +51,14 @@ const fetchAnswers = (action$, store) =>
 
 const getWorkers = (action$, store) =>
   action$.ofType(actionTypes.FETCH_WORKERS).switchMap(action => {
-    return Observable.defer(() => requestersApi.get('allWorkersByJobId/'+action.jobId))
+    return Observable.defer(() => requestersApi.get('getWorkersByJob/'+action.jobId))
       .mergeMap(response => Observable.of(actions.fetchWorkersSuccess(response.data)))
       .catch(error => Observable.of(actions.fetchWorkersError(flattenError(error))));
   });
 
 const fetchWorkers = (action$, store) =>
   action$.ofType(actionTypes.FETCH_ITEM).switchMap(action => {
-    return Observable.defer(() => requestersApi.get(`allWorkersByJobId/`+action.jobId))
+    return Observable.defer(() => requestersApi.get(`getWorkersByJob/`+action.jobId))
       .mergeMap(response => Observable.of(actions.fetchItemSuccess(response.data)))
       .catch(error => Observable.of(actions.fetchItemError(flattenError(error))));
   });

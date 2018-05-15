@@ -26,6 +26,10 @@ const getTaskByWorkerId = async ctx => {
   ctx.response.body = await delegates.testAgreement.getTaskByWorkerId(ctx.params.id);
 };
 
+const getTaskAverageTimeInMillisecond = async ctx => {
+  ctx.response.body = await delegates.testAgreement.getTaskAverageTimeInMillisecond();
+};
+
 exports.register = router => {
   router.get('/workerAnswers/:id', workerAnswers);
   router.get('/allPossibleCouplesOfWorkersAndNumberOfCommonTask', allPossibleCouplesOfWorkersAndNumberOfCommonTask);
@@ -33,4 +37,5 @@ exports.register = router => {
   router.get('/getByJobId/:id', getByJobId);
   router.get('/getTaskByWorkerId/:id', getTaskByWorkerId);
   router.get('/getWorkersByJob/:id', getWorkersByJob);
+  router.get('/getTaskAverageTimeInMillisecond', getTaskAverageTimeInMillisecond);
 };

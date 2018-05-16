@@ -97,8 +97,9 @@ class DonutChart extends React.Component {
           clicked : []
         })
         var nuovo = []
-        this.props.data.map( step => {
-          if(step[y]==d.data) {
+        data.map( step => {
+          console.log(d,d.data)
+          if(step[y]==d.data && (this.state.chosencriteria=='all' ? true : (step[z]==this.state.chosencriteria))) {
             nuovo = nuovo.concat([step])
           }
         })
@@ -159,7 +160,7 @@ class DonutChart extends React.Component {
           })}
         />
         <br />
-      <svg className={this.props.selector} width="800" height="400"> </svg>  
+      <svg className={this.props.selector} width="1000" height="400"> </svg>  
       <br />
       { this.props.data.length ? 
         <React.Fragment>

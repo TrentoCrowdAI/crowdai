@@ -101,7 +101,7 @@ class ChartWrapper extends React.Component {
         return(
           <div>
             No data to display yet
-            <svg width="700"></svg>
+            <svg width="1000"></svg>
           </div>
         );
     }

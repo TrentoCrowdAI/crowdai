@@ -78,32 +78,3 @@ const forASelectedWorkerShowAllWorkers = (exports.forASelectedWorkerShowAllWorke
   }
 });
 
-const getTaskAverageTimeInMillisecond = (exports.getTaskAverageTimeInMillisecond = async () => {
-  try {
-    let res = await db.query(` SELECT
-    times_table.item_id,
-    times_table.criteria_id,
-    AVG (
-    ( EXTRACT ( EPOCH FROM times_table.time_end ) * 1000 - EXTRACT ( EPOCH FROM times_table.time_start ) * 1000 )) AS avgTimeInMilliseconds 
-  FROM
-    (
-  SELECT
-    item_id,
-    ( DATA -> 'criteria' ) :: json #>> '{0,id}' AS criteria_id,
-    ( DATA ->> 'end' ) :: TIMESTAMP WITHOUT TIME ZONE AS time_end,
-    ( DATA ->> 'start' ) :: TIMESTAMP WITHOUT TIME ZONE AS time_start 
-  FROM
-   ${db.TABLES.Task_7500}
-    ) AS times_table 
-  GROUP BY
-    times_table.item_id,
-    times_table.criteria_id 
-  ORDER BY
-    times_table.item_id,
-    times_table.criteria_id`);
-    return res.rows;
-  } catch (error) {
-    console.error(error);
-    throw Boom.badImplementation('Error while trying to fetch the record');
-  }
-});

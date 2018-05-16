@@ -27,7 +27,7 @@ const getTaskAverageTimeInMillisecond = async ctx => {
 };
 
 exports.register = router => {
-  router.get('/workerAnswers/:id', workerAnswers);
+  //router.get('/workerAnswers/:id', workerAnswers);
   router.get('/allPossibleCouplesOfWorkersAndNumberOfCommonTask', allPossibleCouplesOfWorkersAndNumberOfCommonTask);
   router.get('/forASelectedWorkerShowAllWorkers', forASelectedWorkerShowAllWorkers);
   //router.get('/getByJobId/:id', getByJobId);

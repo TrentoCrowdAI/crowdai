@@ -106,7 +106,7 @@ class NestChart extends React.Component {
         .attr("x", d => xscale(d[x]+","+d[z])+(xscale.bandwidth()/2) )
         .attr("text-anchor", "middle")
         .style("fill", "white")
-        .text( d => d[y]/1000)
+        .text( d => (d[y]/1000).toFixed(1))
 
     var line = d3.line()
         .x( (d) => {return xscale(d[x]+","+d[z])} )
@@ -172,7 +172,7 @@ class NestChart extends React.Component {
   render() {
     return (
       <div className='nest'>
-        <svg className={this.props.selector} width="800" height="400"> </svg>
+        <svg className={this.props.selector} width="1000" height="400"> </svg>
         <br />
       { this.props.data.length ? 
         <React.Fragment>

@@ -1,7 +1,7 @@
 const Boom = require('boom');
 const db = require(__base + 'db');
 
-const getAllTasksByJob = (exports.getAllTasksByJob = async id => {
+const getAllTasksTimesByJob = (exports.getAllTasksTimesByJob = async id => {
   try {
     let res = await db.query(`
   SELECT times_table.item_id,
@@ -75,15 +75,33 @@ const getWorkerTimes = (exports.getWorkerTimes = async (jobId, workerId) => {
   }
 });
 
-const workerAnswers = (exports.workerAnswers = async id => {
+const getWorkerAnswers = (exports.getWorkerAnswers = async id => {
   try {
     let res = await db.query(
       `select id, item_id, (data->'criteria')::json#>>'{0,id}' as criteria_id, (data->'criteria')::json#>>'{0,workerAnswer}' as answer
     from ${db.TABLES.Task_7500} 
     where worker_id=$1`,
-      [id]
-    );
+      [id]);
     return (tasks = { tasks: res.rows });
+  } catch (error) {
+    console.error(error);
+    throw Boom.badImplementation('Error while trying to fetch record');
+  }
+});
+
+const getTasksAgreements = (exports.getTasksAgreements = async id => {
+  try {
+    let res = await db.query(
+    `SELECT item_id,(data->'criteria')::json#>>'{0,id}' AS criteria_id,
+      COUNT( CASE (data->'criteria')::json#>>'{0,workerAnswer}' WHEN 'yes' THEN 1 ELSE null END) AS c1,
+      COUNT( CASE (data->'criteria')::json#>>'{0,workerAnswer}' WHEN 'no' THEN 1 ELSE null END) AS c2,
+      COUNT( CASE (data->'criteria')::json#>>'{0,workerAnswer}' WHEN 'not clear' THEN 1 ELSE null END) AS c3
+    FROM ${db.TABLES.Task_7500}
+    WHERE job_id=$1
+    GROUP BY item_id,(data->'criteria')::json#>>'{0,id}'
+    ORDER BY item_id,(data->'criteria')::json#>>'{0,id}'`,
+      [id]);
+    return tasks = { tasks: res.rows }
   } catch (error) {
     console.error(error);
     throw Boom.badImplementation('Error while trying to fetch record');

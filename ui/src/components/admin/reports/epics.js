@@ -7,7 +7,7 @@ import {flattenError} from 'src/utils';
 
 const getTaskTime = (action$, store) =>
   action$.ofType(actionTypes.FETCH_TTIME).switchMap(action => {
-    return Observable.defer(() => requestersApi.get('getAllTasksByJob/'+action.jobId))
+    return Observable.defer(() => requestersApi.get('getAllTasksTimesByJob/'+action.jobId))
       .mergeMap(response => Observable.of(actions.fetchTaskTimeSuccess(response.data)))
       .catch(error => Observable.of(actions.fetchTaskTimeError(flattenError(error))));
   });
@@ -15,7 +15,7 @@ const getTaskTime = (action$, store) =>
 const fetchTaskTime = (action$, store) =>
   action$.ofType(actionTypes.FETCH_ITEM).switchMap(action => {
     return Observable.defer(
-      () => requestersApi.get(`getAllTasksByJob/`+action.jobId))
+      () => requestersApi.get(`getAllTasksTimesByJob/`+action.jobId))
       .mergeMap(response => Observable.of(actions.fetchItemSuccess(response.data)))
       .catch(error => Observable.of(actions.fetchItemError(flattenError(error))));
   });
@@ -37,18 +37,31 @@ const fetchWorkerTimes = (action$, store) =>
 
 const getAnswers = (action$, store) =>
   action$.ofType(actionTypes.FETCH_WANSWERS).switchMap(action => {
-    return Observable.defer(() => requestersApi.get('workerAnswers/'+action.workerId))
+    return Observable.defer(() => requestersApi.get('getWorkerAnswers/'+action.workerId))
       .mergeMap(response => Observable.of(actions.fetchAnswersSuccess(response.data)))
       .catch(error => Observable.of(actions.fetchAnswersError(flattenError(error))));
   });
 
 const fetchAnswers = (action$, store) =>
   action$.ofType(actionTypes.FETCH_ITEM).switchMap(action => {
-    return Observable.defer(() => requestersApi.get(`workerAnswers/`+action.workerId))
+    return Observable.defer(() => requestersApi.get(`getWorkerAnswers/`+action.workerId))
       .mergeMap(response => Observable.of(actions.fetchItemSuccess(response.data)))
       .catch(error => Observable.of(actions.fetchItemError(flattenError(error))));
 });
 
+const getTasksAgreements = (action$, store) =>
+  action$.ofType(actionTypes.FETCH_AGREEMENTS).switchMap(action => {
+    return Observable.defer(() => requestersApi.get('getTasksAgreements/'+action.jobId))
+      .mergeMap(response => Observable.of(actions.fetchTasksAgreementsSuccess(response.data)))
+      .catch(error => Observable.of(actions.fetchTasksAgreementsError(flattenError(error))));
+  });
+
+const fetchTasksAgreements = (action$, store) =>
+  action$.ofType(actionTypes.FETCH_ITEM).switchMap(action => {
+    return Observable.defer(() => requestersApi.get(`getTasksAgreements/`+action.jobId))
+      .mergeMap(response => Observable.of(actions.fetchItemSuccess(response.data)))
+      .catch(error => Observable.of(actions.fetchItemError(flattenError(error))));
+});
 
 const getWorkers = (action$, store) =>
   action$.ofType(actionTypes.FETCH_WORKERS).switchMap(action => {
@@ -68,5 +81,6 @@ export default combineEpics(getTaskTime, fetchTaskTime,
                             getWorkers, fetchWorkers, 
                             getWorkerTimes, fetchWorkerTimes, 
                             getAnswers, fetchAnswers,
-                            getWorkers, fetchWorkers
+                            getWorkers, fetchWorkers,
+                            getTasksAgreements, fetchTasksAgreements
                           );

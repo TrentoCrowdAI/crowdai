@@ -150,7 +150,7 @@ class Histogram extends React.Component {
     var x = this.props.x
     var z = this.props.z
     var stampa = this.props.data.length>0 ? this.state.clicked.map(d => 
-      <li key={d[y]+""+d[z]}>{y+" "}<strong style={{color: 'red'}}>{d[y]}</strong>{", "+z+" "}<strong style={{color: 'red'}}>{d[z]}</strong>{" => "+x+" "+d[x]}</li>) : " "
+      <li key={d[y]+""+d[z]}>{y+" "}<strong style={{color: 'steelblue'}}>{d[y]}</strong>{", "+z+" "}<strong style={{color: 'steelblue'}}>{d[z]}</strong>{" => "+x+" "+d[x]}</li>) : " "
 
     return (
       <div>

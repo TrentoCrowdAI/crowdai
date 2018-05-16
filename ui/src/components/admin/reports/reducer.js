@@ -78,6 +78,26 @@ const reducer = (state = defaultState, action) => {
         error: action.error,
         loading: false
       };
+
+    case actionTypes.FETCH_AGREEMENTS:
+      return {
+        ...state,
+        error: undefined,
+        loading: true
+      };
+    case actionTypes.FETCH_AGREEMENTS_SUCCESS:
+      return {
+        ...state,
+        reports: action.response,
+        loading: false
+      };
+    case actionTypes.FETCH_AGREEMENTS_ERROR:
+      return {
+        ...state,
+        error: action.error,
+        loading: false
+      };
+    
     default:
       return state;
   }

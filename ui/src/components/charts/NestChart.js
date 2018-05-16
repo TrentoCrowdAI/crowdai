@@ -135,7 +135,7 @@ class NestChart extends React.Component {
           .attr("transform", "translate("+width/2+","+yscale(media/1000)+")")
           .attr("text-anchor","middle")
           .attr("dy","-0.5em")
-          .text("media ~ "+media/1000+" s")
+          .text("media ~ "+(media/1000).toFixed(3)+" s")
     }
 
     g.append("g")

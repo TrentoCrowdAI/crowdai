@@ -101,7 +101,6 @@ class Reports extends React.Component {
 	}
 
 	componentDidMount() {
-		console.log(this.props.match.params.jobid)
 		this.props.fetchWorkers(200)
 	}
 
@@ -122,7 +121,8 @@ class Reports extends React.Component {
 				this.props.fetchAnswers(Number(this.state.chosenworker))
 				break;
 			case 'Agreements':
-				this.props.reports.tasks = Object.values(agreeData.tasks)
+				//this.props.reports.tasks = Object.values(agreeData.tasks)
+				this.props.fetchTasksAgreements(200)
 				break;
 			default:
 				console.log('Metric to implement: ', value)
@@ -309,14 +309,14 @@ class Reports extends React.Component {
 				chart='stacked'
 				x='item_id'
 				y=['c1','c2','c3']
-				z='filter_id'
+				z='criteria_id'
 				break;
 
 			case 'Votes':
 				chart='pie'
 				x='id'
 				y='answer'
-				z='criteria_id'
+				z=['item_id','criteria_id']
 				break;
 
 			default:
@@ -372,6 +372,7 @@ Reports.propTypes = {
 	fetchWorkers: PropTypes.func,
 	fetchAnswers: PropTypes.func,
 	fetchWorkerTimes: PropTypes.func,
+	fetchTasksAgreements: PropTypes.func,
 
   //exp_error: PropTypes.any,
   //exp_loading: PropTypes.bool,
@@ -392,7 +393,8 @@ const mapDispatchToProps = dispatch => ({
 	fetchTaskTime: jobId => dispatch(actions.fetchTaskTime(jobId)),
 	fetchWorkerTimes: (jobId,workerId) => dispatch(actions.fetchWorkerTimes(jobId,workerId)),
 	fetchAnswers: workerId => dispatch(actions.fetchAnswers(workerId)),
-	fetchWorkers: jobId => dispatch(actions.fetchWorkers(jobId))
+	fetchWorkers: jobId => dispatch(actions.fetchWorkers(jobId)),
+	fetchTasksAgreements: jobId => dispatch(actions.fetchTasksAgreements(jobId))
 })
 
 const mapStateToProps = state => ({

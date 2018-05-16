@@ -23,7 +23,7 @@ class DonutChart extends React.Component {
     if(this.state.chosencriteria=='all') {
       var crit_filtered_data = this.props.data          
     } else {
-      var crit_filtered_data = this.props.data.filter(d => d[this.props.z]==this.state.chosencriteria )
+      var crit_filtered_data = this.props.data.filter(d => d[this.props.z[1]]==this.state.chosencriteria )
     }
 
     if(crit_filtered_data.length==0) {
@@ -99,7 +99,7 @@ class DonutChart extends React.Component {
         var nuovo = []
         data.map( step => {
           console.log(d,d.data)
-          if(step[y]==d.data && (this.state.chosencriteria=='all' ? true : (step[z]==this.state.chosencriteria))) {
+          if(step[y]==d.data && (this.state.chosencriteria=='all' ? true : (step[z[1]]==this.state.chosencriteria))) {
             nuovo = nuovo.concat([step])
           }
         })
@@ -139,8 +139,11 @@ class DonutChart extends React.Component {
   render() {
     var y = this.props.y
     var x = this.props.x
+    var z = this.props.z
     var stampa = this.props.data.length>0 ?
-      this.state.clicked.map(d => <li key={d[x]}>{'item_id'+" "+d.item_id}</li>) : " "
+      this.state.clicked.map(d => <li key={d[z[0]]+","+d[z[1]]}>
+        {z[0]+" "}<strong style={{color: 'steelblue'}}>{d[z[0]]}</strong>
+        {", "+z[1]+" "}<strong style={{color: 'steelblue'}}>{d[z[1]]}</strong></li>) : " "
     return (
       <div>
         <br />

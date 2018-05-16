@@ -8,9 +8,9 @@ const actionTypes = {
   FETCH_WTIME: 'C_FETCH_WTIME',
   FETCH_WTIME_SUCCESS: 'C_FETCH_WTIME_SUCCESS',
   FETCH_WTIME_ERROR: 'C_FETCH_WTIME_ERROR',
-  FETCH_AGREEMENT: 'C_FETCH_AGREEMENT',
-  FETCH_AGREEMENT_SUCCESS: 'C_FETCH_AGREEMENT_SUCCESS',
-  FETCH_AGREEMENT_ERROR: 'C_FETCH_AGREEMENT_ERROR',
+  FETCH_AGREEMENTS: 'C_FETCH_AGREEMENT',
+  FETCH_AGREEMENTS_SUCCESS: 'C_FETCH_AGREEMENT_SUCCESS',
+  FETCH_AGREEMENTS_ERROR: 'C_FETCH_AGREEMENT_ERROR',
   FETCH_WANSWERS: 'C_FETCH_WANSERS',
   FETCH_WANSWERS_SUCCESS: 'C_FETCH_WANSERS_SUCCESS',
   FETCH_WANSWERS_ERROR: 'C_FETCH_WANSERS_ERROR',
@@ -63,21 +63,21 @@ const actions = {
     };
   },
 
-  fetchAgreement(jobId) {
+  fetchTasksAgreements(jobId) {
     return {
-      type: actionTypes.FETCH_AGREEMENT,
+      type: actionTypes.FETCH_AGREEMENTS,
       jobId
     };
   },
-  fetchAgreementSuccess(response) {
+  fetchTasksAgreementsSuccess(response) {
     return {
-      type: actionTypes.FETCH_AGREEMENT_SUCCESS,
+      type: actionTypes.FETCH_AGREEMENTS_SUCCESS,
       response
     };
   },
-  fetchAgreementError(error) {
+  fetchTasksAgreementsError(error) {
     return {
-      type: actionTypes.FETCH_AGREEMENT_ERROR,
+      type: actionTypes.FETCH_AGREEMENTS_ERROR,
       error
     };
   },

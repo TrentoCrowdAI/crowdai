@@ -23,6 +23,7 @@ const getByUuid = async ctx => {
     data: {
       initialTestsRule: job.data.initialTestsRule,
       maxTasksRule: job.data.maxTasksRule,
+      minTasksRule: job.data.minTasksRule,
       taskRewardRule: job.data.taskRewardRule,
       consentUrl: job.data.consentUrl,
       consentFormat: job.data.consentFormat,

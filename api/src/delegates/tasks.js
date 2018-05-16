@@ -71,7 +71,7 @@ const getWorkerTasks = (exports.getWorkerTasks = async (jobId, workerId) => {
     let res = await db.query(
       `select t.* from ${
         db.TABLES.Task
-      } t where t.job_id = $1 and t.worker_id = $2 and t.data ->> 'answered' = 'true'`,
+      } t where t.job_id = $1 and t.worker_id = $2 and (t.data ->> 'answered')::boolean = true`,
       [jobId, workerId]
     );
     return { rows: res.rows, meta: { count: res.rowCount } };
@@ -97,7 +97,7 @@ const getWorkerTasksCount = (exports.getWorkerTasksCount = async (
     let res = await db.query(
       `select count(t.*) from ${
         db.TABLES.Task
-      } t where t.job_id = $1 and t.worker_id = $2 and t.data ->> 'answered' = 'true'`,
+      } t where t.job_id = $1 and t.worker_id = $2 and (t.data ->> 'answered')::boolean = true`,
       [jobId, workerId]
     );
     return Number(res.rows[0].count);
@@ -121,7 +121,7 @@ const getBuffer = (exports.getBuffer = async (jobId, workerId) => {
     let res = await db.query(
       `select t.item_id, t.data from ${
         db.TABLES.Task
-      } t where t.job_id = $1 and t.worker_id = $2 and t.data ->> 'answered' = 'false'`,
+      } t where t.job_id = $1 and t.worker_id = $2 and (t.data ->> 'answered')::boolean = false`,
       [jobId, workerId]
     );
 

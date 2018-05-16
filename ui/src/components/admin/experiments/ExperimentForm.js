@@ -370,9 +370,19 @@ class ExperimentForm extends React.Component {
         <Header as="h3">Parameters</Header>
         <Form.Group widths="equal">
           <Form.Input
-            label="Max. tasks per worker"
+            label="Max. #tasks per worker"
             name="data.maxTasksRule"
             value={item.data.maxTasksRule}
+            onChange={this.handleChange}
+            type="number"
+            min="1"
+            required
+          />
+
+          <Form.Input
+            label="Min. #tasks per worker"
+            name="data.minTasksRule"
+            value={item.data.minTasksRule}
             onChange={this.handleChange}
             type="number"
             min="1"
@@ -395,6 +405,8 @@ class ExperimentForm extends React.Component {
             value={item.data.taskRewardRule}
             onChange={this.handleChange}
             type="number"
+            min="0"
+            step="0.01"
             required
           />
         </Form.Group>
@@ -440,6 +452,8 @@ class ExperimentForm extends React.Component {
             value={item.data.expertCostRule}
             onChange={this.handleChange}
             type="number"
+            min="0"
+            step="0.01"
           />
         </Form.Group>
       </Segment>

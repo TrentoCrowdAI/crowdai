@@ -63,6 +63,7 @@ const genericFormReducer = getReducer(scopes.EXPERIMENTS, {
     },
     // parameters
     maxTasksRule: 3,
+    minTasksRule: 2,
     taskRewardRule: 0.1,
     testFrequencyRule: 2,
     initialTestsRule: 2,

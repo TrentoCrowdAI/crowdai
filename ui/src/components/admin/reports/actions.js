@@ -43,19 +43,20 @@ const actions = {
     };
   },
 
-  fetchWorkerTime(workerId) {
+  fetchWorkerTimes(jobId,workerId) {
     return {
       type: actionTypes.FETCH_WTIME,
+      jobId,
       workerId
     };
   },
-  fetchWorkerTimeSuccess(response) {
+  fetchWorkerTimesSuccess(response) {
     return {
       type: actionTypes.FETCH_WTIME_SUCCESS,
       response
     };
   },
-  fetchWorkerTimeError(error) {
+  fetchWorkerTimesError(error) {
     return {
       type: actionTypes.FETCH_WTIME_ERROR,
       error

@@ -37,6 +37,7 @@ class Histogram extends React.Component {
     var svg = d3.select("."+this.props.selector);
     var x = this.props.x
     var y = this.props.y
+    var z = this.props.z
 
     var data = this.props.data.sort( function(a,b) {
       return (a[x] > b[x]) ? 1 : ((b[x] > a[x]) ? -1 : 0);
@@ -51,15 +52,14 @@ class Histogram extends React.Component {
     var xscale = d3.scaleLinear()
         .range([0, width])
         .domain([
-          d3.min(data, d => Math.floor(d[x]/10)*10), 
-          d3.max(data, d => Math.round((d[x]+4)/10)*10)
+          d3.min(data, d => Math.floor(d[x]/10000)*10/60), 
+          d3.max(data, d => Math.round((d[x]+4)/10000)*10/60)
         ])
     var xAxis = d3.axisBottom(xscale);
     //console.log(width/xscale.ticks().length)
-    //deploy data to fill an histogram
     var histo = d3.histogram()
         .thresholds(xscale.ticks(10))
-        (data.map(d => d[x]));
+        (data.map(d => (d[x]/1000/60)));
 
     var yscale = d3.scaleLinear()
       .domain([0, d3.max(histo, d => d.length)])
@@ -94,7 +94,7 @@ class Histogram extends React.Component {
             //console.log(d.x0,d.x1)
             var nuovo = []
             data.map( (step,i) => {
-              if((step[x]>=d.x0 && step[x]<d.x1) || (step[x]>=d.x0 && step[x]==d.x1)) {
+              if((step[x]/1000/60>=d.x0 && step[x]/1000/60<d.x1) || (step[x]/1000/60>=d.x0 && step[x]/1000/60==d.x1)) {
                 nuovo = nuovo.concat([step])
               }
             })
@@ -117,7 +117,7 @@ class Histogram extends React.Component {
           .attr("fill","black")
           .attr("transform","translate("+(width-15)+",0)")
           .attr("dy","-1em")
-          .text(this.props.x)
+          .text("avg_time min")
 
     g.append("g")
        .attr("class","y axis")
@@ -148,8 +148,9 @@ class Histogram extends React.Component {
   render() {
     var y = this.props.y
     var x = this.props.x
+    var z = this.props.z
     var stampa = this.props.data.length>0 ? this.state.clicked.map(d => 
-      <li key={d[y]}>{y+" "+d[y]+" => "+x+" "+d[x]}</li>) : " "
+      <li key={d[y]+""+d[z]}>{y+" "}<strong style={{color: 'red'}}>{d[y]}</strong>{", "+z+" "}<strong style={{color: 'red'}}>{d[z]}</strong>{" => "+x+" "+d[x]}</li>) : " "
 
     return (
       <div>
@@ -164,6 +165,7 @@ class Histogram extends React.Component {
               color="orange"
               x={this.props.y}
               y={this.props.x}
+              z={this.props.z}
               chart='nest'
               selector={'nestedchart'}
               data={this.state.clicked}

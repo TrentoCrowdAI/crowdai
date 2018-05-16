@@ -16,8 +16,17 @@ class NestChart extends React.Component {
   }
 
   dataWrapper() {
-    this.props.data.sort( (a,b) =>
-      (a[this.state.order] > b[this.state.order]) ? 1 : ((b[this.state.order] > a[this.state.order]) ? -1 : 0))
+    var order = this.state.order
+    var z = this.props.z
+    this.props.data.sort( function(a,b)
+      {
+        if (a[order]==b[order])
+          return (a[z] > b[z]) ? 1 : ((b[z] > a[z]) ? -1 : 0)
+        else 
+          return (a[order] > b[order]) ? 1 : ((b[order] > a[order]) ? -1 : 0)
+      }
+    )
+      
     
     if(this.props.data.length==0) {
       var svg = d3.select("."+this.props.selector)
@@ -55,12 +64,12 @@ class NestChart extends React.Component {
 
     var yscale = d3.scaleLinear()
         .rangeRound([height, 0])
-        .domain([0, d3.max(data, d => d[y]*1.5)])
+        .domain([0, d3.max(data, d => d[y]/1000*1.5)])
 
     var xscale = d3.scaleBand()
         .rangeRound([0, width])
         .padding(0.1)
-        .domain(data.map(d => d[x]))
+        .domain(data.map(d => d[x]+","+d[z]))
 
     var xAxis = d3.axisBottom(xscale)
     var yAxis = d3.axisLeft(yscale).ticks(10)
@@ -75,10 +84,10 @@ class NestChart extends React.Component {
           if(d[y]>=media) return color
             else return "lightgreen"
         })
-        .attr("x", d => xscale(d[x]))
-        .attr("y", d => yscale(d[y]))
+        .attr("x", d => xscale(d[x]+","+d[z]))
+        .attr("y", d => yscale(d[y]/1000))
         .attr("width", xscale.bandwidth())
-        .attr("height", d => height-yscale(d[y]))
+        .attr("height", d => height-yscale(d[y]/1000))
         .on("mouseover", function() {
           d3.select(this)
             .style("opacity","0.8")
@@ -93,24 +102,25 @@ class NestChart extends React.Component {
         
     bar.append("text")
         .attr("dy", ".75em")
-        .attr("y", d => yscale(d[y])+10 )
-        .attr("x", d => xscale(d[x])+(xscale.bandwidth()/2) )
+        .attr("y", d => yscale(d[y]/1000)+10 )
+        .attr("x", d => xscale(d[x]+","+d[z])+(xscale.bandwidth()/2) )
         .attr("text-anchor", "middle")
         .style("fill", "white")
-        .text( d => d[y])
+        .text( d => d[y]/1000)
 
     var line = d3.line()
-        .x( (d) => {return xscale(d[x])} )
-        .y( (d) => {return yscale(d[y])} )
+        .x( (d) => {return xscale(d[x]+","+d[z])} )
+        .y( (d) => {return yscale(d[y]/1000)} )
 
-    //average value as a line that crosses the chart, to refine
     g.append("path")
       .datum([{
-        total_time : media,
-        task_id : data[0][x]
+        avgtime_ms : media,
+        item_id : data[0][x],
+        criteria_id : data[0][z]
       },{
-        total_time : media,
-        task_id : data[data.length-1][x]
+        avgtime_ms : media,
+        item_id : data[data.length-1][x],
+        criteria_id : data[data.length-1][z]
       }])
       .attr("class","average")
       .attr("transform","translate("+(xscale.bandwidth()/2)+",0)")
@@ -119,17 +129,15 @@ class NestChart extends React.Component {
       .style("fill","none")
       .style("stroke-width",1)
     
-    //display average value only of there are more than 1 elements
     if(data.length>1) {
       g.append("text")
           .attr("fill", "red")
-          .attr("transform", "translate("+width/2+","+yscale(media)+")")
+          .attr("transform", "translate("+width/2+","+yscale(media/1000)+")")
           .attr("text-anchor","middle")
           .attr("dy","-0.5em")
-          .text("media ~ "+media+" min")
+          .text("media ~ "+media/1000+" s")
     }
 
-    //axis
     g.append("g")
         .attr("class","axis axis--x")
         .attr("transform","translate(0,"+height+")")
@@ -138,7 +146,7 @@ class NestChart extends React.Component {
           .attr("fill","black")
           .attr("transform","translate("+(width-15)+",0)")
           .attr("dy","-1em")
-          .text(this.props.x)
+          .text(this.props.x+","+this.props.z)
 
     g.append("g")
         .attr("class","axis axis--y")
@@ -148,7 +156,7 @@ class NestChart extends React.Component {
           .attr("transform","rotate(-90)")
           .attr("text-anchor","end")
           .attr("dy","2em")
-          .text(this.props.y)
+          .text("avg_time s")
 
   }
 
@@ -162,8 +170,6 @@ class NestChart extends React.Component {
   }
 
   render() {
-    //console.log(this.props)
-    //console.log(this.state)
     return (
       <div className='nest'>
         <svg className={this.props.selector} width="800" height="400"> </svg>
@@ -190,7 +196,6 @@ class NestChart extends React.Component {
   }
 }
 
-//to fill if necessary
 NestChart.propTypes = {
 
 }

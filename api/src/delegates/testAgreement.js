@@ -50,21 +50,6 @@ const workerAnswers = (exports.workerAnswers = async id => {
   }
 });
 
-const getWorkersByJob = (exports.workerAnswers = async id => {
-  try {
-    let res = await db.query(
-      `select disticnt t.worker_id, w.turk_id
-    from ${db.TABLES.Task_7500} t join ${db.TABLES.Worker} w on t.worker_id=w.id
-    where t.job_id=$1`,
-      [id]
-    );
-    return (tasks = { tasks: res.rows });
-  } catch (error) {
-    console.error(error);
-    throw Boom.badImplementation('Error while trying to fetch record');
-  }
-});
-
 const allPossibleCouplesOfWorkersAndNumberOfCommonTask = (exports.allPossibleCouplesOfWorkersAndNumberOfCommonTask = async () => {
   try {
     let res = await db.query(

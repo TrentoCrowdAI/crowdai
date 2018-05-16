@@ -7,7 +7,7 @@ import {flattenError} from 'src/utils';
 
 const getTaskTime = (action$, store) =>
   action$.ofType(actionTypes.FETCH_TTIME).switchMap(action => {
-    return Observable.defer(() => requestersApi.get('getByJobId/'+action.jobId))
+    return Observable.defer(() => requestersApi.get('getAllTasksByJob/'+action.jobId))
       .mergeMap(response => Observable.of(actions.fetchTaskTimeSuccess(response.data)))
       .catch(error => Observable.of(actions.fetchTaskTimeError(flattenError(error))));
   });
@@ -15,21 +15,22 @@ const getTaskTime = (action$, store) =>
 const fetchTaskTime = (action$, store) =>
   action$.ofType(actionTypes.FETCH_ITEM).switchMap(action => {
     return Observable.defer(
-      () => requestersApi.get(`getByJobId/`+action.jobId))
+      () => requestersApi.get(`getAllTasksByJob/`+action.jobId))
       .mergeMap(response => Observable.of(actions.fetchItemSuccess(response.data)))
       .catch(error => Observable.of(actions.fetchItemError(flattenError(error))));
   });
 
+
 const getWorkerTimes = (action$, store) =>
   action$.ofType(actionTypes.FETCH_WTIME).switchMap(action => {
-    return Observable.defer(() => requestersApi.get('getTaskByWorkerId/'+action.workerId))
-      .mergeMap(response => Observable.of(actions.fetchWorkerTimeSuccess(response.data)))
-      .catch(error => Observable.of(actions.fetchWorkerTimeError(flattenError(error))));
+    return Observable.defer(() => requestersApi.get('getWorkerTimes/'+action.jobId+'/'+action.workerId))
+      .mergeMap(response => Observable.of(actions.fetchWorkerTimesSuccess(response.data)))
+      .catch(error => Observable.of(actions.fetchWorkerTimesError(flattenError(error))));
   });
 
 const fetchWorkerTimes = (action$, store) =>
   action$.ofType(actionTypes.FETCH_ITEM).switchMap(action => {
-    return Observable.defer(() => requestersApi.get(`getTaskByWorkerId/`+action.workerId))
+    return Observable.defer(() => requestersApi.get(`getWorkerTimes/`+action.jobId+'/'+action.workerId))
       .mergeMap(response => Observable.of(actions.fetchItemSuccess(response.data)))
       .catch(error => Observable.of(actions.fetchItemError(flattenError(error))));
 });
@@ -63,4 +64,9 @@ const fetchWorkers = (action$, store) =>
       .catch(error => Observable.of(actions.fetchItemError(flattenError(error))));
   });
 
-export default combineEpics(getTaskTime, fetchTaskTime, getWorkers, fetchWorkers, getWorkerTimes, fetchWorkerTimes, getAnswers, fetchAnswers);
+export default combineEpics(getTaskTime, fetchTaskTime,
+                            getWorkers, fetchWorkers, 
+                            getWorkerTimes, fetchWorkerTimes, 
+                            getAnswers, fetchAnswers,
+                            getWorkers, fetchWorkers
+                          );

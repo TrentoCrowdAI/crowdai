@@ -6,7 +6,6 @@ import { Form, Button } from 'semantic-ui-react';
 class WorkerChooser extends React.Component {
   
   render() {
-    //console.log(this.props)
     return(
       <div
       style={{textAlign: 'right'}}>

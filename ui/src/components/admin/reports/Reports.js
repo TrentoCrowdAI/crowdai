@@ -101,8 +101,8 @@ class Reports extends React.Component {
 	}
 
 	componentDidMount() {
-		this.props.fetchWorkers(this.props.match.params.jobid);
-		//console.log(this.props.workers)
+		console.log(this.props.match.params.jobid)
+		this.props.fetchWorkers(200)
 	}
 
 	componentDidUpdate() {
@@ -113,10 +113,10 @@ class Reports extends React.Component {
 		this.props.reports.tasks=[]
 		switch(value) {
 			case 'T_CompleteTime':
-				this.props.fetchTaskTime(Number(this.props.match.params.jobid))
+				this.props.fetchTaskTime(200)//(Number(this.props.match.params.jobid))
 				break;
 			case 'W_CompleteTime':
-				this.props.fetchWorkerTime(Number(this.state.chosenworker))
+				this.props.fetchWorkerTimes(200,Number(this.state.chosenworker))
 				break;
 			case 'Votes':
 				this.props.fetchAnswers(Number(this.state.chosenworker))
@@ -143,10 +143,13 @@ class Reports extends React.Component {
 				this.props.reports.tasks = Object.values(agreeData.tasks)
 				break;
 			case 'Votes':
+			if (value=='all')
+				this.props.reports.tasks = []
+			else
 				this.props.fetchAnswers(Number(value))
 				break;
 			default:
-				this.props.fetchWorkerTime(value)		
+				this.props.fetchWorkerTimes(200,value)		
 				break;
 		}
 
@@ -267,8 +270,8 @@ class Reports extends React.Component {
 	}
 
 	render() {
-
 		console.log(this.props.reports)
+		//console.log(this.props.workers)
 		///JobOptions = { 'all' : 'All Jobs' }
 		WorkerOptions = { 'all' : 'All Workers' }
 
@@ -276,7 +279,7 @@ class Reports extends React.Component {
       JobOptions[step.id] = step.data.name
     });*/
 		Object.values(this.props.workers.workers).map( step => {
-      WorkerOptions[step.worker_id] = step.worker_name
+      WorkerOptions[step.worker_id] = step.turk_id
 		});
 
 		var chart
@@ -290,15 +293,15 @@ class Reports extends React.Component {
 
 			case 'T_CompleteTime':
 				chart='histogram'
-				x='item_id'
-				y='num_tasks'
+				x='avgtime_ms'
+				y='item_id'
 				z='criteria_id'
 				break;
 
 			case 'W_CompleteTime':
 				chart='nest'
 				x='item_id'
-				y='num_tasks'
+				y='avgtime_ms'
 				z='criteria_id'
 				break;
 
@@ -313,7 +316,7 @@ class Reports extends React.Component {
 				chart='pie'
 				x='id'
 				y='answer'
-				z=''
+				z='criteria_id'
 				break;
 
 			default:
@@ -368,7 +371,7 @@ Reports.propTypes = {
 	fetchTaskTime: PropTypes.func,
 	fetchWorkers: PropTypes.func,
 	fetchAnswers: PropTypes.func,
-	fetchWorkerTime: PropTypes.func,
+	fetchWorkerTimes: PropTypes.func,
 
   //exp_error: PropTypes.any,
   //exp_loading: PropTypes.bool,
@@ -387,7 +390,7 @@ Reports.propTypes = {
 const mapDispatchToProps = dispatch => ({
 	//fetchExperiments: projectId => dispatch(expactions.fetchExperiments(projectId)),
 	fetchTaskTime: jobId => dispatch(actions.fetchTaskTime(jobId)),
-	fetchWorkerTime: workerId => dispatch(actions.fetchWorkerTime(workerId)),
+	fetchWorkerTimes: (jobId,workerId) => dispatch(actions.fetchWorkerTimes(jobId,workerId)),
 	fetchAnswers: workerId => dispatch(actions.fetchAnswers(workerId)),
 	fetchWorkers: jobId => dispatch(actions.fetchWorkers(jobId))
 })

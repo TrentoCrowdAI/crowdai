@@ -82,9 +82,10 @@ const actions = {
     };
   },
 
-  fetchAnswers(workerId) {
+  fetchAnswers(jobId,workerId) {
     return {
       type: actionTypes.FETCH_WANSWERS,
+      jobId,
       workerId
     };
   },

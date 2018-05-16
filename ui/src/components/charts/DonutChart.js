@@ -40,7 +40,7 @@ class DonutChart extends React.Component {
   }
 
   chooseCriteria(e) {
-    console.log(e.target.value)
+    //console.log(e.target.value)
     this.setState({
       ...this.state,
       chosencriteria: e.target.value
@@ -98,7 +98,7 @@ class DonutChart extends React.Component {
         })
         var nuovo = []
         data.map( step => {
-          console.log(d,d.data)
+          //console.log(d,d.data)
           if(step[y]==d.data && (this.state.chosencriteria=='all' ? true : (step[z[1]]==this.state.chosencriteria))) {
             nuovo = nuovo.concat([step])
           }

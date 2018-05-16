@@ -3,7 +3,7 @@ const Boom = require('boom');
 const delegates = require(__base + 'delegates');
 
 const getWorkerAnswers = async ctx => {
-  ctx.response.body = await delegates.reports.getWorkerAnswers(ctx.params.id);
+  ctx.response.body = await delegates.reports.getWorkerAnswers(ctx.params.jobId, ctx.params.workerId);
 };
 
 const getAllTasksTimesByJob = async ctx => {
@@ -26,6 +26,6 @@ exports.register = router => {
   router.get('/getAllTasksTImesByJob/:id', getAllTasksTimesByJob);
   router.get('/getWorkerTimes/:jobId/:workerId', getWorkerTimes);
   router.get('/getWorkersByJob/:id', getWorkersByJob);
-  router.get('/getWorkerAnswers/:id', getWorkerAnswers);
+  router.get('/getWorkerAnswers/:jobId/:workerId', getWorkerAnswers);
   router.get('/getTasksAgreements/:id', getTasksAgreements);
 };

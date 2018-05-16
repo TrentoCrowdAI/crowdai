@@ -101,7 +101,7 @@ class Reports extends React.Component {
 	}
 
 	componentDidMount() {
-		this.props.fetchWorkers(200)
+		this.props.fetchWorkers(this.props.match.params.jobid)
 	}
 
 	componentDidUpdate() {
@@ -112,17 +112,17 @@ class Reports extends React.Component {
 		this.props.reports.tasks=[]
 		switch(value) {
 			case 'T_CompleteTime':
-				this.props.fetchTaskTime(200)//(Number(this.props.match.params.jobid))
+				this.props.fetchTaskTime(this.props.match.params.jobid)//(Number(this.props.match.params.jobid))
 				break;
 			case 'W_CompleteTime':
-				this.props.fetchWorkerTimes(200,Number(this.state.chosenworker))
+				this.props.fetchWorkerTimes(this.props.match.params.jobid,Number(this.state.chosenworker))
 				break;
-			case 'Votes':
-				this.props.fetchAnswers(Number(this.state.chosenworker))
+			case 'Percentage':
+				this.props.fetchAnswers(this.props.match.params.jobid,Number(this.state.chosenworker))
 				break;
-			case 'Agreements':
+			case 'Distribution':
 				//this.props.reports.tasks = Object.values(agreeData.tasks)
-				this.props.fetchTasksAgreements(200)
+				this.props.fetchTasksAgreements(this.props.match.params.jobid)
 				break;
 			default:
 				console.log('Metric to implement: ', value)
@@ -132,24 +132,24 @@ class Reports extends React.Component {
 		this.setState({
 			...this.state,
 			activeMetric: value,
-			activeworker: value=='T_CompleteTime'||value=='Agreements' ? false : true,
-			chosenworker: value=='T_CompleteTime'||value=='Agreements' ? 'all' : this.state.chosenworker
+			activeworker: value=='T_CompleteTime'||value=='Distribution' ? false : true,
+			chosenworker: value=='T_CompleteTime'||value=='Distribution' ? 'all' : this.state.chosenworker
 		})
 	}
 
 	chooseWorker(e, {value}) {
 		switch(this.state.activeMetric) {
-			case 'Agreements':
+			case 'Distribution':
 				this.props.reports.tasks = Object.values(agreeData.tasks)
 				break;
-			case 'Votes':
+			case 'Percentage':
 			if (value=='all')
 				this.props.reports.tasks = []
 			else
-				this.props.fetchAnswers(Number(value))
+				this.props.fetchAnswers(this.props.match.params.jobid,Number(value))
 				break;
 			default:
-				this.props.fetchWorkerTimes(200,value)		
+				this.props.fetchWorkerTimes(this.props.match.params.jobid,value)		
 				break;
 		}
 
@@ -162,10 +162,10 @@ class Reports extends React.Component {
 	/*chooseJob(e, {value}) {
 		switch(this.state.activeMetric) {
 			case 'W_CompleteTime':
-			case 'Votes':
+			case 'Percentage':
 				this.props.reports.tasks = []
 				break;
-			case 'Agreements':
+			case 'Distribution':
 				this.props.reports.tasks = Object.values(agreeData.tasks)
 				break;
 			default:
@@ -176,7 +176,7 @@ class Reports extends React.Component {
 		
 		switch(this.state.activeMetric) {
 			case 'W_CompleteTime':
-			case 'Votes' :
+			case 'Percentage' :
 				this.setState({
 					...this.state,
 					chosenjob: value,
@@ -188,7 +188,7 @@ class Reports extends React.Component {
 					...this.state, 
 					chosenjob: value,
 					chosenworker: 'all',
-					activeworker: this.state.activeMetric=='T_CompleteTime'||this.state.activeMetric=='Agreements' ? false : true
+					activeworker: this.state.activeMetric=='T_CompleteTime'||this.state.activeMetric=='Distribution' ? false : true
 				})
 				break;
 		}
@@ -202,7 +202,7 @@ class Reports extends React.Component {
 					className='metrics'
 					style={{marginBottom: '5px'}}
 					onClick={this.activeMetric}
-				>Time to complete per Task</Button>
+				>Time to complete per Job</Button>
 				<br />
 				<Button 
 					value='W_CompleteTime'
@@ -212,25 +212,25 @@ class Reports extends React.Component {
 				>Time to complete per Worker</Button>
 				<br />
 				<Button 
-					value='Votes'
+					value='Percentage'
 					className='metrics' 
 					style={{marginBottom: '5px'}}
 					onClick={this.activeMetric}
-				>Percentage % of votes</Button>
+				>Percentage % of Votes</Button>
 				<br />
 				<Button 
-					value='Agreements'
+					value='Distribution'
 					className='metrics' 
 					style={{marginBottom: '5px'}}
 					onClick={this.activeMetric}
-				>Agreement metrics</Button>
+				>Votes Distribution per Task</Button>
 				<br />
 				<Button 
 					value='Classifications'
 					className='metrics' 
 					style={{marginBottom: '5px'}}
 					onClick={this.activeMetric}
-				>Classification decision and Probabilities</Button>
+				>-</Button>
 				<br />
 				<Button 
 					value='Initial_Fails'
@@ -305,14 +305,14 @@ class Reports extends React.Component {
 				z='criteria_id'
 				break;
 
-			case 'Agreements':
+			case 'Distribution':
 				chart='stacked'
 				x='item_id'
 				y=['c1','c2','c3']
 				z='criteria_id'
 				break;
 
-			case 'Votes':
+			case 'Percentage':
 				chart='pie'
 				x='id'
 				y='answer'
@@ -392,7 +392,7 @@ const mapDispatchToProps = dispatch => ({
 	//fetchExperiments: projectId => dispatch(expactions.fetchExperiments(projectId)),
 	fetchTaskTime: jobId => dispatch(actions.fetchTaskTime(jobId)),
 	fetchWorkerTimes: (jobId,workerId) => dispatch(actions.fetchWorkerTimes(jobId,workerId)),
-	fetchAnswers: workerId => dispatch(actions.fetchAnswers(workerId)),
+	fetchAnswers: (jobId,workerId) => dispatch(actions.fetchAnswers(jobId,workerId)),
 	fetchWorkers: jobId => dispatch(actions.fetchWorkers(jobId)),
 	fetchTasksAgreements: jobId => dispatch(actions.fetchTasksAgreements(jobId))
 })

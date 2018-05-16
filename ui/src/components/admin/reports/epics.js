@@ -37,14 +37,14 @@ const fetchWorkerTimes = (action$, store) =>
 
 const getAnswers = (action$, store) =>
   action$.ofType(actionTypes.FETCH_WANSWERS).switchMap(action => {
-    return Observable.defer(() => requestersApi.get('getWorkerAnswers/'+action.workerId))
+    return Observable.defer(() => requestersApi.get('getWorkerAnswers/'+action.jobId+'/'+action.workerId))
       .mergeMap(response => Observable.of(actions.fetchAnswersSuccess(response.data)))
       .catch(error => Observable.of(actions.fetchAnswersError(flattenError(error))));
   });
 
 const fetchAnswers = (action$, store) =>
   action$.ofType(actionTypes.FETCH_ITEM).switchMap(action => {
-    return Observable.defer(() => requestersApi.get(`getWorkerAnswers/`+action.workerId))
+    return Observable.defer(() => requestersApi.get(`getWorkerAnswers/`+action.jobId+'/'+action.workerId))
       .mergeMap(response => Observable.of(actions.fetchItemSuccess(response.data)))
       .catch(error => Observable.of(actions.fetchItemError(flattenError(error))));
 });

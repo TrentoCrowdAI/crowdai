@@ -660,14 +660,14 @@ const finishJob = async job => {
 
 /**
  * Checks if the worker can finish their assignment. We expect the worker to answer
- * at least one task.
+ * at least the min number of tasks specified in the minTasksRule property of a job.
  *
  * @param {Object} job
  * @param {Object} worker
  */
 const workerCanFinish = async (job, worker) => {
   const count = await delegates.tasks.getWorkerTasksCount(job.id, worker.id);
-  return count >= 1;
+  return count >= job.data.minTasksRule;
 };
 
 /**

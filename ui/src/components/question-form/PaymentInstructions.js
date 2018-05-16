@@ -16,11 +16,17 @@ class PaymentInstructions extends React.Component {
               <div style={{fontSize: '1em', textAlign: 'justify'}}>
                 <ul>
                   <li>
-                    Your compensation is {job.data.taskRewardRule} USD per task, up to a maximum of {job.maxReward} USD.
+                    The reward is {job.data.taskRewardRule} USD per given answer. If you complete all the tasks, you
+                    will earn {job.maxReward} USD.
                   </li>
                   <li>
-                    Some of the tasks are test questions. You will be paid for these as well, unless you miss any of the
-                    first {job.data.initialTestsRule} test questions.
+                    Some of the tasks are test questions, and you will be paid for these as well unless you miss any of
+                    the initial test questions.
+                  </li>
+                  <li>For this study, the number of initial test questions is {job.data.initialTestsRule}.</li>
+                  <li>
+                    You will earn the cumulated reward only if you answer a minimum of {job.data.minTasksRule}
+                    {job.data.minTasksRule > 1 ? ' tasks' : ' task'} (test questions are not counted)
                   </li>
                 </ul>
               </div>

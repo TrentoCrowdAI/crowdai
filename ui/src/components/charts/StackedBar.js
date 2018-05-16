@@ -140,7 +140,7 @@ class StackedBar extends React.Component {
   render() {
     return (
     	<div>
-    		<svg className={this.props.selector} width="700" height={this.props.data.length*60}> </svg>
+    		<svg className={this.props.selector} width="1000" height={this.props.data.length*60}> </svg>
     	</div>
     );
   }

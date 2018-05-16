@@ -171,7 +171,7 @@ class SimpleLineChart extends React.Component {
   render() {
     return(
       <div>
-        <svg className={this.props.selector} width="800" height="400"> </svg>
+        <svg className={this.props.selector} width="1000" height="400"> </svg>
         <br />
         <strong>Clicked data:</strong> {this.state.clicked}
       </div>

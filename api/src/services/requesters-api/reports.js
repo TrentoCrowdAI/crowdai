@@ -2,6 +2,10 @@ const Boom = require('boom');
 
 const delegates = require(__base + 'delegates');
 
+const workerAnswers = async ctx => {
+  ctx.response.body = await delegates.reports.workerAnswers(ctx.params.id);
+};
+
 const getAllTasksByJob = async ctx => {
   ctx.response.body = await delegates.reports.getAllTasksByJob(ctx.params.id);
 };
@@ -18,4 +22,5 @@ exports.register = router => {
   router.get('/getAllTasksByJob/:id', getAllTasksByJob);
   router.get('/getWorkerTimes/:jobId/:workerId', getWorkerTimes);
   router.get('/getWorkersByJob/:id', getWorkersByJob);
+  router.get('/workerAnswers/:id', workerAnswers);
 };

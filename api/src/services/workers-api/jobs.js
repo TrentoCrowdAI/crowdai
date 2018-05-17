@@ -40,7 +40,7 @@ const getNext = async ctx => {
     ctx.query.assignmentId
   );
 
-  if (!task.data.finished) {
+  if (task) {
     task.type = task.test_id ? TaskType.TestTask : TaskType.Task;
     task.data.criteria = task.data.criteria.map(c => ({
       id: c.id,
@@ -52,7 +52,7 @@ const getNext = async ctx => {
     delete task.test_id;
     delete task.item_id;
   }
-  ctx.response.body = task;
+  ctx.response.body = task || {};
 };
 
 const saveAnswer = async ctx => {

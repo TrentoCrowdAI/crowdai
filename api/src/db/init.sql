@@ -61,14 +61,16 @@ CREATE TABLE worker (
 
 -- data: {
 --   criteria: [<number>, <number>], 
---   finished: <boolean>, 
 --   start: <date>, 
 --   end: <date>,
---   finishedByWorker: <boolean>,
---   finishedByMaxTasksRule: <boolean>,
+--   finished: <boolean>, the worker is done.
+--   finishedByWorker: <boolean>, the worker decided to finish early.
+--   finishedWithError: <boolean>, means an error occurred and the worker was force to finish the task.
+--   solvedMinTasks: <boolean>, means that the worker solved at least the minimum number of tasks required.
 --   assignmentApproved: <boolean>,  means we approved the worker assignment.
 --   assignmentBonusSent: <boolean>, means we paid the worker.
---   finishedWithError: <boolean>, means an error occurred and the worker clicked the finish button.
+--   honeypotFailed: <boolean>
+--   initialTestFailed: <boolean>
 -- }
 CREATE TABLE worker_assignment (
   id bigserial NOT NULL,

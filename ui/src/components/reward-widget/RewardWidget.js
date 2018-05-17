@@ -10,7 +10,7 @@ class RewardWidget extends React.Component {
     if (this.props.loading) {
       return <div style={{marginRight: '10px'}}>Calculating reward...</div>;
     }
-    return <Statistic label="Current reward" value={`${this.props.reward} $`} style={this.props.style} />;
+    return <Statistic label="Accumulated reward" value={`${this.props.reward} $`} style={this.props.style} />;
   }
 
   componentDidMount() {

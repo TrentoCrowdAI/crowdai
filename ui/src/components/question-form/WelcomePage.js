@@ -89,7 +89,7 @@ class WelcomePage extends React.Component {
   renderRedirectBtn() {
     const {assignmentId, hitId, workerId, experimentId} = this.props.session;
 
-    if (this.props.hasAcceptedHit && this.props.assignmentStatus && !this.props.assignmentStatus.data.finished) {
+    if (this.props.hasAcceptedHit && this.props.assignmentStatus && !this.props.assignmentStatus.data.end) {
       return (
         <Segment>
           <p>Please click on the following button to start. It will open a new window/tab.</p>
@@ -115,27 +115,39 @@ class WelcomePage extends React.Component {
   }
 
   renderFinalStep() {
-    if (this.props.assignmentStatus && this.props.assignmentStatus.data.finished) {
+    const {assignmentStatus} = this.props;
+
+    if (assignmentStatus && assignmentStatus.data.end) {
       return (
         <React.Fragment>
           <Message icon style={{marginTop: 20}}>
             <RewardWidget style={{marginRight: 20}} />
             <Message.Content>
               <Message.Header>Finished</Message.Header>
-              {!this.props.assignmentStatus.data.initialTestFailed && (
-                <div>
-                  <p>Please click the following button to submit your work</p>
-                  <Button type="button" positive onClick={() => this.submit()}>
-                    Submit
-                  </Button>
-                </div>
-              )}
-              {this.props.assignmentStatus.data.initialTestFailed && (
+              {!assignmentStatus.data.initialTestFailed &&
+                assignmentStatus.data.solvedMinTasks && (
+                  <div>
+                    <p>Please click the following button to submit your work</p>
+                    <Button type="button" positive onClick={() => this.submit()}>
+                      Submit
+                    </Button>
+                  </div>
+                )}
+
+              {assignmentStatus.data.initialTestFailed && (
                 <p>
                   Thank you for participating, but you failed to pass the qualification test. Please return the HIT to
                   finish.
                 </p>
               )}
+
+              {!assignmentStatus.data.initialTestFailed &&
+                !assignmentStatus.data.solvedMinTasks && (
+                  <p>
+                    Thank you for participating, but you did not solve the minimum number of tasks required. Please
+                    return the HIT to finish.
+                  </p>
+                )}
             </Message.Content>
           </Message>
           <form id="turkForm" method="POST" />

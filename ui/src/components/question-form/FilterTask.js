@@ -41,7 +41,7 @@ class FilterTask extends React.Component {
       );
     }
 
-    if (this.props.loading || !this.props.task) {
+    if (this.props.loading || !this.props.task || this.props.assignmentStatusLoading) {
       return (
         <Segment vertical>
           <Grid>
@@ -80,7 +80,7 @@ class FilterTask extends React.Component {
     }
 
     if (this.finished()) {
-      return <FinishMessage task={this.props.task} />;
+      return <FinishMessage assignmentStatus={this.props.assignmentStatus} />;
     }
 
     let {task} = this.props;
@@ -148,7 +148,7 @@ class FilterTask extends React.Component {
 
               {this.props.answerSaved && <Message header="Success" content="Answer saved!" positive visible />}
 
-              {this.props.task.workerCanFinish &&
+              {this.props.task.workerSolvedMinTasks &&
                 !this.props.answerSaved && (
                   <FinishButton style={{marginTop: 40, marginRight: '0.6em'}} onClick={() => this.finish()} />
                 )}
@@ -179,17 +179,11 @@ class FilterTask extends React.Component {
   }
 
   initialTestFailed() {
-    return (
-      (this.props.task.data && this.props.task.data.initialTestFailed) ||
-      (this.props.assignmentStatus && this.props.assignmentStatus.data.initialTestFailed)
-    );
+    return this.props.assignmentStatus && this.props.assignmentStatus.data.initialTestFailed;
   }
 
   finished() {
-    return (
-      (this.props.task.data && this.props.task.data.finished) ||
-      (this.props.assignmentStatus && this.props.assignmentStatus.data.finished)
-    );
+    return this.props.assignmentStatus && this.props.assignmentStatus.data.end;
   }
 }
 
@@ -202,25 +196,26 @@ const FinishButton = props => {
 };
 
 const FinishMessage = props => {
-  const {task} = props;
+  const {assignmentStatus} = props;
 
   return (
     <Message icon style={{marginTop: 50}}>
-      <Icon name={task.data.honeypotFailed ? 'smile' : 'checkmark box'} />
+      <Icon name={assignmentStatus.data.honeypotFailed ? 'smile' : 'checkmark box'} />
       <Message.Content>
         <Message.Header>Finished</Message.Header>
-        {task.data.honeypotFailed && (
+        {(assignmentStatus.data.honeypotFailed || assignmentStatus.data.finishedByWorker) && (
           <p>
             Thank you for participating. Please close this tab/window and go back to the HIT page on Amazon Mechanical
             Turk.
           </p>
         )}
-        {!task.data.honeypotFailed && (
-          <p>
-            Thank you for completing the tasks. Please close this tab/window and go back to the HIT page on Amazon
-            Mechanical Turk.
-          </p>
-        )}
+        {!assignmentStatus.data.honeypotFailed &&
+          !assignmentStatus.data.finishedByWorker && (
+            <p>
+              Thank you for completing the tasks. Please close this tab/window and go back to the HIT page on Amazon
+              Mechanical Turk.
+            </p>
+          )}
         <p>
           If you want to leave your anonymous feedback on the task, please click{' '}
           <a
@@ -236,7 +231,7 @@ const FinishMessage = props => {
 };
 
 FinishMessage.propTypes = {
-  task: PropTypes.object
+  assignmentStatus: PropTypes.object
 };
 
 FilterTask.propTypes = {
@@ -253,7 +248,8 @@ FilterTask.propTypes = {
   assignmentStatus: PropTypes.object,
   error: PropTypes.object,
   loading: PropTypes.bool,
-  answerIsValid: PropTypes.bool
+  answerIsValid: PropTypes.bool,
+  assignmentStatusLoading: PropTypes.bool
 };
 
 const mapStateToProps = state => ({
@@ -266,6 +262,7 @@ const mapStateToProps = state => ({
   answerSubmitLoading: state.questionForm.answerSubmitLoading,
   answerSubmitError: state.questionForm.answerSubmitError,
   assignmentStatus: state.questionForm.assignmentStatus,
+  assignmentStatusLoading: state.questionForm.assignmentStatusLoading,
   answerIsValid: state.questionForm.answerIsValid
 });
 

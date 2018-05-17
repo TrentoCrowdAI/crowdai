@@ -7,7 +7,7 @@ const defaultState = {
   error: undefined,
   loading: false,
   assignmentStatus: undefined,
-  assigmentStatusLoading: false,
+  assignmentStatusLoading: false,
   assignmentStatusError: undefined,
   finishAssignmentError: undefined,
   session: {
@@ -110,27 +110,27 @@ const reducer = (state = defaultState, action) => {
         ...state,
         assignmentStatus: undefined,
         assignmentStatusError: undefined,
-        assigmentStatusLoading: true
+        assignmentStatusLoading: true
       };
 
     case actionTypes.CHECK_ASSIGNMENT_STATUS_SUCCESS:
       return {
         ...state,
         assignmentStatus: action.status,
-        assigmentStatusLoading: false
+        assignmentStatusLoading: false
       };
     case actionTypes.CHECK_ASSIGNMENT_STATUS_ERROR:
       return {
         ...state,
         assignmentStatusError: action.error,
-        assigmentStatusLoading: false
+        assignmentStatusLoading: false
       };
     case actionTypes.CHECK_POLLING:
     case actionTypes.CHECK_POLLING_KEEP:
       return {
         ...state,
         assignmentStatusError: undefined,
-        assigmentStatusLoading: true
+        assignmentStatusLoading: true
       };
     case actionTypes.SET_ANSWER_IS_VALID:
       return {

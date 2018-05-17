@@ -13,7 +13,7 @@ const { TestTaskType } = delegates.testTasks;
  * @param {Object} worker
  * @param {Number[]} criteria - Array of criteria IDs assigned to the worker.
  * @param {Boolean} initialTest
- * @private
+ * @return {Object}
  */
 const getTestForWorker = (exports.getTestForWorker = async (
   job,
@@ -54,50 +54,11 @@ const getTestForWorker = (exports.getTestForWorker = async (
 });
 
 /**
- * Verify the status of the worker's assignment. If initial quiz is done, it
- * check the worker's answers. It also evaluates honeypots.
- */
-const checkWorkerAssignment = (exports.checkWorkerAssignment = async (
-  job,
-  worker,
-  assignment
-) => {
-  try {
-    let quizNeeded = await shouldRunInitialTest(job, worker);
-
-    if (quizNeeded) {
-      return assignment;
-    }
-    // check if the worker approved the initial tests
-    let quizScore = await getWorkerQuizScore(job, worker);
-
-    if (quizScore < job.data.initialTestsMinCorrectAnswersRule) {
-      return await rejectAssignment(job, worker, {
-        initialTestFailed: true
-      });
-    }
-    // check if the worker approved the previous honeypot
-    const honeypotApproved = await checkLastHoneypot(job, worker);
-
-    if (!honeypotApproved) {
-      return await rejectAssignment(job, worker, {
-        honeypotFailed: true
-      });
-    }
-    return assignment;
-  } catch (error) {
-    console.error(error);
-    throw Boom.badImplementation(
-      "Error while trying to check the worker's assignment status"
-    );
-  }
-});
-
-/**
- * Checks if the worker needs to do initial quiz.
+ * Checks if the worker has to do the initial quiz.
  *
  * @param {Object} job
  * @param {Object} worker
+ * @return {Boolean}
  */
 const shouldRunInitialTest = (exports.shouldRunInitialTest = async (
   job,
@@ -112,7 +73,17 @@ const shouldRunInitialTest = (exports.shouldRunInitialTest = async (
   return quizAnswersCount < job.data.initialTestsRule;
 });
 
-const getWorkerQuizScore = async (job, worker) => {
+/**
+ * Computes the score of the worker on the initial tests.
+ *
+ * @param {Object} job
+ * @param {Object} worker
+ * @return {Number}
+ */
+const getWorkerQuizScore = (exports.getWorkerQuizScore = async (
+  job,
+  worker
+) => {
   let testTasks = await delegates.testTasks.getWorkerTestTasks(
     job.id,
     worker.id,
@@ -140,8 +111,15 @@ const getWorkerQuizScore = async (job, worker) => {
       "Error while trying to compute worker's initial test score"
     );
   }
-};
+});
 
+/**
+ * Checks if the worker has to do a honeypot test.
+ *
+ * @param {Object} job
+ * @param {Object} worker
+ * @return {Boolean}
+ */
 const shouldRunHoneypot = (exports.shouldRunHoneypot = async (job, worker) => {
   const answersCount = await delegates.tasks.getWorkerTasksCount(
     job.id,
@@ -163,9 +141,9 @@ const shouldRunHoneypot = (exports.shouldRunHoneypot = async (job, worker) => {
  *
  * @param {Object} job
  * @param {Object} worker
- * @returns {Boolean}
+ * @return {Boolean}
  */
-const checkLastHoneypot = async (job, worker) => {
+const checkLastHoneypot = (exports.checkLastHoneypot = async (job, worker) => {
   let testTasks = await delegates.testTasks.getWorkerTestTasks(
     job.id,
     worker.id,
@@ -190,24 +168,4 @@ const checkLastHoneypot = async (job, worker) => {
       "Error while trying to check worker's last honeypot answer"
     );
   }
-};
-
-/**
- * Rejects the worker's assignment.
- *
- * @param {Object} job - The job
- * @param {Object} worker - The worker
- * @param {Object} data - Attributes to add in dat column.
- */
-const rejectAssignment = async (job, worker, data) => {
-  try {
-    return await delegates.workers.updateAssignment(job.uuid, worker.id, {
-      ...data,
-      finished: true,
-      end: new Date()
-    });
-  } catch (error) {
-    console.error(error);
-    throw Boom.badImplementation('Error while trying to reject assignment');
-  }
-};
+});

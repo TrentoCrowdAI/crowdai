@@ -25,7 +25,7 @@ class PaymentInstructions extends React.Component {
                   </li>
                   <li>For this study, the number of initial test questions is {job.data.initialTestsRule}.</li>
                   <li>
-                    You will earn the cumulated reward only if you answer a minimum of {job.data.minTasksRule}
+                    You will earn the accumulated reward only if you answer a minimum of {job.data.minTasksRule}
                     {job.data.minTasksRule > 1 ? ' tasks' : ' task'} (test questions are not counted)
                   </li>
                 </ul>

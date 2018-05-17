@@ -152,6 +152,11 @@ const createAssignment = (exports.createAssignment = async assignment => {
     finished: false,
     initialTestFailed: false,
     honeypotFailed: false,
+    solvedMinTasks: false,
+    finishedWithError: false,
+    finishedByWorker: false,
+    assignmentApproved: false,
+    assignmentBonusSent: false,
     start: new Date()
   };
 

@@ -2,7 +2,8 @@ const delegates = require(__base + 'delegates');
 const qualityManager = require('./quality');
 
 /**
- * Verify the status of the worker's assignment.
+ * Verify the status of the worker's assignment. If initial quiz is done, it
+ * checks the worker's answers. It also evaluates honeypots.
  *
  * @param {Object} job - The experiment
  * @param {Object} worker - The worker
@@ -32,12 +33,42 @@ const getWorkerAssignmentStatus = (exports.getWorkerAssignmentStatus = async (
     worker.id
   );
 
-  if (answersCount >= job.data.maxTasksRule) {
+  if (answersCount === job.data.maxTasksRule) {
     return await finishAssignment(job.uuid, worker.id, {
-      finishedByMaxTasksRule: true
+      finished: true
     });
   }
-  return await qualityManager.checkWorkerAssignment(job, worker, assignment);
+  const solvedMinTasks = await checkWorkerSolvedMinTasks(job, worker);
+
+  if (solvedMinTasks) {
+    assignment = await delegates.workers.updateAssignment(job.uuid, worker.id, {
+      solvedMinTasks
+    });
+  }
+
+  // check if initial quiz applies
+  let quizNeeded = await qualityManager.shouldRunInitialTest(job, worker);
+
+  if (quizNeeded) {
+    return assignment;
+  }
+  // check if the worker approved the initial quiz
+  let quizScore = await qualityManager.getWorkerQuizScore(job, worker);
+
+  if (quizScore < job.data.initialTestsMinCorrectAnswersRule) {
+    return await rejectAssignment(job, worker, {
+      initialTestFailed: true
+    });
+  }
+  // check if the worker approved the previous honeypot
+  const honeypotApproved = await qualityManager.checkLastHoneypot(job, worker);
+
+  if (!honeypotApproved) {
+    return await rejectAssignment(job, worker, {
+      honeypotFailed: true
+    });
+  }
+  return assignment;
 });
 
 /**
@@ -79,8 +110,46 @@ const finishAssignment = (exports.finishAssignment = async (
   data = {}
 ) => {
   return await delegates.workers.updateAssignment(uuid, workerId, {
-    finished: true,
     end: new Date(),
     ...data
   });
+});
+
+/**
+ * Rejects the worker's assignment.
+ *
+ * @param {Object} job - The job
+ * @param {Object} worker - The worker
+ * @param {Object} data - Attributes to add in the data column of the worker_assignment record.
+ */
+const rejectAssignment = (exports.rejectAssignment = async (
+  job,
+  worker,
+  data
+) => {
+  try {
+    return await delegates.workers.updateAssignment(job.uuid, worker.id, {
+      ...data,
+      end: new Date()
+    });
+  } catch (error) {
+    console.error(error);
+    throw Boom.badImplementation('Error while trying to reject assignment');
+  }
+});
+
+/**
+ * Checks if the worker answered the min number of tasks specified
+ * in the minTasksRule property of a job.
+ *
+ * @param {Object} job
+ * @param {Object} worker
+ * @return {Boolean}
+ */
+const checkWorkerSolvedMinTasks = (exports.checkWorkerSolvedMinTasks = async (
+  job,
+  worker
+) => {
+  const count = await delegates.tasks.getWorkerTasksCount(job.id, worker.id);
+  return count >= job.data.minTasksRule;
 });

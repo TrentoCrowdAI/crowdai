@@ -17,6 +17,7 @@ const getNextTask = (action$, store) =>
     return Observable.defer(() => axios.get(`/jobs/${session.experimentId}/tasks/next`, {params}))
       .mergeMap(response =>
         Observable.concat(
+          Observable.of(actions.checkAssignmentStatus()),
           Observable.of(actions.getNextTaskSuccess(response.data)),
           Observable.of(rewardActions.requestReward())
         )

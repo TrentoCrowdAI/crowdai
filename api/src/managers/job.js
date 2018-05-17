@@ -33,8 +33,8 @@ exports.nextTask = async (uuid, turkId, assignmentTurkId) => {
       assignmentTurkId
     );
 
-    if (workerAssignment.data.finished) {
-      return workerAssignment;
+    if (workerAssignment.data.end) {
+      return null;
     }
     let response = await taskManager.generateTasks(job, worker);
 
@@ -50,7 +50,7 @@ exports.nextTask = async (uuid, turkId, assignmentTurkId) => {
         response.criteria,
         true
       );
-      task.workerCanFinish = false;
+      task.workerSolvedMinTasks = false;
       return task;
     }
     const runHoneypot = await qualityManager.shouldRunHoneypot(job, worker);
@@ -62,7 +62,10 @@ exports.nextTask = async (uuid, turkId, assignmentTurkId) => {
         response.criteria,
         false
       );
-      task.workerCanFinish = await workerCanFinish(job, worker);
+      task.workerSolvedMinTasks = await stateManager.checkWorkerSolvedMinTasks(
+        job,
+        worker
+      );
       return task;
     }
     let task = await delegates.tasks.getTaskFromBuffer(job.id, worker.id);
@@ -71,7 +74,10 @@ exports.nextTask = async (uuid, turkId, assignmentTurkId) => {
     for (let c of task.data.criteria) {
       task.instructions.push(job.data.instructions[c.label]);
     }
-    task.workerCanFinish = await workerCanFinish(job, worker);
+    task.workerSolvedMinTasks = await stateManager.checkWorkerSolvedMinTasks(
+      job,
+      worker
+    );
     return task;
   } catch (error) {
     console.error(error);
@@ -182,6 +188,20 @@ const getWorkerReward = (exports.getWorkerReward = async (
       // worker record does not exist yet.
       return { reward: 0 };
     }
+    const assignment = await delegates.workers.getAssignment(uuid, worker.id);
+    const workerSolvedMinTask = await stateManager.checkWorkerSolvedMinTasks(
+      job,
+      worker
+    );
+
+    if (
+      !assignment ||
+      assignment.data.initialTestFailed ||
+      (assignment.data.end && !workerSolvedMinTask)
+    ) {
+      return { reward: 0 };
+    }
+
     const taskCount = await delegates.tasks.getWorkerTasksCount(
       job.id,
       worker.id
@@ -190,11 +210,6 @@ const getWorkerReward = (exports.getWorkerReward = async (
       job.id,
       worker.id
     );
-    const assignment = await delegates.workers.getAssignment(uuid, worker.id);
-
-    if (!assignment || assignment.data.initialTestFailed) {
-      return { reward: 0 };
-    }
 
     if (assignment.data.honeypotFailed) {
       // we do not pay for failed honeypot.
@@ -656,18 +671,6 @@ const finishJob = async job => {
   job.data.status = JobStatus.DONE;
   job.data.end = new Date();
   return await delegates.jobs.update(job.id, job);
-};
-
-/**
- * Checks if the worker can finish their assignment. We expect the worker to answer
- * at least the min number of tasks specified in the minTasksRule property of a job.
- *
- * @param {Object} job
- * @param {Object} worker
- */
-const workerCanFinish = async (job, worker) => {
-  const count = await delegates.tasks.getWorkerTasksCount(job.id, worker.id);
-  return count >= job.data.minTasksRule;
 };
 
 /**

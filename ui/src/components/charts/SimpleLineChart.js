@@ -20,7 +20,7 @@ class SimpleLineChart extends React.Component {
       var g = svg.append("g")
 
       g.append("text")
-        .text("Choose a ...")
+        .text("Choose a Task")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
     } else {
       this.buildGraph()
@@ -35,20 +35,36 @@ class SimpleLineChart extends React.Component {
     var g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
     var color = this.props.color
 
-    var x = this.props.x
-    var y = this.props.y
+    var x = this.props.x //worker_id
+    var y = this.props.y //answer
+    var z = this.props.z //yes,no,not clear
     
+    var datan = {}
+    var datas = this.props.data
+    function cc(i) {
+      datan = datas.filter(d => d[y]==z[i])
+      return datan.length
+    }
+
+    var labels = {
+      'yes': { label: z[0], num: cc(0), xtg: cc(0)*100/datas.length },
+      'no': { label: z[1], num: cc(1), xtg: cc(1)*100/datas.length },
+      'not clear': { label: z[2], num: cc(2), xtg: cc(2)*100/datas.length }
+    }
+
+    console.log(labels)
+
     var data = this.props.data.sort( function(a,b) {
-      return (a[x] > b[x]) ? 1 : ((b[x] > a[x]) ? -1 : 0);
+      return (Number(a[x]) > Number(b[x])) ? 1 : ((Number(b[x]) > Number(a[x])) ? -1 : 0);
     })
     
     var xscale = d3.scaleLinear()
-        .domain(d3.extent(data, d => d[x] ))
+        .domain(d3.extent(data, d => Number(d[x]) ))
         .range([0, width]);
     var xAxis = d3.axisBottom(xscale);
 
     var yscale = d3.scaleLinear()
-        .domain(d3.extent(data, d => d[y] ))
+        .domain( [d3.min(data, d => cc(z.indexOf(d[y]))*100/datas.length )-10, d3.max(data, d => cc(z.indexOf(d[y]))*100/datas.length )+10] )
         .range([height, 0]);
     var yAxis = d3.axisLeft(yscale);
 
@@ -74,26 +90,93 @@ class SimpleLineChart extends React.Component {
 
     //deploy data to be dispalyed on a line
     var line = d3.line()
-        .x( (d) => {return xscale(d[x])} )
-        .y( (d) => {return yscale(d[y])} )
+        .x( (d) => { return xscale( Number(d[x]) ) } )
+        .y( (d) => { return yscale( labels[d[y]].xtg ) } )
         .curve(d3.curveMonotoneX);
+
+    var goldline = d3.line()
+      .x( (d) => {return xscale(d[x]+","+d[z])} )
+      .y( (d) => {return yscale(d[y]/1000)} )
+
+    var xtggold = Math.max( labels[z[0]].xtg, labels[z[1]].xtg, labels[z[2]].xtg )
+    var labelgold
+    z.map(d => labels[d].xtg==xtggold ? labelgold=labels[d].label : null )
+    
+    console.log(labelgold, xtggold)
+
+    g.append("text")
+      .attr("fill", "red")
+      .attr("transform", "translate("+width/2+","+yscale(labels[labelgold].xtg)+")")
+      .attr("text-anchor","middle")
+      .attr("dy","-0.5em")
+      .text(labelgold)
+
+    g.append("text")
+      .attr("fill", "lightgreen")
+      .attr("transform", "translate("+width/2+","+yscale(labels['not clear'].xtg)+")")
+      .attr("text-anchor","middle")
+      .attr("dy","-0.5em")
+      .text('not clear')
+
+    g.append("path")
+      .datum([
+        {
+          item_id: 1,
+          criteria_id: 1,
+          worker_id: "0",
+          answer: labelgold
+        },
+        {
+          item_id: 1,
+          criteria_id: 1,
+          worker_id: '500',
+          answer: labelgold
+        }])
+      .attr("class","gold")
+      .attr("transform","translate(0,0)")
+      .attr("d", line)
+      .style("stroke", "red")
+      .style("fill","none")
+      .style("stroke-width",1)
+      
+      g.append("path")
+      .datum([
+        {
+          item_id: 1,
+          criteria_id: 1,
+          worker_id: "0",
+          answer: 'not clear'
+        },
+        {
+          item_id: 1,
+          criteria_id: 1,
+          worker_id: '500',
+          answer: 'not clear'
+        }])
+      .attr("class","gold")
+      .attr("transform","translate(0,0)")
+      .attr("d", line)
+      .style("stroke", "lightgreen")
+      .style("fill","none")
+      .style("stroke-width",1)
+    
 
     g.append("path")
       .datum(data)
       .attr("class","original")
       .attr("d", line)
-      .style("stroke", color)
+      .style("stroke", 'orange')
       .style("fill","none")
       .style("stroke-width",2)
 
     g.selectAll(".dot")
       .data(data).enter()
         .append("circle")
-        .style("fill", color)
+        .style("fill", 'steelblue')
         .attr("class","dot")
         .attr("cx", d => xscale(d[x]) )
-        .attr("cy", d => yscale(d[y]) )
-        .attr("r",5)
+        .attr("cy", d => yscale(labels[d[y]].xtg) )
+        .attr("r",4)
         .on("click", (d) => {
           this.setState({
             clicked: []
@@ -169,6 +252,7 @@ class SimpleLineChart extends React.Component {
   }
 
   render() {
+    console.log(this.props)
     return(
       <div>
         <svg className={this.props.selector} width="1000" height="400"> </svg>

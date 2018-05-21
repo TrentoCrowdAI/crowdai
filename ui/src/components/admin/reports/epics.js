@@ -63,6 +63,20 @@ const fetchTasksAgreements = (action$, store) =>
       .catch(error => Observable.of(actions.fetchItemError(flattenError(error))));
 });
 
+const getWorkersAgreements = (action$, store) =>
+action$.ofType(actionTypes.FETCH_WAGREES).switchMap(action => {
+  return Observable.defer(() => requestersApi.get('getWorkersAgreements/'+action.jobId+'/'+action.itemId+'/'+action.criteriaId))
+    .mergeMap(response => Observable.of(actions.fetchWorkersAgreementsSuccess(response.data)))
+    .catch(error => Observable.of(actions.fetchWorkersAgreementsError(flattenError(error))));
+});
+
+const fetchWorkersAgreements = (action$, store) =>
+  action$.ofType(actionTypes.FETCH_ITEM).switchMap(action => {
+    return Observable.defer(() => requestersApi.get('getWorkersAgreements/'+action.jobId+'/'+action.itemId+'/'+action.criteriaId))
+      .mergeMap(response => Observable.of(actions.fetchItemSuccess(response.data)))
+      .catch(error => Observable.of(actions.fetchItemError(flattenError(error))));
+});
+
 const getWorkers = (action$, store) =>
   action$.ofType(actionTypes.FETCH_WORKERS).switchMap(action => {
     return Observable.defer(() => requestersApi.get('getWorkersByJob/'+action.jobId))
@@ -82,5 +96,6 @@ export default combineEpics(getTaskTime, fetchTaskTime,
                             getWorkerTimes, fetchWorkerTimes, 
                             getAnswers, fetchAnswers,
                             getWorkers, fetchWorkers,
-                            getTasksAgreements, fetchTasksAgreements
+                            getTasksAgreements, fetchTasksAgreements,
+                            getWorkersAgreements, fetchWorkersAgreements
                           );

@@ -22,10 +22,15 @@ const getTasksAgreements = async ctx => {
   ctx.response.body = await delegates.reports.getTasksAgreements(ctx.params.id);
 };
 
+const getWorkersAgreements = async ctx => {
+  ctx.response.body = await delegates.reports.getWorkersAgreements(ctx.params.jobId, ctx.params.itemId, ctx.params.criteriaId);
+};
+
 exports.register = router => {
   router.get('/getAllTasksTImesByJob/:id', getAllTasksTimesByJob);
   router.get('/getWorkerTimes/:jobId/:workerId', getWorkerTimes);
   router.get('/getWorkersByJob/:id', getWorkersByJob);
   router.get('/getWorkerAnswers/:jobId/:workerId', getWorkerAnswers);
   router.get('/getTasksAgreements/:id', getTasksAgreements);
+  router.get('/getWorkersAgreements/:jobId/:itemId/:criteriaId', getWorkersAgreements);
 };

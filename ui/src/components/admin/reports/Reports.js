@@ -125,7 +125,7 @@ class Reports extends React.Component {
 				this.props.fetchTasksAgreements(this.props.match.params.jobid)
 				break;
 			case 'Classification':
-				this.props.fetchWorkersAgreements(this.props.match.params.jobid,1,1);
+				this.props.fetchWorkersAgreements(this.props.match.params.jobid,50,26);
 				break;
 			default:
 				console.log('Metric to implement: ', value)

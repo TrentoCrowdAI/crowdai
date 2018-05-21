@@ -15,8 +15,8 @@ const getAllTasksTimesByJob = (exports.getAllTasksTimesByJob = async id => {
         (data->'criteria')::json#>>'{0,id}' AS criteria_id,
         (data->>'end')::TIMESTAMP WITHOUT TIME ZONE AS time_end,
         (data->>'start')::TIMESTAMP WITHOUT TIME ZONE AS time_start 
-      FROM ${db.TABLES.Task_7500}
-      WHERE job_id=$1
+      FROM ${db.TABLES.Task}
+      WHERE job_id=$1 AND (data->'end') IS NOT NULL
     ) AS times_table 
   GROUP BY
     times_table.item_id,
@@ -34,10 +34,10 @@ const getAllTasksTimesByJob = (exports.getAllTasksTimesByJob = async id => {
 const getWorkersByJob = (exports.getWorkersByJob = async id => {
   try {
     let res = await db.query(
-    `select distinct t.worker_id, w.turk_id
-    from ${db.TABLES.Task_7500} t join ${db.TABLES.Worker} w on t.worker_id=w.id
-    where t.job_id=$1
-    order by t.worker_id`, [id]);
+    `SELECT DISTINCT t.worker_id, w.turk_id
+    FROM ${db.TABLES.Task} t JOIN ${db.TABLES.Worker} w ON t.worker_id=w.id
+    WHERE t.job_id=$1 AND (t.data->'end') IS NOT NULL
+    ORDER BY t.worker_id`, [id]);
     return workers = { workers: res.rows };
   } catch (error) {
     console.error(error);
@@ -59,8 +59,8 @@ const getWorkerTimes = (exports.getWorkerTimes = async (jobId, workerId) => {
         (data->'criteria')::json#>>'{0,id}' AS criteria_id,
         (data->>'end')::TIMESTAMP WITHOUT TIME ZONE AS time_end,
         (data->>'start')::TIMESTAMP WITHOUT TIME ZONE AS time_start 
-      FROM ${db.TABLES.Task_7500}
-      WHERE job_id=$1 and worker_id=$2
+      FROM ${db.TABLES.Task}
+      WHERE job_id=$1 AND worker_id=$2 AND (data->'end') IS NOT NULL
     ) AS times_table 
   GROUP BY
     times_table.item_id,
@@ -78,9 +78,9 @@ const getWorkerTimes = (exports.getWorkerTimes = async (jobId, workerId) => {
 const getWorkerAnswers = (exports.getWorkerAnswers = async (jobId,workerId) => {
   try {
     let res = await db.query(
-      `select id, item_id, (data->'criteria')::json#>>'{0,id}' as criteria_id, (data->'criteria')::json#>>'{0,workerAnswer}' as answer
-    from ${db.TABLES.Task_7500} 
-    where worker_id=$2 and job_id=$1`,
+      `SELECT id, item_id, (data->'criteria')::json#>>'{0,id}' AS criteria_id, (data->'criteria')::json#>>'{0,workerAnswer}' AS answer
+    FROM ${db.TABLES.Task} 
+    WHERE worker_id=$2 AND job_id=$1 AND (data->'end') IS NOT NULL`,
       [jobId,workerId]);
     return (tasks = { tasks: res.rows });
   } catch (error) {
@@ -96,8 +96,8 @@ const getTasksAgreements = (exports.getTasksAgreements = async id => {
       COUNT( CASE (data->'criteria')::json#>>'{0,workerAnswer}' WHEN 'yes' THEN 1 ELSE null END) AS c1,
       COUNT( CASE (data->'criteria')::json#>>'{0,workerAnswer}' WHEN 'no' THEN 1 ELSE null END) AS c2,
       COUNT( CASE (data->'criteria')::json#>>'{0,workerAnswer}' WHEN 'not clear' THEN 1 ELSE null END) AS c3
-    FROM ${db.TABLES.Task_7500}
-    WHERE job_id=$1
+    FROM ${db.TABLES.Task}
+    WHERE job_id=$1 AND (data->'end') IS NOT NULL
     GROUP BY item_id,(data->'criteria')::json#>>'{0,id}'
     ORDER BY item_id,(data->'criteria')::json#>>'{0,id}'`,
       [id]);
@@ -112,8 +112,8 @@ const getWorkersAgreements = (exports.getWorkersAgreements = async (jobId, itemI
   try {
     let res = await db.query(`
       SELECT item_id,(data->'criteria')::json#>>'{0,id}' AS criteria_id,worker_id,(data->'criteria')::json#>>'{0,workerAnswer}' AS answer
-      FROM ${db.TABLES.Task_7500}
-      WHERE job_id=$1 AND item_id=$2 AND (data->'criteria')::json#>>'{0,id}'=$3
+      FROM ${db.TABLES.Task}
+      WHERE job_id=$1 AND item_id=$2 AND (data->'criteria')::json#>>'{0,id}'=$3 AND (data->'end') IS NOT NULL
       
     `, [jobId,itemId,criteriaId])
     return tasks = { tasks: res.rows }

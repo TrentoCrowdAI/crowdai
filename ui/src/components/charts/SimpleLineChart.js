@@ -86,7 +86,7 @@ class SimpleLineChart extends React.Component {
           .attr("transform","rotate(-90)")
           .attr("text-anchor","end")
           .attr("dy","2em")
-          .text(this.props.y);
+          .text("%");
 
     //deploy data to be dispalyed on a line
     var line = d3.line()

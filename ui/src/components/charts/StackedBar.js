@@ -88,9 +88,9 @@ class StackedBar extends React.Component {
     		.attr("transform", d => "translate(0,"+yscale(d[x]+','+d[z])+")")
     		.on("mouseover", function(d) {
     			d3.select(this).style("opacity","0.8")
-    			g.selectAll(".y").selectAll("text").filter( function(text) {
+    			/*g.selectAll(".y").selectAll("text").filter( function(text) {
     				return text === d[x]+','+d[z] })
-    				.transition().duration(100).style('font','15px sans-serif')
+    				.transition().duration(100).style('font','15px sans-serif')*/
     		})
     		.on("mouseout", function(d) {
     			d3.select(this).style("opacity","1")

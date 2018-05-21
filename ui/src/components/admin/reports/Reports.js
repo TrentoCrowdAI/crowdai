@@ -124,6 +124,9 @@ class Reports extends React.Component {
 				//this.props.reports.tasks = Object.values(agreeData.tasks)
 				this.props.fetchTasksAgreements(this.props.match.params.jobid)
 				break;
+			case 'Classification':
+				this.props.fetchWorkersAgreements(this.props.match.params.jobid,1,1);
+				break;
 			default:
 				console.log('Metric to implement: ', value)
 				break;
@@ -132,24 +135,26 @@ class Reports extends React.Component {
 		this.setState({
 			...this.state,
 			activeMetric: value,
-			activeworker: value=='T_CompleteTime'||value=='Distribution' ? false : true,
-			chosenworker: value=='T_CompleteTime'||value=='Distribution' ? 'all' : this.state.chosenworker
+			activeworker: value=='T_CompleteTime'||value=='Distribution'||value=='Classification' ? false : true,
+			chosenworker: value=='T_CompleteTime'||value=='Distribution'||value=='Classification' ? 'all' : this.state.chosenworker
 		})
 	}
 
 	chooseWorker(e, {value}) {
 		switch(this.state.activeMetric) {
-			case 'Distribution':
-				this.props.reports.tasks = Object.values(agreeData.tasks)
-				break;
 			case 'Percentage':
-			if (value=='all')
-				this.props.reports.tasks = []
-			else
-				this.props.fetchAnswers(this.props.match.params.jobid,Number(value))
+				if (value=='all')
+					this.props.reports.tasks = []
+				else
+					this.props.fetchAnswers(this.props.match.params.jobid,Number(value))
+				break;
+			case 'W_CompleteTime':
+				if (value=='all')
+					this.props.reports.tasks = []
+				else
+					this.props.fetchWorkerTimes(this.props.match.params.jobid,Number(value))
 				break;
 			default:
-				this.props.fetchWorkerTimes(this.props.match.params.jobid,value)		
 				break;
 		}
 
@@ -226,11 +231,11 @@ class Reports extends React.Component {
 				>Votes Distribution per Task</Button>
 				<br />
 				<Button 
-					value='Classifications'
+					value='Classification'
 					className='metrics' 
 					style={{marginBottom: '5px'}}
 					onClick={this.activeMetric}
-				>-</Button>
+				>Task Classification and Worker Agreement</Button>
 				<br />
 				<Button 
 					value='Initial_Fails'
@@ -319,6 +324,13 @@ class Reports extends React.Component {
 				z=['item_id','criteria_id']
 				break;
 
+			case 'Classification' :
+				chart='linechart'
+				x='worker_id'
+				y='answer'
+				z=['yes','no','not clear']
+				break;
+
 			default:
 				break;
 		}
@@ -329,7 +341,7 @@ class Reports extends React.Component {
 					onChange={this.chooseJob}
 					chosenjob={this.state.chosenjob}
 				/>
-				
+			
  */
 
 		return(
@@ -373,6 +385,7 @@ Reports.propTypes = {
 	fetchAnswers: PropTypes.func,
 	fetchWorkerTimes: PropTypes.func,
 	fetchTasksAgreements: PropTypes.func,
+	fetchWorkersAgreements: PropTypes.func,
 
   //exp_error: PropTypes.any,
   //exp_loading: PropTypes.bool,
@@ -394,7 +407,8 @@ const mapDispatchToProps = dispatch => ({
 	fetchWorkerTimes: (jobId,workerId) => dispatch(actions.fetchWorkerTimes(jobId,workerId)),
 	fetchAnswers: (jobId,workerId) => dispatch(actions.fetchAnswers(jobId,workerId)),
 	fetchWorkers: jobId => dispatch(actions.fetchWorkers(jobId)),
-	fetchTasksAgreements: jobId => dispatch(actions.fetchTasksAgreements(jobId))
+	fetchTasksAgreements: jobId => dispatch(actions.fetchTasksAgreements(jobId)),
+	fetchWorkersAgreements: (jobId,itemId,criteriaId) => dispatch(actions.fetchWorkersAgreements(jobId,itemId,criteriaId))
 })
 
 const mapStateToProps = state => ({

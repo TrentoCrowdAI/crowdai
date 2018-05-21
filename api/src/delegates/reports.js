@@ -107,3 +107,18 @@ const getTasksAgreements = (exports.getTasksAgreements = async id => {
     throw Boom.badImplementation('Error while trying to fetch record');
   }
 });
+
+const getWorkersAgreements = (exports.getWorkersAgreements = async (jobId, itemId, criteriaId) => {
+  try {
+    let res = await db.query(`
+      SELECT item_id,(data->'criteria')::json#>>'{0,id}' AS criteria_id,worker_id,(data->'criteria')::json#>>'{0,workerAnswer}' AS answer
+      FROM ${db.TABLES.Task_7500}
+      WHERE job_id=$1 AND item_id=$2 AND (data->'criteria')::json#>>'{0,id}'=$3
+      
+    `, [jobId,itemId,criteriaId])
+    return tasks = { tasks: res.rows }
+  } catch (error) {
+    console.error(error);
+    throw Boom.badImplementation('Error while trying to fetch record');
+  }
+});

@@ -20,6 +20,9 @@ const actionTypes = {
   FETCH_WORKERS: 'C_FETCH_WORKERS',
   FETCH_WORKERS_SUCCESS: 'C_FETCH_WORKERS_SUCCESS',
   FETCH_WORKERS_ERROR: 'C_FETCH_WORKERS_ERROR',
+  FETCH_WAGREES: 'C_FETCH_WAGREES',
+  FETCH_WAGREES_SUCCESS: 'C_FETCH_WAGREES_SUCCESS',
+  FETCH_WAGREES_ERROR: 'C_FETCH_WAGREES_ERROR',
   ...getActionTypes(scopes.REPORTS)
 };
 
@@ -78,6 +81,27 @@ const actions = {
   fetchTasksAgreementsError(error) {
     return {
       type: actionTypes.FETCH_AGREEMENTS_ERROR,
+      error
+    };
+  },
+
+  fetchWorkersAgreements(jobId,itemId,criteriaId) {
+    return {
+      type: actionTypes.FETCH_WAGREES,
+      jobId,
+      itemId,
+      criteriaId
+    };
+  },
+  fetchWorkersAgreementsSuccess(response) {
+    return {
+      type: actionTypes.FETCH_WAGREES_SUCCESS,
+      response
+    };
+  },
+  fetchWorkersAgreementsError(error) {
+    return {
+      type: actionTypes.FETCH_WAGREES_ERROR,
       error
     };
   },

@@ -177,12 +177,32 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+-- helper function that computes in or out votes for a given item
+CREATE OR REPLACE FUNCTION compute_item_in_out_votes(
+	p_job_id bigint, 
+	p_item_id bigint, 
+	p_criteria_id bigint,
+	p_answer varchar(3)
+) RETURNS int AS $$
+DECLARE v_votes int;
+DECLARE v_criteria_filter text;
+BEGIN
+	v_criteria_filter := '{"criteria" : [{"id": "'||p_criteria_id||'", "workerAnswer": "'||p_answer||'"}]}';
+    select count(t.*) into v_votes from task t
+      where t.job_id = p_job_id
+        and t.item_id = p_item_id
+        and t.data @> v_criteria_filter::jsonb
+        and (t.data ->> 'answered')::boolean = true;
+    RETURN v_votes;
+END;
+$$ LANGUAGE plpgsql;
+
 
 -- this tables stores the screening results
 -- data: {
 --  criteria: [<id number>, ...],
 --  pout: <number>,
---  ...  
+--  outcome: 'IN | OUT | NEUTRAL'  
 --}
 CREATE TABLE result (
   id bigserial NOT NULL,

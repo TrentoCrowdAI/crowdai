@@ -5,79 +5,13 @@ import PropTypes from 'prop-types';
 import ChartWrapper from 'src/components/charts/ChartWrapper';
 import JobChooser from './JobChooser';
 import WorkerChooser from './WorkerChooser';
-import { Button, Dimmer, Loader } from 'semantic-ui-react';
+import ItemChooser from './ItemChooser';
+import CritChooser from './CritChooser';
+import { Button, Dimmer, Loader, Item, Form } from 'semantic-ui-react';
 import './reports.css';
 
 import { actions } from './actions';
 //import { actions as expactions } from '../experiments/actions';
-
-var agreeData = {
-			tasks: {
-				question1: {
-					item_id: 2,
-					filter_id: 1,
-					c1: 4,
-					c2: 6,
-					c3: 2
-				},
-				question2: {
-					item_id: 2,
-					filter_id: 2,
-					c1: 2,
-					c2: 4,
-					c3: 0
-				},
-				question3: {
-					item_id: 2,
-					filter_id: 3,
-					c1: 6,
-					c2: 0,
-					c3: 2
-				},
-				question4: {
-					item_id: 1,
-					filter_id: 2,
-					c1: 0,
-					c2: 2,
-					c3: 9
-				},
-				question5: {
-					item_id: 3,
-					filter_id: 1,
-					c1: 0,
-					c2: 3,
-					c3: 3
-				},
-				question6: {
-					item_id: 3,
-					filter_id: 4,
-					c1: 1,
-					c2: 1,
-					c3: 4
-				},
-				question7: {
-					item_id: 3,
-					filter_id: 5,
-					c1: 1,
-					c2: 0,
-					c3: 12
-				},
-				question8: {
-					item_id: 3,
-					filter_id: 6,
-					c1: 9,
-					c2: 6,
-					c3: 3
-				},
-				question9: {
-					item_id: 4,
-					filter_id: 3,
-					c1: 2,
-					c2: 5,
-					c3: 0
-				}
-			}
-}
 
 var WorkerOptions = {
 	'all' : 'All Workers'
@@ -86,6 +20,27 @@ var WorkerOptions = {
 	'all' : 'All Jobs'
 }*/
 
+var CritOptions = {
+	'all': 'Choose Criteria',
+	1: '1',
+	2: '2',
+	3: '3',
+	27: '27',
+	28: '28'
+
+}
+
+var ItemOptions = {
+	'all': 'Choose Item',
+	1: '1',
+	2: '2',
+	3: '3',
+	55: '55',
+	56: '56',
+	57: '57',
+	
+}
+
 class Reports extends React.Component {
 	constructor(props) {
 		super(props);
@@ -93,11 +48,17 @@ class Reports extends React.Component {
 			activeMetric : '(choose a metric)',
 			//chosenjob: this.props.match.params.jobid,
 			chosenworker: 'all',
-			activeworker: false
+			activeworker: false,
+			chosencriteria: 'all',
+			activecriteria: false,
+			chosenitem: 'all',
+			activeitem: false
 		}
 		this.activeMetric = this.activeMetric.bind(this)
 		//this.chooseJob = this.chooseJob.bind(this)
 		this.chooseWorker = this.chooseWorker.bind(this)
+		this.chooseCriteria = this.chooseCriteria.bind(this)
+		this.chooseItem = this.chooseItem.bind(this)
 	}
 
 	componentDidMount() {
@@ -125,7 +86,7 @@ class Reports extends React.Component {
 				this.props.fetchTasksAgreements(this.props.match.params.jobid)
 				break;
 			case 'Classification':
-				this.props.fetchWorkersAgreements(this.props.match.params.jobid,50,26);
+				this.props.fetchWorkersAgreements(this.props.match.params.jobid,'all','all');
 				break;
 			default:
 				console.log('Metric to implement: ', value)
@@ -135,8 +96,10 @@ class Reports extends React.Component {
 		this.setState({
 			...this.state,
 			activeMetric: value,
-			activeworker: value=='T_CompleteTime'||value=='Distribution'||value=='Classification' ? false : true,
-			chosenworker: value=='T_CompleteTime'||value=='Distribution'||value=='Classification' ? 'all' : this.state.chosenworker
+			activeworker: value==='T_CompleteTime'||value==='Distribution'||value==='Classification' ? false : true,
+			chosenworker: value==='T_CompleteTime'||value=='Distribution'||value==='Classification' ? 'all' : this.state.chosenworker,
+			activeitem: value==='Classification' ? true : false,
+			activecriteria: value==='Percentage' ? true : false
 		})
 	}
 
@@ -163,6 +126,32 @@ class Reports extends React.Component {
 			chosenworker: value
 		})
 }
+
+	chooseItem(e, {value}) {
+		this.setState({
+			...this.state,
+			chosenitem: value,
+			activecriteria: true
+		})
+	}
+
+	chooseCriteria(e, {value}) {
+		this.setState({
+			...this.state,
+			chosencriteria: value
+		})
+
+		switch(this.state.activeMetric) {
+			case 'Percentage':
+				break;
+			case 'Classification':
+				this.props.fetchWorkersAgreements(this.props.match.params.jobid,this.state.chosenitem,value);
+				break;
+			default:
+				break;
+		}
+		
+	}
 
 	/*chooseJob(e, {value}) {
 		switch(this.state.activeMetric) {
@@ -255,7 +244,7 @@ class Reports extends React.Component {
 		)
 	}
 
-	renderChart(chart,x,y,z) {
+	renderChart(chart,x,y,z,param) {
 		return(
 			<div>
 			<Dimmer active={this.props.rep_loading} inline="centered" inverted>
@@ -267,7 +256,8 @@ class Reports extends React.Component {
         y={y}
         z={z}
         selector={'chart1'}
-        color={'steelblue'}
+				color={'steelblue'}
+				param={param}
 				data={Object.values(this.props.reports.tasks)}
       />
       </div>
@@ -287,6 +277,15 @@ class Reports extends React.Component {
       WorkerOptions[step.worker_id] = step.turk_id
 		});
 
+		/*Object.values(this.props.items.items).map( step => {
+      ItemOptions[step.id] = step.item_id
+		});
+
+		Object.values(this.props.criteria.criteria).map( step => {
+      CritOptions[step.id] = step.criteria_id
+		});*/
+
+		var param=''
 		var chart
 		//first group_by
 		var x
@@ -313,7 +312,7 @@ class Reports extends React.Component {
 			case 'Distribution':
 				chart='stacked'
 				x='item_id'
-				y=['c1','c2','c3']
+				y=['yes','no','not clear']
 				z='criteria_id'
 				break;
 
@@ -322,6 +321,7 @@ class Reports extends React.Component {
 				x='id'
 				y='answer'
 				z=['item_id','criteria_id']
+				param=this.state.chosencriteria
 				break;
 
 			case 'Classification' :
@@ -350,7 +350,9 @@ class Reports extends React.Component {
 				<div className="rowC">
 				<h3 style={{color: 'steelblue'}}>
 					Selected Job_id: <i>{this.props.match.params.jobid}</i><br />
-					Selected Worker_id: <i>{this.state.chosenworker}</i>
+					Selected Worker_id: <i>{this.state.chosenworker}</i><br />
+					Selected Item_id: <i>{this.state.chosenitem}</i><br />
+					Selected Criteria_id: <i>{this.state.chosencriteria}</i>
 				</h3>
 
 				<div style={{width: "20%"}}></div>
@@ -361,6 +363,18 @@ class Reports extends React.Component {
 					options={WorkerOptions}
 					onChange={this.chooseWorker}
 					chosenworker={this.state.chosenworker}
+				/><br />
+				<ItemChooser 
+					disabled={(!this.state.activeitem)}
+					options={ItemOptions}
+					onChange={this.chooseItem}
+					chosenitem={this.state.chosenitem}
+				/><br />
+				<CritChooser 
+					disabled={(!this.state.activecriteria)}
+					options={CritOptions}
+					onChange={this.chooseCriteria}
+					chosencriteria={this.state.chosencriteria}
 				/>
 				</div>
 				</div>
@@ -370,7 +384,7 @@ class Reports extends React.Component {
 
 				<div className="rowC">
 				{this.renderMetrics()}
-				{this.renderChart(chart,x,y,z)}
+				{this.renderChart(chart,x,y,z,param)}
 				</div>
 
 			</div>
@@ -387,6 +401,8 @@ Reports.propTypes = {
 	fetchTasksAgreements: PropTypes.func,
 	fetchWorkersAgreements: PropTypes.func,
 
+	fetchItems: PropTypes.func,
+	fetchCriteria: PropTypes.func,
   //exp_error: PropTypes.any,
   //exp_loading: PropTypes.bool,
 	//experiments: PropTypes.any,
@@ -398,7 +414,15 @@ Reports.propTypes = {
 
 	worker_error: PropTypes.any,
 	worker_loading: PropTypes.bool,
-	workers: PropTypes.any
+	workers: PropTypes.any,
+
+	/*items: PropTypes.any,
+	i_loading: PropTypes.bool,
+	i_error: PropTypes.any,
+
+	criteria: PropTypes.any,
+	cr_loading: PropTypes.bool,
+	cr_error: PropTypes.any*/
 }
 
 const mapDispatchToProps = dispatch => ({
@@ -408,7 +432,9 @@ const mapDispatchToProps = dispatch => ({
 	fetchAnswers: (jobId,workerId) => dispatch(actions.fetchAnswers(jobId,workerId)),
 	fetchWorkers: jobId => dispatch(actions.fetchWorkers(jobId)),
 	fetchTasksAgreements: jobId => dispatch(actions.fetchTasksAgreements(jobId)),
-	fetchWorkersAgreements: (jobId,itemId,criteriaId) => dispatch(actions.fetchWorkersAgreements(jobId,itemId,criteriaId))
+	fetchWorkersAgreements: (jobId,itemId,criteriaId) => dispatch(actions.fetchWorkersAgreements(jobId,itemId,criteriaId)),
+	/*fetchItems: (jobId) => dispatch(actions.fetchItems(jobId)),
+	fetchCriteria: (jobId) => dispatch(actions.fetchCriteria(jobId))*/
 })
 
 const mapStateToProps = state => ({
@@ -423,6 +449,14 @@ const mapStateToProps = state => ({
 	workers: state.report.wlist.workers,
 	worker_error: state.report.wlist.error,
 	worker_loading: state.report.wlist.loading,
+
+	/*items: state.report.ilist.items,
+	i_error: state.report.ilist.erros,
+	i_loading: state.report.ilist.loading,
+
+	criteria: state.report.crlist.criteria,
+	cr_error: state.report.crlist.error,
+	cr_loading: state.report.crlist.loading*/
 })
 
 export default connect(mapStateToProps,mapDispatchToProps)(Reports)

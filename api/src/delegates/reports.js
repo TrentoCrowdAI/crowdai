@@ -93,9 +93,9 @@ const getTasksAgreements = (exports.getTasksAgreements = async id => {
   try {
     let res = await db.query(
     `SELECT item_id,(data->'criteria')::json#>>'{0,id}' AS criteria_id,
-      COUNT( CASE (data->'criteria')::json#>>'{0,workerAnswer}' WHEN 'yes' THEN 1 ELSE null END) AS c1,
-      COUNT( CASE (data->'criteria')::json#>>'{0,workerAnswer}' WHEN 'no' THEN 1 ELSE null END) AS c2,
-      COUNT( CASE (data->'criteria')::json#>>'{0,workerAnswer}' WHEN 'not clear' THEN 1 ELSE null END) AS c3
+      COUNT( CASE (data->'criteria')::json#>>'{0,workerAnswer}' WHEN 'yes' THEN 1 ELSE null END) AS yes,
+      COUNT( CASE (data->'criteria')::json#>>'{0,workerAnswer}' WHEN 'no' THEN 1 ELSE null END) AS no,
+      COUNT( CASE (data->'criteria')::json#>>'{0,workerAnswer}' WHEN 'not clear' THEN 1 ELSE null END) AS "not clear"
     FROM ${db.TABLES.Task}
     WHERE job_id=$1 AND (data->'end') IS NOT NULL
     GROUP BY item_id,(data->'criteria')::json#>>'{0,id}'

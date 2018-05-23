@@ -52,7 +52,7 @@ class SimpleLineChart extends React.Component {
       'not clear': { label: z[2], num: cc(2), xtg: cc(2)*100/datas.length }
     }
 
-    console.log(labels)
+    //console.log(labels)
 
     var data = this.props.data.sort( function(a,b) {
       return (Number(a[x]) > Number(b[x])) ? 1 : ((Number(b[x]) > Number(a[x])) ? -1 : 0);
@@ -102,7 +102,7 @@ class SimpleLineChart extends React.Component {
     var labelgold
     z.map(d => labels[d].xtg==xtggold ? labelgold=labels[d].label : null )
     
-    console.log(labelgold, xtggold)
+    //console.log(labelgold, xtggold)
 
     g.append("text")
       .attr("fill", "red")
@@ -252,7 +252,7 @@ class SimpleLineChart extends React.Component {
   }
 
   render() {
-    console.log(this.props)
+    //console.log(this.props)
     return(
       <div>
         <svg className={this.props.selector} width="1000" height="400"> </svg>

@@ -94,9 +94,9 @@ class StackedBar extends React.Component {
     		})
     		.on("mouseout", function(d) {
     			d3.select(this).style("opacity","1")
-    			g.selectAll(".y").selectAll("text").filter( function(text) {
+    			/*g.selectAll(".y").selectAll("text").filter( function(text) {
     				return text === d[x]+','+d[z] })
-    				.transition().style('font','10px sans-serif')
+    				.transition().style('font','10px sans-serif')*/
     		})
 
     var bars = rows.selectAll("rect")
@@ -116,7 +116,7 @@ class StackedBar extends React.Component {
     		.attr("dx", "0.5em")
 				.style("text-anchor","begin")
 				.attr("fill","white")
-    		.text(d => d.absolute !==0 && (d.x1-d.x0)>0.04 ? d.absolute : "")
+    		.text(d => d.absolute !==0 && (d.x1-d.x0)>0.04 ? d.absolute+",\t"+d.name : "")
 
     	g.append("g")
     			.attr("class", "y axis")

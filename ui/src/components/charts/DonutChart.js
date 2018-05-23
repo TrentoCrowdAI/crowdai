@@ -11,19 +11,19 @@ class DonutChart extends React.Component {
     super(props);
     this.state = {
       clicked: [],
-      chosencriteria: 'all',
+      //chosencriteria: 'all',
       data: this.props.data
     }
     this.buildGraph = this.buildGraph.bind(this);
     this.dataWrapper = this.dataWrapper.bind(this);
-    this.chooseCriteria = this.chooseCriteria.bind(this);
+    //this.chooseCriteria = this.chooseCriteria.bind(this);
   }
 
   dataWrapper() {
-    if(this.state.chosencriteria=='all') {
+    if(this.props.param=='all') {
       var crit_filtered_data = this.props.data          
     } else {
-      var crit_filtered_data = this.props.data.filter(d => d[this.props.z[1]]==this.state.chosencriteria )
+      var crit_filtered_data = this.props.data.filter(d => d[this.props.z[1]]==this.props.param )
     }
 
     if(crit_filtered_data.length==0) {
@@ -39,13 +39,13 @@ class DonutChart extends React.Component {
     }
   }
 
-  chooseCriteria(e) {
+  /*chooseCriteria(e) {
     //console.log(e.target.value)
     this.setState({
       ...this.state,
       chosencriteria: e.target.value
     })
-  }
+  }*/
 
   buildGraph(crit_filtered_data) {
     var svg = d3.select("."+this.props.selector);
@@ -99,7 +99,7 @@ class DonutChart extends React.Component {
         var nuovo = []
         data.map( step => {
           //console.log(d,d.data)
-          if(step[y]==d.data && (this.state.chosencriteria=='all' ? true : (step[z[1]]==this.state.chosencriteria))) {
+          if(step[y]==d.data && (this.props.param=='all' ? true : (step[z[1]]==this.props.param))) {
             nuovo = nuovo.concat([step])
           }
         })
@@ -136,18 +136,8 @@ class DonutChart extends React.Component {
     this.dataWrapper();
   }
 
-  render() {
-    var y = this.props.y
-    var x = this.props.x
-    var z = this.props.z
-    var stampa = this.props.data.length>0 ?
-      this.state.clicked.map(d => <li key={d[z[0]]+","+d[z[1]]}>
-        {z[0]+" "}<strong style={{color: 'steelblue'}}>{d[z[0]]}</strong>
-        {", "+z[1]+" "}<strong style={{color: 'steelblue'}}>{d[z[1]]}</strong></li>) : " "
-    return (
-      <div>
-        <br />
-        <Form.Select 
+/**
+ * <Form.Select 
           label="Select Criteria  "
           value={this.props.chosencriteria}
           options={[
@@ -163,6 +153,21 @@ class DonutChart extends React.Component {
           })}
         />
         <br />
+ */
+
+  render() {
+    console.log(this.props)
+    var y = this.props.y
+    var x = this.props.x
+    var z = this.props.z
+    var stampa = this.props.data.length>0 ?
+      this.state.clicked.map(d => <li key={d[z[0]]+","+d[z[1]]}>
+        {z[0]+" "}<strong style={{color: 'steelblue'}}>{d[z[0]]}</strong>
+        {", "+z[1]+" "}<strong style={{color: 'steelblue'}}>{d[z[1]]}</strong></li>) : " "
+    return (
+      <div>
+        <br />
+        
       <svg className={this.props.selector} width="1000" height="400"> </svg>  
       <br />
       { this.props.data.length ? 

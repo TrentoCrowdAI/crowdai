@@ -28,7 +28,7 @@ import {
   JobStatus
 } from 'src/utils/constants';
 
-class ExperimentForm extends React.Component {
+class JobForm extends React.Component {
   constructor(props) {
     super(props);
     this.handleChange = this.handleChange.bind(this);
@@ -535,7 +535,7 @@ class ExperimentForm extends React.Component {
   }
 }
 
-ExperimentForm.propTypes = {
+JobForm.propTypes = {
   item: PropTypes.object,
   loading: PropTypes.bool,
   error: PropTypes.any,
@@ -550,10 +550,10 @@ ExperimentForm.propTypes = {
 };
 
 const mapStateToProps = state => ({
-  item: state.experiment.form.item,
-  loading: state.experiment.form.loading,
-  error: state.experiment.form.error,
-  saved: state.experiment.form.saved
+  item: state.job.form.item,
+  loading: state.job.form.loading,
+  error: state.job.form.error,
+  saved: state.job.form.saved
 });
 
 const mapDispatchToProps = dispatch => ({
@@ -564,4 +564,4 @@ const mapDispatchToProps = dispatch => ({
   fetchFiltersCSV: url => dispatch(actions.fetchFiltersCSV(url))
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(ExperimentForm);
+export default connect(mapStateToProps, mapDispatchToProps)(JobForm);

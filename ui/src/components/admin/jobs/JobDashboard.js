@@ -18,10 +18,10 @@ import PropTypes from 'prop-types';
 import lossPrice from 'src/images/lossprice.png';
 import {actions} from './actions';
 import {AggregationStrategies, JobStatus} from 'src/utils/constants';
-import ExperimentParameters from './ExperimentParameters';
+import JobParameters from './JobParameters';
 import HitInformation from './HitInformation';
 
-class ExperimentDashboard extends React.Component {
+class JobDashboard extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -190,7 +190,7 @@ class ExperimentDashboard extends React.Component {
       <div>
         <Image src={lossPrice} style={{width: '400px', marginLeft: 'auto', marginRight: 'auto'}} />
         <Header as="h2" content="Parameters" textAlign="center" />
-        <ExperimentParameters item={item} />
+        <JobParameters item={item} />
       </div>
     );
   }
@@ -354,7 +354,7 @@ class ExperimentDashboard extends React.Component {
   }
 }
 
-ExperimentDashboard.propTypes = {
+JobDashboard.propTypes = {
   item: PropTypes.object,
   match: PropTypes.object,
   fetchItem: PropTypes.func,
@@ -374,13 +374,13 @@ ExperimentDashboard.propTypes = {
 };
 
 const mapStateToProps = state => ({
-  item: state.experiment.form.item,
-  loading: state.experiment.form.loading,
-  error: state.experiment.form.error,
-  saved: state.experiment.form.saved,
-  polling: state.experiment.state.polling,
-  jobState: state.experiment.state.item,
-  jobStateLoading: state.experiment.state.loading
+  item: state.job.form.item,
+  loading: state.job.form.loading,
+  error: state.job.form.error,
+  saved: state.job.form.saved,
+  polling: state.job.state.polling,
+  jobState: state.job.state.item,
+  jobStateLoading: state.job.state.loading
 });
 
 const mapDispatchToProps = dispatch => ({
@@ -395,4 +395,4 @@ const mapDispatchToProps = dispatch => ({
   cleanJobState: () => dispatch(actions.cleanJobState())
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(ExperimentDashboard);
+export default connect(mapStateToProps, mapDispatchToProps)(JobDashboard);

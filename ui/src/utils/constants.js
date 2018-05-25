@@ -1,5 +1,5 @@
 const scopes = {
-  EXPERIMENTS: 'experiments',
+  JOBS: 'jobs',
   PROFILE: 'profile',
   PROJECTS: 'projects',
   REPORTS: 'reports'

@@ -5,7 +5,7 @@ import {getReducer} from 'src/utils/form';
 import {scopes, JobStatus, FileFormats} from 'src/utils/constants';
 
 const defaultState = {
-  experiments: {
+  jobs: {
     rows: [],
     meta: {}
   },
@@ -15,19 +15,19 @@ const defaultState = {
 
 const reducer = (state = defaultState, action) => {
   switch (action.type) {
-    case actionTypes.FETCH_EXPERIMENTS:
+    case actionTypes.FETCH_JOBS:
       return {
         ...state,
         error: undefined,
         loading: true
       };
-    case actionTypes.FETCH_EXPERIMENTS_SUCCESS:
+    case actionTypes.FETCH_JOBS_SUCCESS:
       return {
         ...state,
-        experiments: action.response,
+        jobs: action.response,
         loading: false
       };
-    case actionTypes.FETCH_EXPERIMENTS_ERROR:
+    case actionTypes.FETCH_JOBS_ERROR:
       return {
         ...state,
         error: action.error,
@@ -38,7 +38,7 @@ const reducer = (state = defaultState, action) => {
   }
 };
 
-const genericFormReducer = getReducer(scopes.EXPERIMENTS, {
+const genericFormReducer = getReducer(scopes.JOBS, {
   id: undefined,
   project_id: undefined,
   requester_id: undefined,
@@ -91,22 +91,22 @@ const defaultFormState = genericFormReducer(undefined, {});
 
 const formReducer = (state = defaultFormState, action) => {
   switch (action.type) {
-    case actionTypes.PUBLISH_EXPERIMENT:
+    case actionTypes.PUBLISH_JOB:
       return {
         ...state,
         error: undefined,
         loading: true
       };
-    case actionTypes.PUBLISH_EXPERIMENT_SUCCESS:
+    case actionTypes.PUBLISH_JOB_SUCCESS:
       return {
         ...state,
         item: {
-          ...action.experiment
+          ...action.job
         },
         loading: false,
         saved: true
       };
-    case actionTypes.PUBLISH_EXPERIMENT_ERROR:
+    case actionTypes.PUBLISH_JOB_ERROR:
       return {
         ...state,
         error: action.error,
@@ -226,7 +226,7 @@ const copyReducer = (state = defaultCopyState, action) => {
 export default combineReducers({
   list: reducer,
   // finally we combine generic and formReducer that handles
-  // experiments creation and publishing
+  // jobs creation and publishing
   form: (state = defaultFormState, action) => {
     let outputState = genericFormReducer(state, action);
     return formReducer(outputState, action);

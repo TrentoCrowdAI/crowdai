@@ -9,13 +9,13 @@ import DataTable from 'src/components/core/table/DataTable';
 import {JobStatus} from 'src/utils/constants';
 import {datetimeFormatter} from 'src/utils';
 
-class Experiments extends React.Component {
+class Jobs extends React.Component {
   render() {
     return (
       <DataTable
         title="My jobs"
         options={getOptions(this.props)}
-        data={this.props.experiments.rows}
+        data={this.props.jobs.rows}
         createUrl={`${this.props.match.url}/new`}
         loading={this.props.loading || this.props.copyJobLoading}
       />
@@ -23,7 +23,7 @@ class Experiments extends React.Component {
   }
 
   componentDidMount() {
-    this.props.fetchExperiments(Number(this.props.match.params.projectId));
+    this.props.fetchJobs(Number(this.props.match.params.projectId));
   }
 }
 
@@ -91,26 +91,26 @@ const getOptions = props => {
   };
 };
 
-Experiments.propTypes = {
-  fetchExperiments: PropTypes.func,
+Jobs.propTypes = {
+  fetchJobs: PropTypes.func,
   error: PropTypes.any,
   loading: PropTypes.bool,
-  experiments: PropTypes.object,
+  jobs: PropTypes.object,
   match: PropTypes.object,
   copyJob: PropTypes.func,
   copyJobLoading: PropTypes.bool
 };
 
 const mapStateToProps = state => ({
-  experiments: state.experiment.list.experiments,
-  error: state.experiment.list.error,
-  loading: state.experiment.list.loading,
-  copyJobLoading: state.experiment.copy.loading
+  jobs: state.job.list.jobs,
+  error: state.job.list.error,
+  loading: state.job.list.loading,
+  copyJobLoading: state.job.copy.loading
 });
 
 const mapDispatchToProps = dispatch => ({
-  fetchExperiments: jobId => dispatch(actions.fetchExperiments(jobId)),
+  fetchJobs: jobId => dispatch(actions.fetchJobs(jobId)),
   copyJob: jobId => dispatch(actions.copyJob(jobId))
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(Experiments);
+export default connect(mapStateToProps, mapDispatchToProps)(Jobs);

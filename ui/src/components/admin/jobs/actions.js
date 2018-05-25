@@ -2,12 +2,12 @@ import {getActionTypes, getActions} from 'src/utils/form';
 import {scopes} from 'src/utils/constants';
 
 const actionTypes = {
-  FETCH_EXPERIMENTS: 'C_FETCH_EXPERIMENTS',
-  FETCH_EXPERIMENTS_SUCCESS: 'C_FETCH_EXPERIMENTS_SUCCESS',
-  FETCH_EXPERIMENTS_ERROR: 'C_FETCH_EXPERIMENTS_ERROR',
-  PUBLISH_EXPERIMENT: 'C_PUBLISH_EXPERIMENT',
-  PUBLISH_EXPERIMENT_SUCCESS: 'C_PUBLISH_EXPERIMENT_SUCCESS',
-  PUBLISH_EXPERIMENT_ERROR: 'C_PUBLISH_EXPERIMENT_ERROR',
+  FETCH_JOBS: 'C_FETCH_JOBS',
+  FETCH_JOBS_SUCCESS: 'C_FETCH_JOBS_SUCCESS',
+  FETCH_JOBS_ERROR: 'C_FETCH_JOBS_ERROR',
+  PUBLISH_JOB: 'C_PUBLISH_JOB',
+  PUBLISH_JOB_SUCCESS: 'C_PUBLISH_JOB_SUCCESS',
+  PUBLISH_JOB_ERROR: 'C_PUBLISH_JOB_ERROR',
   FETCH_JOB_STATE: 'C_FETCH_JOB_STATE',
   FETCH_JOB_STATE_SUCCESS: 'C_FETCH_JOB_STATE_SUCCESS',
   FETCH_JOB_STATE_ERROR: 'C_FETCH_JOB_STATE_ERROR',
@@ -24,52 +24,52 @@ const actionTypes = {
   FETCH_FILTERS_CSV: 'C_FETCH_FILTERS_CSV',
   FETCH_FILTERS_CSV_SUCCESS: 'C_FETCH_FILTERS_CSV_SUCCESS',
   FETCH_FILTERS_CSV_ERROR: 'C_FETCH_FILTERS_CSV_ERROR',
-  ...getActionTypes(scopes.EXPERIMENTS)
+  ...getActionTypes(scopes.JOBS)
 };
 
 const actions = {
-  fetchExperiments(projectId) {
+  fetchJobs(projectId) {
     return {
-      type: actionTypes.FETCH_EXPERIMENTS,
+      type: actionTypes.FETCH_JOBS,
       projectId
     };
   },
 
-  fetchExperimentsSuccess(response) {
+  fetchJobsSuccess(response) {
     return {
-      type: actionTypes.FETCH_EXPERIMENTS_SUCCESS,
+      type: actionTypes.FETCH_JOBS_SUCCESS,
       response
     };
   },
 
-  fetchExperimentsError(error) {
+  fetchJobsError(error) {
     return {
-      type: actionTypes.FETCH_EXPERIMENTS_ERROR,
+      type: actionTypes.FETCH_JOBS_ERROR,
       error
     };
   },
 
   publish() {
     return {
-      type: actionTypes.PUBLISH_EXPERIMENT
+      type: actionTypes.PUBLISH_JOB
     };
   },
 
-  publishSuccess(experiment) {
+  publishSuccess(job) {
     return {
-      type: actionTypes.PUBLISH_EXPERIMENT_SUCCESS,
-      experiment
+      type: actionTypes.PUBLISH_JOB_SUCCESS,
+      job
     };
   },
 
   publishError(error) {
     return {
-      type: actionTypes.PUBLISH_EXPERIMENT_ERROR,
+      type: actionTypes.PUBLISH_JOB_ERROR,
       error
     };
   },
 
-  ...getActions(scopes.EXPERIMENTS),
+  ...getActions(scopes.JOBS),
 
   fetchItem(id, isWorker = false) {
     return {

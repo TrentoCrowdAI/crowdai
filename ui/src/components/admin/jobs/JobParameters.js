@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {Grid, List} from 'semantic-ui-react';
 
-const ExperimentParameters = props => (
+const JobParameters = props => (
   <Grid>
     <Grid.Row>
       <Grid.Column width="8">
@@ -59,8 +59,8 @@ const ExperimentParameters = props => (
   </Grid>
 );
 
-ExperimentParameters.propTypes = {
+JobParameters.propTypes = {
   item: PropTypes.object
 };
 
-export default ExperimentParameters;
+export default JobParameters;

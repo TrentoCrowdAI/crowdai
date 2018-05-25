@@ -10,16 +10,16 @@ import {actions as historyActions} from 'src/components/core/history/actions';
 import {actions as toastActions} from 'src/components/core/toast/actions';
 import ToastTypes from 'src/components/core/toast/types';
 
-const getExperiments = (action$, store) =>
-  action$.ofType(actionTypes.FETCH_EXPERIMENTS).switchMap(action => {
+const getJobs = (action$, store) =>
+  action$.ofType(actionTypes.FETCH_JOBS).switchMap(action => {
     return Observable.defer(() => requestersApi.get('jobs'))
-      .mergeMap(response => Observable.of(actions.fetchExperimentsSuccess(response.data)))
-      .catch(error => Observable.of(actions.fetchExperimentsError(flattenError(error))));
+      .mergeMap(response => Observable.of(actions.fetchJobsSuccess(response.data)))
+      .catch(error => Observable.of(actions.fetchJobsError(flattenError(error))));
   });
 
-const saveExperiment = (action$, store) =>
+const saveJob = (action$, store) =>
   action$.ofType(actionTypes.SUBMIT).switchMap(action => {
-    const {item} = store.getState().experiment.form;
+    const {item} = store.getState().job.form;
     const profile = store.getState().profile.item;
     item.requester_id = profile.id;
     return Observable.defer(
@@ -63,7 +63,7 @@ const saveExperiment = (action$, store) =>
       });
   });
 
-const fetchExperiment = (action$, store) =>
+const fetchJob = (action$, store) =>
   action$.ofType(actionTypes.FETCH_ITEM).switchMap(action => {
     return Observable.defer(
       () => (action.isWorker ? axios.get(`jobs/${action.id}`) : requestersApi.get(`jobs/${action.id}`))
@@ -72,9 +72,9 @@ const fetchExperiment = (action$, store) =>
       .catch(error => Observable.of(actions.fetchItemError(flattenError(error))));
   });
 
-const publishExperiment = (action$, store) =>
+const publishJob = (action$, store) =>
   action$.ofType(actionTypes.PUBLISH_EXPERIMENT).switchMap(action => {
-    const {item} = store.getState().experiment.form;
+    const {item} = store.getState().job.form;
     const config = {timeout: 10000};
     return Observable.defer(() => requestersApi.post(`jobs/${item.id}/publish`, {}, config))
       .mergeMap(response => Observable.of(actions.publishSuccess(response.data)))
@@ -177,10 +177,10 @@ function pollCSV(job) {
 }
 
 export default combineEpics(
-  getExperiments,
-  saveExperiment,
-  fetchExperiment,
-  publishExperiment,
+  getJobs,
+  saveJob,
+  fetchJob,
+  publishJob,
   fetchJobState,
   pollJobState,
   copyJob,

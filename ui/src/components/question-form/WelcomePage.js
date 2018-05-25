@@ -18,7 +18,7 @@ import PropTypes from 'prop-types';
 
 // import Instructions from './Instructions';
 import {actions} from './actions';
-import {actions as experimentActions} from 'src/components/admin/experiments/actions';
+import {actions as jobActions} from 'src/components/admin/jobs/actions';
 import config from 'src/config/config.json';
 import RewardWidget from 'src/components/reward-widget/RewardWidget';
 import FileRenderer from 'src/components/core/FileRenderer';
@@ -201,7 +201,7 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = dispatch => ({
   checkAssignmentStatus: () => dispatch(actions.checkAssignmentStatus()),
   checkPolling: () => dispatch(actions.checkPolling()),
-  fetchItem: id => dispatch(experimentActions.fetchItem(id, true))
+  fetchItem: id => dispatch(jobActions.fetchItem(id, true))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(WelcomePage);

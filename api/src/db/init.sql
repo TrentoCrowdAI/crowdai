@@ -200,9 +200,8 @@ $$ LANGUAGE plpgsql;
 
 -- this tables stores the screening results
 -- data: {
---  criteria: [<id number>, ...],
---  pout: <number>,
---  outcome: 'IN | OUT | NEUTRAL'  
+--  criteria: [{id: <number>, pout: <number>, in: <number>, out: <number>}, ...],
+--  outcome: 'IN | OUT | NEUTRAL'
 --}
 CREATE TABLE result (
   id bigserial NOT NULL,

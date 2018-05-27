@@ -16,21 +16,12 @@ const generateTasks = (exports.generateTasks = async (job, worker) => {
   let buffer = await delegates.tasks.getBuffer(job.id, worker.id);
 
   if (!buffer) {
+    // by default we say we are done with the worker
+    buffer = { items: [], criteria: [] };
     let response = await getTasksFromApi(job, worker);
 
     if (response.items && response.items.length > 0) {
       buffer = await delegates.tasks.createBuffer(job.id, worker.id, response);
-    }
-
-    if (response.items && response.items.length === 0) {
-      // we are done with the worker.
-      return response;
-    }
-
-    if (response.done) {
-      // the job is done.
-      await jobManager.stop(job);
-      buffer = { items: [] };
     }
   }
   return buffer;
@@ -46,11 +37,12 @@ const getTasksFromApi = (exports.getTasksFromApi = async (job, worker) => {
     let taskAssignmentApi = await delegates.taskAssignmentApi.getById(
       job.data.taskAssignmentStrategy
     );
+    const url = `${getUrl(taskAssignmentApi)}/next-task`;
 
     let response = await new Promise((resolve, reject) => {
       request(
         {
-          url: taskAssignmentApi.url,
+          url,
           qs: {
             jobId: job.id,
             workerId: worker.id,
@@ -77,4 +69,69 @@ const getTasksFromApi = (exports.getTasksFromApi = async (job, worker) => {
       'Error while trying to call generate tasks for worker'
     );
   }
+});
+
+/**
+ * This function calls the tasks assignment /status endpoint. This endpoint is not
+ * required, therefore, if is not present we will just return null as the state.
+ *
+ * @param {Object} job
+ * @return {String}
+ */
+const getState = (exports.getState = async job => {
+  try {
+    let taskAssignmentApi = await delegates.taskAssignmentApi.getById(
+      job.data.taskAssignmentStrategy
+    );
+    const url = `${getUrl(taskAssignmentApi)}/state`;
+
+    let response = await new Promise((resolve, reject) => {
+      request(
+        {
+          url,
+          qs: {
+            jobId: job.id
+          }
+        },
+        (err, rsp, body) => {
+          if (err) {
+            if (err.code === 'ECONNREFUSED') {
+              resolve(null);
+            }
+            reject(err);
+          } else if (rsp.statusCode === 404) {
+            resolve(null);
+          } else {
+            resolve(rsp.body);
+          }
+        }
+      );
+    });
+
+    if (response && typeof response === 'string') {
+      response = JSON.parse(response);
+    }
+    //return response.state;
+    return 'ASSIGN_FILTERS';
+  } catch (error) {
+    console.error(error);
+    throw Boom.badImplementation(
+      'Error while trying to call the state endpoint'
+    );
+  }
+});
+
+/**
+ * Returns the URL of the task assignment API.
+ *
+ * @param {Object} taskAssignmentApi
+ * @return {String}
+ */
+const getUrl = (exports.getUrl = taskAssignmentApi => {
+  let url = taskAssignmentApi.url;
+
+  if (url.endsWith('/')) {
+    url = url.substr(0, url.length - 1);
+  }
+  return url;
 });

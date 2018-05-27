@@ -198,10 +198,30 @@ END;
 $$ LANGUAGE plpgsql;
 
 
+-- computes the number of votes (or pending) for the given item and criterion
+CREATE OR REPLACE FUNCTION compute_item_entries(
+	p_job_id bigint, 
+	p_item_id bigint, 
+	p_criteria_id bigint
+) RETURNS int AS $$
+DECLARE v_entries int;
+DECLARE v_criteria_filter text;
+BEGIN
+	v_criteria_filter := '{"criteria" : [{"id": "'||p_criteria_id||'"}]}';
+    select count(t.*) into v_entries from task t
+      where t.job_id = p_job_id
+        and t.item_id = p_item_id
+        and t.data @> v_criteria_filter::jsonb
+        and t.deleted_at is null;
+    RETURN v_entries;
+END;
+$$ LANGUAGE plpgsql;
+
+
 -- this tables stores the screening results
 -- data: {
 --  criteria: [{id: <number>, pout: <number>, in: <number>, out: <number>}, ...],
---  outcome: 'IN | OUT | NEUTRAL'
+--  outcome: 'IN | OUT | STOPPED'
 --}
 CREATE TABLE result (
   id bigserial NOT NULL,

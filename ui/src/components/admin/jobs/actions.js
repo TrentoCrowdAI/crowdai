@@ -24,6 +24,7 @@ const actionTypes = {
   FETCH_FILTERS_CSV: 'C_FETCH_FILTERS_CSV',
   FETCH_FILTERS_CSV_SUCCESS: 'C_FETCH_FILTERS_CSV_SUCCESS',
   FETCH_FILTERS_CSV_ERROR: 'C_FETCH_FILTERS_CSV_ERROR',
+  SET_LOADING: 'C_SET_LOADING',
   ...getActionTypes(scopes.JOBS)
 };
 
@@ -192,6 +193,13 @@ const actions = {
     return {
       type: actionTypes.FETCH_FILTERS_CSV_ERROR,
       error
+    };
+  },
+
+  setLoading(loading) {
+    return {
+      type: actionTypes.SET_LOADING,
+      loading
     };
   }
 };

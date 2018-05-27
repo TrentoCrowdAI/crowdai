@@ -20,6 +20,7 @@ import {actions} from './actions';
 import {AggregationStrategies, JobStatus} from 'src/utils/constants';
 import JobParameters from './JobParameters';
 import HitInformation from './HitInformation';
+import JobDashboardButtons from './JobDashboardButtons';
 
 class JobDashboard extends React.Component {
   constructor(props) {
@@ -148,25 +149,7 @@ class JobDashboard extends React.Component {
             </Grid.Row>
           )}
 
-          <Grid.Row>
-            <Grid.Column>
-              {item.data.status === JobStatus.NOT_PUBLISHED && (
-                <Button onClick={() => this.props.publish()} floated="right" size="large" positive>
-                  Run
-                </Button>
-              )}
-              {item.data.status === JobStatus.PUBLISHED && (
-                <Button floated="right" size="large" negative>
-                  Stop
-                </Button>
-              )}
-              {this.state.expertMode && (
-                <Button floated="right" size="large" style={{width: '200px'}}>
-                  Update parameters
-                </Button>
-              )}
-            </Grid.Column>
-          </Grid.Row>
+          <JobDashboardButtons job={item} state={this.props.jobState} />
         </Grid>
       </Form>
     );
@@ -312,7 +295,9 @@ class JobDashboard extends React.Component {
   }
 
   componentDidMount() {
-    this.props.fetchItem(this.props.match.params.jobId);
+    let {jobId} = this.props.match.params;
+    this.props.fetchItem(jobId);
+    this.props.fetchJobState(jobId);
   }
 
   componentDidUpdate(prevProps, prevState, snapshot) {
@@ -320,10 +305,6 @@ class JobDashboard extends React.Component {
 
     if (item.data.status === JobStatus.PUBLISHED && !this.props.polling) {
       this.props.pollJobState(item.id);
-    }
-
-    if (item.data.status === JobStatus.DONE && !this.props.jobState.hit) {
-      this.props.fetchJobState(item.id);
     }
   }
 
@@ -358,7 +339,6 @@ JobDashboard.propTypes = {
   item: PropTypes.object,
   match: PropTypes.object,
   fetchItem: PropTypes.func,
-  publish: PropTypes.func,
   loading: PropTypes.bool,
   saved: PropTypes.bool,
   error: PropTypes.object,
@@ -388,7 +368,6 @@ const mapDispatchToProps = dispatch => ({
   cleanState: () => dispatch(actions.cleanState()),
   setInputValue: (name, value) => dispatch(actions.setInputValue(name, value)),
   fetchItem: id => dispatch(actions.fetchItem(id)),
-  publish: () => dispatch(actions.publish()),
   fetchJobState: id => dispatch(actions.fetchJobState(id)),
   pollJobState: id => dispatch(actions.pollJobState(id)),
   pollJobStateDone: () => dispatch(actions.pollJobStateDone()),

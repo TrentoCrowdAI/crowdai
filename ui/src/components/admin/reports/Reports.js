@@ -88,6 +88,10 @@ class Reports extends React.Component {
 			case 'Classification':
 				this.props.fetchWorkersAgreements(this.props.match.params.jobid,'all','all');
 				break;
+			case 'Independence':
+				this.props.fetchMetric(this.props.match.params.jobid);
+				console.log('new data',this.props.reports.tasks)
+				break;
 			default:
 				console.log('Metric to implement: ', value)
 				break;
@@ -225,6 +229,13 @@ class Reports extends React.Component {
 					style={{marginBottom: '5px'}}
 					onClick={this.activeMetric}
 				>Task Classification and Worker Agreement</Button>
+				<br />
+				<Button 
+					value='Independence'
+					className='metrics' 
+					style={{marginBottom: '5px'}}
+					onClick={this.activeMetric}
+				>Workers Independence</Button>
 				<br />
 				<Button 
 					value='Initial_Fails'
@@ -433,6 +444,7 @@ const mapDispatchToProps = dispatch => ({
 	fetchWorkers: jobId => dispatch(actions.fetchWorkers(jobId)),
 	fetchTasksAgreements: jobId => dispatch(actions.fetchTasksAgreements(jobId)),
 	fetchWorkersAgreements: (jobId,itemId,criteriaId) => dispatch(actions.fetchWorkersAgreements(jobId,itemId,criteriaId)),
+	fetchMetric : jobId => dispatch(actions.fetchMetric(jobId)),
 	/*fetchItems: (jobId) => dispatch(actions.fetchItems(jobId)),
 	fetchCriteria: (jobId) => dispatch(actions.fetchCriteria(jobId))*/
 })

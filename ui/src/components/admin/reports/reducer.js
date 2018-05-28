@@ -12,7 +12,7 @@ const defaultState = {
   loading: false
 };
 
-const wdefaultState = {
+const worker_defaultState = {
   workers: {
     workers: []
   },
@@ -20,7 +20,7 @@ const wdefaultState = {
   loading: false
 };
 
-const reducer = (state = defaultState, action) => {
+const chart_reducer = (state = defaultState, action) => {
   switch (action.type) {
     case actionTypes.FETCH_TTIME:
       return {
@@ -116,13 +116,34 @@ const reducer = (state = defaultState, action) => {
         error: action.error,
         loading: false
       };
+    case actionTypes.FETCH_METRIC:
+      return {
+        ...state,
+        error: undefined,
+        loading: true,
+      }
+      break;
+    case actionTypes.FETCH_METRIC_SUCCESS:
+      return {
+        ...state,
+        reports: action.response,
+        loading: false,
+      }
+      break;
+    case actionTypes.FETCH_METRIC_ERROR:
+      return {
+        ...state,
+        error: action.error,
+        loading: false,
+      }
+      break;
 
     default:
       return state;
   }
 };
 
-const wreducer = (state = wdefaultState, action) => {
+const worker_reducer = (state = worker_defaultState, action) => {
   switch(action.type) {
     case actionTypes.FETCH_WORKERS:
       return {
@@ -148,6 +169,6 @@ const wreducer = (state = wdefaultState, action) => {
 };
 
 export default combineReducers({
-  list: reducer,
-  wlist: wreducer
+  list: chart_reducer,
+  wlist: worker_reducer
 });

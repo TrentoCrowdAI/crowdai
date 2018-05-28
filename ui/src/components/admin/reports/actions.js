@@ -23,6 +23,9 @@ const actionTypes = {
   FETCH_WAGREES: 'C_FETCH_WAGREES',
   FETCH_WAGREES_SUCCESS: 'C_FETCH_WAGREES_SUCCESS',
   FETCH_WAGREES_ERROR: 'C_FETCH_WAGREES_ERROR',
+  FETCH_METRIC: 'C_FETCH_METRIC',
+  FETCH_METRIC_SUCCESS: 'C_FETCH_METRIC_SUCCESS',
+  FETCH_METRIC_ERROR: 'C_FETCH_METRIC_ERROR',
   ...getActionTypes(scopes.REPORTS)
 };
 
@@ -160,6 +163,25 @@ const actions = {
   fetchWorkersError(error) {
     return {
       type: actionTypes.FETCH_WORKERS_ERROR,
+      error
+    };
+  },
+
+  fetchMetric(jobId) {
+    return {
+      type: actionTypes.FETCH_METRIC,
+      jobId
+    };
+  },
+  fetchMetricSuccess(response) {
+    return {
+      type: actionTypes.FETCH_METRIC_SUCCESS,
+      response
+    };
+  },
+  fetchMetricError(error) {
+    return {
+      type: actionTypes.FETCH_METRIC_ERROR,
       error
     };
   },

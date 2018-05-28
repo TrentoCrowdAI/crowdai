@@ -10,6 +10,10 @@ const flattenError = error => {
   if (error.response && error.response.data) {
     return error.response.data.payload || error.response.data;
   }
+
+  if (!error.message) {
+    error.message = 'There was a problem processing your request.';
+  }
   return error;
 };
 

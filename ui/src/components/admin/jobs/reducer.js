@@ -140,6 +140,11 @@ const formReducer = (state = defaultFormState, action) => {
           criteriaLoading: false
         }
       };
+    case actionTypes.SET_LOADING:
+      return {
+        ...state,
+        loading: action.loading
+      };
     default:
       return state;
   }

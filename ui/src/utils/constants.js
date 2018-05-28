@@ -43,6 +43,14 @@ const AggregationStrategies = {
   avg: 'Average-log'
 };
 
+const ShortestRunStatus = {
+  INITIAL: 'INITIAL',
+  ASSIGN_FILTERS: 'ASSIGN_FILTERS',
+  FILTERS_ASSIGNED: 'FILTERS_ASSIGNED',
+  UPDATE: 'UPDATE',
+  DONE: 'DONE'
+};
+
 export {
   scopes,
   FileFormats,
@@ -50,5 +58,6 @@ export {
   CrowdsourcingStrategies,
   AbstractPresentationTechniques,
   LabelOptions,
-  AggregationStrategies
+  AggregationStrategies,
+  ShortestRunStatus
 };

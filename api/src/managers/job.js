@@ -303,19 +303,27 @@ const stop = (exports.stop = async job => {
  * Returns the state of the job. This function returns:
  *
  *   - Information about the associated HIT.
+ *   - The status of the job
+ *   - The status of the task assignment box associated with the box (if available)
  *
  * @param {Number} jobId
  */
 const getState = (exports.getState = async jobId => {
   try {
     let job = await delegates.jobs.getById(jobId);
-    let requester = await delegates.requesters.getById(job.requester_id);
-    const mturk = MTurk.getInstance(requester);
-    let hit = await getHIT(job.data.hit.HITId, mturk);
-    // TODO: return information about the workers.
-    return {
-      hit
+    let state = {
+      job: job.data.status,
+      hit: null
     };
+
+    if (job.data.hit) {
+      let requester = await delegates.requesters.getById(job.requester_id);
+      const mturk = MTurk.getInstance(requester);
+      state.hit = await getHIT(job.data.hit.HITId, mturk);
+    }
+    state.taskAssignmentApi = await taskManager.getState(job);
+    // TODO: return information about the workers.
+    return state;
   } catch (error) {
     console.error(error);
     throw Boom.badImplementation(

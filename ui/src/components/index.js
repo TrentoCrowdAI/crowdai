@@ -8,6 +8,7 @@ import loginEpics from 'src/components/admin/login/epics';
 import jobEpics from 'src/components/admin/jobs/epics';
 import profileEpics from 'src/components/admin/profile/epics';
 import toastEpics from 'src/components/core/toast/epics';
+import shortestRunEpics from 'src/components/admin/jobs/shortest-run-epics';
 import reportEpics from 'src/components/admin/reports/epics';
 
 // reducers
@@ -29,6 +30,14 @@ const rootReducer = combineReducers({
   report
 });
 
-const rootEpic = combineEpics(questionFormEpics, rewardEpics, loginEpics, jobEpics, profileEpics, toastEpics);
+const rootEpic = combineEpics(
+  questionFormEpics,
+  rewardEpics,
+  loginEpics,
+  jobEpics,
+  profileEpics,
+  toastEpics,
+  shortestRunEpics
+);
 
 export {rootReducer, rootEpic};

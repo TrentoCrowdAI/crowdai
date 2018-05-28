@@ -39,7 +39,7 @@ app.use(async (ctx, next) => {
   try {
     await next();
   } catch (error) {
-    console.error('Error', JSON.stringify(error));
+    console.error('Error', error);
 
     if (error.status === 401 && !error.isBoom) {
       const message = 'Not authorized to perform the request';

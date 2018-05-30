@@ -59,7 +59,7 @@ class SimpleLineChart extends React.Component {
     })
     
     var xscale = d3.scaleLinear()
-        .domain(d3.extent(data, d => Number(d[x]) ))
+        .domain([d3.min(data, d => Number(d[x])-2),d3.max(data, d => Number(d[x])+2)])
         .range([0, width]);
     var xAxis = d3.axisBottom(xscale);
 

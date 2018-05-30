@@ -167,10 +167,11 @@ const actions = {
     };
   },
 
-  fetchMetric(jobId) {
+  fetchMetric(jobId, metric) {
     return {
       type: actionTypes.FETCH_METRIC,
-      jobId
+      jobId,
+      metric
     };
   },
   fetchMetricSuccess(response) {

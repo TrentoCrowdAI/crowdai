@@ -27,7 +27,7 @@ class StackedBar extends React.Component {
       return (a[x] > b[x]) ? 1 : ((b[x] > a[x]) ? -1 : 0);
     })
 
-    var margin = {top: 30, right: 30, bottom: 30, left: 30};
+    var margin = {top: 30, right: 30, bottom: 30, left: 50};
     var width = +svg.attr("width") - margin.left - margin.right;
     var height = +svg.attr("height") - margin.top - margin.bottom;
     var g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
@@ -104,14 +104,14 @@ class StackedBar extends React.Component {
     	.enter().append("g")
 
     bars.append("rect")
-    	.attr("height", yscale.bandwidth()-2)
+    	.attr("height", yscale.bandwidth()-10)
     	.attr("x", d => xscale(d.x0))
     	.attr("width", d => xscale(d.x1)-xscale(d.x0))
     	.style("fill", d => color(d.name))
 
     	bars.append("text")
     		.attr("x", d => xscale(d.x0))
-    		.attr("y", yscale.bandwidth()/2)
+    		.attr("y", (yscale.bandwidth()-10)/2)
     		.attr("dy", "0.5em")
     		.attr("dx", "0.5em")
 				.style("text-anchor","begin")

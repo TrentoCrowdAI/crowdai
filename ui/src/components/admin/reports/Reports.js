@@ -88,10 +88,14 @@ class Reports extends React.Component {
 			case 'Classification':
 				this.props.fetchWorkersAgreements(this.props.match.params.jobid,'all','all');
 				break;
-			case 'Independence':
-			
-				this.props.fetchMetric(this.props.match.params.jobid);
-				console.log('new data',this.props.reports.tasks)
+			case 'Cohen':
+				this.props.fetchMetric(this.props.match.params.jobid,'cohen');
+				break;
+			case 'M1':
+				this.props.fetchMetric(this.props.match.params.jobid,'m1');
+				break;
+			case 'WWM2':
+				this.props.fetchMetric(this.props.match.params.jobid,'wwm2');
 				break;
 			default:
 				console.log('Metric to implement: ', value)
@@ -232,11 +236,25 @@ class Reports extends React.Component {
 				>Task Classification and Worker Agreement</Button>
 				<br />
 				<Button 
-					value='Independence'
+					value='Cohen'
 					className='metrics' 
 					style={{marginBottom: '5px'}}
 					onClick={this.activeMetric}
-				>Workers Independence</Button>
+				>Cohen's Kappa between Workers</Button>
+				<br />
+				<Button 
+					value='M1'
+					className='metrics' 
+					style={{marginBottom: '5px'}}
+					onClick={this.activeMetric}
+				>M1 metric between Workers</Button>
+				<br />
+				<Button 
+					value='WWM2'
+					className='metrics' 
+					style={{marginBottom: '5px'}}
+					onClick={this.activeMetric}
+				>WWM2</Button>
 				<br />
 				<Button 
 					value='Initial_Fails'
@@ -281,7 +299,7 @@ class Reports extends React.Component {
 		//console.log(this.props.workers)
 		///JobOptions = { 'all' : 'All Jobs' }
 		
-		if(this.state.activeMetric==='Independence') {
+		if(this.state.activeMetric==='Cohen') {
 			WorkerOptions = {
 				'maria': 'maria',
 				'atiqnur': 'atiqnur',
@@ -353,11 +371,27 @@ class Reports extends React.Component {
 				z=['yes','no','not clear']
 				break;
 
-			case 'Independence':
+			case 'Cohen':
 				chart='heatmap'
 				x='worker_a'
 				y='worker_b'
 				z='cohen_K'
+				param=''
+				break;
+
+			case 'M1':
+				chart='heatmap'
+				x='worker_a'
+				y='worker_b'
+				z='m1'
+				param=''
+				break;
+
+			case 'WWM2':
+				chart='heatmap'
+				x='worker_a'
+				y='worker_b'
+				z='wwm2'
 				param=''
 				break;
 
@@ -463,7 +497,7 @@ const mapDispatchToProps = dispatch => ({
 	fetchWorkers: jobId => dispatch(actions.fetchWorkers(jobId)),
 	fetchTasksAgreements: jobId => dispatch(actions.fetchTasksAgreements(jobId)),
 	fetchWorkersAgreements: (jobId,itemId,criteriaId) => dispatch(actions.fetchWorkersAgreements(jobId,itemId,criteriaId)),
-	fetchMetric : jobId => dispatch(actions.fetchMetric(jobId)),
+	fetchMetric : (jobId,metric) => dispatch(actions.fetchMetric(jobId,metric)),
 	/*fetchItems: (jobId) => dispatch(actions.fetchItems(jobId)),
 	fetchCriteria: (jobId) => dispatch(actions.fetchCriteria(jobId))*/
 })

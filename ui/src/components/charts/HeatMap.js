@@ -62,7 +62,7 @@ class HeatMap extends React.Component {
         .range([0,xelems.length*22])
         .paddingInner(20).paddingOuter(9)
     
-    var xAxis = d3.axisBottom()
+    var xAxis = d3.axisTop()
         .scale(xscale)
         .tickFormat("")
     
@@ -84,7 +84,7 @@ class HeatMap extends React.Component {
         .style('width','240px')
         .style('height','80px')
         .style('background','steelblue')
-        .style('opacity','1')
+        .style('opacity','0.90')
         .style('position','absolute')
         .style('visibility','hidden')
         .style('padding','10px')
@@ -127,14 +127,15 @@ class HeatMap extends React.Component {
               .style('top',(d3.event.pageY-30)+'px')
               .style('left',(d3.event.pageX-260)+'px')
           tooltip.select('div')
-              .html('worker A: <b>'+d[x].toUpperCase()+'</b>,'+
+              .html('Worker A: <b>'+d[x].toUpperCase()+'</b>,'+
                   '<br />Worker B: <b>'+d[y].toUpperCase()+'</b>,'+
                   '<br />Cohen\'s Kappa => <b>'+d[z].toFixed(5)+'</b>')
         })
 
     g.append('g')
         .attr('class', 'xaxis')
-        .attr('transform', 'translate(0,'+(yelems.length*22+9)+')')
+        .attr('transform', 'translate(0,0)')
+        //'+(yelems.length*22+9)+'
         .call(xAxis)
         /*.selectAll('text')
         .attr('font-weight', 'normal')
@@ -168,9 +169,8 @@ class HeatMap extends React.Component {
 	render() {
 		return(
 			<div>
-			- HeatMap -
 			<br />
-			<svg className={this.props.selector} height='1000' width='1000'> </svg>
+			<svg className={this.props.selector} height='1100' width='1000'> </svg>
 			</div>
 		);
 	}

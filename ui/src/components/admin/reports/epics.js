@@ -74,14 +74,14 @@ const fetchWorkersAgreements = (action$, store) =>
 
 const getMetric = (action$, store) =>
   action$.ofType(actionTypes.FETCH_METRIC).switchMap(action => {
-    return Observable.defer(() => reportingApi.get('cohen'))
+    return Observable.defer(() => reportingApi.get(action.metric))
       .mergeMap(response => Observable.of(actions.fetchMetricSuccess(response.data)))
       .catch(error => Observable.of(actions.fetchMetricError(flattenError(error))));
 });
 
 const fetchMetric = (action$, store) =>
   action$.ofType(actionTypes.FETCH_ITEM).switchMap(action => {
-    return Observable.defer(() => reportingApi.get(`cohen`))
+    return Observable.defer(() => reportingApi.get(action.metric))
       .mergeMap(response => Observable.of(actions.fetchItemSuccess(response.data)))
       .catch(error => Observable.of(actions.fetchItemError(flattenError(error))));
 });

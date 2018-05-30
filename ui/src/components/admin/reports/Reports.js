@@ -89,6 +89,7 @@ class Reports extends React.Component {
 				this.props.fetchWorkersAgreements(this.props.match.params.jobid,'all','all');
 				break;
 			case 'Independence':
+			
 				this.props.fetchMetric(this.props.match.params.jobid);
 				console.log('new data',this.props.reports.tasks)
 				break;
@@ -279,8 +280,18 @@ class Reports extends React.Component {
 		console.log(this.props.reports)
 		//console.log(this.props.workers)
 		///JobOptions = { 'all' : 'All Jobs' }
-		WorkerOptions = { 'all' : 'All Workers' }
-
+		
+		if(this.state.activeMetric==='Independence') {
+			WorkerOptions = {
+				'maria': 'maria',
+				'atiqnur': 'atiqnur',
+				'a2ufd1i8zo1v4g': 'a2ufd1i8zo1v4g',
+				'a3kvu2c809dok5': 'a3kvu2c809dok5',
+				'all': 'All Workers'
+			}
+		} else {
+			WorkerOptions = { 'all' : 'All Workers' }
+		}
     /*this.props.experiments.rows.map( step => {
       JobOptions[step.id] = step.data.name
     });*/
@@ -340,6 +351,14 @@ class Reports extends React.Component {
 				x='worker_id'
 				y='answer'
 				z=['yes','no','not clear']
+				break;
+
+			case 'Independence':
+				chart='heatmap'
+				x='worker_a'
+				y='worker_b'
+				z='cohen_K'
+				param=''
 				break;
 
 			default:

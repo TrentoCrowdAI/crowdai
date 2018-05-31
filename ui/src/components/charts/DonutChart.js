@@ -55,7 +55,7 @@ class DonutChart extends React.Component {
     
     var data = crit_filtered_data//this.props.data
 
-    var margin = {top: 30, right: 30, bottom: 30, left: 30};
+    var margin = {top: 10, right: 30, bottom: 30, left: 30};
     var width = +svg.attr('width') - margin.left - margin.right;
     var height = +svg.attr('height') - margin.top - margin.bottom;
     var g = svg.append("g")
@@ -156,7 +156,7 @@ class DonutChart extends React.Component {
  */
 
   render() {
-    console.log(this.props)
+    //console.log(this.props)
     var y = this.props.y
     var x = this.props.x
     var z = this.props.z

@@ -43,7 +43,7 @@ class Histogram extends React.Component {
       return (a[x] > b[x]) ? 1 : ((b[x] > a[x]) ? -1 : 0);
     })
 
-    var margin = {top: 30, right: 30, bottom: 30, left: 30};
+    var margin = {top: 10, right: 30, bottom: 30, left: 30};
     var width = +svg.attr("width") - margin.left - margin.right;
     var height = +svg.attr("height") - margin.top - margin.bottom;
     var g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
@@ -116,7 +116,7 @@ class Histogram extends React.Component {
        .append("text")
           .attr("fill","black")
           .attr("transform","translate("+(width-15)+",0)")
-          .attr("dy","-1em")
+          .attr("dy","2em")
           .text("avg_time min")
 
     g.append("g")

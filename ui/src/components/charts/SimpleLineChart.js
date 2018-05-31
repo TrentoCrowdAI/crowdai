@@ -16,7 +16,7 @@ class SimpleLineChart extends React.Component {
   dataWrapper() {
     if(this.props.data.length==0) {
       var svg = d3.select("."+this.props.selector)
-      var margin = {top: 30, right: 30, bottom: 30, left: 30};
+      var margin = {top: 10, right: 30, bottom: 30, left: 30};
       var g = svg.append("g")
 
       g.append("text")

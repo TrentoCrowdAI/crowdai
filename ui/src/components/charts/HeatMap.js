@@ -24,7 +24,7 @@ class HeatMap extends React.Component {
       var g = svg.append("g")
 
       g.append("text")
-        .text("Choose a worker")
+        .text("No data retrieved")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
     } else {
       this.buildGraph()
@@ -34,7 +34,7 @@ class HeatMap extends React.Component {
 	buildGraph() {
 		var svg = d3.select("."+this.props.selector);
 
-    var margin = {top: 30, right: 30, bottom: 30, left: 30};
+    var margin = {top: 10, right: 30, bottom: 30, left: 110};
     var width = +svg.attr("width") - margin.left - margin.right;
     var height = +svg.attr("height") - margin.top - margin.bottom;
     var g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
@@ -68,15 +68,15 @@ class HeatMap extends React.Component {
     
     var yscale = d3.scaleBand()
         .domain(yelems)
-        .range([0, yelems.length*22])
+        .range([yelems.length*22, 0])
         .paddingInner(.2).paddingOuter(.2)
 
     var yAxis = d3.axisLeft()
         .scale(yscale)
-        .tickFormat("")
+        //.tickFormat("")
 
     var colorScale = d3.scaleQuantile()
-        .domain([-0.25,0,0.25,0.5,0.75,1])
+        .domain([0,1])
         .range(colors)
 
     var tooltip = d3.select('body')
@@ -105,22 +105,22 @@ class HeatMap extends React.Component {
         .attr('ry', 3)
         .on("mouseover", function(d) {
     			//d3.select(this).style("opacity","0.8")
-    			/*g.selectAll(".xaxis").selectAll("text").filter( function(text) {
-    				return text === d[x] })
-            .transition().duration(100).style('font','15px arial').attr('font-weight', 'bold')
-          g.selectAll(".yaxis").selectAll("text").filter( function(text) {
-            return text === d[y] })
-            .transition().duration(100).style('font','15px arial').attr('font-weight', 'bold')*/
-    		})
-    		.on("mouseout", function(d) {
+    	    /*g.selectAll(".xaxis").selectAll("text").filter( function(text) {
+    			return text === d[x] })
+                .transition().duration(100).style('font','15px arial').attr('font-weight', 'bold')*/
+            g.selectAll(".yaxis").selectAll("text").filter( function(text) {
+                return text === d[y] })
+                .transition().duration(100).style('font','15px arial').attr('font-weight', 'bold')
+    	})
+    	.on("mouseout", function(d) {
           //d3.select(this).style("opacity","1")
-          tooltip.style('visibility', 'hidden')
-    			/*g.selectAll(".xaxis").selectAll("text").filter( function(text) {
-    				return text === d[x] })
-            .transition().style('font','10px arial').attr('font-weight', 'normal')
-          g.selectAll(".yaxis").selectAll("text").filter( function(text) {
-            return text === d[y] })
-            .transition().style('font','10px arial').attr('font-weight', 'normal')*/
+            tooltip.style('visibility', 'hidden')
+    		/*g.selectAll(".xaxis").selectAll("text").filter( function(text) {
+    			return text === d[x] })
+                .transition().style('font','10px arial').attr('font-weight', 'normal')*/
+            g.selectAll(".yaxis").selectAll("text").filter( function(text) {
+                return text === d[y] })
+                .transition().style('font','10px arial').attr('font-weight', 'normal')
         })
         .on("mousemove", d => {
           tooltip.style('visibility', 'visible')
@@ -129,7 +129,7 @@ class HeatMap extends React.Component {
           tooltip.select('div')
               .html('Worker A: <b>'+d[x].toUpperCase()+'</b>,'+
                   '<br />Worker B: <b>'+d[y].toUpperCase()+'</b>,'+
-                  '<br />Cohen\'s Kappa => <b>'+d[z].toFixed(5)+'</b>')
+                  '<br />Cohen\'s Kappa => <b>'+d[z].toFixed(4)+'</b>')
         })
 
     g.append('g')
@@ -148,9 +148,9 @@ class HeatMap extends React.Component {
     g.append('g')
         .attr('class', 'yaxis')
         .call(yAxis)
-        /*.selectAll('text')
+        .selectAll('text')
         .attr('font-weight', 'normal')
-        .style('font', '10px arial')*/
+        .style('font', '10px arial')
 
 
 

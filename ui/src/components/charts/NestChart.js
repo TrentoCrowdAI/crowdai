@@ -55,7 +55,7 @@ class NestChart extends React.Component {
     })
     var media = sum/data.length
 
-    var margin = {top: 30, right: 30, bottom: 30, left: 30};
+    var margin = {top: 10, right: 30, bottom: 30, left: 30};
     var width = +svg.attr("width") - margin.left - margin.right;
     var height = +svg.attr("height") - margin.top - margin.bottom;
     var g = svg.append("g")
@@ -145,7 +145,7 @@ class NestChart extends React.Component {
         .append("text")
           .attr("fill","black")
           .attr("transform","translate("+(width-15)+",0)")
-          .attr("dy","-1em")
+          .attr("dy","2em")
           .text(this.props.x+","+this.props.z)
 
     g.append("g")

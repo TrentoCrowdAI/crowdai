@@ -41,6 +41,7 @@ class HeatMap extends React.Component {
     var x = this.props.x //worker_a
     var y = this.props.y //worker_b
     var z = this.props.z //cohen_K
+    var param = this.props.param //scale
 
     function mean(arr) {
       return arr.reduce((acc,prev) => acc+prev)/arr.length
@@ -100,7 +101,7 @@ class HeatMap extends React.Component {
         .attr('height', 20)
         .attr('y', d => yscale(d[y]))
         .attr('x', d => xscale(d[x])-9)
-        .attr('fill', d => d[z]==0 ? 'lightgreen' : colorScale(d[z]))
+        .attr('fill', d => d[z]/param==0 ? 'lightgreen' : d[z]/param==1 ? 'red' : colorScale(d[z]/param))
         .attr('rx', 3)
         .attr('ry', 3)
         .on("mouseover", function(d) {
@@ -129,7 +130,7 @@ class HeatMap extends React.Component {
           tooltip.select('div')
               .html('Worker A: <b>'+d[x].toUpperCase()+'</b>,'+
                   '<br />Worker B: <b>'+d[y].toUpperCase()+'</b>,'+
-                  '<br />Cohen\'s Kappa => <b>'+d[z].toFixed(4)+'</b>')
+                  '<br />'+z+' => <b>'+d[z].toFixed(4)+'</b>')
         })
 
     g.append('g')
@@ -170,7 +171,7 @@ class HeatMap extends React.Component {
 		return(
 			<div>
 			<br />
-			<svg className={this.props.selector} height='1100' width='1000'> </svg>
+			<svg className={this.props.selector} height='1100' width='1100'> </svg>
 			</div>
 		);
 	}

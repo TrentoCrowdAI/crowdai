@@ -42,7 +42,7 @@ class Reports extends React.Component {
 		this.props.reports.tasks=[]
 		switch(value) {
 			case 'T_CompleteTime':
-				this.props.fetchTaskTime(this.props.match.params.jobid)//(Number(this.props.match.params.jobid))
+				this.props.fetchTaskTime(this.props.match.params.jobid)
 				break;
 			case 'W_CompleteTime':
 				this.props.fetchWorkerTimes(this.props.match.params.jobid,Number(this.state.chosenworker))
@@ -51,17 +51,25 @@ class Reports extends React.Component {
 				this.props.fetchAnswers(this.props.match.params.jobid,Number(this.state.chosenworker))
 				break;
 			case 'Distribution':
-				//this.props.reports.tasks = Object.values(agreeData.tasks)
 				this.props.fetchTasksAgreements(this.props.match.params.jobid)
 				break;
 			case 'Classification':
-				this.props.fetchWorkersAgreements(this.props.match.params.jobid,'all','all');
+				this.props.fetchWorkersAgreements(this.props.match.params.jobid);
 				break;
 			case 'Cohen':
 				this.props.fetchMetric(this.props.match.params.jobid,'cohen');
 				break;
 			case 'M1':
 				this.props.fetchMetric(this.props.match.params.jobid,'m1');
+				break;
+			case 'M2':
+				this.props.fetchMetric(this.props.match.params.jobid,'m2');
+				break;
+			case 'M3':
+				this.props.fetchMetric(this.props.match.params.jobid,'m3');
+				break;
+			case 'WWM1':
+				this.props.fetchMetric(this.props.match.params.jobid,'wwm1');
 				break;
 			case 'WWM2':
 				this.props.fetchMetric(this.props.match.params.jobid,'wwm2');
@@ -76,6 +84,8 @@ class Reports extends React.Component {
 			activeMetric: value,
 			activeworker: value==='T_CompleteTime'||value==='Distribution'||value==='Classification' ? false : true,
 			chosenworker: value==='T_CompleteTime'||value=='Distribution'||value==='Classification' ? 'all' : this.state.chosenworker,
+			chosenitem: value==='Classification' ? this.state.chosenitem : 'all',
+			chosencriteria: value==='Classification'||value==='Percentage' ? this.state.chosencriteria : 'all',
 			activeitem: value==='Classification' ? true : false,
 			activecriteria: value==='Percentage' ? true : false
 		})
@@ -117,18 +127,7 @@ class Reports extends React.Component {
 		this.setState({
 			...this.state,
 			chosencriteria: value
-		})
-
-		switch(this.state.activeMetric) {
-			case 'Percentage':
-				break;
-			case 'Classification':
-				this.props.fetchWorkersAgreements(this.props.match.params.jobid,this.state.chosenitem,value);
-				break;
-			default:
-				break;
-		}
-		
+		})		
 	}
 
 renderChart(chart,x,y,z,param) {
@@ -214,6 +213,7 @@ renderChart(chart,x,y,z,param) {
 				x='worker_id'
 				y='answer'
 				z=['yes','no','not clear']
+				param=[this.state.chosenitem,this.state.chosencriteria]
 				break;
 
 			case 'Cohen':
@@ -221,7 +221,7 @@ renderChart(chart,x,y,z,param) {
 				x='worker_a'
 				y='worker_b'
 				z='cohen_K'
-				param=''
+				param=1
 				break;
 
 			case 'M1':
@@ -229,7 +229,7 @@ renderChart(chart,x,y,z,param) {
 				x='worker_a'
 				y='worker_b'
 				z='m1'
-				param=''
+				param=1
 				break;
 
 			case 'WWM2':
@@ -237,7 +237,29 @@ renderChart(chart,x,y,z,param) {
 				x='worker_a'
 				y='worker_b'
 				z='wwm2'
-				param=''
+				param=1
+				break;
+			
+			case 'WWM1':
+				chart='heatmap'
+				x='worker_a'
+				y='worker_b'
+				z='wwm1'
+				param=100
+				break;
+
+			case 'M2':
+				chart='linemetricchart'
+				x='worker_a'
+				y='m2'
+				z=''
+				break;
+
+			case 'M3':
+				chart='linemetricchart'
+				x='worker_a'
+				y='m3'
+				z=['wrong_on_wrongs','right_on_wrongs']
 				break;
 
 			default:
@@ -311,14 +333,6 @@ Reports.propTypes = {
 	worker_error: PropTypes.any,
 	worker_loading: PropTypes.bool,
 	workers: PropTypes.any,
-
-	/*items: PropTypes.any,
-	i_loading: PropTypes.bool,
-	i_error: PropTypes.any,
-
-	criteria: PropTypes.any,
-	cr_loading: PropTypes.bool,
-	cr_error: PropTypes.any*/
 }
 
 const mapDispatchToProps = dispatch => ({
@@ -327,10 +341,8 @@ const mapDispatchToProps = dispatch => ({
 	fetchAnswers: (jobId,workerId) => dispatch(actions.fetchAnswers(jobId,workerId)),
 	fetchWorkers: jobId => dispatch(actions.fetchWorkers(jobId)),
 	fetchTasksAgreements: jobId => dispatch(actions.fetchTasksAgreements(jobId)),
-	fetchWorkersAgreements: (jobId,itemId,criteriaId) => dispatch(actions.fetchWorkersAgreements(jobId,itemId,criteriaId)),
-	fetchMetric : (jobId,metric) => dispatch(actions.fetchMetric(jobId,metric)),
-	/*fetchItems: (jobId) => dispatch(actions.fetchItems(jobId)),
-	fetchCriteria: (jobId) => dispatch(actions.fetchCriteria(jobId))*/
+	fetchWorkersAgreements: (jobId) => dispatch(actions.fetchWorkersAgreements(jobId)),
+	fetchMetric : (jobId,metric) => dispatch(actions.fetchMetric(jobId,metric))
 })
 
 const mapStateToProps = state => ({
@@ -340,15 +352,7 @@ const mapStateToProps = state => ({
 
 	workers: state.report.wlist.workers,
 	worker_error: state.report.wlist.error,
-	worker_loading: state.report.wlist.loading,
-
-	/*items: state.report.ilist.items,
-	i_error: state.report.ilist.erros,
-	i_loading: state.report.ilist.loading,
-
-	criteria: state.report.crlist.criteria,
-	cr_error: state.report.crlist.error,
-	cr_loading: state.report.crlist.loading*/
+	worker_loading: state.report.wlist.loading
 })
 
 export default connect(mapStateToProps,mapDispatchToProps)(Reports)

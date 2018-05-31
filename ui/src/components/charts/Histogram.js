@@ -116,7 +116,7 @@ class Histogram extends React.Component {
        .append("text")
           .attr("fill","black")
           .attr("transform","translate("+(width-15)+",0)")
-          .attr("dy","2em")
+          .attr("dy","2.5em")
           .text("avg_time min")
 
     g.append("g")

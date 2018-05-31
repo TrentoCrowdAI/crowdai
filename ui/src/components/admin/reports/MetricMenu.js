@@ -64,7 +64,28 @@ class MetricMenu extends React.Component {
 					className='metrics' 
 					style={{marginBottom: '5px'}}
 					onClick={this.props.onChange}
-				>M1 metric between Workers</Button>
+				>M1</Button>
+				<br />
+				<Button 
+					value='M2'
+					className='metrics' 
+					style={{marginBottom: '5px'}}
+					onClick={this.props.onChange}
+				>M2</Button>
+				<br />
+				<Button 
+					value='M3'
+					className='metrics' 
+					style={{marginBottom: '5px'}}
+					onClick={this.props.onChange}
+				>M3</Button>
+				<br />
+				<Button 
+					value='WWM1'
+					className='metrics' 
+					style={{marginBottom: '5px'}}
+					onClick={this.props.onChange}
+				>WWM1</Button>
 				<br />
 				<Button 
 					value='WWM2'
@@ -72,20 +93,6 @@ class MetricMenu extends React.Component {
 					style={{marginBottom: '5px'}}
 					onClick={this.props.onChange}
 				>WWM2</Button>
-				<br />
-				<Button 
-					value='Initial_Fails'
-					className='metrics' 
-					style={{marginBottom: '5px'}}
-					onClick={this.props.onChange}
-				>Percentage % of Workers who failed Initial Test</Button>
-				<br />
-				<Button 
-					value='Honeypots_Fails'
-					className='metrics' 
-					style={{marginBottom: '5px'}}
-					onClick={this.props.onChange}
-				>Percentage % of Workers who failed Honeypots</Button>
 				<br />
 			</div>
     )

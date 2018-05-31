@@ -18,12 +18,27 @@ class SimpleLineChart extends React.Component {
       var svg = d3.select("."+this.props.selector)
       var margin = {top: 10, right: 30, bottom: 30, left: 30};
       var g = svg.append("g")
-
       g.append("text")
-        .text("Choose a Task")
+        .text("No data to display yet")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-    } else {
-      this.buildGraph()
+
+    } else if(this.props.param[0]=='all') {
+      var svg = d3.select("."+this.props.selector)
+      var margin = {top: 10, right: 30, bottom: 30, left: 30};
+      var g = svg.append("g")
+      g.append("text")
+        .text("Choose an Item")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    } else if(this.props.param[1]=='all') {
+          var svg = d3.select("."+this.props.selector)
+          var margin = {top: 10, right: 30, bottom: 30, left: 30};
+          var g = svg.append("g")
+          g.append("text")
+            .text("Choose a Criteria")
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    } else { this.buildGraph()
     }
   }
 
@@ -38,7 +53,7 @@ class SimpleLineChart extends React.Component {
     var x = this.props.x //worker_id
     var y = this.props.y //answer
     var z = this.props.z //yes,no,not clear
-    
+    var param = this.props.param
     var datan = {}
     var datas = this.props.data
     function cc(i) {
@@ -57,6 +72,7 @@ class SimpleLineChart extends React.Component {
     var data = this.props.data.sort( function(a,b) {
       return (Number(a[x]) > Number(b[x])) ? 1 : ((Number(b[x]) > Number(a[x])) ? -1 : 0);
     })
+    .filter(d => (d.item_id==param[0] && d.criteria_id==param[1]) )
     
     var xscale = d3.scaleLinear()
         .domain([d3.min(data, d => Number(d[x])-2),d3.max(data, d => Number(d[x])+2)])

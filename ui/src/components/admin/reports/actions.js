@@ -88,12 +88,10 @@ const actions = {
     };
   },
 
-  fetchWorkersAgreements(jobId,itemId,criteriaId) {
+  fetchWorkersAgreements(jobId) {
     return {
       type: actionTypes.FETCH_WAGREES,
-      jobId,
-      itemId,
-      criteriaId
+      jobId
     };
   },
   fetchWorkersAgreementsSuccess(response) {

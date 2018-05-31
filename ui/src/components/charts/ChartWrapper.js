@@ -10,6 +10,7 @@ import AreaChart from './AreaChart.js'
 import NestChart from './NestChart.js'
 import StackedBar from './StackedBar.js'
 import DonutChart from './DonutChart.js';
+import LineMetricChart from './LineMetricChart';
 
 var count = 0;
 
@@ -93,6 +94,15 @@ class ChartWrapper extends React.Component {
           <div>
             <StackedBar 
               {... this.props}
+            />
+          </div>
+        )
+        break;
+      case 'linemetricchart':
+        return(
+          <div>
+            <LineMetricChart
+              {...this.props}
             />
           </div>
         )

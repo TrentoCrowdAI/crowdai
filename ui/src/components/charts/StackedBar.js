@@ -27,7 +27,7 @@ class StackedBar extends React.Component {
       return (a[x] > b[x]) ? 1 : ((b[x] > a[x]) ? -1 : 0);
     })
 
-    var margin = {top: 10, right: 30, bottom: 30, left: 50};
+    var margin = {top: 30, right: 30, bottom: 30, left: 50};
     var width = +svg.attr("width") - margin.left - margin.right;
     var height = +svg.attr("height") - margin.top - margin.bottom;
     var g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");

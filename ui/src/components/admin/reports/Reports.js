@@ -82,8 +82,8 @@ class Reports extends React.Component {
 		this.setState({
 			...this.state,
 			activeMetric: value,
-			activeworker: value==='T_CompleteTime'||value==='Distribution'||value==='Classification' ? false : true,
-			chosenworker: value==='T_CompleteTime'||value=='Distribution'||value==='Classification' ? 'all' : this.state.chosenworker,
+			activeworker: value==='W_CompleteTime'||value==='Percentage' ? true : false,
+			chosenworker: value==='W_CompleteTime'||value==='Percentage' ? this.state.chosenworker : 'all',
 			chosenitem: value==='Classification' ? this.state.chosenitem : 'all',
 			chosencriteria: value==='Classification'||value==='Percentage' ? this.state.chosencriteria : 'all',
 			activeitem: value==='Classification' ? true : false,

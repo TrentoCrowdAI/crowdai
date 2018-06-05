@@ -16,8 +16,8 @@ class StackedBar extends React.Component {
   buildGraph() {
   	var svg = d3.select("."+this.props.selector);
   	
-  	var criteria = this.props.y
-  	/*this.props.y.map( (step,i) => criteria['c'+(i+1)] = step )
+  	var criteria = this.props.param
+  	/*this.props.param.map( (step,i) => criteria['c'+(i+1)] = step )
   	console.log("criteria",criteria)*/
 
     var x = this.props.x

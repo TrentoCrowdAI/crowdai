@@ -196,8 +196,9 @@ renderChart(chart,x,y,z,param) {
 			case 'Distribution':
 				chart='stacked'
 				x='item_id'
-				y=['yes','no','not clear']
+				y=''
 				z='criteria_id'
+				param=['yes','no','not clear']
 				break;
 
 			case 'Percentage':
@@ -253,6 +254,7 @@ renderChart(chart,x,y,z,param) {
 				x='worker_a'
 				y='m2'
 				z=''
+				param=1
 				break;
 
 			case 'M3':
@@ -260,6 +262,7 @@ renderChart(chart,x,y,z,param) {
 				x='worker_a'
 				y='m3'
 				z=['wrong_on_wrongs','right_on_wrongs']
+				param=1
 				break;
 
 			default:

@@ -52,14 +52,14 @@ class Histogram extends React.Component {
     var xscale = d3.scaleLinear()
         .range([0, width])
         .domain([
-          d3.min(data, d => Math.floor(d[x]/10000)*10/60), 
-          d3.max(data, d => Math.round((d[x]+4)/10000)*10/60)
+          d3.min(data, d => Math.floor(d[x])-10), 
+          d3.max(data, d => Math.round(d[x])+10)
         ])
-    var xAxis = d3.axisBottom(xscale);
+    var xAxis = d3.axisBottom(xscale)
     //console.log(width/xscale.ticks().length)
     var histo = d3.histogram()
         .thresholds(xscale.ticks(10))
-        (data.map(d => (d[x]/1000/60)));
+        (data.map(d => (d[x])));
 
     var yscale = d3.scaleLinear()
       .domain([0, d3.max(histo, d => d.length)])
@@ -75,7 +75,8 @@ class Histogram extends React.Component {
     bar.append("rect")
           .style("fill", color)
           .attr("x", 1)
-          .attr("width", d => xscale(d.x1)-xscale(d.x0)-1 )
+          .attr("width", d => 
+              d.x1==d3.max(data, d => d[x]) ? xscale(d.x1+10)-xscale(d.x0)-1 : xscale(d.x1)-xscale(d.x0)-1)
           .attr("height", d => height-yscale(d.length) )
           .on("mouseover", function() {
             d3.select(this)
@@ -94,7 +95,10 @@ class Histogram extends React.Component {
             //console.log(d.x0,d.x1)
             var nuovo = []
             data.map( (step,i) => {
-              if((step[x]/1000/60>=d.x0 && step[x]/1000/60<d.x1) || (step[x]/1000/60>=d.x0 && step[x]/1000/60==d.x1)) {
+              if(
+                (step[x]>=d.x0 && step[x]<d.x1) || 
+                (d.x1==d3.max(data, d => d[x]) && step[x]>=d.x0 && step[x]==d.x1) 
+              ) {
                 nuovo = nuovo.concat([step])
               }
             })
@@ -104,7 +108,8 @@ class Histogram extends React.Component {
     bar.append("text")
           .attr("dy", ".75em")
           .attr("y", d => 10)
-          .attr("x", d => (xscale(d.x1)-xscale(d.x0)-1)/2 )
+          .attr("x", d => 
+          (d.x1==d3.max(data, d => d[x]) ? (xscale(d.x1+10)-xscale(d.x0))/2 : (xscale(d.x1)-xscale(d.x0))/2))
           .attr("text-anchor", "middle")
           .style("fill", "white")
           .text( d => d.length ? d.length : null)
@@ -117,7 +122,7 @@ class Histogram extends React.Component {
           .attr("fill","black")
           .attr("transform","translate("+(width-15)+",0)")
           .attr("dy","2.5em")
-          .text("avg_time min")
+          .text(this.props.x)
 
     g.append("g")
        .attr("class","y axis")
@@ -127,7 +132,7 @@ class Histogram extends React.Component {
           .attr("transform","rotate(-90)")
           .attr("text-anchor","end")
           .attr("dy","2em")
-          .text("# objects")
+          .text("# "+this.props.y)
   }
 
   componentDidMount() {
@@ -150,7 +155,7 @@ class Histogram extends React.Component {
     var x = this.props.x
     var z = this.props.z
     var stampa = this.props.data.length>0 ? this.state.clicked.map(d => 
-      <li key={d[y]+""+d[z]}>{y+" "}<strong style={{color: 'steelblue'}}>{d[y]}</strong>{", "+z+" "}<strong style={{color: 'steelblue'}}>{d[z]}</strong>{" => "+x+" "+d[x]}</li>) : " "
+      <li key={d[x]+""+d[y]}>{y+" "}<strong style={{color: 'steelblue'}}>{d[y]}</strong>{" "+z+" "}<strong style={{color: 'steelblue'}}>{d[z]}</strong>{" => "+x+" "}<strong style={{color: 'steelblue'}}>{d[x]}</strong></li>) : " "
 
     return (
       <div>
@@ -166,6 +171,7 @@ class Histogram extends React.Component {
               x={this.props.y}
               y={this.props.x}
               z={this.props.z}
+              param={1}
               chart='nest'
               selector={'nestedchart'}
               data={this.state.clicked}

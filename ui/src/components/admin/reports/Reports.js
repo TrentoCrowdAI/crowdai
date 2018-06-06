@@ -191,6 +191,7 @@ renderChart(chart,x,y,z,param) {
 				x='item_id'
 				y='avgtime_ms'
 				z='criteria_id'
+				param=1000
 				break;
 
 			case 'Distribution':
@@ -250,9 +251,14 @@ renderChart(chart,x,y,z,param) {
 				break;
 
 			case 'M2':
-				chart='linemetricchart'
+				/*chart='nest'
 				x='worker_a'
 				y='m2'
+				z=''
+				param=1*/
+				chart='histogram'
+				x='m2'
+				y='worker_a'
 				z=''
 				param=1
 				break;

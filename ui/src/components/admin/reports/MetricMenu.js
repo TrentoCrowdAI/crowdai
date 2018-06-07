@@ -17,6 +17,8 @@ class MetricMenu extends React.Component {
   render() {
     return(
 			<div className="options">
+				Available Reports:
+				<br />
 				<Button 
 					value='T_CompleteTime'
 					className='metrics'
@@ -52,6 +54,8 @@ class MetricMenu extends React.Component {
 					onClick={this.props.onChange}
 				>Task Classification and Worker Agreement</Button>
 				<br />
+				Correlation Metrics: 
+				<br />
 				<Button 
 					value='Cohen'
 					className='metrics' 
@@ -64,35 +68,28 @@ class MetricMenu extends React.Component {
 					className='metrics' 
 					style={{marginBottom: '5px'}}
 					onClick={this.props.onChange}
-				>M1</Button>
+				>Correlation in Errors between Workers</Button>
 				<br />
 				<Button 
 					value='M2'
 					className='metrics' 
 					style={{marginBottom: '5px'}}
 					onClick={this.props.onChange}
-				>M2</Button>
-				<br />
-				<Button 
-					value='M3'
-					className='metrics' 
-					style={{marginBottom: '5px'}}
-					onClick={this.props.onChange}
-				>M3</Button>
+				>Percentage contribution to Crowd Error</Button>
 				<br />
 				<Button 
 					value='WWM1'
 					className='metrics' 
 					style={{marginBottom: '5px'}}
 					onClick={this.props.onChange}
-				>WWM1</Button>
+				>Basic Agreement between Workers</Button>
 				<br />
 				<Button 
 					value='WWM2'
 					className='metrics' 
 					style={{marginBottom: '5px'}}
 					onClick={this.props.onChange}
-				>WWM2</Button>
+				>Conditional Error Propability <br /> P_err(A|B)</Button>
 				<br />
 			</div>
     )

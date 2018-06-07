@@ -54,8 +54,15 @@ class SimpleLineChart extends React.Component {
     var y = this.props.y //answer
     var z = this.props.z //yes,no,not clear
     var param = this.props.param
+    
+
+    var data = this.props.data.sort( function(a,b) {
+      return (Number(a[x]) > Number(b[x])) ? 1 : ((Number(b[x]) > Number(a[x])) ? -1 : 0);
+    })
+    .filter(d => (d.item_id==param[0] && d.criteria_id==param[1]) )
+
     var datan = {}
-    var datas = this.props.data
+    var datas = data
     function cc(i) {
       datan = datas.filter(d => d[y]==z[i])
       return datan.length
@@ -67,12 +74,7 @@ class SimpleLineChart extends React.Component {
       'not clear': { label: z[2], num: cc(2), xtg: cc(2)*100/datas.length }
     }
 
-    //console.log(labels)
-
-    var data = this.props.data.sort( function(a,b) {
-      return (Number(a[x]) > Number(b[x])) ? 1 : ((Number(b[x]) > Number(a[x])) ? -1 : 0);
-    })
-    .filter(d => (d.item_id==param[0] && d.criteria_id==param[1]) )
+    console.log(labels)
     
     var xscale = d3.scaleLinear()
         .domain([d3.min(data, d => Number(d[x])-2),d3.max(data, d => Number(d[x])+2)])

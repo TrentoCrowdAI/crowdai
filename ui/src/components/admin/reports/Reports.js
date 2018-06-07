@@ -184,6 +184,7 @@ renderChart(chart,x,y,z,param) {
 				x='avgtime_ms'
 				y='item_id'
 				z='criteria_id'
+				param=1000
 				break;
 
 			case 'W_CompleteTime':
@@ -220,52 +221,47 @@ renderChart(chart,x,y,z,param) {
 
 			case 'Cohen':
 				chart='heatmap'
-				x='worker_a'
-				y='worker_b'
-				z='cohen_K'
+				x='worker A'
+				y='worker B'
+				z='cohen\'s kappa correlation'
 				param=1
 				break;
 
 			case 'M1':
 				chart='heatmap'
-				x='worker_a'
-				y='worker_b'
+				x='worker A'
+				y='worker B'
 				z='m1'
 				param=1
 				break;
 
 			case 'WWM2':
 				chart='heatmap'
-				x='worker_a'
-				y='worker_b'
+				x='worker A'
+				y='worker B'
 				z='wwm2'
 				param=1
 				break;
 			
 			case 'WWM1':
 				chart='heatmap'
-				x='worker_a'
-				y='worker_b'
+				x='worker A'
+				y='worker B'
 				z='wwm1'
 				param=100
 				break;
 
 			case 'M2':
-				/*chart='nest'
-				x='worker_a'
-				y='m2'
-				z=''
-				param=1*/
 				chart='histogram'
 				x='m2'
-				y='worker_a'
+				y='worker A'
 				z=''
 				param=1
 				break;
 
 			case 'M3':
 				chart='linemetricchart'
-				x='worker_a'
+				x='worker A'
 				y='m3'
 				z=['wrong_on_wrongs','right_on_wrongs']
 				param=1
@@ -311,8 +307,6 @@ renderChart(chart,x,y,z,param) {
 				</div>
 
 				<hr />
-				<h4>Available metrics:</h4>
-
 				<div className="rowC">
 				<MetricMenu onChange={this.activeMetric}/>
 				{this.renderChart(chart,x,y,z,param)}

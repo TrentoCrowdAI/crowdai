@@ -38,6 +38,7 @@ class Histogram extends React.Component {
     var x = this.props.x
     var y = this.props.y
     var z = this.props.z
+    var param = this.props.param
 
     var data = this.props.data.sort( function(a,b) {
       return (a[x] > b[x]) ? 1 : ((b[x] > a[x]) ? -1 : 0);
@@ -49,17 +50,21 @@ class Histogram extends React.Component {
     var g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
     var color = this.props.color
 
+    var unity = d3.max(data, d => d[x]) / ( d3.max(data, d => d[x])/10 )
+    console.log(unity)
+
     var xscale = d3.scaleLinear()
         .range([0, width])
         .domain([
-          d3.min(data, d => Math.floor(d[x])-10), 
-          d3.max(data, d => Math.round(d[x])+10)
+          0,
+          //d3.min(data, d => Math.floor(d[x])/param - 10 ), 
+          d3.max(data, d => Math.round(d[x])/param + 10 )
         ])
     var xAxis = d3.axisBottom(xscale)
-    //console.log(width/xscale.ticks().length)
+    
     var histo = d3.histogram()
         .thresholds(xscale.ticks(10))
-        (data.map(d => (d[x])));
+        (data.map(d => (d[x]/param)));
 
     var yscale = d3.scaleLinear()
       .domain([0, d3.max(histo, d => d.length)])
@@ -76,7 +81,10 @@ class Histogram extends React.Component {
           .style("fill", color)
           .attr("x", 1)
           .attr("width", d => 
-              d.x1==d3.max(data, d => d[x]) ? xscale(d.x1+10)-xscale(d.x0)-1 : xscale(d.x1)-xscale(d.x0)-1)
+              d.x1==d3.max(data, d => d[x]) ? 
+                xscale(d.x1+10) - xscale(d.x0)-1 :
+                xscale(d.x1)-xscale(d.x0)-1
+            )
           .attr("height", d => height-yscale(d.length) )
           .on("mouseover", function() {
             d3.select(this)
@@ -96,8 +104,8 @@ class Histogram extends React.Component {
             var nuovo = []
             data.map( (step,i) => {
               if(
-                (step[x]>=d.x0 && step[x]<d.x1) || 
-                (d.x1==d3.max(data, d => d[x]) && step[x]>=d.x0 && step[x]==d.x1) 
+                (step[x]/param>=d.x0 && step[x]/param<d.x1) || 
+                (d.x1==d3.max(data, d => d[x]/param) && step[x]/param>=d.x0 && step[x]/param==d.x1) 
               ) {
                 nuovo = nuovo.concat([step])
               }
@@ -109,7 +117,10 @@ class Histogram extends React.Component {
           .attr("dy", ".75em")
           .attr("y", d => 10)
           .attr("x", d => 
-          (d.x1==d3.max(data, d => d[x]) ? (xscale(d.x1+10)-xscale(d.x0))/2 : (xscale(d.x1)-xscale(d.x0))/2))
+            (d.x1==d3.max(data, d => d[x]) ? 
+              (xscale(d.x1+10) - xscale(d.x0))/2 :
+              (xscale(d.x1)-xscale(d.x0))/2)
+            )
           .attr("text-anchor", "middle")
           .style("fill", "white")
           .text( d => d.length ? d.length : null)

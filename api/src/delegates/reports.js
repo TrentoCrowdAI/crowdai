@@ -113,7 +113,7 @@ const getWorkersAgreements = (exports.getWorkersAgreements = async (jobId) => {
     let res = await db.query(`
       SELECT item_id,(data->'criteria')::json#>>'{0,id}' AS criteria_id,worker_id,(data->'criteria')::json#>>'{0,workerAnswer}' AS answer
       FROM ${db.TABLES.Task}
-      WHERE job_id=$1 AND (data->'end') IS NOT NULL
+      WHERE job_id=$1 AND data->'end' IS NOT NULL
     `, [jobId])
     return tasks = { tasks: res.rows }
   } catch (error) {

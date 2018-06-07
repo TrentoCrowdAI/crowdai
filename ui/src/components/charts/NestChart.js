@@ -116,13 +116,13 @@ class NestChart extends React.Component {
 
     g.append("path")
       .datum([{
-        avgtime_ms : media,
-        item_id : data[0][x],
-        criteria_id : data[0][z]
+        y : media,
+        x : data[0][x],
+        z : data[0][z]
       },{
-        avgtime_ms : media,
-        item_id : data[data.length-1][x],
-        criteria_id : data[data.length-1][z]
+        y : media,
+        x : data[data.length-1][x],
+        z : data[data.length-1][z]
       }])
       .attr("class","average")
       .attr("transform","translate("+(xscale.bandwidth()/2)+",0)")
@@ -134,7 +134,10 @@ class NestChart extends React.Component {
     if(data.length>1) {
       g.append("text")
           .attr("fill", "red")
-          .attr("transform", "translate("+width/2+","+yscale(media/param)+")")
+          .attr("transform", "translate("+width/2+","+
+            ( yscale( (media/param) + d3.max(yscale.domain())/10) )
+            +")"
+          )
           .attr("text-anchor","middle")
           .attr("dy","-0.5em")
           .text("media ~ "+(media/param).toFixed(3)+" "+this.props.y)

@@ -130,7 +130,7 @@ class HeatMap extends React.Component {
           tooltip.select('div')
               .html('Worker A: <b>'+d[x].toUpperCase()+'</b>,'+
                   '<br />Worker B: <b>'+d[y].toUpperCase()+'</b>,'+
-                  '<br />'+z+' => <b>'+d[z].toFixed(4)+'</b>')
+                  '<br />'+z+' => <b>'+d[z].toFixed(2)+'</b>')
         })
 
     g.append('g')

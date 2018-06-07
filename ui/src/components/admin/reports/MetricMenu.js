@@ -68,28 +68,28 @@ class MetricMenu extends React.Component {
 					className='metrics' 
 					style={{marginBottom: '5px'}}
 					onClick={this.props.onChange}
-				>Correlation in Errors between Workers</Button>
+				>Correlation in Errors between Workers<br />[ M1 ]</Button>
 				<br />
 				<Button 
 					value='M2'
 					className='metrics' 
 					style={{marginBottom: '5px'}}
 					onClick={this.props.onChange}
-				>Percentage contribution to Crowd Error</Button>
+				>Percentage contribution to Crowd Error<br />[ M2 ]</Button>
 				<br />
 				<Button 
 					value='WWM1'
 					className='metrics' 
 					style={{marginBottom: '5px'}}
 					onClick={this.props.onChange}
-				>Basic Agreement between Workers</Button>
+				>Basic Agreement between Workers<br />[ WWM1 ]</Button>
 				<br />
 				<Button 
 					value='WWM2'
 					className='metrics' 
 					style={{marginBottom: '5px'}}
 					onClick={this.props.onChange}
-				>Conditional Error Propability <br /> P_err(A|B)</Button>
+				>Conditional Error Propability <br /> P_err(A|B)<br />[ WWM2 ]</Button>
 				<br />
 			</div>
     )

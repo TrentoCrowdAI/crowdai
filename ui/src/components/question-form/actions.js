@@ -76,14 +76,14 @@ export const actions = {
     };
   },
 
-  setCurrentSession(hitId, assignmentId, workerId, experimentId) {
+  setCurrentSession(hitId, assignmentId, workerId, jobId) {
     return {
       type: actionTypes.SET_CURRENT_SESSION,
       session: {
         assignmentId,
         hitId,
         workerId,
-        experimentId
+        jobId
       }
     };
   },

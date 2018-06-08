@@ -63,7 +63,7 @@ CREATE TABLE worker (
 --   criteria: [<number>, <number>], 
 --   start: <date>, 
 --   end: <date>,
---   finished: <boolean>, the worker is done.
+--   finished: <boolean>, the worker completed all the tasks.
 --   finishedByWorker: <boolean>, the worker decided to finish early.
 --   finishedWithError: <boolean>, means an error occurred and the worker was force to finish the task.
 --   solvedMinTasks: <boolean>, means that the worker solved at least the minimum number of tasks required.

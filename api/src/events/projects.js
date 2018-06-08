@@ -3,10 +3,7 @@
  */
 const { on } = require('./emitter');
 const projectsDelegate = require(__base + 'delegates/projects');
-
-const EventTypes = (exports.EventTypes = {
-  PROCESS_CSV: 'PROCESS_CSV'
-});
+const { EventTypes } = require('./types');
 
 /**
  * This listener generates the items, filters and tests records based
@@ -17,6 +14,6 @@ const EventTypes = (exports.EventTypes = {
  *
  * emit(EventTypes.PROCESS_CSV, project);
  */
-on(EventTypes.PROCESS_CSV, async (project, truncate) => {
+on(EventTypes.project.PROCESS_CSV, async (project, truncate) => {
   await projectsDelegate.createRecordsFromCSVs(project, truncate);
 });

@@ -99,6 +99,8 @@ const getState = (exports.getState = async job => {
               resolve(null);
             }
             reject(err);
+          } else if (rsp.statusCode === 400) {
+            reject(rsp.statusMessage);
           } else if (rsp.statusCode === 404) {
             resolve(null);
           } else {
@@ -110,9 +112,9 @@ const getState = (exports.getState = async job => {
 
     if (response && typeof response === 'string') {
       response = JSON.parse(response);
+      return response.state;
     }
-    //return response.state;
-    return 'ASSIGN_FILTERS';
+    return null;
   } catch (error) {
     console.error(error);
     throw Boom.badImplementation(
@@ -134,4 +136,31 @@ const getUrl = (exports.getUrl = taskAssignmentApi => {
     url = url.substr(0, url.length - 1);
   }
   return url;
+});
+
+/**
+ * Returns the estimated number of tasks per worker for the given job.
+ *
+ * @param {Object} job
+ * @param {Number} actualNumTasks In case we now the actual number of tasks for the worker
+ * @return {Number}
+ */
+const getEstimatedTasksPerWorkerCount = (exports.getEstimatedTasksPerWorkerCount = (
+  job,
+  actualNumTasks
+) => {
+  if (!job) {
+    throw Boom.badRequest('The job is required');
+  }
+  let numTasks = actualNumTasks || job.data.maxTasksRule;
+  let estimated = job.data.initialTestsRule + numTasks;
+
+  if (numTasks > job.data.testFrequencyRule) {
+    estimated += Math.floor(numTasks / job.data.testFrequencyRule);
+
+    if (job.data.testFrequencyRule === 1) {
+      estimated -= 1;
+    }
+  }
+  return estimated;
 });

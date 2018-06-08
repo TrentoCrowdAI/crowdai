@@ -2,7 +2,7 @@ const csv = require('csv-parser');
 
 const projectsDelegate = require('./projects');
 const projectsEvent = require(__base + 'events/projects');
-const { EventTypes } = projectsEvent;
+const { EventTypes } = require(__base + 'events/types');
 
 test('projects module should be defined', () => {
   expect(projectsDelegate).toBeDefined();
@@ -42,7 +42,7 @@ describe('projects.create', async () => {
     });
   });
 
-  test(`create should emit ${EventTypes.PROCESS_CSV}`, async () => {
+  test(`create should emit ${EventTypes.project.PROCESS_CSV}`, async () => {
     methodCalled = false;
     await projectsDelegate.create('http://url-items', 'http://url-tests', [
       { label: 'C1', description: 'a filter' }

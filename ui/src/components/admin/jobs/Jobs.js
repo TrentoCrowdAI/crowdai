@@ -53,7 +53,7 @@ const getOptions = props => {
     },
 
     rowPositive(item) {
-      return item.status === JobStatus.PUBLISHED;
+      return item.data.status === JobStatus.PUBLISHED;
     },
 
     actions: {
@@ -67,7 +67,7 @@ const getOptions = props => {
               </Button>
             )}
             <Button icon color="blue" size="mini" as={Link} to={`/admin/screenings/${item.id}/dashboard`}>
-              <Icon name="play" />
+              <Icon name={item.data.status === JobStatus.NOT_PUBLISHED ? 'play' : 'eye'} />
             </Button>
             <Popup
               trigger={

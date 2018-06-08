@@ -125,15 +125,6 @@ class JobDashboard extends React.Component {
                   content={this.props.error.message || 'An error ocurred, please try again.'}
                 />
               )}
-              {this.props.saved &&
-                this.state.showSuccessMsg && (
-                  <Message
-                    onDismiss={() => this.setState({...this.state, showSuccessMsg: false})}
-                    success
-                    header="Success"
-                    content="Published!"
-                  />
-                )}
             </Grid.Column>
           </Grid.Row>
 
@@ -149,7 +140,7 @@ class JobDashboard extends React.Component {
             </Grid.Row>
           )}
 
-          <JobDashboardButtons job={item} state={this.props.jobState} />
+          <JobDashboardButtons job={item} jobState={this.props.jobState} />
         </Grid>
       </Form>
     );

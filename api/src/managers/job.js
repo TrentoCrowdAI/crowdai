@@ -2,14 +2,14 @@ const Boom = require('boom');
 const CronJob = require('cron').CronJob;
 const moment = require('moment');
 
+const delegates = require(__base + 'delegates');
 const qualityManager = require('./quality');
 const taskManager = require('./task');
 const stateManager = require('./state');
-const delegates = require(__base + 'delegates');
 const MTurk = require(__base + 'utils/mturk');
 const config = require(__base + 'config');
 const { JobStatus } = require(__base + 'utils/constants');
-const { EventTypes } = require(__base + 'events/jobs');
+const { EventTypes } = require(__base + 'events/types');
 const { emit } = require(__base + 'events/emitter');
 
 /**
@@ -269,7 +269,7 @@ const publish = (exports.publish = async id => {
     job.data.start = new Date();
     job.data.hit = { ...hit };
     job.data.instructions = instructions;
-    emit(EventTypes.START_CRON_FOR_HIT, job, hit.HITId, mt);
+    emit(EventTypes.job.START_CRON_FOR_HIT, job, hit.HITId, mt);
     return await delegates.jobs.update(id, job);
   } catch (error) {
     console.error(error);
@@ -376,9 +376,13 @@ const reviewAssignments = (exports.reviewAssignments = async (
       console.debug(`Skipping assignments review for job: ${jobId}`);
       return false;
     }
-    // We check if the job is actually done.
+    // We check if the Task Assignment's /next-task endpoint says we are done
     const workerTmp = { id: assignments.rows[0].worker_id };
-    const jobDone = await checkJobDone(job, workerTmp);
+    const jobDone = await checkNextTaskServiceDone(job, workerTmp);
+
+    if (jobDone) {
+      emit(EventTypes.job.NEXT_TASK_SERVICE_DONE, job);
+    }
 
     if (hit.HITStatus === 'Assignable') {
       if (jobDone) {
@@ -406,9 +410,9 @@ const reviewAssignments = (exports.reviewAssignments = async (
       console.log(`Reviewing assignment: ${assignment.data.assignmentTurkId}`);
 
       if (
-        !assignment.data.finished ||
-        assignment.data.initialTestFailed ||
-        (assignment.data.assignmentApproved &&
+        assignment.data.initialTestFailed || // worker did not pass quiz
+        !assignment.data.solvedMinTasks || // worker did not solve the min number of tasks
+        (assignment.data.assignmentApproved && // we have already approved and sent the bonus
           assignment.data.assignmentBonusSent)
       ) {
         continue;
@@ -461,6 +465,8 @@ const reviewAssignments = (exports.reviewAssignments = async (
         }
       }
     }
+    // TODO: here I need to add some extra logic, because SR has multiple steps until is actually done.
+    // probably plugin-based, if a specific method is not present then we just run finishJob.
     console.log(`Review assignments for job: ${jobId} done`);
     await finishJob(job);
     return true;
@@ -659,13 +665,14 @@ const updateExpirationForHIT = (exports.updateExpirationForHIT = async (
 });
 
 /**
- * Check if the job is actually done by calling the task assignment API.
+ * Check if the /next-task service (Task Assignment API) is done, meaning that all
+ * the (item, filter) tuples have votes.
  *
  * @param {Object} job
  * @param {Object} worker
  * @return {Boolean} true if the job is done, false otherwise.
  */
-const checkJobDone = async (job, worker) => {
+const checkNextTaskServiceDone = async (job, worker) => {
   let response = await taskManager.getTasksFromApi(job, worker);
   return response.done;
 };

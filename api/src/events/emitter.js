@@ -7,9 +7,11 @@ const crowdrevEmitter = new EventEmitter();
  *
  * @param {String} eventName
  * @param {Function} listener
+ * @return {Function}  The passed listener
  */
 const on = (eventName, listener) => {
   crowdrevEmitter.on(eventName, listener);
+  return listener;
 };
 
 /**

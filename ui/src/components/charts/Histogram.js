@@ -56,9 +56,9 @@ class Histogram extends React.Component {
     var xscale = d3.scaleLinear()
         .range([0, width])
         .domain([
-          0,
-          //d3.min(data, d => Math.floor(d[x])/param - 10 ), 
-          d3.max(data, d => Math.round(d[x])/param + 10 )
+          //0,
+          d3.min(data, d => Math.floor((d[x]/param)/10)*10), 
+          d3.max(data, d => (Math.round((d[x]/param)/10)*10) +10 )
         ])
     var xAxis = d3.axisBottom(xscale)
     
@@ -75,15 +75,15 @@ class Histogram extends React.Component {
         .data(histo)
         .enter().append("g")
         .attr("class", "bar")
-        .attr("transform", d => "translate("+xscale(d.x0)+","+yscale(d.length)+")")
+        .attr("transform", d => "translate("+xscale(Math.floor(d.x0/10)*10)+","+yscale(d.length)+")")
 
     bar.append("rect")
           .style("fill", color)
           .attr("x", 1)
-          .attr("width", d => 
-              d.x1==d3.max(data, d => d[x]) ? 
+          .attr("width", xscale( (d3.max(xscale.domain())/(xscale.ticks().length-1)))-1
+              /*d.x1==d3.max(data, d => d[x]) ? 
                 xscale(d.x1+10) - xscale(d.x0)-1 :
-                xscale(d.x1)-xscale(d.x0)-1
+                xscale(d.x1)-xscale(d.x0)-1*/
             )
           .attr("height", d => height-yscale(d.length) )
           .on("mouseover", function() {
@@ -95,7 +95,7 @@ class Histogram extends React.Component {
               .style("opacity","1")
           })
           .on("click", (d) => {
-            //console.log(d.x0, d.x1)
+            console.log(Math.floor(d.x0), d.x1)
             //console.log(d.x1+" - "+(Math.floor(d.x1/10)*10)+" = "+xscale(d.x1-(Math.floor(d.x1/10)*10)))
             this.setState({
               clicked : []
@@ -117,9 +117,7 @@ class Histogram extends React.Component {
           .attr("dy", ".75em")
           .attr("y", d => 10)
           .attr("x", d => 
-            (d.x1==d3.max(data, d => d[x]) ? 
-              (xscale(d.x1+10) - xscale(d.x0))/2 :
-              (xscale(d.x1)-xscale(d.x0))/2)
+              xscale( (d3.max(xscale.domain()) / (xscale.ticks().length-1))/2 )
             )
           .attr("text-anchor", "middle")
           .style("fill", "white")

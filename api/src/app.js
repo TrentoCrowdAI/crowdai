@@ -16,6 +16,7 @@ const workersApi = require('./services/workers-api');
 const requestersApi = require('./services/requesters-api');
 const auth = require('./services/auth');
 const authentication = require('./middlewares/authentication');
+require('./events');
 
 const app = new Koa();
 

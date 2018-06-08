@@ -6,10 +6,7 @@ const CronJob = require('cron').CronJob;
 const { on } = require('./emitter');
 const jobManager = require(__base + 'managers/job');
 const config = require(__base + 'config');
-
-const EventTypes = (exports.EventTypes = {
-  START_CRON_FOR_HIT: 'START_CRON_FOR_HIT'
-});
+const { EventTypes } = require('./types');
 
 /**
  * This listener setup a cronjob that will check the progress
@@ -24,10 +21,10 @@ const EventTypes = (exports.EventTypes = {
  *
  * @example
  *
- * emit(EventTypes.START_CRON_FOR_HIT, job, hitId, mt);
+ * emit(EventTypes.job.START_CRON_FOR_HIT, job, hitId, mt);
  *
  */
-on(EventTypes.START_CRON_FOR_HIT, (job, hitId, mturk) => {
+on(EventTypes.job.START_CRON_FOR_HIT, (job, hitId, mturk) => {
   const jobId = job.id;
   const cronjob = new CronJob({
     cronTime: `0 */${config.cron.hitStatusPollTime} * * * *`,

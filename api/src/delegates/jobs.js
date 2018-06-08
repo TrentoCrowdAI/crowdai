@@ -5,6 +5,8 @@ const request = require('request');
 const { JobStatus } = require(__base + 'utils/constants');
 const db = require(__base + 'db');
 const projectsDelegate = require('./projects');
+const { EventTypes } = require(__base + 'events');
+const { emit } = require(__base + 'events/emitter');
 
 const getByRequester = (exports.getByRequester = async requesterId => {
   try {
@@ -83,6 +85,7 @@ const getInstructions = (exports.getInstructions = async job => {
  *
  * 1) It creates a project record, where we store items, tests and filters.
  * 2) Creates a new job record associated with the project created in (1).
+ * 3) emits the JOB_CREATED event passing the created job as a parameter.
  *
  * @param {Object} job
  * @return {Object} the record created.
@@ -100,6 +103,7 @@ const create = (exports.create = async job => {
       );
       projectId = project.id;
     }
+    job.data.status = JobStatus.NOT_PUBLISHED;
 
     let res = await db.query(
       `insert into ${
@@ -109,6 +113,7 @@ const create = (exports.create = async job => {
     );
     const saved = res.rows[0];
     await db.query('COMMIT');
+    emit(EventTypes.job.JOB_CREATED, saved);
     return saved;
   } catch (error) {
     await db.query('ROLLBACK');
@@ -147,6 +152,7 @@ const update = (exports.update = async (id, job) => {
         job.criteria
       );
       job.project_id = project.id;
+      await projectsDelegate.safeDelete(saved.project_id);
     }
 
     let data = {
@@ -159,7 +165,6 @@ const update = (exports.update = async (id, job) => {
       } set project_id = $1, updated_at = $2, data = $3 where id = $4 returning *`,
       [job.project_id, new Date(), data, id]
     );
-    await projectsDelegate.safeDelete(saved.project_id);
     return res.rows[0];
   } catch (error) {
     console.error(error);
@@ -241,7 +246,7 @@ const copy = (exports.copy = async id => {
     };
     delete copy.id;
     delete copy.uuid;
-    copy.data.status = JobStatus.NOT_PUBLISHED;
+    delete copy.data.hit;
     let createdCopy = await create(copy);
     return createdCopy;
   } catch (error) {

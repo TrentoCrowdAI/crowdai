@@ -1,5 +1,7 @@
 const { emit } = require('./emitter');
 const jobsEvent = require('./jobs');
+const { EventTypes } = require('./types');
+
 jest.mock('cron');
 const cron = require('cron');
 
@@ -7,11 +9,7 @@ test('jobs event module should be defined', () => {
   expect(jobsEvent).toBeDefined();
 });
 
-test('jobs event module should exports EventTypes', () => {
-  expect(jobsEvent.EventTypes).toBeDefined();
-});
-
-test(`${jobsEvent.EventTypes.START_CRON_FOR_HIT} should set a cronjob`, () => {
+test(`${EventTypes.job.START_CRON_FOR_HIT} should set a cronjob`, () => {
   let cronSet = false;
 
   cron.CronJob.mockImplementation(options => {
@@ -22,6 +20,6 @@ test(`${jobsEvent.EventTypes.START_CRON_FOR_HIT} should set a cronjob`, () => {
     };
   });
 
-  emit(jobsEvent.EventTypes.START_CRON_FOR_HIT, {}, '', {});
+  emit(EventTypes.job.START_CRON_FOR_HIT, {}, '', {});
   expect(cronSet).toBe(true);
 });

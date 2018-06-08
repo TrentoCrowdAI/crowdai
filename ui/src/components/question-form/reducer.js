@@ -11,6 +11,7 @@ const defaultState = {
   assignmentStatusError: undefined,
   finishAssignmentError: undefined,
   session: {
+    jobId: undefined,
     assignmentId: undefined,
     hitId: undefined,
     workerId: undefined

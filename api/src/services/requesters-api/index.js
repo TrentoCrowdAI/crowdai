@@ -6,6 +6,6 @@ require('./profile').register(router);
 require('./csv-preview').register(router);
 require('./reports').register(router);
 
-require('./shortest-run').register(router);
+require(__base + 'plugins/shortest-run/services').register(router);
 
 module.exports = router.routes();

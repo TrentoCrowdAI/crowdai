@@ -1,8 +1,8 @@
 const Boom = require('boom');
 
 const db = require(__base + 'db');
+const { TestTaskType } = require(__base + 'delegates/test-tasks');
 const delegates = require(__base + 'delegates');
-const { TestTaskType } = delegates.testTasks;
 
 /**
  * Returns a test task for the worker. It can be an initial test or a honeypot test.

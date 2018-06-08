@@ -11,7 +11,7 @@ const QueryStream = require('pg-query-stream');
 const db = require(__base + 'db');
 const tasksDelegate = require('./tasks');
 const { emit } = require(__base + 'events/emitter');
-const { EventTypes } = require(__base + 'events/projects');
+const { EventTypes } = require(__base + 'events/types');
 
 const getById = (exports.getById = async id => {
   try {
@@ -72,7 +72,7 @@ const create = (exports.create = async (itemsUrl, testsUrl, criteria) => {
       );
     }
     await db.query('COMMIT');
-    emit(EventTypes.PROCESS_CSV, created, false);
+    emit(EventTypes.project.PROCESS_CSV, created, false);
     return created;
   } catch (error) {
     console.error(error);

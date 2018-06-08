@@ -7,12 +7,16 @@ import moment from 'moment';
  * @return {Object} {message: 'The error message', ...}
  */
 const flattenError = error => {
-  if (error.response && error.response.data) {
-    return error.response.data.payload || error.response.data;
-  }
+  let err = {};
 
-  if (!error.message) {
-    error.message = 'There was a problem processing your request.';
+  if (error.response && error.response.data) {
+    if (typeof error.response.data === 'object') {
+      err = error.response.data.payload || error.response.data;
+    } else if (typeof error.response.data === 'string') {
+      err.message = error.response.data;
+    }
+  } else {
+    err.message = 'There was a problem processing your request.';
   }
   return error;
 };

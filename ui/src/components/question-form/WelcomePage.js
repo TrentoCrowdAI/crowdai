@@ -87,7 +87,7 @@ class WelcomePage extends React.Component {
   }
 
   renderRedirectBtn() {
-    const {assignmentId, hitId, workerId, experimentId} = this.props.session;
+    const {assignmentId, hitId, workerId, jobId} = this.props.session;
 
     if (this.props.hasAcceptedHit && this.props.assignmentStatus && !this.props.assignmentStatus.data.end) {
       return (
@@ -105,7 +105,7 @@ class WelcomePage extends React.Component {
             onClick={() => this.props.checkPolling()}
             as={Link}
             positive
-            to={`/task/${experimentId}?assignmentId=${assignmentId}&workerId=${workerId}&hitId=${hitId}`}
+            to={`/task/${jobId}?assignmentId=${assignmentId}&workerId=${workerId}&hitId=${hitId}`}
             target="_blank">
             Open
           </Button>
@@ -158,8 +158,8 @@ class WelcomePage extends React.Component {
 
   componentDidMount() {
     this.props.checkAssignmentStatus();
-    const {experimentId} = this.props.match.params;
-    this.props.fetchItem(experimentId);
+    const {jobId} = this.props.match.params;
+    this.props.fetchItem(jobId);
   }
 
   submit() {
@@ -195,7 +195,7 @@ const mapStateToProps = state => ({
   hasAcceptedHit: state.questionForm.hasAcceptedHit,
   assignmentStatus: state.questionForm.assignmentStatus,
   assigmentStatusLoading: state.questionForm.assigmentStatusLoading,
-  item: state.experiment.form.item
+  item: state.job.form.item
 });
 
 const mapDispatchToProps = dispatch => ({

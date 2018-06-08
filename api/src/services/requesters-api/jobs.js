@@ -2,6 +2,7 @@ const Boom = require('boom');
 
 const delegates = require(__base + 'delegates');
 const managers = require(__base + 'managers');
+const plugins = require(__base + 'plugins');
 
 const getRequesterJobs = async ctx => {
   // we use sub as requester primary key. Since is the userId inside Google API
@@ -19,6 +20,7 @@ const getById = async ctx => {
   let job = await delegates.jobs.getById(ctx.params.id);
   let criteria = await delegates.projects.getCriteria(job.project_id);
   job.criteria = criteria.rows;
+  job.estimatedCost = await plugins.coordinator.getEstimatedCost(job);
   ctx.response.body = job;
 };
 

@@ -1,11 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {Grid, Button} from 'semantic-ui-react';
+import {Grid, Button, Label, Popup} from 'semantic-ui-react';
 import {connect} from 'react-redux';
 
-import {JobStatus, ShortestRunStatus} from 'src/utils/constants';
+import {JobStatus} from 'src/utils/constants';
 import {actions} from './actions';
-import {actions as srActions} from './shortest-run-actions';
+import JobDashboardButtonsShortestRun from 'src/components/admin/shortest-run/JobDashboardButtonsShortestRun';
 
 class JobDashboardButtons extends React.Component {
   constructor(props) {
@@ -16,23 +16,14 @@ class JobDashboardButtons extends React.Component {
     };
   }
   render() {
-    const {state} = this.props;
-
     return (
       <Grid.Row>
         <Grid.Column>
-          <RunButton {...this.props} />
-
-          {state.job === JobStatus.PUBLISHED && (
-            <Button floated="right" size="large" negative>
-              Stop
-            </Button>
+          {this.props.job.data.crowdsourcingStrategy === 'sr' && ( // TODO: change these conditionals after implementing #7
+            <JobDashboardButtonsShortestRun {...this.props} expertMode={this.state.expertMode} />
           )}
-
-          {this.state.expertMode && (
-            <Button floated="right" size="large" style={{width: '200px'}}>
-              Update parameters
-            </Button>
+          {this.props.job.data.crowdsourcingStrategy !== 'sr' && (
+            <SimpleTaskAssignmentStrategyButtons {...this.props} expertMode={this.state.expertMode} />
           )}
         </Grid.Column>
       </Grid.Row>
@@ -40,66 +31,103 @@ class JobDashboardButtons extends React.Component {
   }
 }
 
-const RunButton = ({job, state, publish, assignFilters}) => {
-  if (canPublish(state)) {
-    return (
-      <Button onClick={() => publish()} floated="right" size="large" positive>
-        Run: publish on AMT
-      </Button>
-    );
-  }
+/**
+ * These are the buttons that are part of the very simple task assignment strategy.
+ *
+ * @param {Object} props
+ * @return {JSX.Element}
+ */
+const SimpleTaskAssignmentStrategyButtons = props => {
+  return (
+    <React.Fragment>
+      {canPublish(props.jobState) && <PublishButton {...props} />}
+      <StopButton {...props} />
+      <UpdateParametersButton {...props} />
+    </React.Fragment>
+  );
+};
 
-  if (state.taskAssignmentApi === ShortestRunStatus.ASSIGN_FILTERS) {
-    return (
-      <Button onClick={() => assignFilters(job.id)} floated="right" size="large" positive>
-        Run: assign filters
-      </Button>
-    );
-  }
+SimpleTaskAssignmentStrategyButtons.propTypes = {
+  job: PropTypes.object,
+  jobState: PropTypes.object
+};
 
-  if (state.taskAssignmentApi === ShortestRunStatus.INITIAL) {
+const PublishButton = ({publish, jobState, job}) => {
+  return (
+    <Button onClick={() => publish()} floated="right" as="div" labelPosition="right">
+      <Button size="large" positive>
+        Publish on AMT
+      </Button>
+      {job.estimatedCost && (
+        <Popup
+          trigger={
+            <Label as="a" basic color="green" pointing="left">
+              $ {job.estimatedCost.toFixed(2)}
+            </Label>
+          }
+          content="Estimated cost (does not include AMT fees)"
+        />
+      )}
+    </Button>
+  );
+};
+
+PublishButton.propTypes = {
+  publish: PropTypes.func,
+  job: PropTypes.object,
+  jobState: PropTypes.object
+};
+
+const StopButton = ({jobState}) => {
+  if (jobState.job === JobStatus.PUBLISHED) {
     return (
-      <Button onClick={() => publish()} floated="right" size="large" positive>
-        Run: generate tasks for baseline
+      <Button floated="right" size="large" negative>
+        Stop
       </Button>
     );
   }
   return null;
 };
+StopButton.propTypes = {
+  jobState: PropTypes.object
+};
 
-RunButton.propTypes = {
-  state: PropTypes.object,
-  job: PropTypes.object,
-  publish: PropTypes.func,
-  assignFilters: PropTypes.func
+const UpdateParametersButton = ({expertMode}) => {
+  if (expertMode) {
+    return (
+      <Button floated="right" size="large" style={{width: '200px'}}>
+        Update parameters
+      </Button>
+    );
+  }
+  return null;
+};
+UpdateParametersButton.propTypes = {
+  // TODO: remove this after implementing #89
+  expertMode: PropTypes.bool
 };
 
 /**
- * This method checks if we can publish to AMT. In the case task assignment box implements
- * the state service, then we will need to add here additional conditions to manage the
- * states defined by the task assignment API.
+ * This method checks if we can publish to AMT.
  *
  * @param {Object} state
  * @return {Boolean}
  */
 const canPublish = state => {
-  if (!state.taskAssignmentApi) {
-    return state.job === JobStatus.NOT_PUBLISHED;
-  }
-  // for shortest run
-  return state.job === JobStatus.NOT_PUBLISHED && state.taskAssignmentApi === ShortestRunStatus.FILTERS_ASSIGNED;
+  return state.job === JobStatus.NOT_PUBLISHED;
 };
 
 JobDashboardButtons.propTypes = {
-  state: PropTypes.object,
+  jobState: PropTypes.object,
   job: PropTypes.object
 };
 
 const mapStateToProps = state => ({});
 
 const mapDispatchToProps = dispatch => ({
-  publish: () => dispatch(actions.publish()),
-  assignFilters: jobId => dispatch(srActions.assignFilters(jobId))
+  publish: () => dispatch(actions.publish())
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(JobDashboardButtons);
+
+export {PublishButton, StopButton, UpdateParametersButton};

@@ -73,12 +73,23 @@ const fetchJob = (action$, store) =>
   });
 
 const publishJob = (action$, store) =>
-  action$.ofType(actionTypes.PUBLISH_EXPERIMENT).switchMap(action => {
+  action$.ofType(actionTypes.PUBLISH_JOB).switchMap(action => {
     const {item} = store.getState().job.form;
     const config = {timeout: 10000};
     return Observable.defer(() => requestersApi.post(`jobs/${item.id}/publish`, {}, config))
-      .mergeMap(response => Observable.of(actions.publishSuccess(response.data)))
-      .catch(error => Observable.of(actions.publishError(flattenError(error))));
+      .mergeMap(response =>
+        Observable.concat(
+          Observable.of(toastActions.show({message: 'Published!', type: ToastTypes.SUCCESS})),
+          Observable.of(actions.publishSuccess(response.data))
+        )
+      )
+      .catch(error => {
+        let err = flattenError(error);
+        return Observable.concat(
+          Observable.of(actions.publishError(flattenError(err))),
+          Observable.of(toastActions.show({message: err.message, type: ToastTypes.ERROR}))
+        );
+      });
   });
 
 const fetchJobState = (action$, store) =>
@@ -133,10 +144,9 @@ const fetchFiltersCSV = (action$, store) =>
       })
       .catch(error => {
         let err = flattenError(error);
-        let msg = err.message || 'Please try again.';
         return Observable.concat(
           Observable.of(actions.fetchFiltersCSVError(err)),
-          Observable.of(toastActions.show({message: msg, type: ToastTypes.ERROR}))
+          Observable.of(toastActions.show({message: err.message, type: ToastTypes.ERROR}))
         );
       });
   });

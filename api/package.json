@@ -5,7 +5,8 @@
     "test": "jest",
     "test:coverage": "jest --coverage",
     "start": "node -r dotenv/config src/app.js",
-    "debug": "node -r dotenv/config --inspect src/app.js"
+    "debug": "node -r dotenv/config --inspect src/app.js",
+    "db:simulate:voting": "node -r dotenv/config src/db/simulate-voting.js"
   },
   "dependencies": {
     "aws-sdk": "^2.194.0",

@@ -114,7 +114,8 @@ class NestChart extends React.Component {
         .x( (d) => {return xscale(d[z]!=undefined ? d[x]+","+d[z] : d[x])} )
         .y( (d) => {return yscale(d[y]/param)} )
 
-    g.append("path")
+    //average red line
+    /*g.append("path")
       .datum([{
         y : media,
         x : data[0][x],
@@ -129,7 +130,7 @@ class NestChart extends React.Component {
       .attr("d", line)
       .style("stroke", "red")
       .style("fill","none")
-      .style("stroke-width",1)
+      .style("stroke-width",1)*/
     
     if(data.length>1) {
       g.append("text")

@@ -68,7 +68,7 @@ class MetricMenu extends React.Component {
 					className='metrics' 
 					style={{marginBottom: '5px'}}
 					onClick={this.props.onChange}
-				>Correlation in Errors between Workers<br />[ M1 ]</Button>
+				>Inter-Worker Agreement<br />[ M1 ]</Button>
 				<br />
 				<Button 
 					value='M2'
@@ -76,13 +76,6 @@ class MetricMenu extends React.Component {
 					style={{marginBottom: '5px'}}
 					onClick={this.props.onChange}
 				>Percentage contribution to Crowd Error<br />[ M2 ]</Button>
-				<br />
-				<Button 
-					value='WWM1'
-					className='metrics' 
-					style={{marginBottom: '5px'}}
-					onClick={this.props.onChange}
-				>Basic Agreement between Workers<br />[ WWM1 ]</Button>
 				<br />
 				<Button 
 					value='WWM2'
@@ -95,6 +88,16 @@ class MetricMenu extends React.Component {
     )
   }
 }
+
+/**
+ * <Button 
+					value='WWM1'
+					className='metrics' 
+					style={{marginBottom: '5px'}}
+					onClick={this.props.onChange}
+				>Basic Agreement between Workers<br />[ WWM1 ]</Button>
+				<br />
+ */
 
 const mapStateToProps = state => ({
 

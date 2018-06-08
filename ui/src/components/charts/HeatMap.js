@@ -55,8 +55,8 @@ class HeatMap extends React.Component {
     })
     var yelems = Array.from(new Set(this.props.data.map(d => d[y]))).sort();
     var colors = ['#FFE5CC', '#FFCC99', '#FFB266', '#FF9933', '#FF8000', '#CC6600']
-    console.log('xelems', xelems)
-    console.log('yelems', yelems)
+    //console.log('xelems', xelems)
+    //console.log('yelems', yelems)
 
     var xscale = d3.scaleBand()
         .domain(xelems)

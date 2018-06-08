@@ -50,21 +50,22 @@ class Histogram extends React.Component {
     var g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
     var color = this.props.color
 
-    var unity = d3.max(data, d => d[x]) / ( d3.max(data, d => d[x])/10 )
-    console.log(unity)
-
     var xscale = d3.scaleLinear()
-        .range([0, width])
-        .domain([
-          //0,
-          d3.min(data, d => Math.floor((d[x]/param)/10)*10), 
-          d3.max(data, d => (Math.round((d[x]/param)/10)*10) +10 )
-        ])
+      .range([0, width])
+      .domain([
+        //necessary to have values from 0 to scale bandwidth low values
+        0,
+        //d3.min(data, d => Math.floor((d[x]/param)/10)*10), 
+        d3.max(data, d => (Math.round((d[x]/param)/10)*10)  )
+      ])
     var xAxis = d3.axisBottom(xscale)
     
     var histo = d3.histogram()
-        .thresholds(xscale.ticks(10))
-        (data.map(d => (d[x]/param)));
+      .thresholds(xscale.ticks(10))
+      (data.map(d => (d[x]/param)));
+
+      //histo.map(d => console.log(d.x0,d.x1,d.length))
+      //console.log(histo)
 
     var yscale = d3.scaleLinear()
       .domain([0, d3.max(histo, d => d.length)])
@@ -72,76 +73,73 @@ class Histogram extends React.Component {
     var yAxis = d3.axisLeft(yscale);
 
     var bar = g.selectAll(".bar")
-        .data(histo)
-        .enter().append("g")
-        .attr("class", "bar")
-        .attr("transform", d => "translate("+xscale(Math.floor(d.x0/10)*10)+","+yscale(d.length)+")")
+      .data(histo)
+      .enter().append("g")
+      .attr("class", "bar")
+      .attr("transform", d => "translate("+
+        (d.x1==d3.max(data, d => d[x]/param) ? xscale(d.x0) : (xscale( (d.x1) - ( d3.max(xscale.domain()) / ((xscale.ticks().length)-1) ) )))
+        +","+yscale(d.length)+")")
 
     bar.append("rect")
-          .style("fill", color)
-          .attr("x", 1)
-          .attr("width", xscale( (d3.max(xscale.domain())/(xscale.ticks().length-1)))-1
-              /*d.x1==d3.max(data, d => d[x]) ? 
-                xscale(d.x1+10) - xscale(d.x0)-1 :
-                xscale(d.x1)-xscale(d.x0)-1*/
-            )
-          .attr("height", d => height-yscale(d.length) )
-          .on("mouseover", function() {
-            d3.select(this)
-              .style("opacity","0.8")
-          })
-          .on("mouseout", function() {
-            d3.select(this)
-              .style("opacity","1")
-          })
-          .on("click", (d) => {
-            console.log(Math.floor(d.x0), d.x1)
-            //console.log(d.x1+" - "+(Math.floor(d.x1/10)*10)+" = "+xscale(d.x1-(Math.floor(d.x1/10)*10)))
-            this.setState({
-              clicked : []
-            })
-            //console.log(d.x0,d.x1)
-            var nuovo = []
-            data.map( (step,i) => {
-              if(
-                (step[x]/param>=d.x0 && step[x]/param<d.x1) || 
-                (d.x1==d3.max(data, d => d[x]/param) && step[x]/param>=d.x0 && step[x]/param==d.x1) 
-              ) {
-                nuovo = nuovo.concat([step])
-              }
-            })
-            this.handleClick(nuovo)
-          })
+      .style("fill", color )
+      .attr("x", 1)
+      .attr("width", d => 
+        xscale( (d3.max(xscale.domain()) / ((xscale.ticks().length)-1)) )-1
+      )
+      .attr("height", d => height-yscale(d.length) )
+      .on("mouseover", function() {
+        d3.select(this)
+          .style("opacity","0.8")
+      })
+      .on("mouseout", function() {
+        d3.select(this)
+          .style("opacity","1")
+      })
+      .on("click", (d) => {
+        this.setState({
+          clicked : []
+        })
+        var nuovo = []
+        data.map( (step,i) => {
+          if(
+            (step[x]/param>=d.x0 && step[x]/param<d.x1) || 
+            (d.x1==d3.max(data, d => d[x]/param) && step[x]/param>=d.x0 && step[x]/param==d.x1) 
+          ) {
+            nuovo = nuovo.concat([step])
+          }
+        })
+        this.handleClick(nuovo)
+      })
 
     bar.append("text")
-          .attr("dy", ".75em")
-          .attr("y", d => 10)
-          .attr("x", d => 
-              xscale( (d3.max(xscale.domain()) / (xscale.ticks().length-1))/2 )
-            )
-          .attr("text-anchor", "middle")
-          .style("fill", "white")
-          .text( d => d.length ? d.length : null)
+      .attr("dy", ".75em")
+      .attr("y", d => 10)
+      .attr("x", d => 
+          xscale( (d3.max(xscale.domain()) / (xscale.ticks().length-1))/2 )
+        )
+      .attr("text-anchor", "middle")
+      .style("fill", "white")
+      .text( d => d.length ? d.length : null)
 
     g.append("g")
-       .attr("class","x axis")
-       .attr("transform","translate(0,"+height+")")
-       .call(xAxis)
-       .append("text")
-          .attr("fill","black")
-          .attr("transform","translate("+(width-15)+",0)")
-          .attr("dy","2.5em")
-          .text(this.props.x)
+      .attr("class","x axis")
+      .attr("transform","translate(0,"+height+")")
+      .call(xAxis)
+      .append("text")
+        .attr("fill","black")
+        .attr("transform","translate("+(width-15)+",0)")
+        .attr("dy","2.5em")
+        .text(this.props.x)
 
     g.append("g")
-       .attr("class","y axis")
-       .call(yAxis)
-       .append("text")
-          .attr("fill","black")
-          .attr("transform","rotate(-90)")
-          .attr("text-anchor","end")
-          .attr("dy","2em")
-          .text("# "+this.props.y)
+      .attr("class","y axis")
+      .call(yAxis)
+      .append("text")
+        .attr("fill","black")
+        .attr("transform","rotate(-90)")
+        .attr("text-anchor","end")
+        .attr("dy","2em")
+        .text("# "+this.props.y)
   }
 
   componentDidMount() {

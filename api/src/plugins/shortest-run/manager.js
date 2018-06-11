@@ -20,6 +20,10 @@ const ShortestRunStates = (exports.ShortestRunStates = Object.freeze({
   DONE: 'DONE'
 }));
 
+const OUT_THRESHOLD = 0.99;
+const IN_THRESHOLD = 0.99;
+const STOP_SCORE = 30;
+
 /**
  * Calls the POST /generate-baseround endpoint to generate the entries for
  * the baseline round.
@@ -71,6 +75,7 @@ const generateBaseline = (exports.generateBaseline = async (jobId, size) => {
  * Calls the /generate-tasks endpoint of Shortest Run task assignment box.
  *
  * @param {Number} jobId
+ * @return {Object} The job updated.
  */
 const assignFilters = (exports.assignFilters = async jobId => {
   if (!jobId) {
@@ -81,16 +86,11 @@ const assignFilters = (exports.assignFilters = async jobId => {
     job.data.taskAssignmentStrategy
   );
   const url = `${managers.task.getUrl(taskAssignmentApi)}/generate-tasks`;
-  // TODO: remove this fixed payload when the EM step is implemented.
   const payload = {
     jobId: job.id,
-    criteria: {
-      41: { accuracy: 0.85, selectivity: 0.28 },
-      42: { accuracy: 0.9, selectivity: 0.28 },
-      43: { accuracy: 0.86, selectivity: 0.42 }
-    },
-    stopScore: 30,
-    outThreshold: 0.99
+    criteria: getCriteriaPayload(job.data.shortestRun.parametersEstimation),
+    stopScore: STOP_SCORE,
+    outThreshold: OUT_THRESHOLD
   };
 
   let response = await new Promise((resolve, reject) => {
@@ -115,8 +115,8 @@ const assignFilters = (exports.assignFilters = async jobId => {
   if (response && typeof response === 'string') {
     response = JSON.parse(response);
   }
-  // TODO: update state to FILTERS_ASSIGNED
-  return response;
+  job.data.shortestRun.state = ShortestRunStates.FILTERS_ASSIGNED;
+  return await delegates.jobs.update(job.id, job);
 });
 
 /**
@@ -126,33 +126,26 @@ const assignFilters = (exports.assignFilters = async jobId => {
  *   POST /classify
  *
  *
- * @param {Number} jobId
+ * @param {Object} job
  * @return
  * @throws Will throw an error upon failure.
  */
-const updateAndClassify = (exports.updateAndClassify = async jobId => {
-  if (!jobId) {
-    throw Boom.badRequest('The job ID is required');
+const updateAndClassify = (exports.updateAndClassify = async job => {
+  if (!job) {
+    throw Boom.badRequest('The job is required');
   }
-  let job = await delegates.jobs.getById(jobId);
   let taskAssignmentApi = await delegates.taskAssignmentApi.getById(
     job.data.taskAssignmentStrategy
   );
   let baseUrl = managers.task.getUrl(taskAssignmentApi);
-  // updating step
-  // TODO: remove fixed paylaod
   let payload = {
-    criteria: {
-      '41': { accuracy: 0.85, selectivity: 0.28 },
-      '42': { accuracy: 0.9, selectivity: 0.28 },
-      '43': { accuracy: 0.86, selectivity: 0.42 }
-    }
+    criteria: getCriteriaPayload(job.data.shortestRun.parametersEstimation)
   };
 
-  let updatedParams = await new Promise((resolve, reject) => {
+  let response = await new Promise((resolve, reject) => {
     request(
       {
-        url: `${baseUrl}/update-filter-params/${jobId}`,
+        url: `${baseUrl}/update-filter-params/${job.id}`,
         method: 'PUT',
         json: {
           ...payload
@@ -167,27 +160,24 @@ const updateAndClassify = (exports.updateAndClassify = async jobId => {
       }
     );
   });
-  // TODO: store this response somewhere. Probably as an attribute of the job.
-  if (updatedParams && typeof updatedParams === 'string') {
-    updatedParams = JSON.parse(updatedParams);
+
+  if (response && typeof response === 'string') {
+    response = JSON.parse(response);
   }
-
+  // we update the estimations
+  for (let param of job.data.shortestRun.parametersEstimation) {
+    param.accuracy = response.criteria[param.criteria].accuracy;
+    param.selectivity = response.criteria[param.criteria].selectivity;
+  }
   // classification step
-
-  // TODO: we should retrieve the payload from db (probably as a property of the job)
-  //       inThreshold and outThreshold are parameter (we can add these in the frontend probably)
   payload = {
-    jobId: 19,
-    criteria: {
-      '41': { accuracy: 0.85, selectivity: 0.28 },
-      '42': { accuracy: 0.86, selectivity: 0.42 },
-      '43': { accuracy: 0.9, selectivity: 0.28 }
-    },
-    outThreshold: 0.99,
-    inThreshold: 0.99
+    jobId: job.id,
+    criteria: response.criteria,
+    outThreshold: OUT_THRESHOLD,
+    inThreshold: IN_THRESHOLD
   };
 
-  let response = await new Promise((resolve, reject) => {
+  response = await new Promise((resolve, reject) => {
     request(
       {
         url: `${baseUrl}/classify`,
@@ -205,8 +195,69 @@ const updateAndClassify = (exports.updateAndClassify = async jobId => {
       }
     );
   });
+  job.data.shortestRun.state = ShortestRunStates.UPDATED;
+  return await delegates.jobs.update(job.id, job);
+});
 
-  // TODO: update state to UPDATED / DONE.
+/**
+ * Calls POST /estimate-task-parameters to estimate the parameter when baseline round finishes.
+ *
+ * @param {Object} job
+ * @return {Object} The updated job
+ */
+const estimateParameters = (exports.estimateParameters = async job => {
+  if (!job) {
+    throw Boom.badRequest('The job is required');
+  }
+  let taskAssignmentApi = await delegates.taskAssignmentApi.getById(
+    job.data.taskAssignmentStrategy
+  );
+  let baseUrl = managers.task.getUrl(taskAssignmentApi);
+  let payload = {
+    jobId: job.id,
+    outThreshold: OUT_THRESHOLD
+  };
+  let response = await new Promise((resolve, reject) => {
+    request(
+      {
+        url: `${baseUrl}/estimate-task-parameters`,
+        method: 'POST',
+        json: {
+          ...payload
+        }
+      },
+      (err, rsp, body) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(rsp.body);
+        }
+      }
+    );
+  });
+
+  if (response && typeof response === 'string') {
+    response = JSON.parse(response);
+  }
+  // we map the response from the API before storing it on the DB.
+  let estimations = [];
+
+  for (let [id, value] of Object.entries(response.criteria)) {
+    let entry = {
+      criteria: id,
+      accuracy: value.accuracy,
+      selectivity: value.selectivity
+    };
+
+    entry.workers = response.workersAccuracy[id].map(w => {
+      let [workerId, accuracy] = Object.entries(w)[0];
+      return { id: workerId, accuracy };
+    });
+    estimations.push(entry);
+  }
+  job.data.shortestRun.parametersEstimation = estimations;
+  let updated = await delegates.jobs.update(job.id, job);
+  return updated;
 });
 
 /**
@@ -238,42 +289,31 @@ const getEstimatedCost = (exports.getEstimatedCost = async job => {
     );
 
     for (let entry of rsp.rows) {
-      if (entry.count <= job.data.maxTasksRule) {
+      let count = Number(entry.count);
+
+      if (shortestRun.state === ShortestRunStates.BASELINE_GENERATED) {
+        count *= job.data.votesPerTaskRule;
+      }
+
+      if (count <= job.data.maxTasksRule) {
         // only one worker here.
         let numTasksForWorker = managers.task.getEstimatedTasksPerWorkerCount(
           job,
-          entry.count
+          count
         );
-
-        if (shortestRun.state === ShortestRunStates.BASELINE_GENERATED) {
-          numTasksForWorker *= job.data.votesPerTaskRule;
-        }
         cost += numTasksForWorker * job.data.taskRewardRule;
-      } else if (entry.count % job.data.maxTasksRule === 0) {
+      } else if (count % job.data.maxTasksRule === 0) {
         // every worker gets the same amount of tasks.
-        let numWorkers = entry.count / job.data.maxTasksRule;
-
-        if (shortestRun.state === ShortestRunStates.BASELINE_GENERATED) {
-          numWorkers *= job.data.votesPerTaskRule;
-        }
+        let numWorkers = count / job.data.maxTasksRule;
         cost += numWorkers * numTasksPerWorkerDefault * job.data.taskRewardRule;
       } else {
         // one (final) worker does not receive the same amount of tasks.
-        let numWorkers = Math.floor(entry.count / job.data.maxTasksRule);
-        let aux = numWorkers;
-
-        if (shortestRun.state === ShortestRunStates.BASELINE_GENERATED) {
-          aux *= job.data.votesPerTaskRule;
-        }
-        cost += aux * numTasksPerWorkerDefault * job.data.taskRewardRule;
+        let numWorkers = Math.floor(count / job.data.maxTasksRule);
+        cost += numWorkers * numTasksPerWorkerDefault * job.data.taskRewardRule;
         let numTasksForLastWorker = managers.task.getEstimatedTasksPerWorkerCount(
           job,
-          entry.count - numWorkers * job.data.maxTasksRule
+          count - numWorkers * job.data.maxTasksRule
         );
-
-        if (shortestRun.state === ShortestRunStates.BASELINE_GENERATED) {
-          numTasksForLastWorker *= job.data.votesPerTaskRule;
-        }
         cost += numTasksForLastWorker * job.data.taskRewardRule;
       }
     }
@@ -281,3 +321,28 @@ const getEstimatedCost = (exports.getEstimatedCost = async job => {
   }
   return 0;
 });
+
+/**
+ * Checks if the job is done. The job is done if every item is in the
+ * result table.
+ *
+ * @param {Object} job
+ * @return {Boolean}
+ */
+const isDone = (exports.isDone = async job => {
+  let itemsCount = await delegates.projects.getItemsCount(job.project_id);
+  let classifiedCount = await delegates.jobs.getClassifiedItemsCount(job.id);
+  return itemsCount === classifiedCount;
+});
+
+const getCriteriaPayload = parameters => {
+  let criteria = {};
+
+  for (let param of parameters) {
+    criteria[param.criteria] = {
+      accuracy: param.accuracy,
+      selectivity: param.selectivity
+    };
+  }
+  return criteria;
+};

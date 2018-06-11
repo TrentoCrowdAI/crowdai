@@ -136,15 +136,10 @@ const update = (exports.update = async (id, job) => {
 
     if (
       saved.data.status !== JobStatus.NOT_PUBLISHED &&
-      job.data.status !== JobStatus.DONE
-    ) {
-      throw Boom.badRequest('You can only update an unpublished job.');
-    }
-
-    if (
-      job.data.itemsUrl !== saved.data.itemsUrl ||
-      job.data.testsUrl !== saved.data.testsUrl ||
-      job.data.filtersUrl !== saved.data.filtersUrl
+      job.data.status !== JobStatus.DONE &&
+      (job.data.itemsUrl !== saved.data.itemsUrl ||
+        job.data.testsUrl !== saved.data.testsUrl ||
+        job.data.filtersUrl !== saved.data.filtersUrl)
     ) {
       let project = await projectsDelegate.create(
         job.data.itemsUrl,
@@ -318,4 +313,22 @@ const getConsent = (exports.getConsent = async url => {
       'Error while trying fetch informed consent file'
     );
   }
+});
+
+/**
+ * Returns the number of classified items.
+ *
+ * @param {Number} jobId
+ * @return {Number}
+ */
+const getClassifiedItemsCount = (exports.getClassifiedItemsCount = async jobId => {
+  if (!jobId) {
+    throw Boom.badRequest('The jobId is required');
+  }
+
+  let rsp = await db.query(
+    `select count(*) as count from ${db.TABLES.Result} where job_id = $1`,
+    [jobId]
+  );
+  return Number(rsp.rows[0].count);
 });

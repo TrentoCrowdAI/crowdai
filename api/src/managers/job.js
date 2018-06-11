@@ -380,10 +380,6 @@ const reviewAssignments = (exports.reviewAssignments = async (
     const workerTmp = { id: assignments.rows[0].worker_id };
     const jobDone = await checkNextTaskServiceDone(job, workerTmp);
 
-    if (jobDone) {
-      emit(EventTypes.job.NEXT_TASK_SERVICE_DONE, job);
-    }
-
     if (hit.HITStatus === 'Assignable') {
       if (jobDone) {
         console.debug(`Job: ${job.id} is done.`);
@@ -465,10 +461,10 @@ const reviewAssignments = (exports.reviewAssignments = async (
         }
       }
     }
-    // TODO: here I need to add some extra logic, because SR has multiple steps until is actually done.
-    // probably plugin-based, if a specific method is not present then we just run finishJob.
+
     console.log(`Review assignments for job: ${jobId} done`);
-    await finishJob(job);
+    job = await finishJob(job);
+    emit(EventTypes.job.JOB_REVIEW_DONE, job);
     return true;
   } catch (error) {
     console.error(error);

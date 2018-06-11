@@ -33,7 +33,9 @@ app.use(compress());
 app.use(koaBetterBody());
 
 // google-based authentication protects URLs under /requesters
-app.use(authentication.unless({ path: [/^\/auth/, /^\/workers/] }));
+if (process.env.NODE_ENV !== 'test') {
+  app.use(authentication.unless({ path: [/^\/auth/, /^\/workers/] }));
+}
 
 // error-handling middleware
 app.use(async (ctx, next) => {
@@ -58,4 +60,4 @@ app.use(mount('/workers/api/v1', workersApi));
 app.use(mount('/requesters/api/v1', requestersApi));
 app.use(mount('/auth', auth));
 
-app.listen(process.env.PORT || 4000);
+module.exports = app;

@@ -57,7 +57,7 @@ describe('manager.getEstimatedCost', () => {
 
   let setup = [
     {
-      state: ShortestRunStates.BASELINE_GENERATED, //
+      state: ShortestRunStates.BASELINE_GENERATED,
       mockedBacklogOutput: {
         rows: [{ filter: 1, count: 3 }, { filter: 2, count: 3 }]
       },

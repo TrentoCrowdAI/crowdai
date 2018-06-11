@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import {Grid, Button, Label, Popup} from 'semantic-ui-react';
 import {connect} from 'react-redux';
 
-import {JobStatus} from 'src/utils/constants';
+import {JobStatus, RegisteredTaskAssignmentStrategies} from 'src/utils/constants';
 import {actions} from './actions';
 import JobDashboardButtonsShortestRun from 'src/components/admin/shortest-run/JobDashboardButtonsShortestRun';
 
@@ -16,13 +16,18 @@ class JobDashboardButtons extends React.Component {
     };
   }
   render() {
+    const {taskAssignmentStrategy} = this.props.job;
+
+    if (!taskAssignmentStrategy) {
+      return null;
+    }
     return (
       <Grid.Row>
         <Grid.Column>
-          {this.props.job.data.crowdsourcingStrategy === 'sr' && ( // TODO: change these conditionals after implementing #7
+          {taskAssignmentStrategy.name === RegisteredTaskAssignmentStrategies.SHORTEST_RUN && (
             <JobDashboardButtonsShortestRun {...this.props} expertMode={this.state.expertMode} />
           )}
-          {this.props.job.data.crowdsourcingStrategy !== 'sr' && (
+          {taskAssignmentStrategy.name === RegisteredTaskAssignmentStrategies.BASELINE && (
             <SimpleTaskAssignmentStrategyButtons {...this.props} expertMode={this.state.expertMode} />
           )}
         </Grid.Column>

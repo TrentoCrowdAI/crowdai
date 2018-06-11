@@ -147,6 +147,12 @@ class JobDashboard extends React.Component {
   }
 
   renderAggregationStrategySelector() {
+    const {taskAssignmentStrategy} = this.props.item;
+
+    if (taskAssignmentStrategy && taskAssignmentStrategy.aggregation) {
+      // we do not display the Aggregations dropdown if the task assignment strategy performs aggregation.
+      return null;
+    }
     return (
       <Form.Select
         label="Aggregation strategy"

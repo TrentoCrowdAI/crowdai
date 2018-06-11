@@ -16,12 +16,6 @@ const JobStatus = {
   DONE: 'DONE'
 };
 
-const CrowdsourcingStrategies = {
-  baseline: 'Baseline',
-  mr: 'Multi-run',
-  sr: 'Shortest run'
-};
-
 const AbstractPresentationTechniques = {
   kh: 'Keyword highlighting',
   ts: 'Text summarization'
@@ -51,13 +45,19 @@ const ShortestRunStatus = {
   DONE: 'DONE'
 };
 
+// name of the strategies registered in the backend.
+const RegisteredTaskAssignmentStrategies = {
+  SHORTEST_RUN: 'Shortest Run',
+  Baseline: 'Baseline'
+};
+
 export {
   scopes,
   FileFormats,
   JobStatus,
-  CrowdsourcingStrategies,
   AbstractPresentationTechniques,
   LabelOptions,
   AggregationStrategies,
-  ShortestRunStatus
+  ShortestRunStatus,
+  RegisteredTaskAssignmentStrategies
 };

@@ -52,36 +52,40 @@ exports.onJobCreated = async job => {
  * @return {Object} The job updated
  */
 exports.onJobReviewDone = async job => {
-  let isDone = await manager.isDone(job);
-  if (isDone) {
-    job.data.shortestRun.state = ShortestRunStates.DONE;
-  } else {
-    if (job.data.shortestRun.state === ShortestRunStates.BASELINE_GENERATED) {
-      job = await manager.estimateParameters(job);
-    } else if (
-      job.data.shortestRun.state === ShortestRunStates.FILTERS_ASSIGNED
-    ) {
-      job = await manager.updateAndClassify(job);
-    }
+  try {
+    let isDone = await manager.isDone(job);
+    if (isDone) {
+      job.data.shortestRun.state = ShortestRunStates.DONE;
+    } else {
+      if (job.data.shortestRun.state === ShortestRunStates.BASELINE_GENERATED) {
+        job = await manager.estimateParameters(job);
+      } else if (
+        job.data.shortestRun.state === ShortestRunStates.FILTERS_ASSIGNED
+      ) {
+        job = await manager.updateAndClassify(job);
+      }
 
-    job.data.status = JobStatus.NOT_PUBLISHED;
-    job.data.end = undefined;
+      job.data.status = JobStatus.NOT_PUBLISHED;
+      job.data.end = undefined;
 
-    if (!job.data.shortestRun.hits) {
-      job.data.shortestRun.hits = [];
+      if (!job.data.shortestRun.hits) {
+        job.data.shortestRun.hits = [];
+      }
+      let rsp = await db.query(
+        'select max(step) as step from backlog where job_id = $1',
+        [job.id]
+      );
+      let currentStep = rsp.rows[0].step;
+      job.data.shortestRun.hits.push({
+        step: currentStep,
+        hit: job.data.hit
+      });
+      job.data.hit = undefined;
     }
-    let rsp = await db.query(
-      'select max(step) as step from backlog where job_id = $1',
-      [job.id]
-    );
-    let currentStep = rsp.rows[0].step;
-    job.data.shortestRun.hits.push({
-      step: currentStep - 1,
-      hit: job.data.hit
-    });
-    job.data.hit = undefined;
+    return await delegates.jobs.update(job.id, job);
+  } catch (error) {
+    console.log(error);
   }
-  return await delegates.jobs.update(job.id, job);
 };
 
 // we register the handlers

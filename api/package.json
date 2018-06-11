@@ -6,7 +6,8 @@
     "test:coverage": "jest --coverage",
     "start": "node -r dotenv/config src/server.js",
     "debug": "node -r dotenv/config --inspect src/server.js",
-    "db:simulate:voting": "node -r dotenv/config src/db/simulate-voting.js"
+    "db:simulate:voting": "node -r dotenv/config src/db/simulate-voting.js",
+    "cli": "node -r dotenv/config src/utils/cli.js"
   },
   "dependencies": {
     "aws-sdk": "^2.194.0",
@@ -31,6 +32,7 @@
     "uuid": "^3.2.1"
   },
   "devDependencies": {
+    "commander": "^2.15.1",
     "jest": "^22.4.3",
     "supertest": "^3.1.0"
   }

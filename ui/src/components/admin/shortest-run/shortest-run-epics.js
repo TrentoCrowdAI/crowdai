@@ -19,6 +19,7 @@ const assignFilters = (action$, store) =>
             Observable.of(
               toastActions.show({message: 'The list of tasks generated correctly!', type: ToastTypes.SUCCESS})
             ),
+            Observable.of(jobActions.fetchItem(action.jobId)),
             Observable.of(jobActions.fetchJobState(action.jobId))
           )
         )
@@ -44,6 +45,7 @@ const generateBaseline = (action$, store) =>
             Observable.of(
               toastActions.show({message: 'The list of tasks generated correctly!', type: ToastTypes.SUCCESS})
             ),
+            Observable.of(jobActions.fetchItem(action.jobId)),
             Observable.of(jobActions.fetchJobState(action.jobId))
           )
         )

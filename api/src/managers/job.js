@@ -373,7 +373,7 @@ const reviewAssignments = (exports.reviewAssignments = async (
       assignments.rows.length === 0 ||
       hit.HITStatus === 'Unassignable'
     ) {
-      console.debug(`Skipping assignments review for job: ${jobId}`);
+      console.log(`Skipping assignments review for job: ${jobId}`);
       return false;
     }
     // We check if the Task Assignment's /next-task endpoint says we are done
@@ -382,7 +382,7 @@ const reviewAssignments = (exports.reviewAssignments = async (
 
     if (hit.HITStatus === 'Assignable') {
       if (jobDone) {
-        console.debug(`Job: ${job.id} is done.`);
+        console.log(`Job: ${job.id} is done.`);
         await expireHIT(job);
       }
       return false;

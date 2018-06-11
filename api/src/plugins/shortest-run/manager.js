@@ -256,6 +256,7 @@ const estimateParameters = (exports.estimateParameters = async job => {
     estimations.push(entry);
   }
   job.data.shortestRun.parametersEstimation = estimations;
+  job.data.shortestRun.state = ShortestRunStates.ASSIGN_FILTERS;
   let updated = await delegates.jobs.update(job.id, job);
   return updated;
 });

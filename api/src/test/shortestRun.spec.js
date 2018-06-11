@@ -87,6 +87,7 @@ describe('Shortest Run workflow', () => {
     job = await listener.onJobReviewDone(job);
     expect(job).toBeDefined();
     expect(job.data.shortestRun.parametersEstimation).toBeDefined();
+    expect(job.data.shortestRun.state).toBe(ShortestRunStates.ASSIGN_FILTERS);
   });
 
   test('Call POST /shortest-run/assign-filters should set state to FILTERS_ASSIGNED and create entries in backlog', async () => {

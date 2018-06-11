@@ -5,7 +5,9 @@ const taskManager = require(__base + 'managers/task');
 const db = require(__base + 'db');
 
 // we mock to avoid creating the records from the URLs.
-delegates.projects.createRecordsFromCSVs = jest.fn(() => {});
+if (process.env.NODE_ENV === 'test') {
+  delegates.projects.createRecordsFromCSVs = jest.fn(() => {});
+}
 
 /**
  * Helper method that adds a task assigment api record to the DB.
@@ -107,6 +109,14 @@ exports.simulateVoting = async job => {
 
   while (!response.done) {
     let worker = await delegates.workers.create(uuid());
+    await delegates.workers.createAssignment({
+      job_id: job.id,
+      job_uuid: job.uuid,
+      worker_id: worker.id,
+      data: {
+        assignmentTurkId: uuid()
+      }
+    });
     let response = await taskManager.getTasksFromApi(job, worker);
 
     if (response.done) {

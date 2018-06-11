@@ -52,7 +52,7 @@ SimpleTaskAssignmentStrategyButtons.propTypes = {
   jobState: PropTypes.object
 };
 
-const PublishButton = ({publish, jobState, job}) => {
+const PublishButton = ({publish, job}) => {
   return (
     <Button onClick={() => publish()} floated="right" as="div" labelPosition="right">
       <Button size="large" positive>
@@ -74,8 +74,7 @@ const PublishButton = ({publish, jobState, job}) => {
 
 PublishButton.propTypes = {
   publish: PropTypes.func,
-  job: PropTypes.object,
-  jobState: PropTypes.object
+  job: PropTypes.object
 };
 
 const StopButton = ({jobState}) => {
@@ -92,8 +91,8 @@ StopButton.propTypes = {
   jobState: PropTypes.object
 };
 
-const UpdateParametersButton = ({expertMode}) => {
-  if (expertMode) {
+const UpdateParametersButton = ({expertMode, jobState}) => {
+  if (expertMode && jobState.job !== JobStatus.DONE) {
     return (
       <Button floated="right" size="large" style={{width: '200px'}}>
         Update parameters
@@ -103,6 +102,7 @@ const UpdateParametersButton = ({expertMode}) => {
   return null;
 };
 UpdateParametersButton.propTypes = {
+  jobState: PropTypes.object,
   // TODO: remove this after implementing #89
   expertMode: PropTypes.bool
 };

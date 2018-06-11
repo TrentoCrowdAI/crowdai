@@ -163,8 +163,5 @@ describe('Shortest Run workflow', () => {
     expect(job.data.shortestRun.state).toBe(ShortestRunStates.DONE);
     const count = await delegates.jobs.getClassifiedItemsCount(job.id);
     expect(count).toBe(setup.itemsCount);
-    let rsp = await db.query('select * from result where job_id = $1', [
-      job.id
-    ]);
   });
 });

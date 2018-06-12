@@ -9,15 +9,13 @@ const shortestRunManager = require('./manager');
 /**
  * POST /shortest-run/generate-baseline
  * {
- *   jobId: <number>,
- *   size: <number>
+ *   jobId: <number>
  * }
  * @param {Object} ctx
  */
 const generateBaseline = async ctx => {
   const jobId = ctx.request.fields.jobId;
-  const size = ctx.request.fields.size;
-  ctx.response.body = await shortestRunManager.generateBaseline(jobId, size);
+  ctx.response.body = await shortestRunManager.generateBaseline(jobId);
 };
 
 /**

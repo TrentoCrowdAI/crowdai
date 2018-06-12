@@ -27,12 +27,7 @@ exports.onJobCreated = async job => {
     if (taskAssignmentApi.name !== 'Shortest Run') {
       return;
     }
-
-    let shortestRun = {
-      state: ShortestRunStates.INITIAL
-    };
-
-    job.data.shortestRun = shortestRun;
+    job.data.shortestRun.state = ShortestRunStates.INITIAL;
     await delegates.jobs.update(job.id, job);
   } catch (error) {
     console.error(error);

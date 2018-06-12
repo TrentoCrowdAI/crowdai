@@ -22,6 +22,8 @@ import {actions} from './actions';
 import FormContainer from 'src/components/core/form/FormContainer';
 import {FileFormats, AbstractPresentationTechniques, LabelOptions, JobStatus} from 'src/utils/constants';
 import {isExpertMode} from 'src/utils';
+import JobFormPlugin from './JobFormPlugin';
+import NumberInput from 'src/components/core/form/NumberInput';
 
 class JobForm extends React.Component {
   constructor(props) {
@@ -176,6 +178,7 @@ class JobForm extends React.Component {
 
         {this.renderParametersSection()}
         {this.renderHitSection()}
+        <JobFormPlugin job={item} strategies={taskAssignmentStrategies} />
       </React.Fragment>
     );
   }
@@ -313,7 +316,7 @@ class JobForm extends React.Component {
       <Grid columns="1">
         <Grid.Row>
           <Grid.Column>
-            <Form.Input
+            <NumberInput
               type="number"
               label="(C1) Are technology and/or technological solutions involved?"
               name="c1"
@@ -327,7 +330,7 @@ class JobForm extends React.Component {
         </Grid.Row>
         <Grid.Row>
           <Grid.Column>
-            <Form.Input
+            <NumberInput
               type="number"
               label="(C2) Are the elderly involved?"
               name="c2"
@@ -341,7 +344,7 @@ class JobForm extends React.Component {
         </Grid.Row>
         <Grid.Row>
           <Grid.Column>
-            <Form.Input
+            <NumberInput
               type="number"
               label="(C3) Is it related to loneliness, social isolation, or social connectedness reason?"
               name="c3"
@@ -367,17 +370,16 @@ class JobForm extends React.Component {
       <Segment>
         <Header as="h3">Parameters</Header>
         <Form.Group widths="equal">
-          <Form.Input
+          <NumberInput
             label="Max. #tasks per worker"
             name="data.maxTasksRule"
             value={item.data.maxTasksRule}
             onChange={this.handleChange}
-            type="number"
             min="1"
             required
           />
 
-          <Form.Input
+          <NumberInput
             label="Min. #tasks per worker"
             name="data.minTasksRule"
             value={item.data.minTasksRule}
@@ -387,7 +389,7 @@ class JobForm extends React.Component {
             required
           />
 
-          <Form.Input
+          <NumberInput
             label="#Votes per task"
             name="data.votesPerTaskRule"
             value={item.data.votesPerTaskRule}
@@ -397,7 +399,7 @@ class JobForm extends React.Component {
             required
           />
 
-          <Form.Input
+          <NumberInput
             label="Task reward (in USD)"
             name="data.taskRewardRule"
             value={item.data.taskRewardRule}
@@ -410,7 +412,7 @@ class JobForm extends React.Component {
         </Form.Group>
 
         <Form.Group widths="equal">
-          <Form.Input
+          <NumberInput
             width={4}
             label="Test frequency"
             name="data.testFrequencyRule"
@@ -420,7 +422,7 @@ class JobForm extends React.Component {
             min="1"
             required
           />
-          <Form.Input
+          <NumberInput
             width={2}
             label="Initial tests"
             name="data.initialTestsRule"
@@ -431,7 +433,7 @@ class JobForm extends React.Component {
             required
           />
 
-          <Form.Input
+          <NumberInput
             width={4}
             label="Initial Tests min score (%)"
             name="data.initialTestsMinCorrectAnswersRule"
@@ -443,7 +445,7 @@ class JobForm extends React.Component {
             required
           />
 
-          <Form.Input
+          <NumberInput
             width={4}
             label="Expert cost (in USD)"
             name="data.expertCostRule"
@@ -514,7 +516,7 @@ class JobForm extends React.Component {
     }
   }
 
-  handleChange(e, {type, name, value}) {
+  handleChange(e, {name, value}) {
     if (name === 'data.filtersUrl') {
       this.props.setInputValue('data.instructions', {});
       this.props.setInputValue('criteria', []);
@@ -523,7 +525,7 @@ class JobForm extends React.Component {
         this.props.fetchFiltersCSV(value);
       }
     }
-    this.props.setInputValue(name, type === 'number' ? Number(value) : value);
+    this.props.setInputValue(name, value);
   }
 
   setStep(activeStep) {

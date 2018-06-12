@@ -5,7 +5,7 @@ import {connect} from 'react-redux';
 
 import {JobStatus, RegisteredTaskAssignmentStrategies} from 'src/utils/constants';
 import {actions} from './actions';
-import JobDashboardButtonsShortestRun from 'src/components/admin/shortest-run/JobDashboardButtonsShortestRun';
+import JobDashboardButtonsShortestRun from 'src/components/admin/plugins/shortest-run/JobDashboardButtonsShortestRun';
 import EstimatedCostDetails from './EstimatedCostDetails';
 
 class JobDashboardButtons extends React.Component {

@@ -29,9 +29,8 @@ const STOP_SCORE = 30;
  * the baseline round.
  *
  * @param {Number} jobId
- * @param {Number} size
  */
-const generateBaseline = (exports.generateBaseline = async (jobId, size) => {
+const generateBaseline = (exports.generateBaseline = async jobId => {
   if (!jobId) {
     throw Boom.badRequest('The job ID is required');
   }
@@ -42,7 +41,7 @@ const generateBaseline = (exports.generateBaseline = async (jobId, size) => {
   const url = `${managers.task.getUrl(taskAssignmentApi)}/generate-baseround`;
   const payload = {
     jobId,
-    size
+    size: job.data.shortestRun.baselineSize
   };
   let response = await new Promise((resolve, reject) => {
     request(

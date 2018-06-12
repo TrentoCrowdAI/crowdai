@@ -368,7 +368,7 @@ class JobDashboard extends React.Component {
 
 const jobStatusColors = {
   [JobStatus.PUBLISHED]: 'green',
-  [JobStatus.NOT_PUBLISHED]: 'gray',
+  [JobStatus.NOT_PUBLISHED]: 'grey',
   [JobStatus.DONE]: 'blue'
 };
 

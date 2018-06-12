@@ -250,16 +250,8 @@ renderChart(chart,x,y,z,param) {
 				z='wwm2'
 				param=1
 				break;
-			
-			case 'WWM1':
-				chart='heatmap'
-				x='worker A'
-				y='worker B'
-				z='wwm1'
-				param=100
-				break;
 
-			case 'M2':
+			case 'm2':
 				chart='histogram'
 				x='m2'
 				y='worker A'

@@ -48,7 +48,7 @@ const ShortestRunStatus = {
 // name of the strategies registered in the backend.
 const RegisteredTaskAssignmentStrategies = {
   SHORTEST_RUN: 'Shortest Run',
-  Baseline: 'Baseline'
+  BASELINE: 'Baseline'
 };
 
 export {

@@ -6,6 +6,7 @@ import {connect} from 'react-redux';
 import {JobStatus, RegisteredTaskAssignmentStrategies} from 'src/utils/constants';
 import {actions} from './actions';
 import JobDashboardButtonsShortestRun from 'src/components/admin/shortest-run/JobDashboardButtonsShortestRun';
+import EstimatedCostDetails from './EstimatedCostDetails';
 
 class JobDashboardButtons extends React.Component {
   constructor(props) {
@@ -67,10 +68,10 @@ const PublishButton = ({publish, job}) => {
         <Popup
           trigger={
             <Label as="a" basic color="green" pointing="left">
-              $ {job.estimatedCost.toFixed(2)}
+              $ {job.estimatedCost.total.toFixed(2)}
             </Label>
           }
-          content="Estimated cost (does not include AMT fees)"
+          content={<EstimatedCostDetails job={job} />}
         />
       )}
     </Button>

@@ -72,27 +72,49 @@ class JobDashboard extends React.Component {
     const {item} = this.props;
 
     return (
-      <Segment>
+      <Segment loading={this.props.loading}>
         <Header as="h3">
           Job Information
           <Label horizontal color={jobStatusColors[item.data.status]}>
             {item.data.status}
           </Label>
         </Header>
-        <List divided relaxed>
-          <List.Item>
-            <List.Content>
-              <List.Header as="h4">Name</List.Header>
-              <List.Description as="p">{item.data.name}</List.Description>
-            </List.Content>
-          </List.Item>
-          <List.Item>
-            <List.Content>
-              <List.Header as="h4">Description</List.Header>
-              <List.Description as="p">{item.data.description}</List.Description>
-            </List.Content>
-          </List.Item>
-        </List>
+        <Grid>
+          <Grid.Row>
+            <Grid.Column width="8">
+              <List divided relaxed>
+                <List.Item>
+                  <List.Content>
+                    <List.Header as="h4">Name</List.Header>
+                    <List.Description as="p">{item.data.name}</List.Description>
+                  </List.Content>
+                </List.Item>
+                <List.Item>
+                  <List.Content>
+                    <List.Header as="h4">Description</List.Header>
+                    <List.Description as="p">{item.data.description}</List.Description>
+                  </List.Content>
+                </List.Item>
+              </List>
+            </Grid.Column>
+            <Grid.Column width="8">
+              <List divided relaxed>
+                <List.Item>
+                  <List.Content>
+                    <List.Header as="h4">Number of papers</List.Header>
+                    <List.Description as="p">{item.itemsCount}</List.Description>
+                  </List.Content>
+                </List.Item>
+                <List.Item>
+                  <List.Content>
+                    <List.Header as="h4">Number of filters</List.Header>
+                    <List.Description as="p">{item.criteria.length}</List.Description>
+                  </List.Content>
+                </List.Item>
+              </List>
+            </Grid.Column>
+          </Grid.Row>
+        </Grid>
       </Segment>
     );
   }

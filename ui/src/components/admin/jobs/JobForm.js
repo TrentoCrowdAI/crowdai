@@ -96,6 +96,8 @@ class JobForm extends React.Component {
 
   renderExperimentInformation() {
     const {item} = this.props;
+    let {taskAssignmentStrategies} = this.props;
+    taskAssignmentStrategies = [{name: '---', id: 0}].concat(taskAssignmentStrategies);
 
     return (
       <React.Fragment>
@@ -168,10 +170,12 @@ class JobForm extends React.Component {
           {this.state.expertMode && (
             <Form.Select
               label="Task assignment strategy"
-              name="data.crowdsourcingStrategy"
-              value={item.data.crowdsourcingStrategy}
-              options={Object.entries(CrowdsourcingStrategies).map(([key, val]) => ({text: val, value: key}))}
+              placeholder="Task assignment strategy"
+              name="data.taskAssignmentStrategy"
+              value={item.data.taskAssignmentStrategy}
+              options={taskAssignmentStrategies.map(s => ({text: s.name, value: Number(s.id)}))}
               onChange={this.handleChange}
+              required
             />
           )}
         </Segment>
@@ -506,6 +510,7 @@ class JobForm extends React.Component {
 
   componentDidMount() {
     this.props.cleanState();
+    this.props.fetchTaskAssignmentStrategies();
     this.props.setInputValue('project_id', Number(this.props.match.params.projectId));
 
     const {jobId} = this.props.match.params;
@@ -546,14 +551,17 @@ JobForm.propTypes = {
   history: PropTypes.object,
   match: PropTypes.object,
   fetchItem: PropTypes.func,
-  fetchFiltersCSV: PropTypes.func
+  fetchFiltersCSV: PropTypes.func,
+  taskAssignmentStrategies: PropTypes.arrayOf(PropTypes.object),
+  fetchTaskAssignmentStrategies: PropTypes.func
 };
 
 const mapStateToProps = state => ({
   item: state.job.form.item,
   loading: state.job.form.loading,
   error: state.job.form.error,
-  saved: state.job.form.saved
+  saved: state.job.form.saved,
+  taskAssignmentStrategies: state.job.taskAssignmentStrategies.strategies
 });
 
 const mapDispatchToProps = dispatch => ({
@@ -561,7 +569,8 @@ const mapDispatchToProps = dispatch => ({
   cleanState: () => dispatch(actions.cleanState()),
   setInputValue: (name, value) => dispatch(actions.setInputValue(name, value)),
   fetchItem: id => dispatch(actions.fetchItem(id)),
-  fetchFiltersCSV: url => dispatch(actions.fetchFiltersCSV(url))
+  fetchFiltersCSV: url => dispatch(actions.fetchFiltersCSV(url)),
+  fetchTaskAssignmentStrategies: () => dispatch(actions.fetchTaskAssignmentStrategies())
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(JobForm);

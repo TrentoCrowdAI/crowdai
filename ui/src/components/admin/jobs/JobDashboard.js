@@ -10,7 +10,9 @@ import {
   Header,
   Image,
   Accordion,
-  Message
+  Message,
+  List,
+  Label
 } from 'semantic-ui-react';
 import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
@@ -39,6 +41,9 @@ class JobDashboard extends React.Component {
     return (
       <Grid style={{margin: '10px'}}>
         <Grid.Row>
+          <Grid.Column>{this.renderJobInformation()}</Grid.Column>
+        </Grid.Row>
+        <Grid.Row>
           <Grid.Column>
             <Step.Group attached="top">
               <Step active={this.state.activeStep === 'process'} onClick={() => this.setStep('process')}>
@@ -60,6 +65,35 @@ class JobDashboard extends React.Component {
           </Grid.Column>
         </Grid.Row>
       </Grid>
+    );
+  }
+
+  renderJobInformation() {
+    const {item} = this.props;
+
+    return (
+      <Segment>
+        <Header as="h3">
+          Job Information
+          <Label horizontal color={jobStatusColors[item.data.status]}>
+            {item.data.status}
+          </Label>
+        </Header>
+        <List divided relaxed>
+          <List.Item>
+            <List.Content>
+              <List.Header as="h4">Name</List.Header>
+              <List.Description as="p">{item.data.name}</List.Description>
+            </List.Content>
+          </List.Item>
+          <List.Item>
+            <List.Content>
+              <List.Header as="h4">Description</List.Header>
+              <List.Description as="p">{item.data.description}</List.Description>
+            </List.Content>
+          </List.Item>
+        </List>
+      </Segment>
     );
   }
 
@@ -147,6 +181,12 @@ class JobDashboard extends React.Component {
   }
 
   renderAggregationStrategySelector() {
+    const {taskAssignmentStrategy} = this.props.item;
+
+    if (taskAssignmentStrategy && taskAssignmentStrategy.aggregation) {
+      // we do not display the Aggregations dropdown if the task assignment strategy performs aggregation.
+      return null;
+    }
     return (
       <Form.Select
         label="Aggregation strategy"
@@ -325,6 +365,12 @@ class JobDashboard extends React.Component {
     this.props.setInputValue(name, value);
   }
 }
+
+const jobStatusColors = {
+  [JobStatus.PUBLISHED]: 'green',
+  [JobStatus.NOT_PUBLISHED]: 'grey',
+  [JobStatus.DONE]: 'blue'
+};
 
 JobDashboard.propTypes = {
   item: PropTypes.object,

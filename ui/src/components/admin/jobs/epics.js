@@ -22,6 +22,7 @@ const saveJob = (action$, store) =>
     const {item} = store.getState().job.form;
     const profile = store.getState().profile.item;
     item.requester_id = profile.id;
+    item.data.taskAssignmentStrategy = Number(item.data.taskAssignmentStrategy);
     return Observable.defer(
       () => (item.id ? requestersApi.put(`/jobs/${item.id}`, item) : requestersApi.post('/jobs', item))
     )
@@ -186,6 +187,19 @@ function pollCSV(job) {
     });
 }
 
+const fetchTaskAssignmentStrategies = (action$, store) =>
+  action$.ofType(actionTypes.FETCH_TASK_ASSIGNMENT_STRATEGIES).switchMap(action => {
+    return Observable.defer(() => requestersApi.get('task-assignment-strategies'))
+      .mergeMap(response => Observable.of(actions.fetchTaskAssignmentStrategiesSuccess(response.data)))
+      .catch(error => {
+        let err = flattenError(error);
+        return Observable.concat(
+          Observable.of(actions.fetchTaskAssignmentStrategiesError(flattenError(err))),
+          Observable.of(toastActions.show({message: err.message, type: ToastTypes.ERROR}))
+        );
+      });
+  });
+
 export default combineEpics(
   getJobs,
   saveJob,
@@ -195,5 +209,6 @@ export default combineEpics(
   pollJobState,
   copyJob,
   checkCSVCreation,
-  fetchFiltersCSV
+  fetchFiltersCSV,
+  fetchTaskAssignmentStrategies
 );

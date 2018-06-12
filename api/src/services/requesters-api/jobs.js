@@ -21,6 +21,9 @@ const getById = async ctx => {
   let criteria = await delegates.projects.getCriteria(job.project_id);
   job.criteria = criteria.rows;
   job.estimatedCost = await plugins.coordinator.getEstimatedCost(job);
+  job.taskAssignmentStrategy = await delegates.taskAssignmentApi.getById(
+    job.data.taskAssignmentStrategy
+  );
   ctx.response.body = job;
 };
 

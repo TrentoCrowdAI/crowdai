@@ -24,7 +24,7 @@ const { EventTypes } = require('./types');
  * emit(EventTypes.job.START_CRON_FOR_HIT, job, hitId, mt);
  *
  */
-on(EventTypes.job.START_CRON_FOR_HIT, (job, hitId, mturk) => {
+exports.onStartCronForHit = (job, hitId, mturk) => {
   const jobId = job.id;
   const cronjob = new CronJob({
     cronTime: `0 */${config.cron.hitStatusPollTime} * * * *`,
@@ -48,4 +48,9 @@ on(EventTypes.job.START_CRON_FOR_HIT, (job, hitId, mturk) => {
   });
 
   cronjob.start();
-});
+};
+
+// we register the handler
+on(EventTypes.job.START_CRON_FOR_HIT, (job, hitId, mturk) =>
+  exports.onStartCronForHit(job, hitId, mturk)
+);

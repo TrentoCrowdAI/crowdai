@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import {Grid, Button, Label, Popup} from 'semantic-ui-react';
 import {connect} from 'react-redux';
 
-import {JobStatus} from 'src/utils/constants';
+import {JobStatus, RegisteredTaskAssignmentStrategies} from 'src/utils/constants';
 import {actions} from './actions';
 import JobDashboardButtonsShortestRun from 'src/components/admin/shortest-run/JobDashboardButtonsShortestRun';
 
@@ -16,13 +16,18 @@ class JobDashboardButtons extends React.Component {
     };
   }
   render() {
+    const {taskAssignmentStrategy} = this.props.job;
+
+    if (!taskAssignmentStrategy) {
+      return null;
+    }
     return (
       <Grid.Row>
         <Grid.Column>
-          {this.props.job.data.crowdsourcingStrategy === 'sr' && ( // TODO: change these conditionals after implementing #7
+          {taskAssignmentStrategy.name === RegisteredTaskAssignmentStrategies.SHORTEST_RUN && (
             <JobDashboardButtonsShortestRun {...this.props} expertMode={this.state.expertMode} />
           )}
-          {this.props.job.data.crowdsourcingStrategy !== 'sr' && (
+          {taskAssignmentStrategy.name === RegisteredTaskAssignmentStrategies.BASELINE && (
             <SimpleTaskAssignmentStrategyButtons {...this.props} expertMode={this.state.expertMode} />
           )}
         </Grid.Column>
@@ -52,7 +57,7 @@ SimpleTaskAssignmentStrategyButtons.propTypes = {
   jobState: PropTypes.object
 };
 
-const PublishButton = ({publish, jobState, job}) => {
+const PublishButton = ({publish, job}) => {
   return (
     <Button onClick={() => publish()} floated="right" as="div" labelPosition="right">
       <Button size="large" positive>
@@ -74,8 +79,7 @@ const PublishButton = ({publish, jobState, job}) => {
 
 PublishButton.propTypes = {
   publish: PropTypes.func,
-  job: PropTypes.object,
-  jobState: PropTypes.object
+  job: PropTypes.object
 };
 
 const StopButton = ({jobState}) => {
@@ -92,8 +96,8 @@ StopButton.propTypes = {
   jobState: PropTypes.object
 };
 
-const UpdateParametersButton = ({expertMode}) => {
-  if (expertMode) {
+const UpdateParametersButton = ({expertMode, jobState}) => {
+  if (expertMode && jobState.job !== JobStatus.DONE) {
     return (
       <Button floated="right" size="large" style={{width: '200px'}}>
         Update parameters
@@ -103,6 +107,7 @@ const UpdateParametersButton = ({expertMode}) => {
   return null;
 };
 UpdateParametersButton.propTypes = {
+  jobState: PropTypes.object,
   // TODO: remove this after implementing #89
   expertMode: PropTypes.bool
 };

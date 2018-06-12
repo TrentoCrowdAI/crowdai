@@ -14,7 +14,7 @@ class JobDashboardButtonsShortestRun extends React.Component {
         <Grid.Column>
           <RunButton {...this.props} />
           <StopButton {...this.props} />
-          <UpdateParametersButton expertMode={this.props.expertMode} />
+          <UpdateParametersButton {...this.props} />
         </Grid.Column>
       </Grid.Row>
     );

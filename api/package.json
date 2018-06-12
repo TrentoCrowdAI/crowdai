@@ -4,9 +4,10 @@
   "scripts": {
     "test": "jest",
     "test:coverage": "jest --coverage",
-    "start": "node -r dotenv/config src/app.js",
-    "debug": "node -r dotenv/config --inspect src/app.js",
-    "db:simulate:voting": "node -r dotenv/config src/db/simulate-voting.js"
+    "start": "node -r dotenv/config src/server.js",
+    "debug": "node -r dotenv/config --inspect src/server.js",
+    "db:simulate:voting": "node -r dotenv/config src/db/simulate-voting.js",
+    "cli": "node -r dotenv/config src/utils/cli.js"
   },
   "dependencies": {
     "aws-sdk": "^2.194.0",
@@ -31,7 +32,10 @@
     "uuid": "^3.2.1"
   },
   "devDependencies": {
-    "jest": "^22.4.3"
+    "commander": "^2.15.1",
+    "jest": "^22.4.3",
+    "supertest": "^3.1.0"
+  }
   },
   "description": "Service + Business layer for CrowdRev. This project uses [koajs](http://koajs.com/) for the service layer. The business layer uses [PostgreSQL](https://www.postgresql.org/) as database.",
   "main": "jest.config.js",

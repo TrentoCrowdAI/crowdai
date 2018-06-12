@@ -259,11 +259,11 @@ renderChart(chart,x,y,z,param) {
 				param=1
 				break;
 
-			case 'M3':
+			case 'prova':
 				chart='linemetricchart'
-				x='worker A'
-				y='m3'
-				z=['wrong_on_wrongs','right_on_wrongs']
+				x=''
+				y=''
+				z=''
 				param=1
 				break;
 

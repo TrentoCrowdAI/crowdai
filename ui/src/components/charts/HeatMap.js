@@ -54,14 +54,14 @@ class HeatMap extends React.Component {
       return (a > b) ? 1 : ((b > a) ? -1 : 0);
     })
     var yelems = Array.from(new Set(this.props.data.map(d => d[y]))).sort();
-    var colors = ['#FFE5CC', '#FFCC99', '#FFB266', '#FF9933', '#FF8000', '#CC6600']
+    var colors = ['#FFE5CC', '#FFCC77', '#FFB266', '#FF7733', '#FF8000', '#CC6600']
     //console.log('xelems', xelems)
     //console.log('yelems', yelems)
 
     var xscale = d3.scaleBand()
         .domain(xelems)
-        .range([0,xelems.length*22])
-        .paddingInner(20).paddingOuter(9)
+        .range([0,xelems.length*16])
+        .paddingInner(20).paddingOuter(7)
     
     var xAxis = d3.axisTop()
         .scale(xscale)
@@ -69,7 +69,7 @@ class HeatMap extends React.Component {
     
     var yscale = d3.scaleBand()
         .domain(yelems)
-        .range([yelems.length*22, 0])
+        .range([yelems.length*16, 0])
         .paddingInner(.2).paddingOuter(.2)
 
     var yAxis = d3.axisLeft()
@@ -97,13 +97,13 @@ class HeatMap extends React.Component {
         .data(this.props.data)
         .enter().append('g').append('rect')
         .attr('class', 'cell')
-        .attr('width', 20)
-        .attr('height', 20)
+        .attr('width', 15)
+        .attr('height', 15)
         .attr('y', d => yscale(d[y]))
-        .attr('x', d => xscale(d[x])-9)
+        .attr('x', d => xscale(d[x])-7)
         .attr('fill', d => d[z]/param==0 ? 'lightgreen' : d[z]/param==1 ? 'red' : colorScale(d[z]/param))
-        .attr('rx', 3)
-        .attr('ry', 3)
+        .attr('rx', 2)
+        .attr('ry', 2)
         .on("mouseover", function(d) {
     			//d3.select(this).style("opacity","0.8")
     	    /*g.selectAll(".xaxis").selectAll("text").filter( function(text) {
@@ -136,7 +136,7 @@ class HeatMap extends React.Component {
     g.append('g')
         .attr('class', 'xaxis')
         .attr('transform', 'translate(0,0)')
-        //'+(yelems.length*22+9)+'
+        //'+(yelems.length*20+7)+'
         .call(xAxis)
         /*.selectAll('text')
         .attr('font-weight', 'normal')

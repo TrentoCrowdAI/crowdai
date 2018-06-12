@@ -84,6 +84,13 @@ class MetricMenu extends React.Component {
 					onClick={this.props.onChange}
 				>Conditional Error Propability <br /> P_err(A|B)<br />[ WWM2 ]</Button>
 				<br />
+				<Button 
+					value='prova'
+					className='metrics' 
+					style={{marginBottom: '5px'}}
+					onClick={this.props.onChange}
+				>Cohen's Kappa vs M1</Button>
+				<br />
 			</div>
     )
   }

@@ -7,6 +7,7 @@ import JobChooser from './JobChooser';
 import WorkerChooser from './WorkerChooser';
 import ItemChooser from './ItemChooser';
 import CritChooser from './CritChooser';
+import MetricChooser from './MetricChooser';
 import MetricMenu from './MetricMenu';
 import { Button, Dimmer, Loader, Item, Form } from 'semantic-ui-react';
 
@@ -17,7 +18,7 @@ class Reports extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			activeMetric : '(choose a metric)',
+			chosenmetric : '(choose a metric)',
 			chosenworker: 'all',
 			activeworker: false,
 			chosencriteria: 'all',
@@ -25,7 +26,7 @@ class Reports extends React.Component {
 			chosenitem: 'all',
 			activeitem: false
 		}
-		this.activeMetric = this.activeMetric.bind(this)
+		this.chooseMetric = this.chooseMetric.bind(this)
 		this.chooseWorker = this.chooseWorker.bind(this)
 		this.chooseCriteria = this.chooseCriteria.bind(this)
 		this.chooseItem = this.chooseItem.bind(this)
@@ -38,41 +39,35 @@ class Reports extends React.Component {
 	componentDidUpdate() {
 	}
 
-	activeMetric(e, {value}) {
-		this.props.reports.tasks=[]
+	chooseMetric(e, {value}) {
 		switch(value) {
 			case 'T_CompleteTime':
+				this.props.reports.tasks=[]
 				this.props.fetchTaskTime(this.props.match.params.jobid)
 				break;
 			case 'W_CompleteTime':
+				this.props.reports.tasks=[]
 				this.props.fetchWorkerTimes(this.props.match.params.jobid,Number(this.state.chosenworker))
 				break;
 			case 'Percentage':
+				this.props.reports.tasks=[]
 				this.props.fetchAnswers(this.props.match.params.jobid,Number(this.state.chosenworker))
 				break;
 			case 'Distribution':
+				this.props.reports.tasks=[]
 				this.props.fetchTasksAgreements(this.props.match.params.jobid)
 				break;
 			case 'Classification':
+				this.props.reports.tasks=[]
 				this.props.fetchWorkersAgreements(this.props.match.params.jobid);
 				break;
-			case 'Cohen':
-				this.props.fetchMetric(this.props.match.params.jobid,'cohen');
-				break;
-			case 'M1':
-				this.props.fetchMetric(this.props.match.params.jobid,'m1');
+			case 'Correlations':
+				this.props.reports.tasks=[]
+				this.props.fetchMetric('ww/job/'+this.props.match.params.jobid+'/stats');
 				break;
 			case 'M2':
-				this.props.fetchMetric(this.props.match.params.jobid,'m2');
-				break;
-			case 'M3':
-				this.props.fetchMetric(this.props.match.params.jobid,'m3');
-				break;
-			case 'WWM1':
-				this.props.fetchMetric(this.props.match.params.jobid,'wwm1');
-				break;
-			case 'WWM2':
-				this.props.fetchMetric(this.props.match.params.jobid,'wwm2');
+				this.props.reports.tasks=[]
+				this.props.fetchMetric('worker/'+this.state.chosenworker+'/job/'+this.props.match.params.jobid+'/stats');
 				break;
 			default:
 				console.log('Metric to implement: ', value)
@@ -81,7 +76,7 @@ class Reports extends React.Component {
 
 		this.setState({
 			...this.state,
-			activeMetric: value,
+			chosenmetric: value,
 			activeworker: value==='W_CompleteTime'||value==='Percentage' ? true : false,
 			chosenworker: value==='W_CompleteTime'||value==='Percentage' ? this.state.chosenworker : 'all',
 			chosenitem: value==='Classification' ? this.state.chosenitem : 'all',
@@ -92,7 +87,7 @@ class Reports extends React.Component {
 	}
 
 	chooseWorker(e, {value}) {
-		switch(this.state.activeMetric) {
+		switch(this.state.chosenmetric) {
 			case 'Percentage':
 				if (value=='all')
 					this.props.reports.tasks = []
@@ -169,6 +164,12 @@ renderChart(chart,x,y,z,param) {
       CritOptions[step.criteria_id] = step.criteria_id
 		});
 
+		var MetricOptions = {
+			'cohen': "Cohen's Kappa",
+			'm1': "Basic Agreement [ M1 ]",
+			'wwm2': "Correlation in Errors [ WWM2 ]",
+			'compare': "Comparing Cohen's Kappa and M1"
+		}
 		//parameters for reusable charts
 		var chart //to define kind of chart
 		var x //first group_by
@@ -177,7 +178,7 @@ renderChart(chart,x,y,z,param) {
 		var param='' //just used in some charts to add more details
 
 		//show different reports
-		switch (this.state.activeMetric) {
+		switch (this.state.chosenmetric) {
 
 			case 'T_CompleteTime':
 				chart='histogram'
@@ -219,7 +220,14 @@ renderChart(chart,x,y,z,param) {
 				param=[this.state.chosenitem,this.state.chosencriteria]
 				break;
 
-			case 'Cohen':
+			case 'Correlations':
+				x=''
+				y=''
+				z=''
+				param=1
+				break;
+
+			case 'cohen':
 				chart='heatmap'
 				x='worker A'
 				y='worker B'
@@ -227,7 +235,7 @@ renderChart(chart,x,y,z,param) {
 				param=1
 				break;
 
-			case 'M1':
+			case 'm1':
 				chart='heatmap'
 				x='worker A'
 				y='worker B'
@@ -235,7 +243,7 @@ renderChart(chart,x,y,z,param) {
 				param=1
 				break;
 
-			case 'WWM2':
+			case 'wwm2':
 				chart='heatmap'
 				x='worker A'
 				y='worker B'
@@ -259,11 +267,11 @@ renderChart(chart,x,y,z,param) {
 				param=1
 				break;
 
-			case 'prova':
+			case 'compare':
 				chart='linemetricchart'
-				x=''
-				y=''
-				z=''
+				x=['worker A','worker B']
+				y="cohen's kappa correlation"
+				z="m1"
 				param=1
 				break;
 
@@ -290,13 +298,13 @@ renderChart(chart,x,y,z,param) {
 					options={WorkerOptions}
 					onChange={this.chooseWorker}
 					chosenworker={this.state.chosenworker}
-				/><br />
+				/>
 				<ItemChooser 
 					disabled={(!this.state.activeitem)}
 					options={ItemOptions}
 					onChange={this.chooseItem}
 					chosenitem={this.state.chosenitem}
-				/><br />
+				/>
 				<CritChooser 
 					disabled={(!this.state.activecriteria)}
 					options={CritOptions}
@@ -308,10 +316,29 @@ renderChart(chart,x,y,z,param) {
 
 				<hr />
 				<div className="rowC">
-				<MetricMenu onChange={this.activeMetric}/>
+				<div className='options'>
+					<MetricMenu onChange={this.chooseMetric}/>
+					{
+						(this.state.chosenmetric=="cohen"
+						||this.state.chosenmetric=="m1"
+						||this.state.chosenmetric=="wwm2"
+						||this.state.chosenmetric=="Correlations"
+						||this.state.chosenmetric=="compare") && 
+						<div className='row' style={{'display': 'flex'}}>
+							<br />
+							<MetricChooser 
+								options={MetricOptions}
+								onChange={this.chooseMetric}
+								chosenmetric={this.state.chosenmetric}
+							/>
+							<br />
+						</div>
+					}
+				</div>
 				{this.renderChart(chart,x,y,z,param)}
 				</div>
 
+			
 			</div>
 		);
 	}
@@ -345,7 +372,7 @@ const mapDispatchToProps = dispatch => ({
 	fetchWorkers: jobId => dispatch(actions.fetchWorkers(jobId)),
 	fetchTasksAgreements: jobId => dispatch(actions.fetchTasksAgreements(jobId)),
 	fetchWorkersAgreements: (jobId) => dispatch(actions.fetchWorkersAgreements(jobId)),
-	fetchMetric : (jobId,metric) => dispatch(actions.fetchMetric(jobId,metric))
+	fetchMetric : (metric) => dispatch(actions.fetchMetric(metric))
 })
 
 const mapStateToProps = state => ({

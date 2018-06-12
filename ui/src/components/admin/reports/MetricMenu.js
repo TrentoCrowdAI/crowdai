@@ -16,7 +16,7 @@ class MetricMenu extends React.Component {
 
   render() {
     return(
-			<div className="options">
+			<React.Fragment>
 				Available Reports:
 				<br />
 				<Button 
@@ -57,6 +57,26 @@ class MetricMenu extends React.Component {
 				Correlation Metrics: 
 				<br />
 				<Button 
+					value='Correlations'
+					className='metrics'
+					style={{marginBottom: '5px'}}
+					onClick={this.props.onChange}
+				>Correlation Metrics</Button>	
+				<br />
+				<Button 
+					value='M2'
+					className='metrics' 
+					style={{marginBottom: '5px'}}
+					onClick={this.props.onChange}
+				>Percentage contribution to Crowd Error<br />[ M2 ]</Button>
+				<br />
+			</React.Fragment>
+    )
+  }
+}
+
+/**
+ * <Button 
 					value='Cohen'
 					className='metrics' 
 					style={{marginBottom: '5px'}}
@@ -91,10 +111,7 @@ class MetricMenu extends React.Component {
 					onClick={this.props.onChange}
 				>Cohen's Kappa vs M1</Button>
 				<br />
-			</div>
-    )
-  }
-}
+ */
 
 /**
  * <Button 

@@ -8303,10 +8303,8 @@ class LineMetricChart extends React.Component {
         .attr("cx", (d,i) => xscale(i) )
         .attr("cy", d => yscale(d["cohen's kappa correlation"]) )
         .attr("r",0.5)
-        .on("mouseover", d => {
+        .on("move", d => {
           console.log(d)
-        })
-        .on("mouseout", function() {
         })
 
     g.selectAll(".dot")
@@ -8317,7 +8315,7 @@ class LineMetricChart extends React.Component {
         .attr("cx", (d,i) => xscale(i) )
         .attr("cy", d => yscale(d["m1"]) )
         .attr("r",0.5)
-        .on("mouseover", d => {
+        .on("move", d => {
           console.log(d)
         })
 

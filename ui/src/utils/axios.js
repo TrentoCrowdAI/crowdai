@@ -17,8 +17,8 @@ const requestersApi = axios.create({
 });
 
 const reportingApi = axios.create({
-  baseURL: `http://localhost:5000/metrics`,
-  timeout: config.axios.timeout
+  baseURL: `http://localhost:5000/`,
+  //timeout: config.axios.timeout
 });
 
 const token = localStorage.getItem(config.localStorageKey);

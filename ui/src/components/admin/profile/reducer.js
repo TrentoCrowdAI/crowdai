@@ -1,5 +1,5 @@
 import {getReducer} from 'src/utils/form';
-import {scopes} from 'src/utils/constants';
+import {scopes, UserModes} from 'src/utils/constants';
 
 export default getReducer(scopes.PROFILE, {
   data: {
@@ -10,6 +10,7 @@ export default getReducer(scopes.PROFILE, {
     email: '',
     name: '',
     givenName: '',
-    familyName: ''
+    familyName: '',
+    userMode: UserModes.Author
   }
 });

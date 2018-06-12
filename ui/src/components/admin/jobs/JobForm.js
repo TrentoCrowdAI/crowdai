@@ -20,20 +20,14 @@ import validUrl from 'valid-url';
 
 import {actions} from './actions';
 import FormContainer from 'src/components/core/form/FormContainer';
-import {
-  FileFormats,
-  CrowdsourcingStrategies,
-  AbstractPresentationTechniques,
-  LabelOptions,
-  JobStatus
-} from 'src/utils/constants';
+import {FileFormats, AbstractPresentationTechniques, LabelOptions, JobStatus} from 'src/utils/constants';
+import {isExpertMode} from 'src/utils';
 
 class JobForm extends React.Component {
   constructor(props) {
     super(props);
     this.handleChange = this.handleChange.bind(this);
     this.state = {
-      expertMode: true,
       activeStep: 'info'
     };
   }
@@ -167,7 +161,7 @@ class JobForm extends React.Component {
             />
           </Form.Group>
 
-          {this.state.expertMode && (
+          {isExpertMode(this.props.profile) && (
             <Form.Select
               label="Task assignment strategy"
               placeholder="Task assignment strategy"
@@ -366,7 +360,7 @@ class JobForm extends React.Component {
   renderParametersSection() {
     const {item} = this.props;
 
-    if (!this.state.expertMode) {
+    if (!isExpertMode(this.props.profile)) {
       return;
     }
     return (
@@ -553,7 +547,8 @@ JobForm.propTypes = {
   fetchItem: PropTypes.func,
   fetchFiltersCSV: PropTypes.func,
   taskAssignmentStrategies: PropTypes.arrayOf(PropTypes.object),
-  fetchTaskAssignmentStrategies: PropTypes.func
+  fetchTaskAssignmentStrategies: PropTypes.func,
+  profile: PropTypes.object
 };
 
 const mapStateToProps = state => ({
@@ -561,7 +556,8 @@ const mapStateToProps = state => ({
   loading: state.job.form.loading,
   error: state.job.form.error,
   saved: state.job.form.saved,
-  taskAssignmentStrategies: state.job.taskAssignmentStrategies.strategies
+  taskAssignmentStrategies: state.job.taskAssignmentStrategies.strategies,
+  profile: state.profile.item
 });
 
 const mapDispatchToProps = dispatch => ({

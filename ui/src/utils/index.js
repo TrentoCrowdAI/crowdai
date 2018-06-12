@@ -1,4 +1,5 @@
 import moment from 'moment';
+import {UserModes} from './constants';
 
 /**
  * Helper method that flattens an error returned by the API.
@@ -22,10 +23,18 @@ const flattenError = error => {
 };
 
 /**
+ * Checks if the given profile is an expert user.
+ *
+ * @param {Object} profile
+ * @return {Boolean}
+ */
+const isExpertMode = profile => profile.data.userMode === UserModes.Researcher;
+
+/**
  * Formats the given (string) datetime value.
  * @param {String} datetime - String representing a datetime value. Format: YYYY-MM-DDTHH:mm:ss.S Z
  * @return {String} formated datetime value. Format: DD-MM-YYYY HH:mm:ss
  */
 const datetimeFormatter = datetime => moment(datetime, 'YYYY-MM-DDTHH:mm:ss.S Z').format('DD-MM-YYYY HH:mm:ss');
 
-export {flattenError, datetimeFormatter};
+export {flattenError, datetimeFormatter, isExpertMode};

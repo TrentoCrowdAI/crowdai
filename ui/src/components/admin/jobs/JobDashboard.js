@@ -23,13 +23,13 @@ import {AggregationStrategies, JobStatus} from 'src/utils/constants';
 import JobParameters from './JobParameters';
 import HitInformation from './HitInformation';
 import JobDashboardButtons from './JobDashboardButtons';
+import {isExpertMode} from 'src/utils';
 
 class JobDashboard extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       activeStep: 'process',
-      expertMode: true,
       activeIndex: {},
       aggregationStrategy: 'ds',
       showSuccessMsg: true
@@ -129,12 +129,12 @@ class JobDashboard extends React.Component {
             <Grid.Column>
               <h4 style={{textAlign: 'center'}}>Estimated results</h4>
               <hr />
-              {this.state.expertMode ? this.renderExpertEstimations() : this.renderAuthorsEstimations()}
+              {isExpertMode(this.props.profile) ? this.renderExpertEstimations() : this.renderAuthorsEstimations()}
             </Grid.Column>
             <Grid.Column>
               <h4 style={{textAlign: 'center'}}>Actual results</h4>
               <hr />
-              <div hidden={!this.state.expertMode} style={{marginBottom: '20px'}}>
+              <div hidden={!isExpertMode(this.props.profile)} style={{marginBottom: '20px'}}>
                 {this.renderAggregationStrategySelector()}
               </div>
               <Statistic.Group widths="3">
@@ -303,7 +303,7 @@ class JobDashboard extends React.Component {
 
     return (
       <Form>
-        <div hidden={!this.state.expertMode} style={{marginBottom: '20px'}}>
+        <div hidden={!isExpertMode(this.props.profile)} style={{marginBottom: '20px'}}>
           {this.renderAggregationStrategySelector()}
         </div>
         <Accordion style={{width: '100%'}} styled exclusive={false}>
@@ -409,7 +409,8 @@ JobDashboard.propTypes = {
   fetchJobState: PropTypes.func,
   cleanJobState: PropTypes.func,
   jobStateLoading: PropTypes.bool,
-  cleanState: PropTypes.func
+  cleanState: PropTypes.func,
+  profile: PropTypes.object
 };
 
 const mapStateToProps = state => ({
@@ -419,7 +420,8 @@ const mapStateToProps = state => ({
   saved: state.job.form.saved,
   polling: state.job.state.polling,
   jobState: state.job.state.item,
-  jobStateLoading: state.job.state.loading
+  jobStateLoading: state.job.state.loading,
+  profile: state.profile.item
 });
 
 const mapDispatchToProps = dispatch => ({

@@ -148,7 +148,9 @@ const getItemsCount = (exports.getItemsCount = async projectId => {
 const getCriteria = (exports.getCriteria = async id => {
   try {
     let res = await db.query(
-      `select * from ${db.TABLES.Criterion} where project_id = $1`,
+      `select * from ${
+        db.TABLES.Criterion
+      } where project_id = $1 order by id asc`,
       [id]
     );
     return res.rowCount > 0

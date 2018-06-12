@@ -34,6 +34,6 @@ describe('task-assignment-api', () => {
   test('getBuiltin should return the records with requester_id NULL', async () => {
     await testHelpers.createFakeTaskAssignmentApi();
     let records = await taskAssignmentApi.getBuiltIn();
-    expect(records.meta.count).toBe(1);
+    expect(records.meta.count).toBeGreaterThan(0);
   });
 });

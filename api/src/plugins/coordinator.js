@@ -19,7 +19,8 @@ let managersMap = {
  * is for the best-case scenario.
  *
  * @param {Object} job
- * @return {Number} The estimated cost. Zero means estimation is not yet possible.
+ * @return {Object} The estimated cost. Zero means estimation is not yet possible. Format
+ *                  {total: <number>, details: [{criteria: <number>, numWorkers: <number>, totalTasksPerWorker: <number>, cost: <number>}]}
  */
 exports.getEstimatedCost = async job => {
   if (!job) {

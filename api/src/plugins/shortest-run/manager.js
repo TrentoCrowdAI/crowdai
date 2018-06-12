@@ -266,17 +266,20 @@ const estimateParameters = (exports.estimateParameters = async job => {
  * is for the best-case scenario.
  *
  * @param {Object} job
- * @return {Number}
+ * @return {Object} The estimated cost. Zero means estimation is not yet possible. Format
+ *                  {total: <number>, details: [{criteria: <number>, numWorkers: <number>, totalTasksPerWorker: <number>, cost: <number>}]}
  */
 const getEstimatedCost = (exports.getEstimatedCost = async job => {
   const { shortestRun } = job.data;
   let numTasksPerWorkerDefault = managers.task.getEstimatedTasksPerWorkerCount(
     job
   );
+
   if (
     shortestRun.state === ShortestRunStates.BASELINE_GENERATED ||
     shortestRun.state === ShortestRunStates.FILTERS_ASSIGNED
   ) {
+    let details = [];
     let cost = 0;
     let rsp = await db.query(
       `select count(item_id) as count, criterion_id as filter from backlog b
@@ -285,6 +288,7 @@ const getEstimatedCost = (exports.getEstimatedCost = async job => {
         ) 
         and b.job_id = $1
         group by criterion_id
+        order by filter asc
      `,
       [job.id]
     );
@@ -292,35 +296,84 @@ const getEstimatedCost = (exports.getEstimatedCost = async job => {
     for (let entry of rsp.rows) {
       let count = Number(entry.count);
 
-      if (shortestRun.state === ShortestRunStates.BASELINE_GENERATED) {
-        count *= job.data.votesPerTaskRule;
-      }
-
       if (count <= job.data.maxTasksRule) {
-        // only one worker here.
+        // only one worker here (if it is BASELINE_GENERATED state, then we multiply by votesPerTaskRule).
         let numTasksForWorker = managers.task.getEstimatedTasksPerWorkerCount(
           job,
           count
         );
-        cost += numTasksForWorker * job.data.taskRewardRule;
+        let stepCost = numTasksForWorker * job.data.taskRewardRule;
+        let numWorkers = 1;
+
+        if (shortestRun.state === ShortestRunStates.BASELINE_GENERATED) {
+          stepCost *= job.data.votesPerTaskRule;
+          numWorkers = job.data.votesPerTaskRule;
+        }
+        cost += stepCost;
+        details.push({
+          criteria: entry.filter,
+          numWorkers,
+          totalTasksPerWorker: numTasksForWorker,
+          cost: stepCost
+        });
       } else if (count % job.data.maxTasksRule === 0) {
         // every worker gets the same amount of tasks.
         let numWorkers = count / job.data.maxTasksRule;
-        cost += numWorkers * numTasksPerWorkerDefault * job.data.taskRewardRule;
+
+        if (shortestRun.state === ShortestRunStates.BASELINE_GENERATED) {
+          numWorkers *= job.data.votesPerTaskRule;
+        }
+        let stepCost =
+          numWorkers * numTasksPerWorkerDefault * job.data.taskRewardRule;
+        cost += stepCost;
+        details.push({
+          criteria: entry.filter,
+          numWorkers: numWorkers,
+          totalTasksPerWorker: numTasksPerWorkerDefault,
+          cost: stepCost
+        });
       } else {
-        // one (final) worker does not receive the same amount of tasks.
-        let numWorkers = Math.floor(count / job.data.maxTasksRule);
-        cost += numWorkers * numTasksPerWorkerDefault * job.data.taskRewardRule;
-        let numTasksForLastWorker = managers.task.getEstimatedTasksPerWorkerCount(
+        // some workers do not receive the same amount of tasks.
+        let baseNumWorkers = Math.floor(count / job.data.maxTasksRule);
+        let numWorkers = baseNumWorkers;
+
+        if (shortestRun.state === ShortestRunStates.BASELINE_GENERATED) {
+          numWorkers *= job.data.votesPerTaskRule;
+        }
+
+        let stepCost =
+          numWorkers * numTasksPerWorkerDefault * job.data.taskRewardRule;
+        cost += stepCost;
+        details.push({
+          criteria: entry.filter,
+          numWorkers,
+          totalTasksPerWorker: numTasksPerWorkerDefault,
+          cost: stepCost
+        });
+
+        let numTasksForLastWorkers = managers.task.getEstimatedTasksPerWorkerCount(
           job,
-          count - numWorkers * job.data.maxTasksRule
+          count - baseNumWorkers * job.data.maxTasksRule
         );
-        cost += numTasksForLastWorker * job.data.taskRewardRule;
+        stepCost = numTasksForLastWorkers * job.data.taskRewardRule;
+        numWorkers = 1;
+
+        if (shortestRun.state === ShortestRunStates.BASELINE_GENERATED) {
+          stepCost *= job.data.votesPerTaskRule;
+          numWorkers = job.data.votesPerTaskRule;
+        }
+        cost += stepCost;
+        details.push({
+          criteria: entry.filter,
+          numWorkers,
+          totalTasksPerWorker: numTasksForLastWorkers,
+          cost: stepCost
+        });
       }
     }
-    return cost;
+    return { total: cost, details };
   }
-  return 0;
+  return { total: 0 };
 });
 
 /**

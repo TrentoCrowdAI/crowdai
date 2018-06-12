@@ -73,6 +73,24 @@ describe('manager.getEstimatedCost', () => {
     {
       state: ShortestRunStates.BASELINE_GENERATED,
       mockedBacklogOutput: {
+        rows: [
+          { filter: 1, count: 10 },
+          { filter: 2, count: 10 },
+          { filter: 3, count: 10 }
+        ]
+      },
+      job: {
+        votesPerTaskRule: 3,
+        maxTasksRule: 3,
+        initialTestsRule: 2,
+        testFrequencyRule: 2,
+        taskRewardRule: 0.1
+      },
+      cost: '18.90'
+    },
+    {
+      state: ShortestRunStates.BASELINE_GENERATED,
+      mockedBacklogOutput: {
         rows: [{ filter: 1, count: 3 }]
       },
       job: {
@@ -130,7 +148,7 @@ describe('manager.getEstimatedCost', () => {
       shortestRun: { state: shortestRunManager.ShortestRunStates.INITIAL }
     });
     let cost = await shortestRunManager.getEstimatedCost(job);
-    expect(cost).toBe(0);
+    expect(cost.total).toBe(0);
   });
 
   for (let s of setup) {
@@ -145,7 +163,8 @@ describe('manager.getEstimatedCost', () => {
         return s.mockedBacklogOutput;
       });
       let cost = await shortestRunManager.getEstimatedCost(job);
-      expect(cost.toFixed(2)).toBe(s.cost);
+      expect(cost.total.toFixed(2)).toBe(s.cost);
+      expect(cost.details).toBeDefined();
     });
   }
 });

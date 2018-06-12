@@ -24,6 +24,7 @@ const getById = async ctx => {
   job.taskAssignmentStrategy = await delegates.taskAssignmentApi.getById(
     job.data.taskAssignmentStrategy
   );
+  job.itemsCount = await delegates.projects.getItemsCount(job.project_id);
   ctx.response.body = job;
 };
 

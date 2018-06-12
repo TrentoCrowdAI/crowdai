@@ -23,7 +23,7 @@ describe('Shortest Run workflow', () => {
       taskRewardRule: 0.2,
       hitConfig: {}
     },
-    cost: '56.00'
+    cost: '56.40'
   };
   let job;
 
@@ -63,7 +63,7 @@ describe('Shortest Run workflow', () => {
     );
     expect(response.status).toBe(200);
     expect(response.body.estimatedCost).toBeDefined();
-    expect(response.body.estimatedCost.toFixed(2)).toBe(setup.cost);
+    expect(response.body.estimatedCost.total.toFixed(2)).toBe(setup.cost);
     job = response.body;
   });
 

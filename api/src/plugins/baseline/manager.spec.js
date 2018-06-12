@@ -58,6 +58,30 @@ describe('manager.getEstimatedCost', () => {
         taskRewardRule: 0.1
       },
       cost: '1.20'
+    },
+    {
+      itemsCount: 2,
+      filtersCount: 1,
+      job: {
+        votesPerTaskRule: 3,
+        maxTasksRule: 3,
+        initialTestsRule: 1,
+        testFrequencyRule: 1,
+        taskRewardRule: 0.1
+      },
+      cost: '1.20'
+    },
+    {
+      itemsCount: 10,
+      filtersCount: 3,
+      job: {
+        votesPerTaskRule: 3,
+        maxTasksRule: 3,
+        initialTestsRule: 2,
+        testFrequencyRule: 2,
+        taskRewardRule: 0.1
+      },
+      cost: '18.90'
     }
   ];
 
@@ -65,9 +89,17 @@ describe('manager.getEstimatedCost', () => {
     test(getDescription(s), async () => {
       job = await testHelpers.createFakeJob(s.job);
       delegates.projects.getItemsCount = jest.fn(() => s.itemsCount);
-      delegates.projects.getCriteriaCount = jest.fn(() => s.filtersCount);
+      delegates.projects.getCriteria = jest.fn(() => {
+        let filters = { rows: [], meta: { count: s.filtersCount } };
+
+        for (let i = 0; i < s.filtersCount; i++) {
+          filters.rows.push({ id: i + 1 });
+        }
+        return filters;
+      });
       let cost = await baselineManager.getEstimatedCost(job);
-      expect(cost.toFixed(2)).toBe(s.cost);
+      expect(cost.total.toFixed(2)).toBe(s.cost);
+      expect(cost.details).toBeDefined();
     });
   }
 });

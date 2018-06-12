@@ -12,34 +12,64 @@ exports.NAME = 'Baseline';
  * is for the best-case scenario.
  *
  * @param {Object} job
+ * @return {Object} The estimated cost. Zero means estimation is not yet possible. Format
+ *                  {total: <number>, details: [{criteria: <number>, numWorkers: <number>, totalTasksPerWorker: <number>, cost: <number>}]}
  */
 const getEstimatedCost = (exports.getEstimatedCost = async job => {
   const itemsCount = await delegates.projects.getItemsCount(job.project_id);
-  const filtersCount = await delegates.projects.getCriteriaCount(
-    job.project_id
-  );
+  const filters = await delegates.projects.getCriteria(job.project_id);
+  const filtersCount = filters.meta.count;
 
   if (itemsCount <= job.data.maxTasksRule) {
     let numTasksForWorker = managers.task.getEstimatedTasksPerWorkerCount(
       job,
       itemsCount
     );
-    return (
+    let total =
       numTasksForWorker *
       job.data.votesPerTaskRule *
       filtersCount *
-      job.data.taskRewardRule
-    );
+      job.data.taskRewardRule;
+    let details = [];
+
+    for (let i = 0; i < filtersCount; i++) {
+      details.push({
+        criteria: filters.rows[i].id,
+        numWorkers: job.data.votesPerTaskRule,
+        totalTasksPerWorker: numTasksForWorker,
+        cost:
+          numTasksForWorker *
+          job.data.votesPerTaskRule *
+          job.data.taskRewardRule
+      });
+    }
+
+    return { total, details };
   } else if (itemsCount % job.data.maxTasksRule === 0) {
     let numWorkers = itemsCount / job.data.maxTasksRule;
     let numTasksForWorker = managers.task.getEstimatedTasksPerWorkerCount(job);
-    return (
+    let total =
       numWorkers *
       numTasksForWorker *
       job.data.votesPerTaskRule *
       filtersCount *
-      job.data.taskRewardRule
-    );
+      job.data.taskRewardRule;
+
+    let details = [];
+
+    for (let i = 0; i < filtersCount; i++) {
+      details.push({
+        criteria: filters.rows[i].id,
+        numWorkers: numWorkers * job.data.votesPerTaskRule,
+        totalTasksPerWorker: numTasksForWorker,
+        cost:
+          numWorkers *
+          numTasksForWorker *
+          job.data.votesPerTaskRule *
+          job.data.taskRewardRule
+      });
+    }
+    return { total, details };
   } else {
     let numWorkers = Math.floor(itemsCount / job.data.maxTasksRule);
     let numTasksPerWorker = managers.task.getEstimatedTasksPerWorkerCount(job);
@@ -64,6 +94,33 @@ const getEstimatedCost = (exports.getEstimatedCost = async job => {
 
     // just a factorized version of what the one (commented) above.
     let k = job.data.votesPerTaskRule * filtersCount * job.data.taskRewardRule;
-    return k * (numWorkers * numTasksPerWorker + numTasksForLastWorker);
+    let total = k * (numWorkers * numTasksPerWorker + numTasksForLastWorker);
+
+    let details = [];
+
+    for (let i = 0; i < filtersCount; i++) {
+      details.push(
+        {
+          criteria: filters.rows[i].id,
+          numWorkers: numWorkers * job.data.votesPerTaskRule,
+          totalTasksPerWorker: numTasksPerWorker,
+          cost:
+            numWorkers *
+            numTasksPerWorker *
+            job.data.votesPerTaskRule *
+            job.data.taskRewardRule
+        },
+        {
+          criteria: filters.rows[i].id,
+          numWorkers: job.data.votesPerTaskRule,
+          totalTasksPerWorker: numTasksForLastWorker,
+          cost:
+            numTasksForLastWorker *
+            job.data.votesPerTaskRule *
+            job.data.taskRewardRule
+        }
+      );
+    }
+    return { total, details };
   }
 });

@@ -306,6 +306,7 @@ const stop = (exports.stop = async job => {
  *   - Information about the associated HIT.
  *   - The status of the job
  *   - The status of the task assignment box associated with the box (if available)
+ *   - The results summary
  *
  * @param {Number} jobId
  */
@@ -323,6 +324,7 @@ const getState = (exports.getState = async jobId => {
       state.hit = await getHIT(job.data.hit.HITId, mturk);
     }
     state.taskAssignmentApi = await taskManager.getState(job);
+    state.results = await delegates.results.getSummary(job.id);
     // TODO: return information about the workers.
     return state;
   } catch (error) {

@@ -150,7 +150,9 @@ const formReducer = (state = defaultFormState, action) => {
 };
 
 const defaultJobState = {
-  item: {},
+  item: {
+    results: {}
+  },
   error: undefined,
   loading: false,
   polling: false

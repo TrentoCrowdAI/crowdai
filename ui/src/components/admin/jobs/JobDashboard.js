@@ -138,39 +138,7 @@ class JobDashboard extends React.Component {
               <div hidden={!isExpertMode(this.props.profile)} style={{marginBottom: '20px'}}>
                 {this.renderAggregationStrategySelector()}
               </div>
-              <Statistic.Group widths="3">
-                <Statistic>
-                  <Statistic.Value>
-                    <Icon name="check" /* color="green"*/ />
-                    10
-                  </Statistic.Value>
-                  <Statistic.Label>Papers IN</Statistic.Label>
-                </Statistic>
-
-                <Statistic>
-                  <Statistic.Value>
-                    <Icon name="remove" /* color="red"*/ />
-                    8
-                  </Statistic.Value>
-                  <Statistic.Label>Papers OUT</Statistic.Label>
-                </Statistic>
-
-                <Statistic>
-                  <Statistic.Value>
-                    <Icon name="question" /* color="orange"*/ />
-                    2
-                  </Statistic.Value>
-                  <Statistic.Label>Papers unclassified</Statistic.Label>
-                </Statistic>
-
-                <Statistic style={{marginLeft: 'auto', marginRight: 'auto'}}>
-                  <Statistic.Value>
-                    <Icon name="dollar" /* color="blue"*/ />
-                    20
-                  </Statistic.Value>
-                  <Statistic.Label>Total cost</Statistic.Label>
-                </Statistic>
-              </Statistic.Group>
+              <JobResultSummary jobState={this.props.jobState} />
             </Grid.Column>
           </Grid.Row>
           <Grid.Row>
@@ -388,6 +356,49 @@ class JobDashboard extends React.Component {
     this.props.setInputValue(name, value);
   }
 }
+
+const JobResultSummary = ({jobState}) => {
+  const {results} = jobState;
+  return (
+    <Statistic.Group widths="3">
+      <Statistic>
+        <Statistic.Value>
+          <Icon name="check" />
+          {results.in}
+        </Statistic.Value>
+        <Statistic.Label>Papers IN</Statistic.Label>
+      </Statistic>
+
+      <Statistic>
+        <Statistic.Value>
+          <Icon name="remove" />
+          {results.out}
+        </Statistic.Value>
+        <Statistic.Label>Papers OUT</Statistic.Label>
+      </Statistic>
+
+      <Statistic>
+        <Statistic.Value>
+          <Icon name="question" />
+          {results.stopped}
+        </Statistic.Value>
+        <Statistic.Label>Papers unclassified</Statistic.Label>
+      </Statistic>
+
+      <Statistic style={{marginLeft: 'auto', marginRight: 'auto'}}>
+        <Statistic.Value>
+          <Icon name="dollar" />
+          20
+        </Statistic.Value>
+        <Statistic.Label>Total cost</Statistic.Label>
+      </Statistic>
+    </Statistic.Group>
+  );
+};
+
+JobResultSummary.propTypes = {
+  jobState: PropTypes.object
+};
 
 const jobStatusColors = {
   [JobStatus.PUBLISHED]: 'green',

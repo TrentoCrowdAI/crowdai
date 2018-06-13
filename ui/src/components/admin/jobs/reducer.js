@@ -45,6 +45,7 @@ const genericFormReducer = getReducer(scopes.JOBS, {
   uuid: '',
   data: {
     name: '',
+    internalName: '',
     description: '',
     status: JobStatus.NOT_PUBLISHED,
     instructions: {},

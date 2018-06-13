@@ -110,6 +110,15 @@ class JobForm extends React.Component {
               required
             />
           </Form.Group>
+          <Form.Group widths="equal">
+            <Form.Input
+              label="Internal name"
+              name="data.internalName"
+              value={item.data.internalName}
+              placeholder="An internal codename for the job."
+              onChange={this.handleChange}
+            />
+          </Form.Group>
           <Form.TextArea
             label="Description"
             name="data.description"

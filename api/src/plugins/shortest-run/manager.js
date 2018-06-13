@@ -266,7 +266,7 @@ const estimateParameters = (exports.estimateParameters = async job => {
  *
  * @param {Object} job
  * @return {Object} The estimated cost. Zero means estimation is not yet possible. Format
- *                  {total: <number>, details: [{criteria: <number>, numWorkers: <number>, totalTasksPerWorker: <number>, cost: <number>}]}
+ *                  {total: <number>, totalWorkers: <number>, details: [{criteria: <number>, numWorkers: <number>, totalTasksPerWorker: <number>, cost: <number>}]}
  */
 const getEstimatedCost = (exports.getEstimatedCost = async job => {
   const { shortestRun } = job.data;
@@ -370,7 +370,11 @@ const getEstimatedCost = (exports.getEstimatedCost = async job => {
         });
       }
     }
-    return { total: cost, details };
+    return {
+      total: cost,
+      totalWorkers: details.reduce((s, d) => s + d.numWorkers, 0),
+      details
+    };
   }
   return { total: 0 };
 });

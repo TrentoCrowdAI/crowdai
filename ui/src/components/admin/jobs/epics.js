@@ -81,8 +81,7 @@ const publishJob = (action$, store) =>
       .mergeMap(response =>
         Observable.concat(
           Observable.of(toastActions.show({message: 'Published!', type: ToastTypes.SUCCESS})),
-          Observable.of(actions.publishSuccess(response.data)),
-          Observable.of(actions.fetchItem(item.id))
+          Observable.of(actions.publishSuccess(response.data))
         )
       )
       .catch(error => {

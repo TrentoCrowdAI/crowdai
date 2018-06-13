@@ -13,7 +13,7 @@ exports.NAME = 'Baseline';
  *
  * @param {Object} job
  * @return {Object} The estimated cost. Zero means estimation is not yet possible. Format
- *                  {total: <number>, details: [{criteria: <number>, numWorkers: <number>, totalTasksPerWorker: <number>, cost: <number>}]}
+ *                  {total: <number>, totalWorkers: <number>, details: [{criteria: <number>, numWorkers: <number>, totalTasksPerWorker: <number>, cost: <number>}]}
  */
 const getEstimatedCost = (exports.getEstimatedCost = async job => {
   const itemsCount = await delegates.projects.getItemsCount(job.project_id);
@@ -44,7 +44,11 @@ const getEstimatedCost = (exports.getEstimatedCost = async job => {
       });
     }
 
-    return { total, details };
+    return {
+      total,
+      totalWorkers: details.reduce((s, d) => s + d.numWorkers, 0),
+      details
+    };
   } else if (itemsCount % job.data.maxTasksRule === 0) {
     let numWorkers = itemsCount / job.data.maxTasksRule;
     let numTasksForWorker = managers.task.getEstimatedTasksPerWorkerCount(job);
@@ -69,7 +73,11 @@ const getEstimatedCost = (exports.getEstimatedCost = async job => {
           job.data.taskRewardRule
       });
     }
-    return { total, details };
+    return {
+      total,
+      totalWorkers: details.reduce((s, d) => s + d.numWorkers, 0),
+      details
+    };
   } else {
     let numWorkers = Math.floor(itemsCount / job.data.maxTasksRule);
     let numTasksPerWorker = managers.task.getEstimatedTasksPerWorkerCount(job);
@@ -121,6 +129,10 @@ const getEstimatedCost = (exports.getEstimatedCost = async job => {
         }
       );
     }
-    return { total, details };
+    return {
+      total,
+      totalWorkers: details.reduce((s, d) => s + d.numWorkers, 0),
+      details
+    };
   }
 });

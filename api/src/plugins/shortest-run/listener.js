@@ -48,18 +48,18 @@ exports.onJobCreated = async job => {
  */
 exports.onJobReviewDone = async job => {
   try {
+    if (job.data.shortestRun.state === ShortestRunStates.BASELINE_GENERATED) {
+      job = await manager.estimateParameters(job);
+    } else if (
+      job.data.shortestRun.state === ShortestRunStates.FILTERS_ASSIGNED
+    ) {
+      job = await manager.updateAndClassify(job);
+    }
     let isDone = await manager.isDone(job);
+
     if (isDone) {
       job.data.shortestRun.state = ShortestRunStates.DONE;
     } else {
-      if (job.data.shortestRun.state === ShortestRunStates.BASELINE_GENERATED) {
-        job = await manager.estimateParameters(job);
-      } else if (
-        job.data.shortestRun.state === ShortestRunStates.FILTERS_ASSIGNED
-      ) {
-        job = await manager.updateAndClassify(job);
-      }
-
       job.data.status = JobStatus.NOT_PUBLISHED;
       job.data.end = undefined;
 

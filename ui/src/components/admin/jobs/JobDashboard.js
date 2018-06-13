@@ -70,6 +70,7 @@ class JobDashboard extends React.Component {
 
   renderJobInformation() {
     const {item} = this.props;
+    const criteria = item.criteria || [];
 
     return (
       <Segment loading={this.props.loading}>
@@ -108,7 +109,7 @@ class JobDashboard extends React.Component {
                 <List.Item>
                   <List.Content>
                     <List.Header as="h4">Number of filters</List.Header>
-                    <List.Description as="p">{item.criteria.length}</List.Description>
+                    <List.Description as="p">{criteria && criteria.length}</List.Description>
                   </List.Content>
                 </List.Item>
               </List>

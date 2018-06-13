@@ -81,7 +81,8 @@ const publishJob = (action$, store) =>
       .mergeMap(response =>
         Observable.concat(
           Observable.of(toastActions.show({message: 'Published!', type: ToastTypes.SUCCESS})),
-          Observable.of(actions.publishSuccess(response.data))
+          Observable.of(actions.publishSuccess(response.data)),
+          Observable.of(actions.fetchItem(item.id))
         )
       )
       .catch(error => {
@@ -106,7 +107,12 @@ const pollJobState = (action$, store) =>
       Observable.of(actions.fetchJobState(action.id)),
       Observable.interval(config.polling.jobState)
         .takeUntil(action$.ofType(actionTypes.FETCH_JOB_STATE_POLLED_DONE))
-        .mergeMap(() => Observable.of(actions.fetchJobState(action.id)))
+        .mergeMap(() => {
+          return Observable.concat(
+            Observable.of(actions.fetchJobState(action.id)),
+            Observable.of(actions.fetchItem(action.id))
+          );
+        })
     );
   });
 

@@ -61,7 +61,7 @@ class JobForm extends React.Component {
               <Step active={this.state.activeStep === 'criteria'} onClick={() => this.setStep('criteria')}>
                 <Icon name="filter" />
                 <Step.Content>
-                  <Step.Title>Criteria knowledge</Step.Title>
+                  <Step.Title>Filters knowledge</Step.Title>
                 </Step.Content>
               </Step>
             </Step.Group>
@@ -226,13 +226,13 @@ class JobForm extends React.Component {
     return (
       <Segment>
         <Dimmer active={item.criteriaLoading} inverted>
-          <Loader>Loading criteria from CSV...</Loader>
+          <Loader>Loading filters from CSV...</Loader>
         </Dimmer>
-        <Header as="h3">Criteria</Header>
+        <Header as="h3">Filters</Header>
         <Form.Field>
           <Radio
             disabled={(criteria && criteria.length === 1) || true}
-            label="Ask to each worker multiple criteria"
+            label="Ask to each worker multiple filters"
             name="data.multipleCriteria"
             value={1}
             checked={item.data.multipleCriteria}
@@ -255,7 +255,7 @@ class JobForm extends React.Component {
 
         <Form.Field>
           <Radio
-            label="Ask to each worker one criterion only"
+            label="Ask to each worker one filter only"
             name="data.multipleCriteria"
             value={0}
             checked={!item.data.multipleCriteria}
@@ -265,7 +265,7 @@ class JobForm extends React.Component {
 
         <Form.Field style={{marginTop: '2em', marginBottom: '2em'}}>
           <Checkbox
-            label="Assist me in criteria quality analysis"
+            label="Assist me in filter quality analysis"
             name="data.criteriaQualityAnalysis"
             checked={item.data.criteriaQualityAnalysis}
             onChange={(e, {name, value}) => this.handleChange(e, {name, value: !item.data.criteriaQualityAnalysis})}
@@ -324,7 +324,7 @@ class JobForm extends React.Component {
               onChange={this.handleChange}
               min="0"
               max="100"
-              placeholder="% of papers you think would meet the criteria"
+              placeholder="% of papers you think would meet the filter"
             />
           </Grid.Column>
         </Grid.Row>
@@ -338,7 +338,7 @@ class JobForm extends React.Component {
               onChange={this.handleChange}
               min="0"
               max="100"
-              placeholder="% of papers you think would meet the criteria"
+              placeholder="% of papers you think would meet the filter"
             />
           </Grid.Column>
         </Grid.Row>
@@ -352,7 +352,7 @@ class JobForm extends React.Component {
               onChange={this.handleChange}
               min="0"
               max="100"
-              placeholder="% of papers you think would meet the criteria"
+              placeholder="% of papers you think would meet the filter"
             />
           </Grid.Column>
         </Grid.Row>

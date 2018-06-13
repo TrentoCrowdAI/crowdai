@@ -242,6 +242,8 @@ const copy = (exports.copy = async id => {
     delete copy.id;
     delete copy.uuid;
     delete copy.data.hit;
+    delete copy.data.end;
+    delete copy.data.start;
     let createdCopy = await create(copy);
     return createdCopy;
   } catch (error) {

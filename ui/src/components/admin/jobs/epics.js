@@ -77,11 +77,13 @@ const publishJob = (action$, store) =>
   action$.ofType(actionTypes.PUBLISH_JOB).switchMap(action => {
     const {item} = store.getState().job.form;
     const config = {timeout: 10000};
+    actions.pollJobStateDone();
     return Observable.defer(() => requestersApi.post(`jobs/${item.id}/publish`, {}, config))
       .mergeMap(response =>
         Observable.concat(
           Observable.of(toastActions.show({message: 'Published!', type: ToastTypes.SUCCESS})),
-          Observable.of(actions.publishSuccess(response.data))
+          Observable.of(actions.publishSuccess(response.data)),
+          Observable.of(actions.pollJobState(item.id))
         )
       )
       .catch(error => {

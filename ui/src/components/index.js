@@ -8,7 +8,7 @@ import loginEpics from 'src/components/admin/login/epics';
 import jobEpics from 'src/components/admin/jobs/epics';
 import profileEpics from 'src/components/admin/profile/epics';
 import toastEpics from 'src/components/core/toast/epics';
-import shortestRunEpics from 'src/components/admin/shortest-run/shortest-run-epics';
+import shortestRunEpics from 'src/components/admin/plugins/shortest-run/shortest-run-epics';
 
 // reducers
 import questionForm from 'src/components/question-form/reducer';

@@ -49,9 +49,7 @@ program
     job.data.status = JobStatus.NOT_PUBLISHED;
 
     if (job.data.shortestRun) {
-      job.data.shortestRun = {
-        state: ShortestRunStates.INITIAL
-      };
+      job.data.shortestRun.state = ShortestRunStates.INITIAL;
     }
     await db.query('delete from result where job_id = $1', [job.id]);
     await db.query('delete from task where job_id = $1', [job.id]);

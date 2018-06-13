@@ -29,9 +29,8 @@ const STOP_SCORE = 30;
  * the baseline round.
  *
  * @param {Number} jobId
- * @param {Number} size
  */
-const generateBaseline = (exports.generateBaseline = async (jobId, size) => {
+const generateBaseline = (exports.generateBaseline = async jobId => {
   if (!jobId) {
     throw Boom.badRequest('The job ID is required');
   }
@@ -42,7 +41,7 @@ const generateBaseline = (exports.generateBaseline = async (jobId, size) => {
   const url = `${managers.task.getUrl(taskAssignmentApi)}/generate-baseround`;
   const payload = {
     jobId,
-    size
+    size: job.data.shortestRun.baselineSize
   };
   let response = await new Promise((resolve, reject) => {
     request(
@@ -267,7 +266,7 @@ const estimateParameters = (exports.estimateParameters = async job => {
  *
  * @param {Object} job
  * @return {Object} The estimated cost. Zero means estimation is not yet possible. Format
- *                  {total: <number>, details: [{criteria: <number>, numWorkers: <number>, totalTasksPerWorker: <number>, cost: <number>}]}
+ *                  {total: <number>, totalWorkers: <number>, details: [{criteria: <number>, numWorkers: <number>, totalTasksPerWorker: <number>, cost: <number>}]}
  */
 const getEstimatedCost = (exports.getEstimatedCost = async job => {
   const { shortestRun } = job.data;
@@ -371,7 +370,11 @@ const getEstimatedCost = (exports.getEstimatedCost = async job => {
         });
       }
     }
-    return { total: cost, details };
+    return {
+      total: cost,
+      totalWorkers: details.reduce((s, d) => s + d.numWorkers, 0),
+      details
+    };
   }
   return { total: 0 };
 });

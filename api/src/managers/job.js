@@ -1,5 +1,4 @@
 const Boom = require('boom');
-const CronJob = require('cron').CronJob;
 const moment = require('moment');
 
 const delegates = require(__base + 'delegates');
@@ -11,6 +10,7 @@ const config = require(__base + 'config');
 const { JobStatus } = require(__base + 'utils/constants');
 const { EventTypes } = require(__base + 'events/types');
 const { emit } = require(__base + 'events/emitter');
+const { coordinator } = require(__base + 'plugins');
 
 /**
  * Returns a task for the worker.
@@ -270,7 +270,8 @@ const publish = (exports.publish = async id => {
     job.data.hit = { ...hit };
     job.data.instructions = instructions;
     emit(EventTypes.job.START_CRON_FOR_HIT, job, hit.HITId, mt);
-    return await delegates.jobs.update(id, job);
+    await delegates.jobs.update(id, job);
+    return await getJobWithRelations(id);
   } catch (error) {
     console.error(error);
     throw Boom.badImplementation('Error while trying to publish the job');
@@ -661,6 +662,34 @@ const updateExpirationForHIT = (exports.updateExpirationForHIT = async (
 });
 
 /**
+ * Returns the job and:
+ *  - criteria list
+ *  - estimatedCost
+ *  - task assignment strategy
+ *  - itemsCount
+ *
+ * @param {Number} jobId
+ */
+const getJobWithRelations = (exports.getJobWithRelations = async jobId => {
+  if (!jobId) {
+    throw Boom.badRequest('The jobId is required');
+  }
+  let job = await delegates.jobs.getById(jobId);
+
+  if (!job) {
+    throw Boom.badRequest(`The job with ID=${jobId} does not exist`);
+  }
+  let criteria = await delegates.projects.getCriteria(job.project_id);
+  job.criteria = criteria.rows;
+  job.estimatedCost = await coordinator.getEstimatedCost(job);
+  job.taskAssignmentStrategy = await delegates.taskAssignmentApi.getById(
+    job.data.taskAssignmentStrategy
+  );
+  job.itemsCount = await delegates.projects.getItemsCount(job.project_id);
+  return job;
+});
+
+/**
  * Check if the /next-task service (Task Assignment API) is done, meaning that all
  * the (item, filter) tuples have votes.
  *
@@ -686,7 +715,8 @@ const finishJob = async job => {
 
 /**
  * Computes the max number of assignments (max number of workers) based on the
- * parameters configuration.
+ * parameters configuration. It delegates the computation to the task assignment
+ * strategy's manager.
  *
  * @param {Object} job
  * @return {Number}
@@ -695,12 +725,8 @@ const computeMaxAssignments = async job => {
   if (job.data.hitConfig.maxAssignments > 0) {
     return job.data.hitConfig.maxAssignments;
   }
-  const itemsCount = await delegates.projects.getItemsCount(job.project_id);
-  const criteriaCount = await delegates.projects.getCriteriaCount(
-    job.project_id
-  );
-  const totalCount = itemsCount * criteriaCount * job.data.votesPerTaskRule;
-  let maxAssignments = Math.ceil(totalCount / job.data.maxTasksRule);
+  let costSummary = await coordinator.getEstimatedCost(job);
+  const maxAssignments = costSummary.totalWorkers;
 
   if (maxAssignments < 10) {
     console.warn(

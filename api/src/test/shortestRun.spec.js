@@ -35,7 +35,10 @@ describe('Shortest Run workflow', () => {
     );
     job = await testHelpers.createJob(setup.itemsCount, setup.filtersCount, {
       ...setup.job,
-      taskAssignmentStrategy: taskAssignmentApi.id
+      taskAssignmentStrategy: taskAssignmentApi.id,
+      shortestRun: {
+        baselineSize: 20
+      }
     });
   });
 
@@ -52,7 +55,7 @@ describe('Shortest Run workflow', () => {
   test('Initialize baseline round', async () => {
     const response = await request(app.callback())
       .post(`${requesterApi}/shortest-run/generate-baseline`)
-      .send({ jobId: job.id, size: 20 });
+      .send({ jobId: job.id });
     expect(response.status).toBe(200);
     expect(response.body.message).toBe('generated');
   });

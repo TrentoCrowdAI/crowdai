@@ -165,6 +165,7 @@ describe('manager.getEstimatedCost', () => {
       let cost = await shortestRunManager.getEstimatedCost(job);
       expect(cost.total.toFixed(2)).toBe(s.cost);
       expect(cost.details).toBeDefined();
+      expect(cost.totalWorkers).toBeDefined();
     });
   }
 });

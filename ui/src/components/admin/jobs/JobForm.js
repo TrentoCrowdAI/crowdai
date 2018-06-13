@@ -20,20 +20,16 @@ import validUrl from 'valid-url';
 
 import {actions} from './actions';
 import FormContainer from 'src/components/core/form/FormContainer';
-import {
-  FileFormats,
-  CrowdsourcingStrategies,
-  AbstractPresentationTechniques,
-  LabelOptions,
-  JobStatus
-} from 'src/utils/constants';
+import {FileFormats, AbstractPresentationTechniques, LabelOptions, JobStatus} from 'src/utils/constants';
+import {isExpertMode} from 'src/utils';
+import JobFormPlugin from './JobFormPlugin';
+import NumberInput from 'src/components/core/form/NumberInput';
 
 class JobForm extends React.Component {
   constructor(props) {
     super(props);
     this.handleChange = this.handleChange.bind(this);
     this.state = {
-      expertMode: true,
       activeStep: 'info'
     };
   }
@@ -65,7 +61,7 @@ class JobForm extends React.Component {
               <Step active={this.state.activeStep === 'criteria'} onClick={() => this.setStep('criteria')}>
                 <Icon name="filter" />
                 <Step.Content>
-                  <Step.Title>Criteria knowledge</Step.Title>
+                  <Step.Title>Filters knowledge</Step.Title>
                 </Step.Content>
               </Step>
             </Step.Group>
@@ -114,6 +110,15 @@ class JobForm extends React.Component {
               required
             />
           </Form.Group>
+          <Form.Group widths="equal">
+            <Form.Input
+              label="Internal name"
+              name="data.internalName"
+              value={item.data.internalName}
+              placeholder="An internal codename for the job."
+              onChange={this.handleChange}
+            />
+          </Form.Group>
           <Form.TextArea
             label="Description"
             name="data.description"
@@ -130,6 +135,7 @@ class JobForm extends React.Component {
               value={item.data.consentUrl}
               placeholder="URL to consent file"
               onChange={this.handleChange}
+              data-is-url
               required
             />
 
@@ -167,7 +173,7 @@ class JobForm extends React.Component {
             />
           </Form.Group>
 
-          {this.state.expertMode && (
+          {isExpertMode(this.props.profile) && (
             <Form.Select
               label="Task assignment strategy"
               placeholder="Task assignment strategy"
@@ -182,6 +188,7 @@ class JobForm extends React.Component {
 
         {this.renderParametersSection()}
         {this.renderHitSection()}
+        <JobFormPlugin job={item} strategies={taskAssignmentStrategies} />
       </React.Fragment>
     );
   }
@@ -198,6 +205,7 @@ class JobForm extends React.Component {
             value={item.data.itemsUrl}
             placeholder="URL to items CSV file"
             onChange={this.handleChange}
+            data-is-url
             required
           />
           <Form.Input
@@ -206,6 +214,7 @@ class JobForm extends React.Component {
             value={item.data.filtersUrl}
             placeholder="URL to filters CSV file"
             onChange={this.handleChange}
+            data-is-url
             required
           />
 
@@ -215,6 +224,7 @@ class JobForm extends React.Component {
             value={item.data.testsUrl}
             placeholder="URL to tests CSV file"
             onChange={this.handleChange}
+            data-is-url
             required
           />
         </Form.Group>
@@ -229,13 +239,13 @@ class JobForm extends React.Component {
     return (
       <Segment>
         <Dimmer active={item.criteriaLoading} inverted>
-          <Loader>Loading criteria from CSV...</Loader>
+          <Loader>Loading filters from CSV...</Loader>
         </Dimmer>
-        <Header as="h3">Criteria</Header>
+        <Header as="h3">Filters</Header>
         <Form.Field>
           <Radio
             disabled={(criteria && criteria.length === 1) || true}
-            label="Ask to each worker multiple criteria"
+            label="Ask to each worker multiple filters"
             name="data.multipleCriteria"
             value={1}
             checked={item.data.multipleCriteria}
@@ -258,7 +268,7 @@ class JobForm extends React.Component {
 
         <Form.Field>
           <Radio
-            label="Ask to each worker one criterion only"
+            label="Ask to each worker one filter only"
             name="data.multipleCriteria"
             value={0}
             checked={!item.data.multipleCriteria}
@@ -268,7 +278,7 @@ class JobForm extends React.Component {
 
         <Form.Field style={{marginTop: '2em', marginBottom: '2em'}}>
           <Checkbox
-            label="Assist me in criteria quality analysis"
+            label="Assist me in filter quality analysis"
             name="data.criteriaQualityAnalysis"
             checked={item.data.criteriaQualityAnalysis}
             onChange={(e, {name, value}) => this.handleChange(e, {name, value: !item.data.criteriaQualityAnalysis})}
@@ -292,6 +302,7 @@ class JobForm extends React.Component {
                     value={item.data.instructions[label] ? item.data.instructions[label].taskInstructionsUrl : ''}
                     placeholder="URL to file"
                     onChange={this.handleChange}
+                    data-is-url
                     required
                   />
 
@@ -319,7 +330,7 @@ class JobForm extends React.Component {
       <Grid columns="1">
         <Grid.Row>
           <Grid.Column>
-            <Form.Input
+            <NumberInput
               type="number"
               label="(C1) Are technology and/or technological solutions involved?"
               name="c1"
@@ -327,13 +338,13 @@ class JobForm extends React.Component {
               onChange={this.handleChange}
               min="0"
               max="100"
-              placeholder="% of papers you think would meet the criteria"
+              placeholder="% of papers you think would meet the filter"
             />
           </Grid.Column>
         </Grid.Row>
         <Grid.Row>
           <Grid.Column>
-            <Form.Input
+            <NumberInput
               type="number"
               label="(C2) Are the elderly involved?"
               name="c2"
@@ -341,13 +352,13 @@ class JobForm extends React.Component {
               onChange={this.handleChange}
               min="0"
               max="100"
-              placeholder="% of papers you think would meet the criteria"
+              placeholder="% of papers you think would meet the filter"
             />
           </Grid.Column>
         </Grid.Row>
         <Grid.Row>
           <Grid.Column>
-            <Form.Input
+            <NumberInput
               type="number"
               label="(C3) Is it related to loneliness, social isolation, or social connectedness reason?"
               name="c3"
@@ -355,7 +366,7 @@ class JobForm extends React.Component {
               onChange={this.handleChange}
               min="0"
               max="100"
-              placeholder="% of papers you think would meet the criteria"
+              placeholder="% of papers you think would meet the filter"
             />
           </Grid.Column>
         </Grid.Row>
@@ -366,24 +377,23 @@ class JobForm extends React.Component {
   renderParametersSection() {
     const {item} = this.props;
 
-    if (!this.state.expertMode) {
+    if (!isExpertMode(this.props.profile)) {
       return;
     }
     return (
       <Segment>
         <Header as="h3">Parameters</Header>
         <Form.Group widths="equal">
-          <Form.Input
+          <NumberInput
             label="Max. #tasks per worker"
             name="data.maxTasksRule"
             value={item.data.maxTasksRule}
             onChange={this.handleChange}
-            type="number"
             min="1"
             required
           />
 
-          <Form.Input
+          <NumberInput
             label="Min. #tasks per worker"
             name="data.minTasksRule"
             value={item.data.minTasksRule}
@@ -393,7 +403,7 @@ class JobForm extends React.Component {
             required
           />
 
-          <Form.Input
+          <NumberInput
             label="#Votes per task"
             name="data.votesPerTaskRule"
             value={item.data.votesPerTaskRule}
@@ -403,7 +413,7 @@ class JobForm extends React.Component {
             required
           />
 
-          <Form.Input
+          <NumberInput
             label="Task reward (in USD)"
             name="data.taskRewardRule"
             value={item.data.taskRewardRule}
@@ -416,7 +426,7 @@ class JobForm extends React.Component {
         </Form.Group>
 
         <Form.Group widths="equal">
-          <Form.Input
+          <NumberInput
             width={4}
             label="Test frequency"
             name="data.testFrequencyRule"
@@ -426,7 +436,7 @@ class JobForm extends React.Component {
             min="1"
             required
           />
-          <Form.Input
+          <NumberInput
             width={2}
             label="Initial tests"
             name="data.initialTestsRule"
@@ -437,7 +447,7 @@ class JobForm extends React.Component {
             required
           />
 
-          <Form.Input
+          <NumberInput
             width={4}
             label="Initial Tests min score (%)"
             name="data.initialTestsMinCorrectAnswersRule"
@@ -449,7 +459,7 @@ class JobForm extends React.Component {
             required
           />
 
-          <Form.Input
+          <NumberInput
             width={4}
             label="Expert cost (in USD)"
             name="data.expertCostRule"
@@ -520,16 +530,21 @@ class JobForm extends React.Component {
     }
   }
 
-  handleChange(e, {type, name, value}) {
-    if (name === 'data.filtersUrl') {
-      this.props.setInputValue('data.instructions', {});
-      this.props.setInputValue('criteria', []);
+  handleChange(e, {name, value, 'data-is-url': dataIsUrl}) {
+    // key is data-is-url but we just map it to dataIsUrl
+    if (dataIsUrl) {
+      value = value.trim();
 
-      if (value.length > 0 && validUrl.isWebUri(value)) {
-        this.props.fetchFiltersCSV(value);
+      if (name === 'data.filtersUrl') {
+        this.props.setInputValue('data.instructions', {});
+        this.props.setInputValue('criteria', []);
+
+        if (validUrl.isWebUri(value)) {
+          this.props.fetchFiltersCSV(value);
+        }
       }
     }
-    this.props.setInputValue(name, type === 'number' ? Number(value) : value);
+    this.props.setInputValue(name, value);
   }
 
   setStep(activeStep) {
@@ -553,7 +568,8 @@ JobForm.propTypes = {
   fetchItem: PropTypes.func,
   fetchFiltersCSV: PropTypes.func,
   taskAssignmentStrategies: PropTypes.arrayOf(PropTypes.object),
-  fetchTaskAssignmentStrategies: PropTypes.func
+  fetchTaskAssignmentStrategies: PropTypes.func,
+  profile: PropTypes.object
 };
 
 const mapStateToProps = state => ({
@@ -561,7 +577,8 @@ const mapStateToProps = state => ({
   loading: state.job.form.loading,
   error: state.job.form.error,
   saved: state.job.form.saved,
-  taskAssignmentStrategies: state.job.taskAssignmentStrategies.strategies
+  taskAssignmentStrategies: state.job.taskAssignmentStrategies.strategies,
+  profile: state.profile.item
 });
 
 const mapDispatchToProps = dispatch => ({

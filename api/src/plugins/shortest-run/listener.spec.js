@@ -28,7 +28,10 @@ describe('testing Shortest Run listener', async () => {
       data: {
         itemsUrl: 'http://items',
         testsUrl: 'http://tests',
-        taskAssignmentStrategy: taskAssignmentApi.id
+        taskAssignmentStrategy: taskAssignmentApi.id,
+        shortestRun: {
+          baselineSize: 20
+        }
       },
       criteria: [{ label: 'C1', description: 'a filter' }]
     });

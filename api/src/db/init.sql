@@ -217,6 +217,43 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+-- ShortestRun specific: computes the number of votes (or pending) for the given item, criterion and step.
+CREATE OR REPLACE FUNCTION compute_item_entries_step(
+	p_job_id bigint, 
+	p_item_id bigint, 
+	p_criteria_id bigint,
+  p_step int
+) RETURNS int AS $$
+DECLARE v_entries int;
+DECLARE v_item_in_baseline bigint;
+DECLARE v_criteria_filter text;
+DECLARE v_max_votes int;
+BEGIN
+	v_criteria_filter := '{"criteria" : [{"id": "'||p_criteria_id||'"}]}';
+    select count(t.*) into v_entries from task t
+    join backlog b on (t.item_id = b.item_id)
+      where t.job_id = p_job_id
+        and t.item_id = p_item_id
+        and t.data @> v_criteria_filter::jsonb
+        and b.job_id = p_job_id
+        and b.criterion_id = p_criteria_id
+				and b.step = p_step
+        and t.deleted_at is null;
+		
+		-- we check if item was part of baseline round, so that we can substract max_votes from the count
+		select (data ->> 'votesPerTaskRule')::int into v_max_votes from job where id = p_job_id;
+		
+		select id into v_item_in_baseline from backlog 
+			where item_id = p_item_id
+				and criterion_id = p_criteria_id
+				and step = 0;
+		
+		IF v_item_in_baseline is not null THEN
+			v_entries = v_entries - v_max_votes;
+		END IF;
+    RETURN v_entries;
+END;
+$$ LANGUAGE plpgsql;
 
 -- this tables stores the screening results
 -- data: {

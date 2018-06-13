@@ -52,6 +52,11 @@ const RegisteredTaskAssignmentStrategies = {
   BASELINE: 'Baseline'
 };
 
+const UserModes = {
+  Author: 'Author',
+  Researcher: 'Researcher'
+};
+
 export {
   scopes,
   FileFormats,
@@ -60,5 +65,6 @@ export {
   LabelOptions,
   AggregationStrategies,
   ShortestRunStatus,
-  RegisteredTaskAssignmentStrategies
+  RegisteredTaskAssignmentStrategies,
+  UserModes
 };

@@ -5,16 +5,13 @@ import {connect} from 'react-redux';
 
 import {JobStatus, RegisteredTaskAssignmentStrategies} from 'src/utils/constants';
 import {actions} from './actions';
-import JobDashboardButtonsShortestRun from 'src/components/admin/shortest-run/JobDashboardButtonsShortestRun';
+import JobDashboardButtonsShortestRun from 'src/components/admin/plugins/shortest-run/JobDashboardButtonsShortestRun';
 import EstimatedCostDetails from './EstimatedCostDetails';
+import {isExpertMode} from 'src/utils';
 
 class JobDashboardButtons extends React.Component {
   constructor(props) {
     super(props);
-    // TODO: remove this after implementing #89
-    this.state = {
-      expertMode: true
-    };
   }
   render() {
     const {taskAssignmentStrategy} = this.props.job;
@@ -26,10 +23,10 @@ class JobDashboardButtons extends React.Component {
       <Grid.Row>
         <Grid.Column>
           {taskAssignmentStrategy.name === RegisteredTaskAssignmentStrategies.SHORTEST_RUN && (
-            <JobDashboardButtonsShortestRun {...this.props} expertMode={this.state.expertMode} />
+            <JobDashboardButtonsShortestRun {...this.props} />
           )}
           {taskAssignmentStrategy.name === RegisteredTaskAssignmentStrategies.BASELINE && (
-            <SimpleTaskAssignmentStrategyButtons {...this.props} expertMode={this.state.expertMode} />
+            <SimpleTaskAssignmentStrategyButtons {...this.props} />
           )}
         </Grid.Column>
       </Grid.Row>
@@ -83,8 +80,8 @@ PublishButton.propTypes = {
   job: PropTypes.object
 };
 
-const StopButton = ({jobState}) => {
-  if (jobState.job === JobStatus.PUBLISHED) {
+const StopButton = ({job}) => {
+  if (job.data.status === JobStatus.PUBLISHED) {
     return (
       <Button floated="right" size="large" negative>
         Stop
@@ -94,11 +91,11 @@ const StopButton = ({jobState}) => {
   return null;
 };
 StopButton.propTypes = {
-  jobState: PropTypes.object
+  job: PropTypes.object
 };
 
-const UpdateParametersButton = ({expertMode, jobState}) => {
-  if (expertMode && jobState.job !== JobStatus.DONE) {
+const UpdateParametersButton = ({job, profile}) => {
+  if (isExpertMode(profile) && job.data.status === JobStatus.NOT_PUBLISHED) {
     return (
       <Button floated="right" size="large" style={{width: '200px'}}>
         Update parameters
@@ -108,9 +105,8 @@ const UpdateParametersButton = ({expertMode, jobState}) => {
   return null;
 };
 UpdateParametersButton.propTypes = {
-  jobState: PropTypes.object,
-  // TODO: remove this after implementing #89
-  expertMode: PropTypes.bool
+  job: PropTypes.object,
+  profile: PropTypes.object
 };
 
 /**
@@ -128,7 +124,9 @@ JobDashboardButtons.propTypes = {
   job: PropTypes.object
 };
 
-const mapStateToProps = state => ({});
+const mapStateToProps = state => ({
+  profile: state.profile.item
+});
 
 const mapDispatchToProps = dispatch => ({
   publish: () => dispatch(actions.publish())

@@ -37,8 +37,7 @@ const generateBaseline = (action$, store) =>
   action$.ofType(actionTypes.GENERATE_BASELINE).switchMap(action => {
     return Observable.concat(
       Observable.of(jobActions.setLoading(true)),
-      // TODO: add size as a parameter of JobForm when task assignment is SR
-      Observable.defer(() => requestersApi.post('shortest-run/generate-baseline', {jobId: action.jobId, size: 10}))
+      Observable.defer(() => requestersApi.post('shortest-run/generate-baseline', {jobId: action.jobId}))
         .mergeMap(response =>
           Observable.concat(
             Observable.of(jobActions.setLoading(false)),

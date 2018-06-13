@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import {Container, Form, Button, Grid, Message} from 'semantic-ui-react';
 
 import {actions} from './actions';
+import {UserModes} from 'src/utils/constants';
 
 class Profile extends React.Component {
   constructor(props) {
@@ -41,20 +42,19 @@ class Profile extends React.Component {
                   placeholder="Amazon Secret Access Key"
                   type="password"
                   onChange={this.handleChange}
-                  required
+                  required={!profile.updated_at}
                 />
 
-                <Form.Input label="Email" value={profile.data.email} readOnly />
                 <Form.Input label="Name" value={profile.data.name} readOnly />
+                <Form.Input label="Email" value={profile.data.email} readOnly />
 
-                {this.props.error && (
-                  <Message
-                    error
-                    header="Error"
-                    content={this.props.error.message || 'Changes not saved. Please try again.'}
-                  />
-                )}
-                {this.props.saved && <Message success header="Success" content="Profile saved!" />}
+                <Form.Select
+                  label="User mode"
+                  name={'data.userMode'}
+                  value={profile.data.userMode}
+                  options={Object.entries(UserModes).map(([k, v]) => ({text: v, value: k}))}
+                  onChange={this.handleChange}
+                />
                 <Button floated="right" positive onClick={() => this.doSubmit()}>
                   Save
                 </Button>

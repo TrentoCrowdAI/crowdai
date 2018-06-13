@@ -22,11 +22,14 @@ class JobDashboardButtonsShortestRun extends React.Component {
 }
 
 const RunButton = ({job, jobState, publish, assignFilters, generateBaseline}) => {
-  if (canPublish(jobState)) {
+  if (canPublish(job, jobState)) {
     return <PublishButton job={job} jobState={jobState} publish={publish} />;
   }
 
-  if (jobState.taskAssignmentApi === ShortestRunStatus.ASSIGN_FILTERS) {
+  if (
+    jobState.taskAssignmentApi === ShortestRunStatus.ASSIGN_FILTERS ||
+    jobState.taskAssignmentApi === ShortestRunStatus.UPDATED
+  ) {
     return (
       <Button onClick={() => assignFilters(job.id)} floated="right" size="large" positive>
         Run: assign filters
@@ -55,16 +58,17 @@ RunButton.propTypes = {
 /**
  * This method checks if we can publish to AMT, and it adds conditions specific to ShortestRun.
  *
+ * @param {Object} job
  * @param {Object} state
  * @return {Boolean}
  */
-const canPublish = state => {
+const canPublish = (job, state) => {
   if (!state.taskAssignmentApi) {
-    return state.job === JobStatus.NOT_PUBLISHED;
+    return job.data.status === JobStatus.NOT_PUBLISHED;
   }
   // for shortest run
   return (
-    state.job === JobStatus.NOT_PUBLISHED &&
+    job.data.status === JobStatus.NOT_PUBLISHED &&
     (state.taskAssignmentApi === ShortestRunStatus.FILTERS_ASSIGNED ||
       state.taskAssignmentApi === ShortestRunStatus.BASELINE_GENERATED)
   );
@@ -73,11 +77,12 @@ const canPublish = state => {
 JobDashboardButtonsShortestRun.propTypes = {
   jobState: PropTypes.object,
   job: PropTypes.object,
-  expertMode: PropTypes.bool,
   publish: PropTypes.func
 };
 
-const mapStateToProps = state => ({});
+const mapStateToProps = state => ({
+  profile: state.profile.item
+});
 
 const mapDispatchToProps = dispatch => ({
   assignFilters: jobId => dispatch(srActions.assignFilters(jobId)),

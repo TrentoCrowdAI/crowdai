@@ -135,6 +135,7 @@ class JobForm extends React.Component {
               value={item.data.consentUrl}
               placeholder="URL to consent file"
               onChange={this.handleChange}
+              data-is-url
               required
             />
 
@@ -204,6 +205,7 @@ class JobForm extends React.Component {
             value={item.data.itemsUrl}
             placeholder="URL to items CSV file"
             onChange={this.handleChange}
+            data-is-url
             required
           />
           <Form.Input
@@ -212,6 +214,7 @@ class JobForm extends React.Component {
             value={item.data.filtersUrl}
             placeholder="URL to filters CSV file"
             onChange={this.handleChange}
+            data-is-url
             required
           />
 
@@ -221,6 +224,7 @@ class JobForm extends React.Component {
             value={item.data.testsUrl}
             placeholder="URL to tests CSV file"
             onChange={this.handleChange}
+            data-is-url
             required
           />
         </Form.Group>
@@ -298,6 +302,7 @@ class JobForm extends React.Component {
                     value={item.data.instructions[label] ? item.data.instructions[label].taskInstructionsUrl : ''}
                     placeholder="URL to file"
                     onChange={this.handleChange}
+                    data-is-url
                     required
                   />
 
@@ -525,13 +530,18 @@ class JobForm extends React.Component {
     }
   }
 
-  handleChange(e, {name, value}) {
-    if (name === 'data.filtersUrl') {
-      this.props.setInputValue('data.instructions', {});
-      this.props.setInputValue('criteria', []);
+  handleChange(e, {name, value, 'data-is-url': dataIsUrl}) {
+    // key is data-is-url but we just map it to dataIsUrl
+    if (dataIsUrl) {
+      value = value.trim();
 
-      if (value.length > 0 && validUrl.isWebUri(value)) {
-        this.props.fetchFiltersCSV(value);
+      if (name === 'data.filtersUrl') {
+        this.props.setInputValue('data.instructions', {});
+        this.props.setInputValue('criteria', []);
+
+        if (validUrl.isWebUri(value)) {
+          this.props.fetchFiltersCSV(value);
+        }
       }
     }
     this.props.setInputValue(name, value);

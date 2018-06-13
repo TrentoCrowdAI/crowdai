@@ -20,3 +20,9 @@
   .label {
    font-weight: 600;
   }
+
+  .zoom {
+    cursor: move;
+    fill: none;
+    pointer-events: all;
+  }

@@ -57,14 +57,21 @@ class MetricMenu extends React.Component {
 				Correlation Metrics: 
 				<br />
 				<Button 
-					value='Correlations'
+					value='TwoWorkers'
 					className='metrics'
 					style={{marginBottom: '5px'}}
 					onClick={this.props.onChange}
-				>Correlation Metrics</Button>	
+				>Worker Worker Metrics</Button>	
 				<br />
 				<Button 
-					value='m2'
+					value='SingleWorker'
+					className='metrics'
+					style={{marginBottom: '5px'}}
+					onClick={this.props.onChange}
+				>Single Worker Metrics</Button>	
+				<br />
+				<Button 
+					value='M2'
 					className='metrics' 
 					style={{marginBottom: '5px'}}
 					onClick={this.props.onChange}

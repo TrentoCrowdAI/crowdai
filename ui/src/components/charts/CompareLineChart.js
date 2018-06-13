@@ -4,7 +4,7 @@ import * as d3 from 'd3'
 import {connect} from 'react-redux'
 
 
-class LineMetricChart extends React.Component {
+class CompareLineChart extends React.Component {
   constructor(props) {
     super(props);
     this.buildGraph = this.buildGraph.bind(this);
@@ -27,21 +27,28 @@ class LineMetricChart extends React.Component {
 
   buildGraph() {
     var svg = d3.select("."+this.props.selector);
+
+    var zoom = d3.zoom()
+      .on("zoom", zoomFunction)
+
     var margin = {top: 30, right: 30, bottom: 30, left: 30};
     var width = +svg.attr("width") - margin.left - margin.right;
     var height = +svg.attr("height") - margin.top - margin.bottom;
-    var g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+    var g = svg.append("g")
+      .attr("class","innerspace")
+      .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+      .call(zoom)
+    
     var color = this.props.color
-
     var x = this.props.x
     var y = this.props.y
     var z = this.props.z
-        
     var data = this.props.data.sort( (a,b) => a[y]<b[y] ? 1 : a[y]>b[y] ? -1 : 0 )
     
-    var xscale = d3.scaleOrdinal()
+    var xscale = d3.scaleBand()
         .domain( data.map(d => d[x[0]]+", "+d[x[1]]) )
-        .range(data.map( (d,i) => i*(width/data.length)))
+        .range([0,width])
+        //.range(data.map( (d,i) => i*(width/data.length)))
     var xAxis = d3.axisBottom(xscale)
       .tickFormat("")
 
@@ -63,7 +70,7 @@ class LineMetricChart extends React.Component {
 
     var toolval = tooltip.append('div')
 
-    g.append("g")
+    var gx = g.append("g")
        .attr("class","x axis")
        .attr("transform","translate(0,"+height+")")
        .call(xAxis)
@@ -73,11 +80,11 @@ class LineMetricChart extends React.Component {
           .attr("dy","-.5em")
           .attr("transform","rotate(-65)")
 
-    g.append("g")
+    var gy = g.append("g")
        .attr("class","y axis")
        .call(yAxis)
 
-    var line = d3.line()
+    var line1 = d3.line()
         .x( d => xscale(d[x[0]]+", "+d[x[1]]) )
         .y( d => yscale(d[y]) )
         .curve(d3.curveMonotoneX);
@@ -87,30 +94,38 @@ class LineMetricChart extends React.Component {
       .y( d => yscale(d[z]) )
       .curve(d3.curveMonotoneX);
 
-    g.append("path")
+    var path1 = g.append("path")
       .datum(data)
       .attr("class","original")
-      .attr("d", line)
+      .attr("id", "cohen")
+      .attr("d", line1)
       .style("stroke", 'steelblue')
       .style("fill","none")
       .style("stroke-width",1)
       
-    g.append("path")
+    var path2 = g.append("path")
       .datum(data)
       .attr("class","original")
+      .attr("id","m1")
       .attr("d", line2)
       .style("stroke", 'orange')
       .style("fill","none")
       .style("stroke-width",1)
 
-    g.selectAll(".dot2")
+    var view = g.append("rect")
+      .attr("class","zoom")
+      .attr("width", width)
+      .attr("height", height)
+      .call(zoom)
+
+    var points1 = g.selectAll(".dot2")
       .data(data).enter()
         .append("circle")
         .style("fill", 'steelblue')
         .attr("class","dot2")
-        .attr("cx", (d,i) => xscale(i) )
+        .attr("cx", d => xscale(d[x[0]]+", "+d[x[1]]) )
         .attr("cy", d => yscale(d[y]) )
-        .attr("r",1)
+        .attr("r",2)
         .on("mouseover", d => {
           tooltip.style('visibility', 'visible')
               .style('top',(d3.event.pageY-30)+'px')
@@ -122,14 +137,14 @@ class LineMetricChart extends React.Component {
         })
         .on("mouseout", d => tooltip.style('visibility', 'hidden'))
 
-    g.selectAll(".dot")
+    var points2 = g.selectAll(".dot")
       .data(data).enter()
         .append("circle")
         .style("fill", 'orange')
         .attr("class","dot")
-        .attr("cx", (d,i) => xscale(i) )
+        .attr("cx", d => xscale(d[x[0]]+", "+d[x[1]]) )
         .attr("cy", d => yscale(d[z]) )
-        .attr("r",1)
+        .attr("r",2)
         .on("mouseover", d => {
           tooltip.style('visibility', 'visible')
               .style('top',(d3.event.pageY-30)+'px')
@@ -140,6 +155,31 @@ class LineMetricChart extends React.Component {
                   '<br />'+z+' => <b>'+d[z].toFixed(2)+'</b>')
         })
         .on("mouseout", d => tooltip.style('visibility', 'hidden'))
+
+    function zoomFunction() {
+      //to zoom x axis
+      xscale.range([0,width].map(d => d3.event.transform.applyX(d)))
+
+      line1.x(d => xscale(d[x[0]]+", "+d[x[1]]))
+      line2.x(d => xscale(d[x[0]]+", "+d[x[1]]))
+
+      path1.attr("d",line1)
+      path2.attr("d",line2)
+      /*points1.attr("r", )
+      points2.attr("r", )*/
+      points1.attr("cx", d => xscale(d[x[0]]+", "+d[x[1]]) )
+      points2.attr("cx", d => xscale(d[x[0]]+", "+d[x[1]]) )
+
+      //to zoom y axis
+      /*var new_yscale = d3.event.transform.rescaleY(yscale)
+      gy.call(yAxis.scale(d3.event.transform.rescaleY(yscale)))
+
+      line1.y(d => new_yscale(d[y]))
+      line2.y(d => new_yscale(d[z]))
+
+      path1.attr("d",line1)
+      path2.attr("d",line2)*/
+    }
 
   }
 
@@ -165,7 +205,7 @@ class LineMetricChart extends React.Component {
   }
 }
 
-LineMetricChart.propTypes = {
+CompareLineChart.propTypes = {
 
 }
 
@@ -177,4 +217,5 @@ const mapDispatchToProps = dispatch => ({
 
 })
 
-export default connect(mapStateToProps, mapDispatchToProps)(LineMetricChart);
+export default connect(mapStateToProps, mapDispatchToProps)(CompareLineChart);
+

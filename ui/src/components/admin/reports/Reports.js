@@ -61,13 +61,17 @@ class Reports extends React.Component {
 				this.props.reports.tasks=[]
 				this.props.fetchWorkersAgreements(this.props.match.params.jobid);
 				break;
-			case 'Correlations':
+			case 'TwoWorkers':
 				this.props.reports.tasks=[]
 				this.props.fetchMetric('ww/job/'+this.props.match.params.jobid+'/stats');
 				break;
+			case 'SingleWorker':
+				this.props.reports.tasks=[]
+				this.props.fetchMetric('worker/'+this.state.chosenworker+'/job/'+this.props.match.params.jobid+'/stats')
+				break;
 			case 'M2':
 				this.props.reports.tasks=[]
-				this.props.fetchMetric('worker/'+this.state.chosenworker+'/job/'+this.props.match.params.jobid+'/stats');
+				this.props.fetchMetric('worker/m2');
 				break;
 			default:
 				console.log('Metric to implement: ', value)
@@ -77,8 +81,8 @@ class Reports extends React.Component {
 		this.setState({
 			...this.state,
 			chosenmetric: value,
-			activeworker: value==='W_CompleteTime'||value==='Percentage' ? true : false,
-			chosenworker: value==='W_CompleteTime'||value==='Percentage' ? this.state.chosenworker : 'all',
+			activeworker: value==='W_CompleteTime'||value==='Percentage'||value==='SingleWorker' ? true : false,
+			chosenworker: value==='W_CompleteTime'||value==='Percentage'||value==='SingleWorker' ? this.state.chosenworker : 'all',
 			chosenitem: value==='Classification' ? this.state.chosenitem : 'all',
 			chosencriteria: value==='Classification'||value==='Percentage' ? this.state.chosencriteria : 'all',
 			activeitem: value==='Classification' ? true : false,
@@ -99,6 +103,12 @@ class Reports extends React.Component {
 					this.props.reports.tasks = []
 				else
 					this.props.fetchWorkerTimes(this.props.match.params.jobid,Number(value))
+				break;
+			case 'SingleWorker':
+				if (value=='all')
+					this.props.reports.tasks = []
+				else
+					this.props.fetchMetric('worker/'+value+'/job/'+this.props.match.params.jobid+'/stats')
 				break;
 			default:
 				break;
@@ -167,7 +177,8 @@ renderChart(chart,x,y,z,param) {
 		var MetricOptions = {
 			'cohen': "Cohen's Kappa",
 			'm1': "Basic Agreement [ M1 ]",
-			'wwm2': "Correlation in Errors [ WWM2 ]",
+			'wwm2(a|b)': "Correlation in Errors [ P_err(A|B) ]",
+			'wwm2(b|a)': "Correlation in Errors [ P_err(B|A) ]",
 			'compare': "Comparing Cohen's Kappa and M1"
 		}
 		//parameters for reusable charts
@@ -220,7 +231,7 @@ renderChart(chart,x,y,z,param) {
 				param=[this.state.chosenitem,this.state.chosencriteria]
 				break;
 
-			case 'Correlations':
+			case 'TwoWorkers':
 				x=''
 				y=''
 				z=''
@@ -243,18 +254,34 @@ renderChart(chart,x,y,z,param) {
 				param=1
 				break;
 
-			case 'wwm2':
+			case 'wwm2(a|b)':
 				chart='heatmap'
 				x='worker A'
 				y='worker B'
-				z='wwm2'
+				z='wwm2(a|b)'
 				param=1
 				break;
 
-			case 'm2':
+			case 'wwm2(b|a)':
+				chart='heatmap'
+				x='worker A'
+				y='worker B'
+				z='wwm2(b|a)'
+				param=1
+				break;
+
+			case 'M2':
 				chart='histogram'
 				x='m2'
 				y='worker A'
+				z=''
+				param=1
+				break;
+
+			case 'SingleWorker':
+				chart=''
+				x=''
+				y=''
 				z=''
 				param=1
 				break;
@@ -313,8 +340,9 @@ renderChart(chart,x,y,z,param) {
 					{
 						(this.state.chosenmetric=="cohen"
 						||this.state.chosenmetric=="m1"
-						||this.state.chosenmetric=="wwm2"
-						||this.state.chosenmetric=="Correlations"
+						||this.state.chosenmetric=="wwm2(a|b)"
+						||this.state.chosenmetric=="wwm2(b|a)"
+						||this.state.chosenmetric=="TwoWorkers"
 						||this.state.chosenmetric=="compare") && 
 						<div className='row' style={{'display': 'flex'}}>
 							<br />

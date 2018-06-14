@@ -2,7 +2,6 @@ import React from 'react';
 import {Route} from 'react-router-dom';
 import PropTypes from 'prop-types';
 
-import ExperimentsRoute from 'src/components/admin/experiments/ExperimentsRoute';
 import Reports from './Reports'
 import ReportsForm from './ReportsForm'
 

@@ -1,23 +1,13 @@
 import React from 'react';
 import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
-import {Redirect, Link} from 'react-router-dom';
+import {Link} from 'react-router-dom';
 import DataTable from 'src/components/core/table/DataTable';
-import {ExperimentStatus} from 'src/utils/constants';
 import {
-  Step,
-  Icon,
-  Segment,
-  Grid,
   Form,
-  Button,
-  Statistic,
-  Header,
-  Image,
-  Accordion,
-  Message
+  Button
 } from 'semantic-ui-react';
-import { actions as projectactions } from '../experiments/actions';
+import { actions as jobactions } from '../jobs/actions';
 
 var ProjectOptions = { }
 
@@ -47,7 +37,7 @@ class ReportsForm extends React.Component {
 	}
 
 	componentDidMount() {
-    this.props.fetchExperiments();
+    this.props.fetchJobs();
 
     this.props.projects.rows.map( step => {
     	ProjectOptions[step.id] = step.data.name+" ( "+step.created_at+" ) "
@@ -108,13 +98,13 @@ ReportsForm.propTypes = {
 }
 
 const mapStateToProps = state => ({
-  projects: state.experiment.list.experiments,
-  error: state.experiment.list.error,
-  loading: state.experiment.list.loading
+  projects: state.job.list.jobs,
+  error: state.job.list.error,
+  loading: state.job.list.loading
 })
 
 const mapDispatchToProps = dispatch => ({
-  fetchExperiments: () => dispatch(projectactions.fetchExperiments())
+  fetchJobs: () => dispatch(jobactions.fetchJobs())
 })
 
 export default connect(mapStateToProps,mapDispatchToProps)(ReportsForm)

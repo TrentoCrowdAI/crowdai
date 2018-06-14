@@ -9,7 +9,7 @@ import { Button, Dimmer, Loader } from 'semantic-ui-react';
 import './reports.css';
 
 import { actions } from './actions';
-import { actions as expactions } from '../experiments/actions';
+import { actions as jobactions } from '../jobs/actions';
 
 var agreeData = {
 			tasks: {
@@ -101,7 +101,7 @@ class Reports extends React.Component {
 	}
 
 	componentDidMount() {
-		this.props.fetchExperiments(this.props.match.params.projectid);
+		this.props.fetchJobs(this.props.match.params.projectid);
 	}
 
 	componentDidUpdate() {
@@ -267,7 +267,7 @@ class Reports extends React.Component {
 		JobOptions = { 'all' : 'All Jobs' }
 		WorkerOptions = { 'all' : 'All Workers' }
 
-    this.props.experiments.rows.map( step => {
+    this.props.jobs.rows.map( step => {
       JobOptions[step.id] = step.data.name
     });
 		Object.values(this.props.workers.workers).map( step => {
@@ -356,14 +356,14 @@ class Reports extends React.Component {
 }
 
 Reports.propTypes = {
-	fetchExperiments: PropTypes.func,
+	fetchJobs: PropTypes.func,
 	fetchTaskTime: PropTypes.func,
 	fetchWorkers: PropTypes.func,
 	fetchWorkerTime: PropTypes.func,
 
-  exp_error: PropTypes.any,
-  exp_loading: PropTypes.bool,
-	experiments: PropTypes.any,
+  job_error: PropTypes.any,
+  job_loading: PropTypes.bool,
+	jobs: PropTypes.any,
 	match: PropTypes.object,
 
 	rep_error: PropTypes.any,
@@ -376,16 +376,16 @@ Reports.propTypes = {
 }
 
 const mapDispatchToProps = dispatch => ({
-	fetchExperiments: projectId => dispatch(expactions.fetchExperiments(projectId)),
+	fetchJobs: projectId => dispatch(jobactions.fetchJobs(projectId)),
 	fetchTaskTime: jobId => dispatch(actions.fetchTaskTime(jobId)),
 	fetchWorkerTime: workerId => dispatch(actions.fetchWorkerTime(workerId)),
 	fetchWorkers: jobId => dispatch(actions.fetchWorkers(jobId))
 })
 
 const mapStateToProps = state => ({
-  experiments: state.experiment.list.experiments,
-  exp_error: state.experiment.list.error,
-	exp_loading: state.experiment.list.loading,
+  jobs: state.job.list.jobs,
+  job_error: state.job.list.error,
+	job_loading: state.job.list.loading,
 
 	reports: state.report.list.reports,
 	rep_error: state.report.list.error,

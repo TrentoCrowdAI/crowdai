@@ -37,7 +37,8 @@ const rootEpic = combineEpics(
   jobEpics,
   profileEpics,
   toastEpics,
-  shortestRunEpics
+  shortestRunEpics,
+  reportEpics
 );
 
 export {rootReducer, rootEpic};

@@ -31,6 +31,9 @@ const actionTypes = {
   FETCH_RESULTS: 'C_FETCH_RESULTS',
   FETCH_RESULTS_SUCCESS: 'C_FETCH_RESULTS_SUCCESS',
   FETCH_RESULTS_ERROR: 'C_FETCH_RESULTS_ERROR',
+  FETCH_AGGREGATION_STRATEGIES: 'C_FETCH_AGGREGATION_STRATEGIES',
+  FETCH_AGGREGATION_STRATEGIES_SUCCESS: 'C_FETCH_AGGREGATION_STRATEGIES_SUCCESS',
+  FETCH_AGGREGATION_STRATEGIES_ERROR: 'C_FETCH_AGGREGATION_STRATEGIES_ERROR',
   ...getActionTypes(scopes.JOBS)
 };
 
@@ -247,6 +250,26 @@ const actions = {
   fetchResultsError(error) {
     return {
       type: actionTypes.FETCH_RESULTS_ERROR,
+      error
+    };
+  },
+
+  fetchAggregationStrategies() {
+    return {
+      type: actionTypes.FETCH_AGGREGATION_STRATEGIES
+    };
+  },
+
+  fetchAggregationStrategiesSuccess(aggregationStrategies) {
+    return {
+      type: actionTypes.FETCH_AGGREGATION_STRATEGIES_SUCCESS,
+      aggregationStrategies
+    };
+  },
+
+  fetchAggregationStrategiesError(error) {
+    return {
+      type: actionTypes.FETCH_AGGREGATION_STRATEGIES_ERROR,
       error
     };
   }

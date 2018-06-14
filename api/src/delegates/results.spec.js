@@ -36,8 +36,14 @@ describe('getSummary', () => {
     const projectsDelegate = require('./projects');
     const jobsDelegate = require('./jobs');
 
-    projectsDelegate.getItemsCount = jest.fn(() => 10);
-    jobsDelegate.getById = jest.fn(() => ({ id: 1 }));
+    projectSpy = jest
+      .spyOn(projectsDelegate, 'getItemsCount')
+      .mockImplementation(() => 10);
+
+    jobsSpy = jest
+      .spyOn(jobsDelegate, 'getById')
+      .mockImplementation(() => ({ id: 1 }));
+
     dbSpy = jest.spyOn(db, 'query').mockImplementation(() => {
       return {
         rows: [
@@ -53,6 +59,8 @@ describe('getSummary', () => {
     expect(summary.out).toBe(4);
     expect(summary.stopped).toBe(3);
     expect(summary.pending).toBe(2);
+    projectSpy.mockRestore();
+    jobsSpy.mockRestore();
   });
 });
 
@@ -93,7 +101,7 @@ describe('getAll', () => {
         [job.id, item.id]
       );
     }
-    const page = 2;
+    const page = 1;
     const pageSize = 5;
     let results = await resultsDelegate.getAll(job.id, page, pageSize);
     expect(results).toBeDefined();

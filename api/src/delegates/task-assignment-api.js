@@ -69,8 +69,8 @@ const create = (exports.create = async taskAssignmentApi => {
   let rsp = await db.query(
     `insert into ${
       db.TABLES.TaskAssignmentApi
-    }(requester_id, name, url, aggregation) values($1, $2, $3, $4) returning *`,
-    [requester_id, name, url, aggregation]
+    }(created_at, requester_id, name, url, aggregation) values($1, $2, $3, $4, $5) returning *`,
+    [new Date(), requester_id, name, url, aggregation]
   );
   return rsp.rows[0];
 });

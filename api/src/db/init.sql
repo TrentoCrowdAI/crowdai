@@ -281,3 +281,17 @@ CREATE TABLE backlog (
   step int,
   CONSTRAINT pk_backlog PRIMARY KEY (id)
 );
+
+
+-- this table stores the aggregation algorithms that
+-- the are integrated with the platform.
+CREATE TABLE aggregation_api (
+  id bigserial NOT NULL,
+  requester_id bigint,
+  created_at timestamp,
+  updated_at timestamp,
+  deleted_at timestamp,
+  name varchar(255),
+  url  text,
+  CONSTRAINT pk_aggregation_api PRIMARY KEY (id)
+);

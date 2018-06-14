@@ -27,14 +27,14 @@ const LabelOptions = {
   yns: 'Yes | No | I am not sure'
 };
 
-const AggregationStrategies = {
-  mv: 'Majority Voting',
-  tf: 'Truth Finder',
-  ds: 'Dawid & Skene',
-  sums: 'SUMS',
-  inv: 'Investment',
-  avg: 'Average-log'
-};
+// const AggregationStrategies = {
+//   mv: 'Majority Voting',
+//   tf: 'Truth Finder',
+//   ds: 'Dawid & Skene',
+//   sums: 'SUMS',
+//   inv: 'Investment',
+//   avg: 'Average-log'
+// };
 
 const ShortestRunStatus = {
   INITIAL: 'INITIAL',
@@ -68,7 +68,6 @@ export {
   JobStatus,
   AbstractPresentationTechniques,
   LabelOptions,
-  AggregationStrategies,
   ShortestRunStatus,
   RegisteredTaskAssignmentStrategies,
   UserModes,

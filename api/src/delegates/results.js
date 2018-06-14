@@ -46,3 +46,55 @@ const getSummary = (exports.getSummary = async jobId => {
   summary.pending = itemsCount - sum;
   return summary;
 });
+
+/**
+ * Returns the entries in the result table for the given job.
+ *
+ * @param {Number} jobId
+ * @param {Number} page
+ * @param {Number} pageSize
+ * @return {Object} The output format is:
+ *
+ * {
+ *  rows: [...],
+ *  meta: {
+ *    count: 20,
+ *    totalPages: 2,
+ *    page: 1,
+ *    pageSize: 10
+ *  }
+ *
+ * }
+ */
+const getAll = (exports.getAll = async (jobId, page = 1, pageSize = 10) => {
+  if (!jobId) {
+    throw Boom.badRequest('The jobId parameter is required');
+  }
+  let job = await jobsDelegate.getById(jobId);
+
+  if (!job) {
+    throw Boom.badRequest(`The job with ID=${jobId} does not exist`);
+  }
+
+  const offset = (page - 1) * pageSize;
+  let rsp = await db.query(
+    `select r.*, i.data->'title' as title from ${db.TABLES.Result} r join ${
+      db.TABLES.Item
+    } i on (r.item_id = i.id)
+    where r.job_id = $1 offset $2 limit $3`,
+    [job.id, offset, pageSize]
+  );
+  let countRsp = await db.query(
+    `select count(*) from ${db.TABLES.Result} where job_id = $1`,
+    [job.id]
+  );
+  return {
+    rows: rsp.rows,
+    meta: {
+      count: Number(countRsp.rows[0].count),
+      totalPages: Math.ceil(Number(countRsp.rows[0].count) / pageSize),
+      page,
+      pageSize
+    }
+  };
+});

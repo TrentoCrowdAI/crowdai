@@ -207,6 +207,21 @@ const fetchTaskAssignmentStrategies = (action$, store) =>
       });
   });
 
+const fetchResults = (action$, store) =>
+  action$.ofType(actionTypes.FETCH_RESULTS).switchMap(action => {
+    return Observable.defer(() =>
+      requestersApi.get(`jobs/${action.jobId}/results`, {params: {page: action.page, pageSize: 10}})
+    )
+      .mergeMap(response => Observable.of(actions.fetchResultsSuccess(response.data)))
+      .catch(error => {
+        let err = flattenError(error);
+        return Observable.concat(
+          Observable.of(actions.fetchResultsError(flattenError(err))),
+          Observable.of(toastActions.show({message: err.message, type: ToastTypes.ERROR}))
+        );
+      });
+  });
+
 export default combineEpics(
   getJobs,
   saveJob,
@@ -217,5 +232,6 @@ export default combineEpics(
   copyJob,
   checkCSVCreation,
   fetchFiltersCSV,
-  fetchTaskAssignmentStrategies
+  fetchTaskAssignmentStrategies,
+  fetchResults
 );

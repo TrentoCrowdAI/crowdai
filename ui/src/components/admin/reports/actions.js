@@ -8,15 +8,24 @@ const actionTypes = {
   FETCH_WTIME: 'C_FETCH_WTIME',
   FETCH_WTIME_SUCCESS: 'C_FETCH_WTIME_SUCCESS',
   FETCH_WTIME_ERROR: 'C_FETCH_WTIME_ERROR',
-  FETCH_AGREEMENT: 'C_FETCH_AGREEMENT',
-  FETCH_AGREEMENT_SUCCESS: 'C_FETCH_AGREEMENT_SUCCESS',
-  FETCH_AGREEMENT_ERROR: 'C_FETCH_AGREEMENT_ERROR',
+  FETCH_AGREEMENTS: 'C_FETCH_AGREEMENT',
+  FETCH_AGREEMENTS_SUCCESS: 'C_FETCH_AGREEMENT_SUCCESS',
+  FETCH_AGREEMENTS_ERROR: 'C_FETCH_AGREEMENT_ERROR',
+  FETCH_WANSWERS: 'C_FETCH_WANSERS',
+  FETCH_WANSWERS_SUCCESS: 'C_FETCH_WANSERS_SUCCESS',
+  FETCH_WANSWERS_ERROR: 'C_FETCH_WANSERS_ERROR',
   FETCH_PERCENTAGE: 'C_FETCH_PERCENTAGE',
   FETCH_PERCENTAGE_SUCCESS: 'C_FETCH_PERCENTAGE_SUCCESS',
   FETCH_PERCENTAGE_ERROR: 'C_FETCH_PERCENTAGE_ERROR',
   FETCH_WORKERS: 'C_FETCH_WORKERS',
   FETCH_WORKERS_SUCCESS: 'C_FETCH_WORKERS_SUCCESS',
   FETCH_WORKERS_ERROR: 'C_FETCH_WORKERS_ERROR',
+  FETCH_WAGREES: 'C_FETCH_WAGREES',
+  FETCH_WAGREES_SUCCESS: 'C_FETCH_WAGREES_SUCCESS',
+  FETCH_WAGREES_ERROR: 'C_FETCH_WAGREES_ERROR',
+  FETCH_METRIC: 'C_FETCH_METRIC',
+  FETCH_METRIC_SUCCESS: 'C_FETCH_METRIC_SUCCESS',
+  FETCH_METRIC_ERROR: 'C_FETCH_METRIC_ERROR',
   ...getActionTypes(scopes.REPORTS)
 };
 
@@ -40,40 +49,80 @@ const actions = {
     };
   },
 
-  fetchWorkerTime(workerId) {
+  fetchWorkerTimes(jobId,workerId) {
     return {
       type: actionTypes.FETCH_WTIME,
+      jobId,
       workerId
     };
   },
-  fetchWorkerTimeSuccess(response) {
+  fetchWorkerTimesSuccess(response) {
     return {
       type: actionTypes.FETCH_WTIME_SUCCESS,
       response
     };
   },
-  fetchWorkerTimeError(error) {
+  fetchWorkerTimesError(error) {
     return {
       type: actionTypes.FETCH_WTIME_ERROR,
       error
     };
   },
 
-  fetchAgreement(jobId) {
+  fetchTasksAgreements(jobId) {
     return {
-      type: actionTypes.FETCH_AGREEMENT,
+      type: actionTypes.FETCH_AGREEMENTS,
       jobId
     };
   },
-  fetchAgreementSuccess(response) {
+  fetchTasksAgreementsSuccess(response) {
     return {
-      type: actionTypes.FETCH_AGREEMENT_SUCCESS,
+      type: actionTypes.FETCH_AGREEMENTS_SUCCESS,
       response
     };
   },
-  fetchAgreementError(error) {
+  fetchTasksAgreementsError(error) {
     return {
-      type: actionTypes.FETCH_AGREEMENT_ERROR,
+      type: actionTypes.FETCH_AGREEMENTS_ERROR,
+      error
+    };
+  },
+
+  fetchWorkersAgreements(jobId) {
+    return {
+      type: actionTypes.FETCH_WAGREES,
+      jobId
+    };
+  },
+  fetchWorkersAgreementsSuccess(response) {
+    return {
+      type: actionTypes.FETCH_WAGREES_SUCCESS,
+      response
+    };
+  },
+  fetchWorkersAgreementsError(error) {
+    return {
+      type: actionTypes.FETCH_WAGREES_ERROR,
+      error
+    };
+  },
+
+  fetchAnswers(jobId,workerId) {
+    return {
+      type: actionTypes.FETCH_WANSWERS,
+      jobId,
+      workerId
+    };
+  },
+  fetchAnswersSuccess(response) {
+    return {
+      type: actionTypes.FETCH_WANSWERS_SUCCESS,
+      response
+    };
+  },
+  fetchAnswersError(error) {
+    return {
+      type: actionTypes.FETCH_WANSWERS_ERROR,
       error
     };
   },
@@ -112,6 +161,25 @@ const actions = {
   fetchWorkersError(error) {
     return {
       type: actionTypes.FETCH_WORKERS_ERROR,
+      error
+    };
+  },
+
+  fetchMetric(metric) {
+    return {
+      type: actionTypes.FETCH_METRIC,
+      metric
+    };
+  },
+  fetchMetricSuccess(response) {
+    return {
+      type: actionTypes.FETCH_METRIC_SUCCESS,
+      response
+    };
+  },
+  fetchMetricError(error) {
+    return {
+      type: actionTypes.FETCH_METRIC_ERROR,
       error
     };
   },

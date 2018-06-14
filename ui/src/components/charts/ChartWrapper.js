@@ -10,6 +10,7 @@ import AreaChart from './AreaChart.js'
 import NestChart from './NestChart.js'
 import StackedBar from './StackedBar.js'
 import DonutChart from './DonutChart.js';
+import CompareLineChart from './CompareLineChart';
 
 var count = 0;
 
@@ -97,11 +98,20 @@ class ChartWrapper extends React.Component {
           </div>
         )
         break;
+      case 'linemetricchart':
+        return(
+          <div>
+            <CompareLineChart
+              {...this.props}
+            />
+          </div>
+        )
+        break;
       default:
         return(
           <div>
             No data to display yet
-            <svg width="700"></svg>
+            <svg width="1000"></svg>
           </div>
         );
     }

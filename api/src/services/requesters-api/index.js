@@ -6,6 +6,7 @@ require('./profile').register(router);
 require('./csv-preview').register(router);
 require('./task-assignment-strategies').register(router);
 require('./reports').register(router);
+require('./testAgreement').register(router);
 
 require(__base + 'plugins/shortest-run/services').register(router);
 

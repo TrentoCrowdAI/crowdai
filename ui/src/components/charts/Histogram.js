@@ -37,29 +37,35 @@ class Histogram extends React.Component {
     var svg = d3.select("."+this.props.selector);
     var x = this.props.x
     var y = this.props.y
+    var z = this.props.z
+    var param = this.props.param
 
     var data = this.props.data.sort( function(a,b) {
       return (a[x] > b[x]) ? 1 : ((b[x] > a[x]) ? -1 : 0);
     })
 
-    var margin = {top: 30, right: 30, bottom: 30, left: 30};
+    var margin = {top: 10, right: 30, bottom: 30, left: 30};
     var width = +svg.attr("width") - margin.left - margin.right;
     var height = +svg.attr("height") - margin.top - margin.bottom;
     var g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
     var color = this.props.color
 
     var xscale = d3.scaleLinear()
-        .range([0, width])
-        .domain([
-          d3.min(data, d => Math.floor(d[x]/10)*10), 
-          d3.max(data, d => Math.round((d[x]+4)/10)*10)
-        ])
-    var xAxis = d3.axisBottom(xscale);
-    //console.log(width/xscale.ticks().length)
-    //deploy data to fill an histogram
+      .range([0, width])
+      .domain([
+        //necessary to have values from 0 to scale bandwidth low values
+        0,
+        //d3.min(data, d => Math.floor((d[x]/param)/10)*10), 
+        d3.max(data, d => (Math.round((d[x]/param)/10)*10)  )
+      ])
+    var xAxis = d3.axisBottom(xscale)
+    
     var histo = d3.histogram()
-        .thresholds(xscale.ticks(10))
-        (data.map(d => d[x]));
+      .thresholds(xscale.ticks(10))
+      (data.map(d => (d[x]/param)));
+
+      //histo.map(d => console.log(d.x0,d.x1,d.length))
+      //console.log(histo)
 
     var yscale = d3.scaleLinear()
       .domain([0, d3.max(histo, d => d.length)])
@@ -67,67 +73,73 @@ class Histogram extends React.Component {
     var yAxis = d3.axisLeft(yscale);
 
     var bar = g.selectAll(".bar")
-        .data(histo)
-        .enter().append("g")
-        .attr("class", "bar")
-        .attr("transform", d => "translate("+xscale(d.x0)+","+yscale(d.length)+")")
+      .data(histo)
+      .enter().append("g")
+      .attr("class", "bar")
+      .attr("transform", d => "translate("+
+        (d.x1==d3.max(data, d => d[x]/param) ? xscale(d.x0) : (xscale( (d.x1) - ( d3.max(xscale.domain()) / ((xscale.ticks().length)-1) ) )))
+        +","+yscale(d.length)+")")
 
     bar.append("rect")
-          .style("fill", color)
-          .attr("x", 1)
-          .attr("width", d => xscale(d.x1)-xscale(d.x0)-1 )
-          .attr("height", d => height-yscale(d.length) )
-          .on("mouseover", function() {
-            d3.select(this)
-              .style("opacity","0.8")
-          })
-          .on("mouseout", function() {
-            d3.select(this)
-              .style("opacity","1")
-          })
-          .on("click", (d) => {
-            //console.log(d.x0, d.x1)
-            //console.log(d.x1+" - "+(Math.floor(d.x1/10)*10)+" = "+xscale(d.x1-(Math.floor(d.x1/10)*10)))
-            this.setState({
-              clicked : []
-            })
-            //console.log(d.x0,d.x1)
-            var nuovo = []
-            data.map( (step,i) => {
-              if((step[x]>=d.x0 && step[x]<d.x1) || (step[x]>=d.x0 && step[x]==d.x1)) {
-                nuovo = nuovo.concat([step])
-              }
-            })
-            this.handleClick(nuovo)
-          })
+      .style("fill", color )
+      .attr("x", 1)
+      .attr("width", d => 
+        xscale( (d3.max(xscale.domain()) / ((xscale.ticks().length)-1)) )-1
+      )
+      .attr("height", d => height-yscale(d.length) )
+      .on("mouseover", function() {
+        d3.select(this)
+          .style("opacity","0.8")
+      })
+      .on("mouseout", function() {
+        d3.select(this)
+          .style("opacity","1")
+      })
+      .on("click", (d) => {
+        this.setState({
+          clicked : []
+        })
+        var nuovo = []
+        data.map( (step,i) => {
+          if(
+            (step[x]/param>=d.x0 && step[x]/param<d.x1) || 
+            (d.x1==d3.max(data, d => d[x]/param) && step[x]/param>=d.x0 && step[x]/param==d.x1) 
+          ) {
+            nuovo = nuovo.concat([step])
+          }
+        })
+        this.handleClick(nuovo)
+      })
 
     bar.append("text")
-          .attr("dy", ".75em")
-          .attr("y", d => 10)
-          .attr("x", d => (xscale(d.x1)-xscale(d.x0)-1)/2 )
-          .attr("text-anchor", "middle")
-          .style("fill", "white")
-          .text( d => d.length ? d.length : null)
+      .attr("dy", ".75em")
+      .attr("y", d => 10)
+      .attr("x", d => 
+          xscale( (d3.max(xscale.domain()) / (xscale.ticks().length-1))/2 )
+        )
+      .attr("text-anchor", "middle")
+      .style("fill", "white")
+      .text( d => d.length ? d.length : null)
 
     g.append("g")
-       .attr("class","x axis")
-       .attr("transform","translate(0,"+height+")")
-       .call(xAxis)
-       .append("text")
-          .attr("fill","black")
-          .attr("transform","translate("+(width-15)+",0)")
-          .attr("dy","-1em")
-          .text(this.props.x)
+      .attr("class","x axis")
+      .attr("transform","translate(0,"+height+")")
+      .call(xAxis)
+      .append("text")
+        .attr("fill","black")
+        .attr("transform","translate("+(width-15)+",0)")
+        .attr("dy","2.5em")
+        .text(this.props.x)
 
     g.append("g")
-       .attr("class","y axis")
-       .call(yAxis)
-       .append("text")
-          .attr("fill","black")
-          .attr("transform","rotate(-90)")
-          .attr("text-anchor","end")
-          .attr("dy","2em")
-          .text("# objects")
+      .attr("class","y axis")
+      .call(yAxis)
+      .append("text")
+        .attr("fill","black")
+        .attr("transform","rotate(-90)")
+        .attr("text-anchor","end")
+        .attr("dy","2em")
+        .text("# "+this.props.y)
   }
 
   componentDidMount() {
@@ -148,13 +160,14 @@ class Histogram extends React.Component {
   render() {
     var y = this.props.y
     var x = this.props.x
+    var z = this.props.z
     var stampa = this.props.data.length>0 ? this.state.clicked.map(d => 
-      <li key={d[y]}>{y+" "+d[y]+" => "+x+" "+d[x]}</li>) : " "
+      <li key={d[x]+""+d[y]}>{y+" "}<strong style={{color: 'steelblue'}}>{d[y]}</strong>{" "+z+" "}<strong style={{color: 'steelblue'}}>{d[z]}</strong>{" => "+x+" "}<strong style={{color: 'steelblue'}}>{d[x]}</strong></li>) : " "
 
     return (
       <div>
         <br />
-        <svg className={this.props.selector} width="800" height="400"> </svg>
+        <svg className={this.props.selector} width="1000" height="500"> </svg>
         <br />
         {this.props.data.length ? <strong>Clicked data:</strong> : " "} <ul>{stampa}</ul>
 
@@ -164,6 +177,8 @@ class Histogram extends React.Component {
               color="orange"
               x={this.props.y}
               y={this.props.x}
+              z={this.props.z}
+              param={1}
               chart='nest'
               selector={'nestedchart'}
               data={this.state.clicked}

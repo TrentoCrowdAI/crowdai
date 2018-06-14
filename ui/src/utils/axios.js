@@ -16,13 +16,19 @@ const requestersApi = axios.create({
   timeout: config.axios.timeout
 });
 
+const reportingApi = axios.create({
+  baseURL: `http://localhost:5000/`,
+  //timeout: config.axios.timeout
+});
+
 const token = localStorage.getItem(config.localStorageKey);
 
 if (token) {
   axiosAuth.defaults.headers.common['Authorization'] = `Bearer ${token}`;
   requestersApi.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+  reportingApi.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 }
 
 export default instance;
 
-export {axiosAuth, requestersApi};
+export {axiosAuth, requestersApi, reportingApi};

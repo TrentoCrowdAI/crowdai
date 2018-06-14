@@ -16,8 +16,6 @@ import DashboardContainer from 'src/components/admin/dashboard/DashboardContaine
 import Login from 'src/components/admin/login/Login';
 import {history} from 'src/components/core/history';
 
-import Diff from 'src/components/charts/Diff'
-
 /**
  * Main component.
  */

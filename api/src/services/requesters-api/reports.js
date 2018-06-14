@@ -2,20 +2,35 @@ const Boom = require('boom');
 
 const delegates = require(__base + 'delegates');
 
-const getAllTasksByJobId = async ctx => {
-  ctx.response.body = await delegates.reports.getAllTasksByJobId(ctx.params.id);
+const getWorkerAnswers = async ctx => {
+  ctx.response.body = await delegates.reports.getWorkerAnswers(ctx.params.jobId, ctx.params.workerId);
 };
 
-const getAllWorkersByJobId = async ctx => {
-  ctx.response.body = await delegates.reports.getAllWorkersByJobId(ctx.params.id);
+const getAllTasksTimesByJob = async ctx => {
+  ctx.response.body = await delegates.reports.getAllTasksTimesByJob(ctx.params.id);
+};
+
+const getWorkersByJob = async ctx => {
+  ctx.response.body = await delegates.reports.getWorkersByJob(ctx.params.id);
 };
 
 const getWorkerTimes = async ctx => {
-  ctx.response.body = await delegates.reports.getWorkerTimes(ctx.params.id);
+  ctx.response.body = await delegates.reports.getWorkerTimes(ctx.params.jobId, ctx.params.workerId);
+};
+
+const getTasksAgreements = async ctx => {
+  ctx.response.body = await delegates.reports.getTasksAgreements(ctx.params.id);
+};
+
+const getWorkersAgreements = async ctx => {
+  ctx.response.body = await delegates.reports.getWorkersAgreements(ctx.params.jobId);
 };
 
 exports.register = router => {
-  router.get('/allTasksByJobId/:id', getAllTasksByJobId);
-  router.get('/allWorkersByJobId/:id', getAllWorkersByJobId);
-  router.get('/allWorkerTimes/:id', getWorkerTimes);
+  router.get('/getAllTasksTImesByJob/:id', getAllTasksTimesByJob);
+  router.get('/getWorkerTimes/:jobId/:workerId', getWorkerTimes);
+  router.get('/getWorkersByJob/:id', getWorkersByJob);
+  router.get('/getWorkerAnswers/:jobId/:workerId', getWorkerAnswers);
+  router.get('/getTasksAgreements/:id', getTasksAgreements);
+  router.get('/getWorkersAgreements/:jobId', getWorkersAgreements);
 };

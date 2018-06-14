@@ -16,8 +16,8 @@ class StackedBar extends React.Component {
   buildGraph() {
   	var svg = d3.select("."+this.props.selector);
   	
-  	var criteria = this.props.y
-  	/*this.props.y.map( (step,i) => criteria['c'+(i+1)] = step )
+  	var criteria = this.props.param
+  	/*this.props.param.map( (step,i) => criteria['c'+(i+1)] = step )
   	console.log("criteria",criteria)*/
 
     var x = this.props.x
@@ -27,7 +27,7 @@ class StackedBar extends React.Component {
       return (a[x] > b[x]) ? 1 : ((b[x] > a[x]) ? -1 : 0);
     })
 
-    var margin = {top: 30, right: 30, bottom: 30, left: 30};
+    var margin = {top: 30, right: 30, bottom: 30, left: 50};
     var width = +svg.attr("width") - margin.left - margin.right;
     var height = +svg.attr("height") - margin.top - margin.bottom;
     var g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
@@ -88,15 +88,15 @@ class StackedBar extends React.Component {
     		.attr("transform", d => "translate(0,"+yscale(d[x]+','+d[z])+")")
     		.on("mouseover", function(d) {
     			d3.select(this).style("opacity","0.8")
-    			g.selectAll(".y").selectAll("text").filter( function(text) {
+    			/*g.selectAll(".y").selectAll("text").filter( function(text) {
     				return text === d[x]+','+d[z] })
-    				.transition().duration(100).style('font','15px sans-serif')
+    				.transition().duration(100).style('font','15px sans-serif')*/
     		})
     		.on("mouseout", function(d) {
     			d3.select(this).style("opacity","1")
-    			g.selectAll(".y").selectAll("text").filter( function(text) {
+    			/*g.selectAll(".y").selectAll("text").filter( function(text) {
     				return text === d[x]+','+d[z] })
-    				.transition().style('font','10px sans-serif')
+    				.transition().style('font','10px sans-serif')*/
     		})
 
     var bars = rows.selectAll("rect")
@@ -104,19 +104,19 @@ class StackedBar extends React.Component {
     	.enter().append("g")
 
     bars.append("rect")
-    	.attr("height", yscale.bandwidth()-2)
+    	.attr("height", yscale.bandwidth()-10)
     	.attr("x", d => xscale(d.x0))
     	.attr("width", d => xscale(d.x1)-xscale(d.x0))
     	.style("fill", d => color(d.name))
 
     	bars.append("text")
     		.attr("x", d => xscale(d.x0))
-    		.attr("y", yscale.bandwidth()/2)
+    		.attr("y", (yscale.bandwidth()-10)/2)
     		.attr("dy", "0.5em")
     		.attr("dx", "0.5em")
 				.style("text-anchor","begin")
 				.attr("fill","white")
-    		.text(d => d.absolute !==0 && (d.x1-d.x0)>0.04 ? d.absolute : "")
+    		.text(d => d.absolute !==0 && (d.x1-d.x0)>0.04 ? d.absolute+",\t"+d.name : "")
 
     	g.append("g")
     			.attr("class", "y axis")
@@ -140,7 +140,7 @@ class StackedBar extends React.Component {
   render() {
     return (
     	<div>
-    		<svg className={this.props.selector} width="700" height={this.props.data.length*60}> </svg>
+    		<svg className={this.props.selector} width="1000" height={this.props.data.length*60}> </svg>
     	</div>
     );
   }

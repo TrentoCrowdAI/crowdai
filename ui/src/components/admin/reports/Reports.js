@@ -5,142 +5,113 @@ import PropTypes from 'prop-types';
 import ChartWrapper from 'src/components/charts/ChartWrapper';
 import JobChooser from './JobChooser';
 import WorkerChooser from './WorkerChooser';
-import { Button, Dimmer, Loader } from 'semantic-ui-react';
-import './reports.css';
+import ItemChooser from './ItemChooser';
+import CritChooser from './CritChooser';
+import MetricChooser from './MetricChooser';
+import MetricMenu from './MetricMenu';
+import { Button, Dimmer, Loader, Item, Form } from 'semantic-ui-react';
 
+import './reports.css';
 import { actions } from './actions';
 import { actions as jobactions } from '../jobs/actions';
-
-var agreeData = {
-			tasks: {
-				question1: {
-					item_id: 2,
-					filter_id: 1,
-					c1: 4,
-					c2: 6,
-					c3: 2
-				},
-				question2: {
-					item_id: 2,
-					filter_id: 2,
-					c1: 2,
-					c2: 4,
-					c3: 0
-				},
-				question3: {
-					item_id: 2,
-					filter_id: 3,
-					c1: 6,
-					c2: 0,
-					c3: 2
-				},
-				question4: {
-					item_id: 1,
-					filter_id: 2,
-					c1: 0,
-					c2: 2,
-					c3: 9
-				},
-				question5: {
-					item_id: 3,
-					filter_id: 1,
-					c1: 0,
-					c2: 3,
-					c3: 3
-				},
-				question6: {
-					item_id: 3,
-					filter_id: 4,
-					c1: 1,
-					c2: 1,
-					c3: 4
-				},
-				question7: {
-					item_id: 3,
-					filter_id: 5,
-					c1: 1,
-					c2: 0,
-					c3: 12
-				},
-				question8: {
-					item_id: 3,
-					filter_id: 6,
-					c1: 9,
-					c2: 6,
-					c3: 3
-				},
-				question9: {
-					item_id: 4,
-					filter_id: 3,
-					c1: 2,
-					c2: 5,
-					c3: 0
-				}
-			}
-}
-
-var WorkerOptions = {
-	'all' : 'All Workers'
-}
-var JobOptions = {
-	'all' : 'All Jobs'
-}
 
 class Reports extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			activeMetric : '(choose a metric)',
-			chosenjob: 'all',
+			chosenmetric : '(choose a metric)',
 			chosenworker: 'all',
-			activeworker: false
+			activeworker: false,
+			chosencriteria: 'all',
+			activecriteria: false,
+			chosenitem: 'all',
+			activeitem: false
 		}
-		this.activeMetric = this.activeMetric.bind(this)
-		this.chooseJob = this.chooseJob.bind(this)
+		this.chooseMetric = this.chooseMetric.bind(this)
 		this.chooseWorker = this.chooseWorker.bind(this)
+		this.chooseCriteria = this.chooseCriteria.bind(this)
+		this.chooseItem = this.chooseItem.bind(this)
 	}
 
 	componentDidMount() {
-		this.props.fetchJobs(this.props.match.params.projectid);
+		this.props.fetchWorkers(this.props.match.params.jobid)
 	}
 
 	componentDidUpdate() {
 	}
 
-	activeMetric(e, {value}) {
+	chooseMetric(e, {value}) {
 		switch(value) {
 			case 'T_CompleteTime':
-				this.props.fetchTaskTime(this.state.chosenjob)
+				this.props.reports.tasks=[]
+				this.props.fetchTaskTime(this.props.match.params.jobid)
 				break;
 			case 'W_CompleteTime':
-				this.props.fetchWorkerTime(this.state.chosenworker)
+				this.props.reports.tasks=[]
+				this.props.fetchWorkerTimes(this.props.match.params.jobid,Number(this.state.chosenworker))
 				break;
-			case 'Votes':
-				this.props.fetchWorkerTime(this.state.chosenworker)
+			case 'Percentage':
+				this.props.reports.tasks=[]
+				this.props.fetchAnswers(this.props.match.params.jobid,Number(this.state.chosenworker))
 				break;
-			case 'Agreements':
-				this.props.reports.tasks = Object.values(agreeData.tasks)
+			case 'Distribution':
+				this.props.reports.tasks=[]
+				this.props.fetchTasksAgreements(this.props.match.params.jobid)
 				break;
-			default: 
+			case 'Classification':
+				this.props.reports.tasks=[]
+				this.props.fetchWorkersAgreements(this.props.match.params.jobid);
+				break;
+			case 'TwoWorkers':
+				this.props.reports.tasks=[]
+				this.props.fetchMetric('ww/job/'+this.props.match.params.jobid+'/stats');
+				break;
+			case 'SingleWorker':
+				this.props.reports.tasks=[]
+				this.props.fetchMetric('worker/'+this.state.chosenworker+'/job/'+this.props.match.params.jobid+'/stats')
+				break;
+			case 'M2':
+				this.props.reports.tasks=[]
+				this.props.fetchMetric('worker/m2');
+				break;
+			default:
 				console.log('Metric to implement: ', value)
 				break;
 		}
 
 		this.setState({
 			...this.state,
-			activeMetric: value,
-			activeworker: value=='T_CompleteTime'||value=='Agreements' ? false : true,
-			chosenworker: value=='T_CompleteTime'||value=='Agreements' ? 'all' : this.state.chosenworker
+			chosenmetric: value,
+			activeworker: value==='W_CompleteTime'||value==='Percentage'||value==='SingleWorker' ? true : false,
+			chosenworker: value==='W_CompleteTime'||value==='Percentage'||value==='SingleWorker' ? this.state.chosenworker : 'all',
+			chosenitem: value==='Classification' ? this.state.chosenitem : 'all',
+			chosencriteria: value==='Classification'||value==='Percentage' ? this.state.chosencriteria : 'all',
+			activeitem: value==='Classification' ? true : false,
+			activecriteria: value==='Percentage' ? true : false
 		})
 	}
 
 	chooseWorker(e, {value}) {
-		switch(this.state.activeMetric) {
-			case 'Agreements':
-				this.props.reports.tasks = Object.values(agreeData.tasks)
+		switch(this.state.chosenmetric) {
+			case 'Percentage':
+				if (value=='all')
+					this.props.reports.tasks = []
+				else
+					this.props.fetchAnswers(this.props.match.params.jobid,Number(value))
+				break;
+			case 'W_CompleteTime':
+				if (value=='all')
+					this.props.reports.tasks = []
+				else
+					this.props.fetchWorkerTimes(this.props.match.params.jobid,Number(value))
+				break;
+			case 'SingleWorker':
+				if (value=='all')
+					this.props.reports.tasks = []
+				else
+					this.props.fetchMetric('worker/'+value+'/job/'+this.props.match.params.jobid+'/stats')
 				break;
 			default:
-				this.props.fetchWorkerTime(value)		
 				break;
 		}
 
@@ -150,98 +121,22 @@ class Reports extends React.Component {
 		})
 }
 
-	chooseJob(e, {value}) {
-		switch(this.state.activeMetric) {
-			case 'W_CompleteTime':
-			case 'Votes':
-				this.props.reports.tasks = []
-				break;
-			case 'Agreements':
-				this.props.reports.tasks = Object.values(agreeData.tasks)
-				break;
-			default:
-				this.props.fetchTaskTime(value);
-				break;
-		}
-		this.props.fetchWorkers(value);
-		
-		switch(this.state.activeMetric) {
-			case 'W_CompleteTime':
-			case 'Votes' :
-				this.setState({
-					...this.state,
-					chosenjob: value,
-					chosenworker: 'all'
-				})
-				break;
-			default:
-				this.setState({
-					...this.state, 
-					chosenjob: value,
-					chosenworker: 'all',
-					activeworker: this.state.activeMetric=='T_CompleteTime'||this.state.activeMetric=='Agreements' ? false : true
-				})
-				break;
-		}
-  }
-
-	renderMetrics() {
-		return(
-			<div className="options">
-				<Button 
-					value='T_CompleteTime'
-					className='metrics'
-					style={{marginBottom: '5px'}}
-					onClick={this.activeMetric}
-				>Time to complete per Task</Button>
-				<br />
-				<Button 
-					value='W_CompleteTime'
-					className='metrics'
-					style={{marginBottom: '5px'}}
-					onClick={this.activeMetric}
-				>Time to complete per Worker</Button>
-				<br />
-				<Button 
-					value='Votes'
-					className='metrics' 
-					style={{marginBottom: '5px'}}
-					onClick={this.activeMetric}
-				>Percentage % of votes</Button>
-				<br />
-				<Button 
-					value='Agreements'
-					className='metrics' 
-					style={{marginBottom: '5px'}}
-					onClick={this.activeMetric}
-				>Agreement metrics</Button>
-				<br />
-				<Button 
-					value='Classifications'
-					className='metrics' 
-					style={{marginBottom: '5px'}}
-					onClick={this.activeMetric}
-				>Classification decision and Probabilities</Button>
-				<br />
-				<Button 
-					value='Initial_Fails'
-					className='metrics' 
-					style={{marginBottom: '5px'}}
-					onClick={this.activeMetric}
-				>Percentage % of Workers who failed Initial Test</Button>
-				<br />
-				<Button 
-					value='Honeypots_Fails'
-					className='metrics' 
-					style={{marginBottom: '5px'}}
-					onClick={this.activeMetric}
-				>Percentage % of Workers who failed Honeypots</Button>
-				<br />
-			</div>
-		)
+	chooseItem(e, {value}) {
+		this.setState({
+			...this.state,
+			chosenitem: value,
+			activecriteria: true
+		})
 	}
 
-	renderChart(chart,x,y,z) {
+	chooseCriteria(e, {value}) {
+		this.setState({
+			...this.state,
+			chosencriteria: value
+		})		
+	}
+
+renderChart(chart,x,y,z,w,j,param) {
 		return(
 			<div>
 			<Dimmer active={this.props.rep_loading} inline="centered" inverted>
@@ -251,9 +146,12 @@ class Reports extends React.Component {
 				chart={chart}
         x={x}
         y={y}
-        z={z}
+				z={z}
+				w={w}
+				j={j}
         selector={'chart1'}
-        color={'steelblue'}
+				color={'steelblue'}
+				param={param}
 				data={Object.values(this.props.reports.tasks)}
       />
       </div>
@@ -261,54 +159,165 @@ class Reports extends React.Component {
 	}
 
 	render() {
-		//data = Object.values(this.props.reports.tasks)
-		//console.log(this.props.reports.tasks)
-		//console.log(this.state)
-		JobOptions = { 'all' : 'All Jobs' }
-		WorkerOptions = { 'all' : 'All Workers' }
+		console.log(this.props.reports.tasks)
 
-    this.props.jobs.rows.map( step => {
-      JobOptions[step.id] = step.data.name
-    });
+		//refresh options for charts with new loaded data every time
+		var WorkerOptions =  { 'all' : 'All Workers' }
 		Object.values(this.props.workers.workers).map( step => {
-      WorkerOptions[step.worker_id] = step.worker_name
+      WorkerOptions[step.worker_id] = step.turk_id
 		});
 
-		var chart
-		//first groupby
-		var x
-		//categories
+		var ItemOptions = { 'all': 'All Items' }
+		Object.values(this.props.reports.tasks).map( step => {
+      ItemOptions[step.item_id] = step.item_id
+		});
+
+		var CritOptions = { 'all' : 'All Criteria' }
+		Object.values(this.props.reports.tasks).map( step => {
+      CritOptions[step.criteria_id] = step.criteria_id
+		});
+
+		var MetricOptions = {
+			'cohen': "Cohen's Kappa",
+			'm1': "Weighted Agreement [ M1 ]",
+			'kendall': "Kendall's Tau",
+			'bennett': "Bennett's S",
+			'wwm2(a|b)': "Correlation in Errors [ P_err(A|B) ]",
+			'wwm2(b|a)': "Correlation in Errors [ P_err(B|A) ]",
+			'compare': "Comparing Cohen's Kappa and M1"
+		}
+		//parameters for reusable charts
+		var chart //to define kind of chart
+		var x //first group_by
+		var y //categories
+		var z //second group_by if necessary
+		var w
 		var y
-		//second groupby if necessary
-		var z
-		switch (this.state.activeMetric) {
+		var j
+		var param='' //just used in some charts to add more details
+
+		//show different reports
+		switch (this.state.chosenmetric) {
 
 			case 'T_CompleteTime':
 				chart='histogram'
-				x='total_time'
+				x='avgtime_ms'
 				y='item_id'
-				z=''
+				z='criteria_id'
+				param=1000
 				break;
 
 			case 'W_CompleteTime':
 				chart='nest'
-				x='task_id'
-				y='total_time'
-				z=''
+				x='item_id'
+				y='avgtime_ms'
+				z='criteria_id'
+				param=1000
 				break;
 
-			case 'Agreements':
+			case 'Distribution':
 				chart='stacked'
 				x='item_id'
-				y=['c1','c2','c3']
-				z='filter_id'
+				y=''
+				z='criteria_id'
+				param=['yes','no','not clear']
 				break;
 
-			case 'Votes':
+			case 'Percentage':
 				chart='pie'
-				x='task_id'
+				x='id'
 				y='answer'
+				z=['item_id','criteria_id']
+				param=this.state.chosencriteria
+				break;
+
+			case 'Classification' :
+				chart='linechart'
+				x='worker_id'
+				y='answer'
+				z=['yes','no','not clear']
+				param=[this.state.chosenitem,this.state.chosencriteria]
+				break;
+
+			case 'TwoWorkers':
+				x=''
+				y=''
 				z=''
+				param=1
+				break;
+
+			case 'cohen':
+				chart='heatmap'
+				x='worker A'
+				y='worker B'
+				z='cohen\'s kappa correlation'
+				param=1
+				break;
+
+			case 'm1':
+				chart='heatmap'
+				x='worker A'
+				y='worker B'
+				z='weighted agreement'
+				param=1
+				break;
+
+			case 'kendall':
+				chart='heatmap'
+				x='worker A'
+				y='worker B'
+				z='kendall\'s t'
+				param=1
+				break;
+
+			case 'bennett':
+				chart='heatmap'
+				x='worker A'
+				y='worker B'
+				z='bennett\'s s'
+				param=1
+				break;
+
+			case 'wwm2(a|b)':
+				chart='heatmap'
+				x='worker A'
+				y='worker B'
+				z='probability in errors(a|b)'
+				param=1
+				break;
+
+			case 'wwm2(b|a)':
+				chart='heatmap'
+				x='worker A'
+				y='worker B'
+				z='probability in errors(b|a)'
+				param=1
+				break;
+
+			case 'M2':
+				chart='histogram'
+				x='m2'
+				y='worker A'
+				z=''
+				param=1
+				break;
+
+			case 'SingleWorker':
+				chart=''
+				x=''
+				y=''
+				z=''
+				param=1
+				break;
+
+			case 'compare':
+				chart='linemetricchart'
+				x=['worker A','worker B']
+				y="cohen's kappa correlation"
+				z="weighted agreement"
+				w="bennett's s"
+				j="kendall's t"
+				param=1
 				break;
 
 			default:
@@ -320,50 +329,79 @@ class Reports extends React.Component {
 
 				<div className="rowC">
 				<h3 style={{color: 'steelblue'}}>
-					Selected Project_id: <i>{this.props.match.params.projectid}</i><br />
-					Selected Job_id: <i>{this.state.chosenjob}</i><br />
-					Selected Worker_id: <i>{this.state.chosenworker}</i>
+					Selected Job_id: <i>{this.props.match.params.jobid}</i><br />
+					Selected Worker_id: <i>{this.state.chosenworker}</i><br />
+					Selected Item_id: <i>{this.state.chosenitem}</i><br />
+					Selected Criteria_id: <i>{this.state.chosencriteria}</i>
 				</h3>
 
 				<div style={{width: "20%"}}></div>
 
 				<div>
-				<JobChooser 
-					options={JobOptions}
-					onChange={this.chooseJob}
-					chosenjob={this.state.chosenjob}
-				/>
 				<WorkerChooser 
-					disabled={(!this.state.activeworker) || (this.state.chosenjob=='all')}
+					disabled={(!this.state.activeworker)}
 					options={WorkerOptions}
 					onChange={this.chooseWorker}
 					chosenworker={this.state.chosenworker}
+				/>
+				<ItemChooser 
+					disabled={(!this.state.activeitem)}
+					options={ItemOptions}
+					onChange={this.chooseItem}
+					chosenitem={this.state.chosenitem}
+				/>
+				<CritChooser 
+					disabled={(!this.state.activecriteria)}
+					options={CritOptions}
+					onChange={this.chooseCriteria}
+					chosencriteria={this.state.chosencriteria}
 				/>
 				</div>
 				</div>
 
 				<hr />
-				<h4>Available metrics:</h4>
-
 				<div className="rowC">
-				{this.renderMetrics()}
-				{this.renderChart(chart,x,y,z)}
+				<div className='options'>
+				{
+						(this.state.chosenmetric=="cohen"
+						||this.state.chosenmetric=="m1"
+						||this.state.chosenmetric=="kendall"
+						||this.state.chosenmetric=="bennett"
+						||this.state.chosenmetric=="wwm2(a|b)"
+						||this.state.chosenmetric=="wwm2(b|a)"
+						||this.state.chosenmetric=="TwoWorkers"
+						||this.state.chosenmetric=="compare") && 
+						<div className='row' style={{'display': 'flex'}}>
+							<br />
+							<MetricChooser 
+								options={MetricOptions}
+								onChange={this.chooseMetric}
+								chosenmetric={this.state.chosenmetric}
+							/>
+							<br />
+						</div>
+					}
+					<MetricMenu onChange={this.chooseMetric}/>
+				</div>
+				{this.renderChart(chart,x,y,z,w,j,param)}
 				</div>
 
+			
 			</div>
 		);
 	}
 }
 
 Reports.propTypes = {
-	fetchJobs: PropTypes.func,
 	fetchTaskTime: PropTypes.func,
 	fetchWorkers: PropTypes.func,
-	fetchWorkerTime: PropTypes.func,
+	fetchAnswers: PropTypes.func,
+	fetchWorkerTimes: PropTypes.func,
+	fetchTasksAgreements: PropTypes.func,
+	fetchWorkersAgreements: PropTypes.func,
 
-  job_error: PropTypes.any,
-  job_loading: PropTypes.bool,
-	jobs: PropTypes.any,
+	fetchItems: PropTypes.func,
+	fetchCriteria: PropTypes.func,
 	match: PropTypes.object,
 
 	rep_error: PropTypes.any,
@@ -372,28 +410,27 @@ Reports.propTypes = {
 
 	worker_error: PropTypes.any,
 	worker_loading: PropTypes.bool,
-	workers: PropTypes.any
+	workers: PropTypes.any,
 }
 
 const mapDispatchToProps = dispatch => ({
-	fetchJobs: projectId => dispatch(jobactions.fetchJobs(projectId)),
 	fetchTaskTime: jobId => dispatch(actions.fetchTaskTime(jobId)),
-	fetchWorkerTime: workerId => dispatch(actions.fetchWorkerTime(workerId)),
-	fetchWorkers: jobId => dispatch(actions.fetchWorkers(jobId))
+	fetchWorkerTimes: (jobId,workerId) => dispatch(actions.fetchWorkerTimes(jobId,workerId)),
+	fetchAnswers: (jobId,workerId) => dispatch(actions.fetchAnswers(jobId,workerId)),
+	fetchWorkers: jobId => dispatch(actions.fetchWorkers(jobId)),
+	fetchTasksAgreements: jobId => dispatch(actions.fetchTasksAgreements(jobId)),
+	fetchWorkersAgreements: (jobId) => dispatch(actions.fetchWorkersAgreements(jobId)),
+	fetchMetric : (metric) => dispatch(actions.fetchMetric(metric))
 })
 
 const mapStateToProps = state => ({
-  jobs: state.job.list.jobs,
-  job_error: state.job.list.error,
-	job_loading: state.job.list.loading,
-
 	reports: state.report.list.reports,
 	rep_error: state.report.list.error,
 	rep_loading: state.report.list.loading,
 
 	workers: state.report.wlist.workers,
 	worker_error: state.report.wlist.error,
-	worker_loading: state.report.wlist.loading,
+	worker_loading: state.report.wlist.loading
 })
 
 export default connect(mapStateToProps,mapDispatchToProps)(Reports)

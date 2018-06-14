@@ -15,7 +15,7 @@ const getRequesterJobs = async ctx => {
 };
 
 const getById = async ctx => {
-  ctx.response.body = await managers.job.getJobWithRelations(ctx.params.id);
+  ctx.response.body = await managers.job.getJobWithDetails(ctx.params.id);
 };
 
 const getState = async ctx => {
@@ -45,6 +45,14 @@ const checkCSVCreation = async ctx => {
   ctx.response.body = await delegates.jobs.checkCSVCreation(ctx.params.id);
 };
 
+const getResults = async ctx => {
+  ctx.response.body = await delegates.results.getAll(
+    ctx.params.id,
+    ctx.query.page,
+    ctx.query.pageSize
+  );
+};
+
 exports.register = router => {
   router.get('/jobs', getRequesterJobs);
   router.post('/jobs', post);
@@ -54,4 +62,5 @@ exports.register = router => {
   router.get('/jobs/:id/state', getState);
   router.post('/jobs/:id/copy', copy);
   router.get('/jobs/:id/check-csv', checkCSVCreation);
+  router.get('/jobs/:id/results', getResults);
 };

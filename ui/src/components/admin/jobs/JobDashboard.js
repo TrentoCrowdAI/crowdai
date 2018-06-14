@@ -1,19 +1,5 @@
 import React from 'react';
-import {
-  Step,
-  Icon,
-  Segment,
-  Grid,
-  Form,
-  Button,
-  Statistic,
-  Header,
-  Image,
-  Accordion,
-  Message,
-  List,
-  Label
-} from 'semantic-ui-react';
+import {Step, Icon, Segment, Grid, Form, Statistic, Header, Image, Message, List, Label} from 'semantic-ui-react';
 import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
 
@@ -24,17 +10,16 @@ import JobParameters from './JobParameters';
 import HitInformation from './HitInformation';
 import JobDashboardButtons from './JobDashboardButtons';
 import {isExpertMode} from 'src/utils';
+import JobResults from './JobResults';
 
 class JobDashboard extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       activeStep: 'process',
-      activeIndex: {},
       aggregationStrategy: 'ds',
       showSuccessMsg: true
     };
-    this.handleAccordionClick = this.handleAccordionClick.bind(this);
     this.handleChange = this.handleChange.bind(this);
   }
   render() {
@@ -138,39 +123,7 @@ class JobDashboard extends React.Component {
               <div hidden={!isExpertMode(this.props.profile)} style={{marginBottom: '20px'}}>
                 {this.renderAggregationStrategySelector()}
               </div>
-              <Statistic.Group widths="3">
-                <Statistic>
-                  <Statistic.Value>
-                    <Icon name="check" /* color="green"*/ />
-                    10
-                  </Statistic.Value>
-                  <Statistic.Label>Papers IN</Statistic.Label>
-                </Statistic>
-
-                <Statistic>
-                  <Statistic.Value>
-                    <Icon name="remove" /* color="red"*/ />
-                    8
-                  </Statistic.Value>
-                  <Statistic.Label>Papers OUT</Statistic.Label>
-                </Statistic>
-
-                <Statistic>
-                  <Statistic.Value>
-                    <Icon name="question" /* color="orange"*/ />
-                    2
-                  </Statistic.Value>
-                  <Statistic.Label>Papers unclassified</Statistic.Label>
-                </Statistic>
-
-                <Statistic style={{marginLeft: 'auto', marginRight: 'auto'}}>
-                  <Statistic.Value>
-                    <Icon name="dollar" /* color="blue"*/ />
-                    20
-                  </Statistic.Value>
-                  <Statistic.Label>Total cost</Statistic.Label>
-                </Statistic>
-              </Statistic.Group>
+              <JobResultSummary jobState={this.props.jobState} job={item} />
             </Grid.Column>
           </Grid.Row>
           <Grid.Row>
@@ -307,43 +260,7 @@ class JobDashboard extends React.Component {
         <div hidden={!isExpertMode(this.props.profile)} style={{marginBottom: '20px'}}>
           {this.renderAggregationStrategySelector()}
         </div>
-        <Accordion style={{width: '100%'}} styled exclusive={false}>
-          {[1, 2, 3].map((paper, idx) => (
-            <div key={idx}>
-              <Accordion.Title active={this.state.activeIndex[idx]} index={idx} onClick={this.handleAccordionClick}>
-                <Icon name="dropdown" />
-                Paper #{paper}
-                <Icon
-                  name={results[idx].in ? 'check' : 'remove'}
-                  color={results[idx].in ? 'green' : 'red'}
-                  style={{marginLeft: '10px'}}
-                />
-                <span style={{marginLeft: '10px'}}>P(OUT) = {results[idx].pout}</span>
-                {!results[idx].in && <span style={{marginLeft: '10px'}}>Reason: {results[idx].reason}</span>}
-              </Accordion.Title>
-              <Accordion.Content active={this.state.activeIndex === idx} style={{textAlign: 'center'}}>
-                {['C1', 'C2', 'C3'].map(f => (
-                  <div key={f} style={{display: 'inline-block', marginRight: '10px'}}>
-                    <Header size="large" content={f} textAlign="center" />
-                    <Button
-                      size="mini"
-                      content="IN"
-                      icon="check"
-                      label={{basic: true, pointing: 'left', content: results[idx].votes[f].in}}
-                    />
-                    <Button
-                      basic
-                      size="mini"
-                      content="OUT"
-                      icon="remove"
-                      label={{as: 'a', basic: true, pointing: 'left', content: results[idx].votes[f].out}}
-                    />
-                  </div>
-                ))}
-              </Accordion.Content>
-            </div>
-          ))}
-        </Accordion>
+        <JobResults job={this.props.item} />
       </Form>
     );
   }
@@ -352,6 +269,7 @@ class JobDashboard extends React.Component {
     let {jobId} = this.props.match.params;
     this.props.fetchItem(jobId);
     this.props.fetchJobState(jobId);
+    this.props.fetchResults(jobId);
   }
 
   componentDidUpdate(prevProps, prevState, snapshot) {
@@ -375,19 +293,54 @@ class JobDashboard extends React.Component {
     });
   }
 
-  handleAccordionClick(e, {index}) {
-    const {activeIndex} = this.state;
-    const newIndex = activeIndex === index ? -1 : index;
-    this.setState({
-      ...this.state,
-      activeIndex: newIndex
-    });
-  }
-
   handleChange(e, {name, value}) {
     this.props.setInputValue(name, value);
   }
 }
+
+const JobResultSummary = ({jobState, job}) => {
+  const {results} = jobState;
+  return (
+    <Statistic.Group widths="3">
+      <Statistic>
+        <Statistic.Value>
+          <Icon name="check" />
+          {results.in}
+        </Statistic.Value>
+        <Statistic.Label>Papers IN</Statistic.Label>
+      </Statistic>
+
+      <Statistic>
+        <Statistic.Value>
+          <Icon name="remove" />
+          {results.out}
+        </Statistic.Value>
+        <Statistic.Label>Papers OUT</Statistic.Label>
+      </Statistic>
+
+      <Statistic>
+        <Statistic.Value>
+          <Icon name="question" />
+          {results.stopped}
+        </Statistic.Value>
+        <Statistic.Label>Papers unclassified</Statistic.Label>
+      </Statistic>
+
+      <Statistic style={{marginLeft: 'auto', marginRight: 'auto'}}>
+        <Statistic.Value>
+          <Icon name="dollar" />
+          {job.totalCost && job.totalCost.toFixed(2)}
+        </Statistic.Value>
+        <Statistic.Label>Total cost</Statistic.Label>
+      </Statistic>
+    </Statistic.Group>
+  );
+};
+
+JobResultSummary.propTypes = {
+  jobState: PropTypes.object,
+  job: PropTypes.object
+};
 
 const jobStatusColors = {
   [JobStatus.PUBLISHED]: 'green',
@@ -411,7 +364,8 @@ JobDashboard.propTypes = {
   cleanJobState: PropTypes.func,
   jobStateLoading: PropTypes.bool,
   cleanState: PropTypes.func,
-  profile: PropTypes.object
+  profile: PropTypes.object,
+  fetchResults: PropTypes.func
 };
 
 const mapStateToProps = state => ({
@@ -433,7 +387,8 @@ const mapDispatchToProps = dispatch => ({
   fetchJobState: id => dispatch(actions.fetchJobState(id)),
   pollJobState: id => dispatch(actions.pollJobState(id)),
   pollJobStateDone: () => dispatch(actions.pollJobStateDone()),
-  cleanJobState: () => dispatch(actions.cleanJobState())
+  cleanJobState: () => dispatch(actions.cleanJobState()),
+  fetchResults: id => dispatch(actions.fetchResults(id))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(JobDashboard);

@@ -150,7 +150,9 @@ const formReducer = (state = defaultFormState, action) => {
 };
 
 const defaultJobState = {
-  item: {},
+  item: {
+    results: {}
+  },
   error: undefined,
   loading: false,
   polling: false
@@ -251,6 +253,33 @@ const taskAssignmentStrategiesReducer = (state = defaultTaskAssignmentStrategies
   }
 };
 
+const defaultResultsState = {
+  results: {rows: []},
+  error: undefined,
+  loading: false
+};
+
+const resultsReducer = (state = defaultResultsState, action) => {
+  switch (action.type) {
+    case actionTypes.FETCH_RESULTS:
+      return {...state, error: undefined, loading: true};
+    case actionTypes.FETCH_RESULTS_SUCCESS:
+      return {
+        ...state,
+        loading: false,
+        results: action.results
+      };
+    case actionTypes.FETCH_RESULTS_ERROR:
+      return {
+        ...state,
+        error: action.error,
+        loading: false
+      };
+    default:
+      return state;
+  }
+};
+
 export default combineReducers({
   list: reducer,
   // finally we combine generic and formReducer that handles
@@ -261,5 +290,6 @@ export default combineReducers({
   },
   state: stateReducer,
   copy: copyReducer,
-  taskAssignmentStrategies: taskAssignmentStrategiesReducer
+  taskAssignmentStrategies: taskAssignmentStrategiesReducer,
+  results: resultsReducer
 });

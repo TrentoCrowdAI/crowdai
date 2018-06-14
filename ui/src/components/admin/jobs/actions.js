@@ -28,6 +28,9 @@ const actionTypes = {
   FETCH_TASK_ASSIGNMENT_STRATEGIES: 'C_FETCH_TASK_ASSIGNMENT_STRATEGIES',
   FETCH_TASK_ASSIGNMENT_STRATEGIES_SUCCESS: 'C_FETCH_TASK_ASSIGNMENT_STRATEGIES_SUCCESS',
   FETCH_TASK_ASSIGNMENT_STRATEGIES_ERROR: 'C_FETCH_TASK_ASSIGNMENT_STRATEGIES_ERROR',
+  FETCH_RESULTS: 'C_FETCH_RESULTS',
+  FETCH_RESULTS_SUCCESS: 'C_FETCH_RESULTS_SUCCESS',
+  FETCH_RESULTS_ERROR: 'C_FETCH_RESULTS_ERROR',
   ...getActionTypes(scopes.JOBS)
 };
 
@@ -222,6 +225,28 @@ const actions = {
   fetchTaskAssignmentStrategiesError(error) {
     return {
       type: actionTypes.FETCH_TASK_ASSIGNMENT_STRATEGIES_ERROR,
+      error
+    };
+  },
+
+  fetchResults(jobId, page = 1) {
+    return {
+      type: actionTypes.FETCH_RESULTS,
+      jobId,
+      page
+    };
+  },
+
+  fetchResultsSuccess(results) {
+    return {
+      type: actionTypes.FETCH_RESULTS_SUCCESS,
+      results
+    };
+  },
+
+  fetchResultsError(error) {
+    return {
+      type: actionTypes.FETCH_RESULTS_ERROR,
       error
     };
   }

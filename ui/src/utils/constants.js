@@ -57,6 +57,12 @@ const UserModes = {
   Researcher: 'Researcher'
 };
 
+const ResultOutcomes = {
+  OUT: 'OUT',
+  IN: 'IN',
+  STOPPED: 'STOPPED'
+};
+
 export {
   scopes,
   FileFormats,
@@ -66,5 +72,6 @@ export {
   AggregationStrategies,
   ShortestRunStatus,
   RegisteredTaskAssignmentStrategies,
-  UserModes
+  UserModes,
+  ResultOutcomes
 };

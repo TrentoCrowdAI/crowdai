@@ -3,3 +3,9 @@ exports.JobStatus = Object.freeze({
   PUBLISHED: 'PUBLISHED',
   DONE: 'DONE'
 });
+
+exports.ResultOutcomes = Object.freeze({
+  OUT: 'OUT',
+  IN: 'IN',
+  STOPPED: 'STOPPED'
+});

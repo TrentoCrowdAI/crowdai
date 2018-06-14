@@ -138,7 +138,7 @@ class JobDashboard extends React.Component {
               <div hidden={!isExpertMode(this.props.profile)} style={{marginBottom: '20px'}}>
                 {this.renderAggregationStrategySelector()}
               </div>
-              <JobResultSummary jobState={this.props.jobState} />
+              <JobResultSummary jobState={this.props.jobState} job={item} />
             </Grid.Column>
           </Grid.Row>
           <Grid.Row>
@@ -357,7 +357,7 @@ class JobDashboard extends React.Component {
   }
 }
 
-const JobResultSummary = ({jobState}) => {
+const JobResultSummary = ({jobState, job}) => {
   const {results} = jobState;
   return (
     <Statistic.Group widths="3">
@@ -388,7 +388,7 @@ const JobResultSummary = ({jobState}) => {
       <Statistic style={{marginLeft: 'auto', marginRight: 'auto'}}>
         <Statistic.Value>
           <Icon name="dollar" />
-          20
+          {job.totalCost && job.totalCost.toFixed(2)}
         </Statistic.Value>
         <Statistic.Label>Total cost</Statistic.Label>
       </Statistic>
@@ -397,7 +397,8 @@ const JobResultSummary = ({jobState}) => {
 };
 
 JobResultSummary.propTypes = {
-  jobState: PropTypes.object
+  jobState: PropTypes.object,
+  job: PropTypes.object
 };
 
 const jobStatusColors = {

@@ -178,53 +178,10 @@ const getWorkerReward = (exports.getWorkerReward = async (
   const job = await delegates.jobs.getByUuid(uuid);
 
   if (!job) {
-    throw Boom.badRequest('Experiment with the given ID does not exist');
+    throw Boom.badRequest(`A job with UUID=${uuid} does not exist`);
   }
-
-  try {
-    let worker = await delegates.workers.getByTurkId(turkId);
-
-    if (!worker) {
-      // worker record does not exist yet.
-      return { reward: 0 };
-    }
-    const assignment = await delegates.workers.getAssignment(uuid, worker.id);
-    const workerSolvedMinTask = await stateManager.checkWorkerSolvedMinTasks(
-      job,
-      worker
-    );
-
-    if (
-      !assignment ||
-      assignment.data.initialTestFailed ||
-      (assignment.data.end && !workerSolvedMinTask)
-    ) {
-      return { reward: 0 };
-    }
-
-    const taskCount = await delegates.tasks.getWorkerTasksCount(
-      job.id,
-      worker.id
-    );
-    let testCount = await delegates.testTasks.getWorkerTestTasksCount(
-      job.id,
-      worker.id
-    );
-
-    if (assignment.data.honeypotFailed) {
-      // we do not pay for failed honeypot.
-      --testCount;
-    }
-    // the total amount that we pay to a worker is HIT reward + bonus. Therefore we
-    // should subtract 1 in order to pay the worker using the reward + bonus strategy.
-    const delta = asBonus ? -1 : 0;
-    return {
-      reward: (taskCount + testCount + delta) * job.data.taskRewardRule
-    };
-  } catch (error) {
-    console.error(error);
-    throw Boom.badImplementation('Error while computing reward');
-  }
+  let worker = await delegates.workers.getByTurkId(turkId);
+  return await __getWorkerReward(job, worker, asBonus);
 });
 
 /**
@@ -271,7 +228,7 @@ const publish = (exports.publish = async id => {
     job.data.instructions = instructions;
     emit(EventTypes.job.START_CRON_FOR_HIT, job, hit.HITId, mt);
     await delegates.jobs.update(id, job);
-    return await getJobWithRelations(id);
+    return await getJobWithDetails(id);
   } catch (error) {
     console.error(error);
     throw Boom.badImplementation('Error while trying to publish the job');
@@ -669,10 +626,11 @@ const updateExpirationForHIT = (exports.updateExpirationForHIT = async (
  *  - estimatedCost
  *  - task assignment strategy
  *  - itemsCount
+ *  - totalCost
  *
  * @param {Number} jobId
  */
-const getJobWithRelations = (exports.getJobWithRelations = async jobId => {
+const getJobWithDetails = (exports.getJobWithDetails = async jobId => {
   if (!jobId) {
     throw Boom.badRequest('The jobId is required');
   }
@@ -688,8 +646,42 @@ const getJobWithRelations = (exports.getJobWithRelations = async jobId => {
     job.data.taskAssignmentStrategy
   );
   job.itemsCount = await delegates.projects.getItemsCount(job.project_id);
+  job.totalCost = await getTotalCost(job);
   return job;
 });
+
+/**
+ * Computest the total cost of the given job.
+ *
+ * @param {Object} job
+ * @return {Number}
+ */
+const getTotalCost = async job => {
+  const assignments = await delegates.jobs.getAssignments(job.id);
+  let totalCost = 0;
+
+  if (!assignments) {
+    return 0;
+  }
+
+  for (assignment of assignments.rows) {
+    if (!assignment.data.end) {
+      continue;
+    }
+
+    if (assignment.data.reward) {
+      totalCost += assignment.data.reward;
+    } else {
+      let worker = await delegates.workers.getById(assignment.worker_id);
+      let rsp = await __getWorkerReward(job, worker);
+      totalCost += rsp.reward;
+      await delegates.workers.updateAssignment(job.uuid, worker.id, {
+        reward: rsp.reward
+      });
+    }
+  }
+  return totalCost;
+};
 
 /**
  * Check if the /next-task service (Task Assignment API) is done, meaning that all
@@ -738,4 +730,55 @@ const computeMaxAssignments = async job => {
     );
   }
   return maxAssignments;
+};
+
+/**
+ * Internal wrapper that computes the reward for the worker.
+ *
+ * @param {Object} job
+ * @param {String} worker
+ * @param {Boolean} asBonus
+ * @return {Object} The reward. The format is:
+ *
+ * @example
+ *  {reward: 0.90}
+ */
+const __getWorkerReward = async (job, worker, asBonus = false) => {
+  if (!worker) {
+    // worker record does not exist yet.
+    return { reward: 0 };
+  }
+  const assignment = await delegates.workers.getAssignment(job.uuid, worker.id);
+  const workerSolvedMinTask = await stateManager.checkWorkerSolvedMinTasks(
+    job,
+    worker
+  );
+
+  if (
+    !assignment ||
+    assignment.data.initialTestFailed ||
+    (assignment.data.end && !workerSolvedMinTask)
+  ) {
+    return { reward: 0 };
+  }
+
+  const taskCount = await delegates.tasks.getWorkerTasksCount(
+    job.id,
+    worker.id
+  );
+  let testCount = await delegates.testTasks.getWorkerTestTasksCount(
+    job.id,
+    worker.id
+  );
+
+  if (assignment.data.honeypotFailed) {
+    // we do not pay for failed honeypot.
+    --testCount;
+  }
+  // the total amount that we pay to a worker is HIT reward + bonus. Therefore we
+  // should subtract 1 in order to pay the worker using the reward + bonus strategy.
+  const delta = asBonus ? -1 : 0;
+  return {
+    reward: (taskCount + testCount + delta) * job.data.taskRewardRule
+  };
 };

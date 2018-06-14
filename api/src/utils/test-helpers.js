@@ -106,6 +106,21 @@ exports.createJob = async (itemsCount, filtersCount, attrs = {}) => {
  */
 exports.simulateVoting = async job => {
   let response = { done: false };
+  // we fake one test item
+  let test = await db.query(
+    `insert into ${
+      db.TABLES.Test
+    }(created_at, project_id, data) values($1, $2, $3) returning *`,
+    [
+      new Date(),
+      job.project_id,
+      {
+        title: 'Paper.title',
+        description: 'Paper.description'
+      }
+    ]
+  );
+  test = test.rows[0];
 
   while (!response.done) {
     let worker = await delegates.workers.create(uuid());
@@ -114,7 +129,8 @@ exports.simulateVoting = async job => {
       job_uuid: job.uuid,
       worker_id: worker.id,
       data: {
-        assignmentTurkId: uuid()
+        assignmentTurkId: uuid(),
+        end: new Date()
       }
     });
     let response = await taskManager.getTasksFromApi(job, worker);
@@ -139,6 +155,39 @@ exports.simulateVoting = async job => {
             }
           ],
           answered: true
+        }
+      });
+    }
+
+    for (let i = 0; i < job.data.initialTestsRule; i++) {
+      await delegates.testTasks.createTestTask({
+        job_id: job.id,
+        worker_id: worker.id,
+        test_id: test.id,
+        data: {
+          initial: true,
+          item: {},
+          criteria: {},
+          answered: true,
+          start: new Date(),
+          end: new Date()
+        }
+      });
+    }
+    let honeypotsCount = Math.floor(items.length / job.data.testFrequencyRule);
+
+    for (let i = 0; i < honeypotsCount; i++) {
+      await delegates.testTasks.createTestTask({
+        job_id: job.id,
+        worker_id: worker.id,
+        test_id: test.id,
+        data: {
+          initial: false,
+          item: {},
+          criteria: {},
+          answered: true,
+          start: new Date(),
+          end: new Date()
         }
       });
     }

@@ -15,7 +15,7 @@ const getRequesterJobs = async ctx => {
 };
 
 const getById = async ctx => {
-  ctx.response.body = await managers.job.getJobWithRelations(ctx.params.id);
+  ctx.response.body = await managers.job.getJobWithDetails(ctx.params.id);
 };
 
 const getState = async ctx => {

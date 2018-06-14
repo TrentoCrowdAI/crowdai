@@ -76,7 +76,7 @@ const fetchJob = (action$, store) =>
 const publishJob = (action$, store) =>
   action$.ofType(actionTypes.PUBLISH_JOB).switchMap(action => {
     const {item} = store.getState().job.form;
-    const config = {timeout: 10000};
+    const config = {timeout: 20000};
     actions.pollJobStateDone();
     return Observable.defer(() => requestersApi.post(`jobs/${item.id}/publish`, {}, config))
       .mergeMap(response =>

@@ -17,7 +17,7 @@ describe('getSummary', () => {
     let ok = true;
 
     try {
-      await resultsDelegate.getSummary(1);
+      await resultsDelegate.getSummary(0);
     } catch (error) {
       ok = false;
     }

@@ -2,6 +2,7 @@ const Boom = require('boom');
 
 const delegates = require(__base + 'delegates');
 const managers = require(__base + 'managers');
+const { UserModes } = require(__base + 'utils/constants');
 
 const getRequesterJobs = async ctx => {
   // we use sub as requester primary key. Since is the userId inside Google API
@@ -23,7 +24,13 @@ const getState = async ctx => {
 };
 
 const post = async ctx => {
-  ctx.response.body = await delegates.jobs.create(ctx.request.fields);
+  const { sub } = ctx.state.loginInfo;
+  let requester = await delegates.requesters.getRequesterByGid(sub);
+  let isAuthorMode = requester.data.userMode === UserModes.Author;
+  ctx.response.body = await delegates.jobs.create(
+    ctx.request.fields,
+    isAuthorMode
+  );
 };
 
 const put = async ctx => {

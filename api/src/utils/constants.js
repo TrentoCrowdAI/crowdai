@@ -9,3 +9,8 @@ exports.ResultOutcomes = Object.freeze({
   IN: 'IN',
   STOPPED: 'STOPPED'
 });
+
+exports.UserModes = Object.freeze({
+  Author: 'Author',
+  Researcher: 'Researcher'
+});

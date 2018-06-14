@@ -192,14 +192,14 @@ class NestChart extends React.Component {
               order: this.props.y
             })
           }
-        ><strong>Sort y</strong></button>
+        ><strong>Sort {this.props.y}</strong></button>
 
         <button
           onClick={(event) => this.setState({
               order: this.props.x
             })
           }
-        ><strong>Sort x</strong></button>
+        ><strong>Sort {this.props.x}</strong></button>
         </React.Fragment> : " "
       }
       </div>

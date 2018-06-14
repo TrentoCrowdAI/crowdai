@@ -7,6 +7,9 @@ import {connect} from 'react-redux'
 class CompareLineChart extends React.Component {
   constructor(props) {
     super(props);
+    this.state = {
+      order: this.props.y
+    }
     this.buildGraph = this.buildGraph.bind(this);
     this.dataWrapper = this.dataWrapper.bind(this);
   }
@@ -43,7 +46,10 @@ class CompareLineChart extends React.Component {
     var x = this.props.x
     var y = this.props.y
     var z = this.props.z
-    var data = this.props.data.sort( (a,b) => a[y]<b[y] ? 1 : a[y]>b[y] ? -1 : 0 )
+    var w = this.props.w
+    var j = this.props.j
+    
+    var data = this.props.data.sort( (a,b) => a[this.state.order]<b[this.state.order] ? 1 : a[this.state.order]>b[this.state.order] ? -1 : 0 )
     
     var xscale = d3.scaleBand()
         .domain( data.map(d => d[x[0]]+", "+d[x[1]]) )
@@ -53,14 +59,14 @@ class CompareLineChart extends React.Component {
       .tickFormat("")
 
     var yscale = d3.scaleLinear()
-        .domain(d3.extent(data, d => d[y]))
+        .domain([ d3.min(data, d => Math.min(d[w],d[y],d[z],d[j])), d3.max(data, d => Math.max(d[w],d[y],d[z],d[j])) ])
         .range([height, 0])
     var yAxis = d3.axisLeft(yscale);
 
     var tooltip = d3.select('body')
         .append('div')
-        .style('width','240px')
-        .style('height','80px')
+        .style('width','250px')
+        .style('height','125px')
         .style('background','steelblue')
         .style('opacity','0.90')
         .style('position','absolute')
@@ -94,6 +100,16 @@ class CompareLineChart extends React.Component {
       .y( d => yscale(d[z]) )
       .curve(d3.curveMonotoneX);
 
+    var line3 = d3.line()
+      .x( d => xscale(d[x[0]]+", "+d[x[1]]) )
+      .y( d => yscale(d[w]) )
+      .curve(d3.curveMonotoneX);
+
+    var line4 = d3.line()
+      .x( d => xscale(d[x[0]]+", "+d[x[1]]) )
+      .y( d => yscale(d[j]) )
+      .curve(d3.curveMonotoneX);
+
     var path1 = g.append("path")
       .datum(data)
       .attr("class","original")
@@ -108,6 +124,24 @@ class CompareLineChart extends React.Component {
       .attr("class","original")
       .attr("id","m1")
       .attr("d", line2)
+      .style("stroke", 'red')
+      .style("fill","none")
+      .style("stroke-width",1)
+
+    var path3 = g.append("path")
+      .datum(data)
+      .attr("class","original")
+      .attr("id","po")
+      .attr("d", line3)
+      .style("stroke", 'lightgreen')
+      .style("fill","none")
+      .style("stroke-width",1)
+
+    var path4 = g.append("path")
+      .datum(data)
+      .attr("class","original")
+      .attr("id","po")
+      .attr("d", line4)
       .style("stroke", 'orange')
       .style("fill","none")
       .style("stroke-width",1)
@@ -133,11 +167,14 @@ class CompareLineChart extends React.Component {
           tooltip.select('div')
               .html('Worker A: <b>'+d[x[0]].toUpperCase()+'</b>,'+
                   '<br />Worker B: <b>'+d[x[1]].toUpperCase()+'</b>,'+
-                  '<br />'+y+' => <b>'+d[y].toFixed(2)+'</b>')
+                  '<br />'+y+' => <b>'+d[y].toFixed(2)+'</b>,'+
+                  '<br />'+z+' => <b>'+d[z].toFixed(2)+'</b>,'+
+                  '<br />'+w+' => <b>'+d[w].toFixed(2)+'</b>,'+
+                  '<br />'+j+' => <b>'+d[j].toFixed(2)+'</b>')
         })
         .on("mouseout", d => tooltip.style('visibility', 'hidden'))
 
-    var points2 = g.selectAll(".dot")
+    /*var points2 = g.selectAll(".dot")
       .data(data).enter()
         .append("circle")
         .style("fill", 'orange')
@@ -152,9 +189,10 @@ class CompareLineChart extends React.Component {
           tooltip.select('div')
               .html('Worker A: <b>'+d[x[0]].toUpperCase()+'</b>,'+
                   '<br />Worker B: <b>'+d[x[1]].toUpperCase()+'</b>,'+
-                  '<br />'+z+' => <b>'+d[z].toFixed(2)+'</b>')
+                  '<br />'+z+' => <b>'+d[z].toFixed(2)+'</b>,'+
+                  '<br />'+w+' => <b>'+d[w].toFixed(2)+'</b>')
         })
-        .on("mouseout", d => tooltip.style('visibility', 'hidden'))
+        .on("mouseout", d => tooltip.style('visibility', 'hidden'))*/
 
     function zoomFunction() {
       //to zoom x axis
@@ -162,13 +200,17 @@ class CompareLineChart extends React.Component {
 
       line1.x(d => xscale(d[x[0]]+", "+d[x[1]]))
       line2.x(d => xscale(d[x[0]]+", "+d[x[1]]))
+      line3.x(d => xscale(d[x[0]]+", "+d[x[1]]))
+      line4.x(d => xscale(d[x[0]]+", "+d[x[1]]))
 
       path1.attr("d",line1)
       path2.attr("d",line2)
+      path3.attr("d",line3)
+      path4.attr("d",line4)
       /*points1.attr("r", )
       points2.attr("r", )*/
       points1.attr("cx", d => xscale(d[x[0]]+", "+d[x[1]]) )
-      points2.attr("cx", d => xscale(d[x[0]]+", "+d[x[1]]) )
+      //points2.attr("cx", d => xscale(d[x[0]]+", "+d[x[1]]) )
 
       //to zoom y axis
       /*var new_yscale = d3.event.transform.rescaleY(yscale)
@@ -198,8 +240,55 @@ class CompareLineChart extends React.Component {
     var z = this.props.z
     return(
       <div>
+        { this.props.data.length ? 
+        <React.Fragment>
+        <button
+          onClick={(event) => this.setState({
+              order: this.props.y
+            })
+          }
+        ><strong>Sort {this.props.y}</strong></button>
+
+        <button
+          onClick={(event) => this.setState({
+              order: this.props.z
+            })
+          }
+        ><strong>Sort {this.props.z}</strong></button>
+
+        <button
+          onClick={(event) => this.setState({
+              order: this.props.w
+            })
+          }
+        ><strong>Sort {this.props.w}</strong></button>
+
+        <button
+          onClick={(event) => this.setState({
+              order: this.props.j
+            })
+          }
+        ><strong>Sort {this.props.j}</strong></button>
+        </React.Fragment> : " "
+        }
+        <br />
         <svg className={this.props.selector} width="1000" height="500"> </svg>
         <br />
+        <strong style={{color: 'steelblue'}}>Cohen's K</strong>:
+        <br />
+        {"   "}<strong>percentage</strong> of inter-rater agreement for categorical tasks, that takes in account possible agreement happening <strong>by chance</strong>.
+        <br />
+        <strong style={{color: 'red'}}>Weighted Agreement</strong>:
+        <br />
+        {"   "}<strong>percentage</strong> of inter-worker basic agreement, considering just when <strong>they vote the same</strong> or agree in voting against the crowd.
+        <br />
+        <strong style={{color: 'lightgreen'}}>Bennett's et al S</strong>:
+        <br />
+        {"   "}<strong>percentage</strong> of rater agreement that might be expected <strong>by chance</strong>, basing on the number of categories available.
+        <br />
+        <strong style={{color: 'orange'}}>Kendall's tau</strong>:
+        <br />
+        {"   "}<strong>ordinal association</strong> of each worker couple representing the relation between how much they answered the same vs how much they answered the opposite.
       </div>
     )
   }

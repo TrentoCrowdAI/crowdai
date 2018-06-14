@@ -135,7 +135,7 @@ class Reports extends React.Component {
 		})		
 	}
 
-renderChart(chart,x,y,z,param) {
+renderChart(chart,x,y,z,w,j,param) {
 		return(
 			<div>
 			<Dimmer active={this.props.rep_loading} inline="centered" inverted>
@@ -145,7 +145,9 @@ renderChart(chart,x,y,z,param) {
 				chart={chart}
         x={x}
         y={y}
-        z={z}
+				z={z}
+				w={w}
+				j={j}
         selector={'chart1'}
 				color={'steelblue'}
 				param={param}
@@ -176,7 +178,9 @@ renderChart(chart,x,y,z,param) {
 
 		var MetricOptions = {
 			'cohen': "Cohen's Kappa",
-			'm1': "Basic Agreement [ M1 ]",
+			'm1': "Weighted Agreement [ M1 ]",
+			'kendall': "Kendall's Tau",
+			'bennett': "Bennett's S",
 			'wwm2(a|b)': "Correlation in Errors [ P_err(A|B) ]",
 			'wwm2(b|a)': "Correlation in Errors [ P_err(B|A) ]",
 			'compare': "Comparing Cohen's Kappa and M1"
@@ -186,6 +190,9 @@ renderChart(chart,x,y,z,param) {
 		var x //first group_by
 		var y //categories
 		var z //second group_by if necessary
+		var w
+		var y
+		var j
 		var param='' //just used in some charts to add more details
 
 		//show different reports
@@ -250,7 +257,23 @@ renderChart(chart,x,y,z,param) {
 				chart='heatmap'
 				x='worker A'
 				y='worker B'
-				z='m1'
+				z='weighted agreement'
+				param=1
+				break;
+
+			case 'kendall':
+				chart='heatmap'
+				x='worker A'
+				y='worker B'
+				z='kendall\'s t'
+				param=1
+				break;
+
+			case 'bennett':
+				chart='heatmap'
+				x='worker A'
+				y='worker B'
+				z='bennett\'s s'
 				param=1
 				break;
 
@@ -258,7 +281,7 @@ renderChart(chart,x,y,z,param) {
 				chart='heatmap'
 				x='worker A'
 				y='worker B'
-				z='wwm2(a|b)'
+				z='probability in errors(a|b)'
 				param=1
 				break;
 
@@ -266,7 +289,7 @@ renderChart(chart,x,y,z,param) {
 				chart='heatmap'
 				x='worker A'
 				y='worker B'
-				z='wwm2(b|a)'
+				z='probability in errors(b|a)'
 				param=1
 				break;
 
@@ -290,7 +313,9 @@ renderChart(chart,x,y,z,param) {
 				chart='linemetricchart'
 				x=['worker A','worker B']
 				y="cohen's kappa correlation"
-				z="m1"
+				z="weighted agreement"
+				w="bennett's s"
+				j="kendall's t"
 				param=1
 				break;
 
@@ -336,10 +361,11 @@ renderChart(chart,x,y,z,param) {
 				<hr />
 				<div className="rowC">
 				<div className='options'>
-					<MetricMenu onChange={this.chooseMetric}/>
-					{
+				{
 						(this.state.chosenmetric=="cohen"
 						||this.state.chosenmetric=="m1"
+						||this.state.chosenmetric=="kendall"
+						||this.state.chosenmetric=="bennett"
 						||this.state.chosenmetric=="wwm2(a|b)"
 						||this.state.chosenmetric=="wwm2(b|a)"
 						||this.state.chosenmetric=="TwoWorkers"
@@ -354,8 +380,9 @@ renderChart(chart,x,y,z,param) {
 							<br />
 						</div>
 					}
+					<MetricMenu onChange={this.chooseMetric}/>
 				</div>
-				{this.renderChart(chart,x,y,z,param)}
+				{this.renderChart(chart,x,y,z,w,j,param)}
 				</div>
 
 			

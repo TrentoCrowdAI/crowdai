@@ -5,6 +5,7 @@ const projectsDelegate = require('./projects');
 const { on } = require(__base + 'events/emitter');
 const { EventTypes } = require(__base + 'events');
 const testHelpers = require(__base + 'utils/test-helpers');
+const taskAssignmentApi = require('./task-assignment-api');
 
 describe('jobs.create', async () => {
   let job;
@@ -45,11 +46,16 @@ describe('jobs.create', async () => {
   });
 
   test('Author mode should set taskAssignmentStrategy automatically', async () => {
-    let taskAssignmentApi = await testHelpers.createFakeTaskAssignmentApi(
+    let taskAssignmentStrategy = await testHelpers.createFakeTaskAssignmentApi(
       'Shortest Run',
       'http://127.0.0.1:5000/msr',
       true
     );
+
+    let spy = jest
+      .spyOn(taskAssignmentApi, 'getByName')
+      .mockImplementation(() => taskAssignmentStrategy);
+
     job = await jobsDelegate.create(
       {
         requester_id: requester.id,
@@ -64,6 +70,7 @@ describe('jobs.create', async () => {
 
     expect(job.data.shortestRun).toBeDefined();
     expect(job.data.shortestRun.baselineSize).toBe(20);
-    expect(job.data.taskAssignmentStrategy).toBe(taskAssignmentApi.id);
+    expect(job.data.taskAssignmentStrategy).toBe(taskAssignmentStrategy.id);
+    spy.mockRestore();
   });
 });

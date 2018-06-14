@@ -151,5 +151,12 @@ const checkWorkerSolvedMinTasks = (exports.checkWorkerSolvedMinTasks = async (
   worker
 ) => {
   const count = await delegates.tasks.getWorkerTasksCount(job.id, worker.id);
+  const buffer = await delegates.tasks.getBuffer(job.id, worker.id);
+
+  // if the number of tasks generated for the worker is less than the minimum
+  // we just check that the worker answered all of them.
+  if (!buffer && count < job.data.minTasksRule) {
+    return true;
+  }
   return count >= job.data.minTasksRule;
 });

@@ -9,7 +9,7 @@ import {
 } from 'semantic-ui-react';
 import { actions as jobactions } from '../jobs/actions';
 
-var ExperimentOptions = { }
+var JobOptions = { }
 
 const options = {
   columns: {
@@ -39,8 +39,8 @@ class ReportsForm extends React.Component {
 	componentDidMount() {
     this.props.fetchJobs();
 
-    this.props.experiments.rows.map( step => {
-    	ExperimentOptions[step.id] = step.data.name+" ( "+step.created_at+" ) "
+    this.props.jobs.rows.map( step => {
+    	JobOptions[step.id] = step.data.name+" ( "+step.created_at+" ) "
     })
   }
 
@@ -59,7 +59,7 @@ class ReportsForm extends React.Component {
 				<DataTable
 					title="My Jobs"
         	options={options}
-        	data={this.props.experiments.rows}
+        	data={this.props.jobs.rows}
         	loading={this.props.loading}
       	/>
 
@@ -70,7 +70,7 @@ class ReportsForm extends React.Component {
 					style={{margin: '10px'}}
 					label="Select Project  "
         	value={this.state.chosenexp}
-					options={Object.entries(ExperimentOptions).map(([key, val]) => ({text: val, value: key}))}
+					options={Object.entries(JobOptions).map(([key, val]) => ({text: val, value: key}))}
 					onChange={this.chooseExp}
 				/>
 
@@ -89,14 +89,14 @@ class ReportsForm extends React.Component {
 }
 
 ReportsForm.propTypes = {
-  fetchExperiments: PropTypes.func,
+  fetchJobs: PropTypes.func,
   error: PropTypes.object,
   loading: PropTypes.bool,
-  experiments: PropTypes.object
+  jobs: PropTypes.object
 }
 
 const mapStateToProps = state => ({
-  projects: state.job.list.jobs,
+  jobs: state.job.list.jobs,
   error: state.job.list.error,
   loading: state.job.list.loading
 })

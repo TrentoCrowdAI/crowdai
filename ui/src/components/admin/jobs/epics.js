@@ -222,6 +222,19 @@ const fetchResults = (action$, store) =>
       });
   });
 
+const fetchAggregationStrategies = (action$, store) =>
+  action$.ofType(actionTypes.FETCH_AGGREGATION_STRATEGIES).switchMap(action => {
+    return Observable.defer(() => requestersApi.get('aggregation-strategies'))
+      .mergeMap(response => Observable.of(actions.fetchAggregationStrategiesSuccess(response.data)))
+      .catch(error => {
+        let err = flattenError(error);
+        return Observable.concat(
+          Observable.of(actions.fetchAggregationStrategiesError(flattenError(err))),
+          Observable.of(toastActions.show({message: err.message, type: ToastTypes.ERROR}))
+        );
+      });
+  });
+
 export default combineEpics(
   getJobs,
   saveJob,
@@ -233,5 +246,6 @@ export default combineEpics(
   checkCSVCreation,
   fetchFiltersCSV,
   fetchTaskAssignmentStrategies,
-  fetchResults
+  fetchResults,
+  fetchAggregationStrategies
 );

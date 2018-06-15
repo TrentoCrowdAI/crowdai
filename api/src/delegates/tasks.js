@@ -196,7 +196,7 @@ const getTaskFromBuffer = (exports.getTaskFromBuffer = async (
     let res = await db.query(
       `select * from ${
         db.TABLES.Task
-      } where job_id = $1 and worker_id = $2 and data ->> 'answered' = 'false' order by random() limit 1`,
+      } where job_id = $1 and worker_id = $2 and (data ->> 'answered')::boolean = false order by random() limit 1`,
       [jobId, workerId]
     );
     let task = res.rows[0];
@@ -220,7 +220,7 @@ const cleanBuffer = (exports.cleanBuffer = async (uuid, workerId) => {
   try {
     let job = await jobsDelegate.getByUuid(uuid);
     await db.query(
-      `update task set deleted_at = now() where job_id = $1 and worker_id = $2 and data ->> 'answered' = 'false'`,
+      `update task set deleted_at = now() where job_id = $1 and worker_id = $2 and (data ->> 'answered')::boolean = false`,
       [job.id, workerId]
     );
   } catch (error) {

@@ -40,6 +40,8 @@ const TABLES = Object.freeze({
   TaskAnswer: 'task_answer',
   Result: 'result',
   TaskAssignmentApi: 'task_assignment_api',
+  Result: 'result',
+  AggregationApi: 'aggregation_api'
   Task_7500: 'task_test_7500'
 });
 

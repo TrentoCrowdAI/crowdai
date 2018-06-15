@@ -7,6 +7,8 @@ const db = require(__base + 'db');
 const projectsDelegate = require('./projects');
 const { EventTypes } = require(__base + 'events');
 const { emit } = require(__base + 'events/emitter');
+const taskAssignmentApi = require('./task-assignment-api');
+const { NAME: SHORTEST_RUN } = require(__base + 'plugins/shortest-run/manager');
 
 const getByRequester = (exports.getByRequester = async requesterId => {
   try {
@@ -88,9 +90,10 @@ const getInstructions = (exports.getInstructions = async job => {
  * 3) emits the JOB_CREATED event passing the created job as a parameter.
  *
  * @param {Object} job
+ * @param {Boolean} isAuthorMode
  * @return {Object} the record created.
  */
-const create = (exports.create = async job => {
+const create = (exports.create = async (job, isAuthorMode = false) => {
   try {
     await db.query('BEGIN');
     let projectId = job.project_id;
@@ -104,6 +107,13 @@ const create = (exports.create = async job => {
       projectId = project.id;
     }
     job.data.status = JobStatus.NOT_PUBLISHED;
+
+    if (isAuthorMode) {
+      // we set Shortest Run strategy as default.
+      job.data.shortestRun = { baselineSize: 20 };
+      let strategy = await taskAssignmentApi.getByName(SHORTEST_RUN);
+      job.data.taskAssignmentStrategy = strategy.id;
+    }
 
     let res = await db.query(
       `insert into ${

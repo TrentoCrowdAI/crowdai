@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 
 import lossPrice from 'src/images/lossprice.png';
 import {actions} from './actions';
-import {AggregationStrategies, JobStatus} from 'src/utils/constants';
+import {JobStatus} from 'src/utils/constants';
 import JobParameters from './JobParameters';
 import HitInformation from './HitInformation';
 import JobDashboardButtons from './JobDashboardButtons';
@@ -17,10 +17,10 @@ class JobDashboard extends React.Component {
     super(props);
     this.state = {
       activeStep: 'process',
-      aggregationStrategy: 'ds',
       showSuccessMsg: true
     };
     this.handleChange = this.handleChange.bind(this);
+    this.handleAggregationChange = this.handleAggregationChange.bind(this);
   }
   render() {
     return (
@@ -158,6 +158,7 @@ class JobDashboard extends React.Component {
 
   renderAggregationStrategySelector() {
     const {taskAssignmentStrategy} = this.props.item;
+    const {aggregationStrategies} = this.props;
 
     if (taskAssignmentStrategy && taskAssignmentStrategy.aggregation) {
       // we do not display the Aggregations dropdown if the task assignment strategy performs aggregation.
@@ -166,9 +167,10 @@ class JobDashboard extends React.Component {
     return (
       <Form.Select
         label="Aggregation strategy"
-        value={this.state.aggregationStrategy}
-        options={Object.entries(AggregationStrategies).map(([key, val]) => ({text: val, value: key}))}
-        onChange={(e, {value}) => {this.setState({...this.state, aggregationStrategy: value})}}
+        name="data.aggregationStrategy"
+        value={this.props.item.data.aggregationStrategy}
+        options={aggregationStrategies.map(s => ({text: s.name, value: Number(s.id)}))}
+        onChange={this.handleAggregationChange}
       />
     );
   }
@@ -270,6 +272,7 @@ class JobDashboard extends React.Component {
     this.props.fetchItem(jobId);
     this.props.fetchJobState(jobId);
     this.props.fetchResults(jobId);
+    this.props.fetchAggregationStrategies();
   }
 
   componentDidUpdate(prevProps, prevState, snapshot) {
@@ -295,6 +298,11 @@ class JobDashboard extends React.Component {
 
   handleChange(e, {name, value}) {
     this.props.setInputValue(name, value);
+  }
+
+  handleAggregationChange(e, {name, value}) {
+    this.handleChange(e, {name, value});
+    console.log('POST /aggregation', name, value);
   }
 }
 
@@ -365,7 +373,9 @@ JobDashboard.propTypes = {
   jobStateLoading: PropTypes.bool,
   cleanState: PropTypes.func,
   profile: PropTypes.object,
-  fetchResults: PropTypes.func
+  fetchResults: PropTypes.func,
+  aggregationStrategies: PropTypes.arrayOf(PropTypes.object),
+  fetchAggregationStrategies: PropTypes.func
 };
 
 const mapStateToProps = state => ({
@@ -376,7 +386,8 @@ const mapStateToProps = state => ({
   polling: state.job.state.polling,
   jobState: state.job.state.item,
   jobStateLoading: state.job.state.loading,
-  profile: state.profile.item
+  profile: state.profile.item,
+  aggregationStrategies: state.job.aggregationStrategies.strategies
 });
 
 const mapDispatchToProps = dispatch => ({
@@ -388,7 +399,8 @@ const mapDispatchToProps = dispatch => ({
   pollJobState: id => dispatch(actions.pollJobState(id)),
   pollJobStateDone: () => dispatch(actions.pollJobStateDone()),
   cleanJobState: () => dispatch(actions.cleanJobState()),
-  fetchResults: id => dispatch(actions.fetchResults(id))
+  fetchResults: id => dispatch(actions.fetchResults(id)),
+  fetchAggregationStrategies: () => dispatch(actions.fetchAggregationStrategies())
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(JobDashboard);

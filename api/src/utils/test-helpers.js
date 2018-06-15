@@ -31,6 +31,25 @@ exports.createFakeTaskAssignmentApi = async (
 };
 
 /**
+ * Helper method that adds a aggregation api record to the DB.
+ *
+ * @param {String} name
+ * @param {String} url
+ */
+exports.createFakeAggregationApi = async (
+  name = 'fake aggregation api',
+  url = 'http://url'
+) => {
+  let record = await db.query(
+    `insert into ${
+      db.TABLES.AggregationApi
+    }(created_at, name, url) values($1, $2, $3) returning *`,
+    [new Date(), name, url]
+  );
+  return record.rows[0];
+};
+
+/**
  * Helper method that creates an empty job in the db.
  *
  * @param {Object} extraDataAttrs Additional data attributes

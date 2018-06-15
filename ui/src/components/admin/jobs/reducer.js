@@ -71,6 +71,7 @@ const genericFormReducer = getReducer(scopes.JOBS, {
     votesPerTaskRule: 2,
     expertCostRule: 0.2,
     taskAssignmentStrategy: 0,
+    aggregationStrategy: 0,
     // information related to the underlying project.
     itemsUrl: '',
     filtersUrl: '',
@@ -280,6 +281,30 @@ const resultsReducer = (state = defaultResultsState, action) => {
   }
 };
 
+const defaultAggregationStrategiesState = {
+  strategies: [],
+  error: undefined
+};
+
+const aggregationStrategiesReducer = (state = defaultAggregationStrategiesState, action) => {
+  switch (action.type) {
+    case actionTypes.FETCH_AGGREGATION_STRATEGIES:
+      return {...defaultAggregationStrategiesState};
+    case actionTypes.FETCH_AGGREGATION_STRATEGIES_SUCCESS:
+      return {
+        ...state,
+        strategies: action.aggregationStrategies
+      };
+    case actionTypes.FETCH_AGGREGATION_STRATEGIES_ERROR:
+      return {
+        ...state,
+        error: action.error
+      };
+    default:
+      return state;
+  }
+};
+
 export default combineReducers({
   list: reducer,
   // finally we combine generic and formReducer that handles
@@ -291,5 +316,6 @@ export default combineReducers({
   state: stateReducer,
   copy: copyReducer,
   taskAssignmentStrategies: taskAssignmentStrategiesReducer,
-  results: resultsReducer
+  results: resultsReducer,
+  aggregationStrategies: aggregationStrategiesReducer
 });

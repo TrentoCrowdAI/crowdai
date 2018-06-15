@@ -69,8 +69,24 @@ const create = (exports.create = async taskAssignmentApi => {
   let rsp = await db.query(
     `insert into ${
       db.TABLES.TaskAssignmentApi
-    }(requester_id, name, url, aggregation) values($1, $2, $3, $4) returning *`,
-    [requester_id, name, url, aggregation]
+    }(created_at, requester_id, name, url, aggregation) values($1, $2, $3, $4, $5) returning *`,
+    [new Date(), requester_id, name, url, aggregation]
   );
   return rsp.rows[0];
+});
+
+/**
+ * Returns the task assignment record for the given name.
+ *
+ * @param {String} name
+ */
+const getByName = (exports.getByName = async name => {
+  if (!name) {
+    throw Boom.badRequest('The name is required');
+  }
+  let res = await db.query(
+    `select * from ${db.TABLES.TaskAssignmentApi} where name = $1`,
+    [name]
+  );
+  return res.rowCount ? res.rows[0] : null;
 });

@@ -155,7 +155,7 @@ const checkWorkerSolvedMinTasks = (exports.checkWorkerSolvedMinTasks = async (
 
   // if the number of tasks generated for the worker is less than the minimum
   // we just check that the worker answered all of them.
-  if (!buffer && count < job.data.minTasksRule) {
+  if (!buffer && count > 0 && count < job.data.minTasksRule) {
     return true;
   }
   return count >= job.data.minTasksRule;

@@ -65,23 +65,14 @@ class WelcomePage extends React.Component {
             </Accordion>
           </div>
 
-          {!this.props.assigmentStatusLoading && <PaymentInstructions job={this.props.item} />}
-
-          {this.props.assigmentStatusLoading && (
-            <Segment vertical style={{borderBottom: 0}}>
-              <Grid>
-                <Grid.Row>
-                  <Dimmer active inverted>
-                    <Loader inverted>Loading</Loader>
-                  </Dimmer>
-                </Grid.Row>
-              </Grid>
-            </Segment>
-          )}
+          <PaymentInstructions job={this.props.item} />
 
           {this.renderRedirectBtn()}
           {this.renderFinalStep()}
         </Grid.Row>
+        <Dimmer active={this.props.assignmentStatusLoading} inverted>
+          <Loader inverted>Loading</Loader>
+        </Dimmer>
       </Container>
     );
   }
@@ -141,11 +132,19 @@ class WelcomePage extends React.Component {
                 </p>
               )}
 
-              {!assignmentStatus.data.initialTestFailed &&
+              {assignmentStatus.data.honeypotFailed &&
                 !assignmentStatus.data.solvedMinTasks && (
                   <p>
                     Thank you for participating, but you did not solve the minimum number of tasks required. Please
                     return the HIT to finish.
+                  </p>
+                )}
+
+              {assignmentStatus.data.finishedWithError &&
+                !assignmentStatus.data.solvedMinTasks && (
+                  <p>
+                    Sorry for the inconvenience, we will look into the problem. Please return the HIT to finish.
+                    Consider trying again later.
                   </p>
                 )}
             </Message.Content>
@@ -183,7 +182,7 @@ WelcomePage.propTypes = {
   hasAcceptedHit: PropTypes.bool,
   checkAssignmentStatus: PropTypes.func,
   assignmentStatus: PropTypes.object,
-  assigmentStatusLoading: PropTypes.bool,
+  assignmentStatusLoading: PropTypes.bool,
   checkPolling: PropTypes.func,
   match: PropTypes.object,
   fetchItem: PropTypes.func,
@@ -194,7 +193,7 @@ const mapStateToProps = state => ({
   session: state.questionForm.session,
   hasAcceptedHit: state.questionForm.hasAcceptedHit,
   assignmentStatus: state.questionForm.assignmentStatus,
-  assigmentStatusLoading: state.questionForm.assigmentStatusLoading,
+  assignmentStatusLoading: state.questionForm.assignmentStatusLoading,
   item: state.job.form.item
 });
 

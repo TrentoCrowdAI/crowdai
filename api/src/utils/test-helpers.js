@@ -16,7 +16,7 @@ if (process.env.NODE_ENV === 'test') {
  * @param {String} url
  * @param {Boolean} aggregation
  */
-exports.createFakeTaskAssignmentApi = async (
+const createFakeTaskAssignmentApi = (exports.createFakeTaskAssignmentApi = async (
   name = 'fake task assignment',
   url = 'http://url',
   aggregation = false
@@ -28,7 +28,7 @@ exports.createFakeTaskAssignmentApi = async (
     [name, url, aggregation]
   );
   return record.rows[0];
-};
+});
 
 /**
  * Helper method that adds a aggregation api record to the DB.
@@ -47,6 +47,22 @@ exports.createFakeAggregationApi = async (
     [new Date(), name, url]
   );
   return record.rows[0];
+};
+
+exports.createBaselineTaskAssignmentApi = async () => {
+  return await createFakeTaskAssignmentApi(
+    'Baseline',
+    'http://127.0.0.1:10000',
+    false
+  );
+};
+
+exports.createShortestRunTaskAssignmentApi = async () => {
+  return await createFakeTaskAssignmentApi(
+    'Shortest Run',
+    'http://127.0.0.1:5000',
+    true
+  );
 };
 
 /**
@@ -72,7 +88,7 @@ exports.createFakeJob = async (extraDataAttrs = {}) => {
 };
 
 /**
- * Creates a job with items and filters.
+ * Creates a job with items, tests and filters.
  *
  * @param {Number} itemsCount Number of items to insert into the item table
  * @param {Number} filtersCount Number of filters to insert into the criterion table
@@ -82,9 +98,12 @@ exports.createJob = async (itemsCount, filtersCount, attrs = {}) => {
   await db.query('BEGIN');
   let requester = await delegates.requesters.create({});
   let filters = [];
+  attrs.instructions = {};
 
   for (let i = 0; i < filtersCount; i++) {
-    filters.push({ label: `C${i + 1}`, description: `filter number ${i + 1}` });
+    let filter = { label: `C${i + 1}`, description: `filter number ${i + 1}` };
+    filters.push(filter);
+    attrs.instructions[filter.label] = '';
   }
 
   job = await delegates.jobs.create({
@@ -112,6 +131,38 @@ exports.createJob = async (itemsCount, filtersCount, attrs = {}) => {
         }
       ]
     );
+  }
+  // we create test records based on the itemsCount
+  filters = await delegates.projects.getCriteria(job.project_id);
+
+  for (let i = 0; i < filtersCount; i++) {
+    let filter = filters.rows[i];
+
+    for (let j = 0; j < itemsCount; j++) {
+      await db.query(
+        `insert into ${
+          db.TABLES.Test
+        }(created_at, project_id, data) values($1, $2, $3) returning *`,
+        [
+          new Date(),
+          job.project_id,
+          {
+            item: {
+              title: `Paper.title number ${j + 1}`,
+              description: `Paper.description number ${j + 1}`
+            },
+            criteria: [
+              {
+                id: filter.id,
+                label: filter.data.label,
+                description: filter.data.description,
+                answer: Math.random() > 0.5 ? 'yes' : 'no'
+              }
+            ]
+          }
+        ]
+      );
+    }
   }
   await db.query('COMMIT');
   return job;

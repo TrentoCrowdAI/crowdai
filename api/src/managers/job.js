@@ -18,6 +18,7 @@ const { coordinator } = require(__base + 'plugins');
  * @param {string} uuid - The job's UUID
  * @param {string} turkId - The worker's Mechanical Turk ID.
  * @param {string} assignmentTurkId - The worker's assignment ID on Mechanical Turk.
+ * @param {Object} The generated task for the worker.
  */
 exports.nextTask = async (uuid, turkId, assignmentTurkId) => {
   try {
@@ -81,13 +82,23 @@ exports.nextTask = async (uuid, turkId, assignmentTurkId) => {
     return task;
   } catch (error) {
     console.error(error);
-
-    if (error.isBoom) {
-      throw error;
-    }
-    throw Boom.badImplementation(
+    const err = Boom.badImplementation(
       'Error while trying to generate next task for worker'
     );
+    // before throwing we check if the worker have solved the min number of tasks.
+    // if the worker is below min, then we simply finish their assignment.
+    const job = await delegates.jobs.getByUuid(uuid);
+    let worker = await delegates.workers.getByTurkId(turkId);
+    const solvedMinTasks = await stateManager.checkWorkerSolvedMinTasks(
+      job,
+      worker
+    );
+    err.output.payload.workerSolvedMinTasks = solvedMinTasks;
+
+    if (!solvedMinTasks) {
+      await stateManager.forceFinish(uuid, turkId, true);
+    }
+    throw err;
   }
 };
 

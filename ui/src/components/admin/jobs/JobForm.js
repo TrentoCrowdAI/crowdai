@@ -114,7 +114,7 @@ class JobForm extends React.Component {
             <Form.Input
               label="Internal name"
               name="data.internalName"
-              value={item.data.internalName}
+              value={item.data.internalName || ''}
               placeholder="An internal codename for the job."
               onChange={this.handleChange}
             />
@@ -326,50 +326,32 @@ class JobForm extends React.Component {
 
   renderCriteriaKnowledge() {
     const {item} = this.props;
+    const {criteria} = item;
     return (
       <Grid columns="1">
-        <Grid.Row>
-          <Grid.Column>
-            <NumberInput
-              type="number"
-              label="(C1) Are technology and/or technological solutions involved?"
-              name="c1"
-              value={item.c1}
-              onChange={this.handleChange}
-              min="0"
-              max="100"
-              placeholder="% of papers you think would meet the filter"
-            />
-          </Grid.Column>
-        </Grid.Row>
-        <Grid.Row>
-          <Grid.Column>
-            <NumberInput
-              type="number"
-              label="(C2) Are the elderly involved?"
-              name="c2"
-              value={item.c2}
-              onChange={this.handleChange}
-              min="0"
-              max="100"
-              placeholder="% of papers you think would meet the filter"
-            />
-          </Grid.Column>
-        </Grid.Row>
-        <Grid.Row>
-          <Grid.Column>
-            <NumberInput
-              type="number"
-              label="(C3) Is it related to loneliness, social isolation, or social connectedness reason?"
-              name="c3"
-              value={item.c2}
-              onChange={this.handleChange}
-              min="0"
-              max="100"
-              placeholder="% of papers you think would meet the filter"
-            />
-          </Grid.Column>
-        </Grid.Row>
+        {criteria &&
+          criteria.map((c, idx) => {
+            const label = c.label || c.data.label;
+            const description = c.description || c.data.description;
+            const value = item.data.priors ? item.data.priors[label] : '';
+            return (
+              <Grid.Row key={idx}>
+                <Grid.Column>
+                  <NumberInput
+                    type="number"
+                    label={`(${label}) ${description}`}
+                    name={`data.priors[${label}]`}
+                    value={value}
+                    onChange={this.handleChange}
+                    min="0"
+                    max="100"
+                    placeholder="% of papers you think would meet the filter"
+                  />
+                </Grid.Column>
+              </Grid.Row>
+            );
+          })}
+        {criteria.length === 0 && <p style={{padding: '10px'}}>No filters specified yet.</p>}
       </Grid>
     );
   }

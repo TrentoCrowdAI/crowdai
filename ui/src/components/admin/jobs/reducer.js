@@ -49,6 +49,7 @@ const genericFormReducer = getReducer(scopes.JOBS, {
     description: '',
     status: JobStatus.NOT_PUBLISHED,
     instructions: {},
+    priors: {},
     consentUrl: '',
     consentFormat: FileFormats.PLAIN_TEXT,
     // True: ask each worker multiple criteria per paper. False: ask one criterion only per paper.

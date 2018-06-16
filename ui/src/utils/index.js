@@ -19,7 +19,7 @@ const flattenError = error => {
   } else {
     err.message = 'There was a problem processing your request.';
   }
-  return error;
+  return err;
 };
 
 /**

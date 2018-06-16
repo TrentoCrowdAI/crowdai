@@ -104,7 +104,7 @@ const getWorkerQuizScore = (exports.getWorkerQuizScore = async (
         ++count;
       }
     }
-    return count / job.data.initialTestsRule * 100;
+    return (count / job.data.initialTestsRule) * 100;
   } catch (error) {
     console.error(error);
     throw Boom.badImplementation(

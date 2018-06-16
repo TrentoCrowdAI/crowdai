@@ -102,6 +102,10 @@ class JobResults extends React.Component {
     );
   }
 
+  componentDidMount() {
+    this.props.fetchResults(this.props.job.id);
+  }
+
   handleAccordionClick(e, {index}) {
     const {activeIndex} = this.state;
     const newIndex = activeIndex === index ? -1 : index;

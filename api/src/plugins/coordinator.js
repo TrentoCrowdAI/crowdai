@@ -32,6 +32,18 @@ let managersMap = {
  * }
  */
 exports.getEstimatedCost = async job => {
+  let mngr = await getManager(job);
+  let cost = await mngr.getEstimatedCost(job);
+  return cost;
+};
+
+/**
+ * Just a private helper to return the manager for the given job.
+ *
+ * @param {Object} job
+ * @private
+ */
+const getManager = async job => {
   if (!job) {
     throw Boom.badRequest('The job is required');
   }
@@ -50,6 +62,5 @@ exports.getEstimatedCost = async job => {
       'The manager for the task assignment strategy does not exist'
     );
   }
-  let cost = await mngr.getEstimatedCost(job);
-  return cost;
+  return mngr;
 };

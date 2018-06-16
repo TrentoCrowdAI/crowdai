@@ -18,6 +18,7 @@ const { coordinator } = require(__base + 'plugins');
  * @param {string} uuid - The job's UUID
  * @param {string} turkId - The worker's Mechanical Turk ID.
  * @param {string} assignmentTurkId - The worker's assignment ID on Mechanical Turk.
+ * @param {Object} The generated task for the worker.
  */
 exports.nextTask = async (uuid, turkId, assignmentTurkId) => {
   try {
@@ -80,14 +81,23 @@ exports.nextTask = async (uuid, turkId, assignmentTurkId) => {
     );
     return task;
   } catch (error) {
-    console.error(error);
-
-    if (error.isBoom) {
-      throw error;
-    }
-    throw Boom.badImplementation(
+    const err = Boom.badImplementation(
       'Error while trying to generate next task for worker'
     );
+    // before throwing we check if the worker have solved the min number of tasks.
+    // if the worker is below min, then we simply finish their assignment.
+    const job = await delegates.jobs.getByUuid(uuid);
+    let worker = await delegates.workers.getByTurkId(turkId);
+    const solvedMinTasks = await stateManager.checkWorkerSolvedMinTasks(
+      job,
+      worker
+    );
+    err.output.payload.workerSolvedMinTasks = solvedMinTasks;
+
+    if (!solvedMinTasks) {
+      await stateManager.forceFinish(uuid, turkId, true);
+    }
+    throw err;
   }
 };
 
@@ -353,7 +363,7 @@ const reviewAssignments = (exports.reviewAssignments = async (
       job.data.hitConfig.maxAssignments === 0 &&
       !jobDone
     ) {
-      console.debug(
+      console.log(
         `Job: ${job.id} is not done yet. Adding more Assignments for HIT ${
           hit.HITId
         }`
@@ -454,19 +464,20 @@ const createAdditionalAssignmentsForHIT = (exports.createAdditionalAssignmentsFo
   hit,
   mturk
 ) => {
-  const records = await delegates.jobs.getAssignmentsFinishedByWorkers(job.id);
+  const pendings = await taskManager.getPendingVotes(job);
+  const numWorkers = await taskManager.getEstimatedWorkersCount(job, pendings);
+
   let params = {
     HITId: hit.HITId,
-    NumberOfAdditionalAssignments: records.meta.count
+    NumberOfAdditionalAssignments: numWorkers
   };
+
   await new Promise((resolve, reject) => {
     mturk.createAdditionalAssignmentsForHIT(params, (err, data) => {
       if (err) {
         reject(err);
       } else {
-        console.debug(
-          `Added ${records.meta.count} assignments to HIT: ${hit.HITId}`
-        );
+        console.log(`Added ${numWorkers} assignments to HIT: ${hit.HITId}`);
         resolve(data);
       }
     });
@@ -475,7 +486,7 @@ const createAdditionalAssignmentsForHIT = (exports.createAdditionalAssignmentsFo
   let now = moment();
 
   if (hit.HITStatus === 'Reviewable' && expiration.isBefore(now)) {
-    console.debug(
+    console.log(
       `HIT ${hit.HITId} is Reviewable and has expired. Changing the expiration 
       to make it Assignable again.`
     );

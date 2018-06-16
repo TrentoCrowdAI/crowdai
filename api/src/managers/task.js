@@ -2,7 +2,7 @@ const request = require('request');
 const Boom = require('boom');
 
 const delegates = require(__base + 'delegates');
-const jobManager = require('./job');
+const db = require(__base + 'db');
 
 /**
  * Generate the tasks for the given worker. It integrates with the
@@ -164,3 +164,64 @@ const getEstimatedTasksPerWorkerCount = (exports.getEstimatedTasksPerWorkerCount
   }
   return estimated;
 });
+
+/**
+ * This method returns a summary of the missing votes per each (item, filter) pair.
+ *
+ * @param {Object} job
+ * @return {Object} A summary of the number of votes pendings. It has the following format:
+ *
+ * @example
+ *
+ * [
+ *    {item: 1, filter: 1, pending: 1},
+ *    {item: 2, filter: 1, pending: 2},
+ *    {item: 3, filter: 2, pending: 2}
+ * ]
+ */
+exports.getPendingVotes = async job => {
+  let rsp = await db.query(
+    `select t.item_id as item, (t.data->'criteria')::json#>>'{0,id}' as filter, count(t.item_id) as pending
+      from ${db.TABLES.Task} t
+      where t.job_id = $1 
+        and t.deleted_at is not null
+      group by (t.data->'criteria')::json#>>'{0,id}', t.item_id`,
+    [job.id]
+  );
+  return rsp.rows;
+};
+
+/**
+ * This methods estimated the number of workers needed to complete the missing votes.
+ *
+ * @param {Object} job
+ * @param {Object[]} pendings A summary of the missing votes, as returned by {@link coordinator#getPendingVotes}
+ * @return {Number}
+ */
+exports.getEstimatedWorkersCount = async (job, pendings) => {
+  const filters = new Set(pendings.map(p => p.filter));
+  let totalCount = 0;
+
+  for (let filter of filters) {
+    let fpendings = getPendingsForFilter(filter, pendings);
+
+    while (fpendings.length > 0) {
+      let vc = 0; // votes for current worker
+      ++totalCount;
+
+      for (let p of fpendings) {
+        --p.pending;
+        ++vc;
+
+        if (vc === job.data.maxTasksRule) {
+          break;
+        }
+      }
+      fpendings = getPendingsForFilter(filter, pendings);
+    }
+  }
+  return totalCount;
+};
+
+const getPendingsForFilter = (filter, pendings) =>
+  pendings.filter(p => p.filter === filter && p.pending > 0);

@@ -15,6 +15,32 @@ class FilterTask extends React.Component {
    */
   render() {
     if (this.props.error) {
+      if (this.props.error.workerSolvedMinTasks) {
+        return (
+          <Segment vertical>
+            <Grid>
+              <Grid.Row>
+                <Grid.Column>
+                  <Message style={{marginLeft: 'auto', marginRight: 'auto'}} negative>
+                    <Message.Header>Error</Message.Header>
+                    <p>
+                      An error occurred while trying to fetch the task. Please refresh the page to retry. If the problem
+                      persists, click on the following button to submit your progress. We will look into the problem and
+                      contact you if needed.
+                    </p>
+                    <FinishButton
+                      style={{marginTop: 40, marginRight: '0.6em'}}
+                      onClick={() => {
+                        this.finish(true);
+                      }}
+                    />
+                  </Message>
+                </Grid.Column>
+              </Grid.Row>
+            </Grid>
+          </Segment>
+        );
+      }
       return (
         <Segment vertical>
           <Grid>
@@ -23,16 +49,9 @@ class FilterTask extends React.Component {
                 <Message style={{marginLeft: 'auto', marginRight: 'auto'}} negative>
                   <Message.Header>Error</Message.Header>
                   <p>
-                    An error occurred while trying to fetch the task. Please refresh the page to retry. If the problem
-                    persists, click on the following button to submit your progress. We will look into the problem and
-                    contact you if needed.
+                    An error occurred while trying to fetch the task. Sorry for the inconvenience, please close this
+                    tab/window and go back to the HIT page on Amazon Mechanical Turk.
                   </p>
-                  <FinishButton
-                    style={{marginTop: 40, marginRight: '0.6em'}}
-                    onClick={() => {
-                      this.finish(true);
-                    }}
-                  />
                 </Message>
               </Grid.Column>
             </Grid.Row>

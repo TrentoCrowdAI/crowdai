@@ -86,7 +86,7 @@ const checkPolling = (action$, store) =>
       .mergeMap(() =>
         Observable.defer(() => axios.get(`/jobs/${session.jobId}/workers/${session.workerId}/assignment-status`))
           .mergeMap(response => {
-            if (response.data.data.finished) {
+            if (response.data.data.end) {
               return Observable.concat(
                 Observable.of(actions.checkPollingDone()),
                 Observable.of(actions.checkAssignmentStatusSuccess(response.data))

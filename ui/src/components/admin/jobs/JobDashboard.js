@@ -271,7 +271,6 @@ class JobDashboard extends React.Component {
     let {jobId} = this.props.match.params;
     this.props.fetchItem(jobId);
     this.props.fetchJobState(jobId);
-    this.props.fetchResults(jobId);
     this.props.fetchAggregationStrategies();
   }
 

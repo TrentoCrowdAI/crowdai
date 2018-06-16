@@ -81,7 +81,6 @@ exports.nextTask = async (uuid, turkId, assignmentTurkId) => {
     );
     return task;
   } catch (error) {
-    console.error(error);
     const err = Boom.badImplementation(
       'Error while trying to generate next task for worker'
     );
@@ -364,7 +363,7 @@ const reviewAssignments = (exports.reviewAssignments = async (
       job.data.hitConfig.maxAssignments === 0 &&
       !jobDone
     ) {
-      console.debug(
+      console.log(
         `Job: ${job.id} is not done yet. Adding more Assignments for HIT ${
           hit.HITId
         }`
@@ -465,19 +464,20 @@ const createAdditionalAssignmentsForHIT = (exports.createAdditionalAssignmentsFo
   hit,
   mturk
 ) => {
-  const records = await delegates.jobs.getAssignmentsFinishedByWorkers(job.id);
+  const pendings = await taskManager.getPendingVotes(job);
+  const numWorkers = await taskManager.getEstimatedWorkersCount(job, pendings);
+
   let params = {
     HITId: hit.HITId,
-    NumberOfAdditionalAssignments: records.meta.count
+    NumberOfAdditionalAssignments: numWorkers
   };
+
   await new Promise((resolve, reject) => {
     mturk.createAdditionalAssignmentsForHIT(params, (err, data) => {
       if (err) {
         reject(err);
       } else {
-        console.debug(
-          `Added ${records.meta.count} assignments to HIT: ${hit.HITId}`
-        );
+        console.log(`Added ${numWorkers} assignments to HIT: ${hit.HITId}`);
         resolve(data);
       }
     });
@@ -486,7 +486,7 @@ const createAdditionalAssignmentsForHIT = (exports.createAdditionalAssignmentsFo
   let now = moment();
 
   if (hit.HITStatus === 'Reviewable' && expiration.isBefore(now)) {
-    console.debug(
+    console.log(
       `HIT ${hit.HITId} is Reviewable and has expired. Changing the expiration 
       to make it Assignable again.`
     );

@@ -12,14 +12,12 @@ test('should define getEstimatedCost', () => {
 });
 
 describe('manager.getEstimatedCost', () => {
-  let getItemsCount = delegates.projects.getItemsCount;
-  let getCriteriaCount = delegates.projects.getCriteriaCount;
+  let getItemsCountSpy = jest.spyOn(delegates.projects, 'getItemsCount');
+  let getCriteriaSpy = jest.spyOn(delegates.projects, 'getCriteria');
 
-  afterEach(() => {
-    if (delegates.projects.getItemsCount.mockReset) {
-      delegates.projects.getItemsCount = getItemsCount;
-      delegates.projects.getCriteriaCount = getCriteriaCount;
-    }
+  afterAll(() => {
+    getItemsCountSpy.mockRestore();
+    getCriteriaSpy.mockRestore();
   });
 
   let setup = [
@@ -88,8 +86,8 @@ describe('manager.getEstimatedCost', () => {
   for (let s of setup) {
     test(getDescription(s), async () => {
       job = await testHelpers.createFakeJob(s.job);
-      delegates.projects.getItemsCount = jest.fn(() => s.itemsCount);
-      delegates.projects.getCriteria = jest.fn(() => {
+      getItemsCountSpy.mockImplementation(() => s.itemsCount);
+      getCriteriaSpy.mockImplementation(() => {
         let filters = { rows: [], meta: { count: s.filtersCount } };
 
         for (let i = 0; i < s.filtersCount; i++) {
@@ -97,6 +95,7 @@ describe('manager.getEstimatedCost', () => {
         }
         return filters;
       });
+
       let cost = await baselineManager.getEstimatedCost(job);
       expect(cost.total.toFixed(2)).toBe(s.cost);
       expect(cost.details).toBeDefined();

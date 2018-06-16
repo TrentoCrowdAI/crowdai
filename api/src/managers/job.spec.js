@@ -3,7 +3,7 @@ const moment = require('moment');
 const taskManager = require('./task');
 const jobManager = require('./job');
 
-test('createAdditionalAssignmentsForHIT should create additional assignments', async () => {
+test('createAdditionalAssignmentsForHIT should create 5 additional assignments', async () => {
   let called = false;
   let payload;
   let mturk = {

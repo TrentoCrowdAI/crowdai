@@ -1,11 +1,14 @@
 const { OAuth2Client } = require('google-auth-library');
 const unless = require('koa-unless');
+const Boom = require('boom');
 
 const config = require(__base + 'config');
 
 const middleware = async (ctx, next) => {
   if (!ctx.header.authorization) {
-    ctx.throw(401, 'Token not found');
+    ctx.status = 401;
+    ctx.body = Boom.unauthorized('Token not found');
+    return;
   }
   const parts = ctx.header.authorization.split(' ');
 
@@ -27,14 +30,15 @@ const middleware = async (ctx, next) => {
         ctx.state.loginInfo = decodedToken.payload;
       } catch (error) {
         console.error(error);
-        ctx.throw(401, 'Authentication Error');
+        ctx.status = 401;
+        ctx.body = Boom.unauthorized('Authentication Error');
+        return;
       }
       return next();
     }
   }
-
-  ctx.throw(
-    401,
+  ctx.status = 401;
+  ctx.body = Boom.unauthorized(
     'Bad Authorization header format. Format is "Authorization: Bearer <token>"'
   );
 };

@@ -1,3 +1,6 @@
 const app = require('./app');
+const jobManager = require(__base + 'managers/job');
 
-app.listen(process.env.PORT || 4000);
+app.listen({ port: process.env.PORT || 4000 }, () => {
+  jobManager.restartCronJobs();
+});

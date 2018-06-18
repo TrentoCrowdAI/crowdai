@@ -344,3 +344,15 @@ const getClassifiedItemsCount = (exports.getClassifiedItemsCount = async jobId =
   );
   return Number(rsp.rows[0].count);
 });
+
+/**
+ * Returns all the PUBLISHED jobs.
+ */
+exports.getAllPublished = async () => {
+  let rsp = await db.query(
+    `select * from ${db.TABLES.Job} where data->>'status' = $1`,
+    [JobStatus.PUBLISHED]
+  );
+
+  return { rows: rsp.rows, meta: { count: rsp.rowCount } };
+};

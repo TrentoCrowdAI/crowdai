@@ -41,7 +41,7 @@ const TABLES = Object.freeze({
   Result: 'result',
   TaskAssignmentApi: 'task_assignment_api',
   Result: 'result',
-  AggregationApi: 'aggregation_api'
+  AggregationApi: 'aggregation_api',
   Task_7500: 'task_test_7500'
 });
 

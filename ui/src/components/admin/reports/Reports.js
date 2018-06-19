@@ -182,9 +182,9 @@ renderChart(chart,x,y,z,w,j,param) {
 			'm1': "Weighted Agreement [ M1 ]",
 			'kendall': "Kendall's Tau",
 			'bennett': "Bennett's S",
-			'wwm2(a|b)': "Correlation in Errors [ P_err(A|B) ]",
-			'wwm2(b|a)': "Correlation in Errors [ P_err(B|A) ]",
-			'compare': "Comparing Cohen's Kappa and M1"
+			'wwm2(a|b)': "Probability in Errors [ P_err(A|B) ]",
+			'wwm2(b|a)': "Probability in Errors [ P_err(B|A) ]",
+			'compare': "Comparing Correlation Metrics"
 		}
 		//parameters for reusable charts
 		var chart //to define kind of chart
@@ -296,7 +296,7 @@ renderChart(chart,x,y,z,w,j,param) {
 
 			case 'M2':
 				chart='histogram'
-				x='m2'
+				x='contribution to crowd error'
 				y='worker A'
 				z=''
 				param=1
@@ -314,8 +314,8 @@ renderChart(chart,x,y,z,w,j,param) {
 				chart='linemetricchart'
 				x=['worker A','worker B']
 				y="cohen's kappa correlation"
-				z="weighted agreement"
-				w="bennett's s"
+				z="weighted kappa"
+				w="bennett\'s s"
 				j="kendall's t"
 				param=1
 				break;

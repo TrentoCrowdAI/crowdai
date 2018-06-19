@@ -42,11 +42,7 @@ class HeatMap extends React.Component {
     var y = this.props.y
     var z = this.props.z
     var param = this.props.param
-
-    function mean(arr) {
-      return arr.reduce((acc,prev) => acc+prev)/arr.length
-    }
-
+    
     var xelems = Array.from(new Set(this.props.data.map(d => d[x]))).sort( 
         (a,b) => a > b ? 1 : a < b ? -1 : 0);
     var yelems = Array.from(new Set(this.props.data.map(d => d[y]))).sort();

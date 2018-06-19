@@ -152,47 +152,56 @@ class CompareLineChart extends React.Component {
       .attr("height", height)
       .call(zoom)
 
-    var points1 = g.selectAll(".dot2")
+    
+
+    var points2 = g.selectAll(".dot2")
       .data(data).enter()
         .append("circle")
-        .style("fill", 'steelblue')
-        .attr("class","dot2")
+        .style("fill", 'red')
+        .attr("class","dot")
         .attr("cx", d => xscale(d[x[0]]+", "+d[x[1]]) )
-        .attr("cy", d => yscale(d[y]) )
+        .attr("cy", d => yscale(d[z]) )
         .attr("r",2)
-        .on("mouseover", d => {
-          tooltip.style('visibility', 'visible')
-              .style('top',(d3.event.pageY-30)+'px')
-              .style('left',(d3.event.pageX-260)+'px')
-          tooltip.select('div')
-              .html('Worker A: <b>'+d[x[0]].toUpperCase()+'</b>,'+
-                  '<br />Worker B: <b>'+d[x[1]].toUpperCase()+'</b>,'+
-                  '<br />'+y+' => <b>'+d[y].toFixed(2)+'</b>,'+
-                  '<br />'+z+' => <b>'+d[z].toFixed(2)+'</b>,'+
-                  '<br />'+w+' => <b>'+d[w].toFixed(2)+'</b>,'+
-                  '<br />'+j+' => <b>'+d[j].toFixed(2)+'</b>')
-        })
-        .on("mouseout", d => tooltip.style('visibility', 'hidden'))
+        
+    var points3 = g.selectAll(".dot3")
+        .data(data).enter()
+          .append("circle")
+          .style("fill", 'lightgreen')
+          .attr("class","dot")
+          .attr("cx", d => xscale(d[x[0]]+", "+d[x[1]]) )
+          .attr("cy", d => yscale(d[w]) )
+          .attr("r",2)
 
-    /*var points2 = g.selectAll(".dot")
+    var points4 = g.selectAll(".dot4")
       .data(data).enter()
         .append("circle")
         .style("fill", 'orange')
         .attr("class","dot")
         .attr("cx", d => xscale(d[x[0]]+", "+d[x[1]]) )
-        .attr("cy", d => yscale(d[z]) )
+        .attr("cy", d => yscale(d[j]) )
         .attr("r",2)
-        .on("mouseover", d => {
-          tooltip.style('visibility', 'visible')
-              .style('top',(d3.event.pageY-30)+'px')
-              .style('left',(d3.event.pageX-260)+'px')
-          tooltip.select('div')
-              .html('Worker A: <b>'+d[x[0]].toUpperCase()+'</b>,'+
-                  '<br />Worker B: <b>'+d[x[1]].toUpperCase()+'</b>,'+
-                  '<br />'+z+' => <b>'+d[z].toFixed(2)+'</b>,'+
-                  '<br />'+w+' => <b>'+d[w].toFixed(2)+'</b>')
-        })
-        .on("mouseout", d => tooltip.style('visibility', 'hidden'))*/
+
+    var points1 = g.selectAll(".dot1")
+        .data(data).enter()
+          .append("circle")
+          .style("fill", 'steelblue')
+          .attr("class","dot2")
+          .attr("cx", d => xscale(d[x[0]]+", "+d[x[1]]) )
+          .attr("cy", d => yscale(d[y]) )
+          .attr("r",2)
+          .on("mouseover", d => {
+            tooltip.style('visibility', 'visible')
+                .style('top',(d3.event.pageY-30)+'px')
+                .style('left',(d3.event.pageX-260)+'px')
+            tooltip.select('div')
+                .html('Worker A: <b>'+d[x[0]].toUpperCase()+'</b>,'+
+                    '<br />Worker B: <b>'+d[x[1]].toUpperCase()+'</b>,'+
+                    '<br />'+y+' => <b>'+d[y].toFixed(2)+'</b>,'+
+                    '<br />'+z+' => <b>'+d[z].toFixed(2)+'</b>,'+
+                    '<br />'+w+' => <b>'+d[w].toFixed(2)+'</b>,'+
+                    '<br />'+j+' => <b>'+d[j].toFixed(2)+'</b>')
+          })
+          .on("mouseout", d => tooltip.style('visibility', 'hidden'))
 
     function zoomFunction() {
       //to zoom x axis
@@ -210,6 +219,9 @@ class CompareLineChart extends React.Component {
       /*points1.attr("r", )
       points2.attr("r", )*/
       points1.attr("cx", d => xscale(d[x[0]]+", "+d[x[1]]) )
+      points2.attr("cx", d => xscale(d[x[0]]+", "+d[x[1]]) )
+      points3.attr("cx", d => xscale(d[x[0]]+", "+d[x[1]]) )
+      points4.attr("cx", d => xscale(d[x[0]]+", "+d[x[1]]) )
       //points2.attr("cx", d => xscale(d[x[0]]+", "+d[x[1]]) )
 
       //to zoom y axis

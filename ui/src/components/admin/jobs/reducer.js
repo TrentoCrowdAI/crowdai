@@ -59,7 +59,7 @@ const genericFormReducer = getReducer(scopes.JOBS, {
     labelOptions: 'ynk',
     hitConfig: {
       maxAssignments: 0, // if maxAssignments is > 0, then we limit the number of workers.
-      lifetimeInMinutes: 5 * 24 * 60,
+      lifetimeInMinutes: 7 * 24 * 60,
       assignmentDurationInMinutes: 20
     },
     // parameters
@@ -69,7 +69,7 @@ const genericFormReducer = getReducer(scopes.JOBS, {
     testFrequencyRule: 2,
     initialTestsRule: 2,
     initialTestsMinCorrectAnswersRule: 100,
-    votesPerTaskRule: 2,
+    votesPerTaskRule: 3,
     expertCostRule: 0.2,
     taskAssignmentStrategy: 0,
     aggregationStrategy: 0,

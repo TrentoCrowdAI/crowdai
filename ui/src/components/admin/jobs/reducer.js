@@ -277,6 +277,10 @@ const resultsReducer = (state = defaultResultsState, action) => {
         error: action.error,
         loading: false
       };
+    case actionTypes.CLEAN_RESULTS:
+      return {
+        ...defaultResultsState
+      };
     default:
       return state;
   }

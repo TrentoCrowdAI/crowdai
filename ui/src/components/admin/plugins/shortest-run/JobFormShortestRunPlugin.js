@@ -5,6 +5,7 @@ import PropTypes from 'prop-types';
 
 import {actions} from 'src/components/admin/jobs/actions';
 import NumberInput from 'src/components/core/form/NumberInput';
+import store from 'src/store';
 
 class JobFormShortestRunPlugin extends React.Component {
   constructor(props) {
@@ -13,9 +14,9 @@ class JobFormShortestRunPlugin extends React.Component {
   }
 
   render() {
-    const {item} = this.props;
+    const {job} = this.props;
 
-    if (!item.data.shortestRun) {
+    if (!job.data.shortestRun) {
       return null;
     }
     return (
@@ -29,7 +30,7 @@ class JobFormShortestRunPlugin extends React.Component {
             max="50"
             label="Baseline size"
             name="data.shortestRun.baselineSize"
-            value={item.data.shortestRun.baselineSize}
+            value={job.data.shortestRun.baselineSize}
             placeholder="The number of papers for the baseline round"
             onChange={this.handleChange}
             required
@@ -40,7 +41,7 @@ class JobFormShortestRunPlugin extends React.Component {
   }
 
   componentDidMount() {
-    if (!this.props.item.id) {
+    if (!this.props.job.id) {
       this.props.setInputValue('data.shortestRun', {baselineSize: 20});
     }
   }
@@ -51,16 +52,23 @@ class JobFormShortestRunPlugin extends React.Component {
 }
 
 JobFormShortestRunPlugin.propTypes = {
-  item: PropTypes.object,
+  job: PropTypes.object,
   setInputValue: PropTypes.func
 };
 
-const mapStateToProps = state => ({
-  item: state.job.form.item
-});
+const mapStateToProps = state => ({});
 
 const mapDispatchToProps = dispatch => ({
   setInputValue: (name, value) => dispatch(actions.setInputValue(name, value))
 });
+
+/**
+ * This method removes the additional properties added by this plugin.
+ */
+const cleanProps = () => {
+  store.dispatch(actions.setInputValue('data.shortestRun', undefined));
+};
+
+export {cleanProps};
 
 export default connect(mapStateToProps, mapDispatchToProps)(JobFormShortestRunPlugin);

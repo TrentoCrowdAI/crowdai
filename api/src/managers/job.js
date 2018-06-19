@@ -662,6 +662,27 @@ const getJobWithDetails = (exports.getJobWithDetails = async jobId => {
 });
 
 /**
+ * When the application restarts, this method is responsible for resuming
+ * all of the cronjobs for the published jobs.
+ */
+exports.restartCronJobs = async () => {
+  try {
+    console.info('Restarting cronjobs...');
+    let jobs = await delegates.jobs.getAllPublished();
+
+    for (let job of jobs.rows) {
+      let requester = await delegates.requesters.getById(job.requester_id);
+      const mturk = MTurk.getInstance(requester);
+      emit(EventTypes.job.START_CRON_FOR_HIT, job, job.data.hit.HITId, mturk);
+    }
+    console.info('Restarting cronjobs done');
+  } catch (error) {
+    console.error(error);
+    process.exit(1);
+  }
+};
+
+/**
  * Computest the total cost of the given job.
  *
  * @param {Object} job

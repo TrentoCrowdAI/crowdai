@@ -56,7 +56,7 @@ class CompareLineChart extends React.Component {
         .range([0,width])
         //.range(data.map( (d,i) => i*(width/data.length)))
     var xAxis = d3.axisBottom(xscale)
-      .tickFormat("")
+      .ticks(d=> d[x[0]]+", "+d[x[1]])
 
     var yscale = d3.scaleLinear()
         .domain([ d3.min(data, d => Math.min(d[w],d[y],d[z],d[j])), d3.max(data, d => Math.max(d[w],d[y],d[z],d[j])) ])
@@ -65,13 +65,13 @@ class CompareLineChart extends React.Component {
 
     var tooltip = d3.select('body')
         .append('div')
-        .style('width','250px')
-        .style('height','125px')
-        .style('background','steelblue')
+        .style('width','300px')
+        .style('height','120px')
+        .style('background','#A7DEF2')
         .style('opacity','0.90')
         .style('position','absolute')
         .style('visibility','hidden')
-        .style('padding','10px')
+        .style('padding','5px')
         .style('box-shadow','0px 0px 6px #7861A5')
 
     var toolval = tooltip.append('div')
@@ -152,8 +152,6 @@ class CompareLineChart extends React.Component {
       .attr("height", height)
       .call(zoom)
 
-    
-
     var points2 = g.selectAll(".dot2")
       .data(data).enter()
         .append("circle")
@@ -191,11 +189,11 @@ class CompareLineChart extends React.Component {
           .attr("r",2)
           .on("mouseover", d => {
             tooltip.style('visibility', 'visible')
-                .style('top',(d3.event.pageY-30)+'px')
-                .style('left',(d3.event.pageX-260)+'px')
+                .style('top',(d3.event.pageY-50)+'px')
+                .style('left',(d3.event.pageX-310)+'px')
             tooltip.select('div')
-                .html('Worker A: <b>'+d[x[0]].toUpperCase()+'</b>,'+
-                    '<br />Worker B: <b>'+d[x[1]].toUpperCase()+'</b>,'+
+                .html(x[0]+': <b>'+d[x[0]].toUpperCase()+'</b>,'+
+                    '<br />'+x[1]+': <b>'+d[x[1]].toUpperCase()+'</b>,'+
                     '<br />'+y+' => <b>'+d[y].toFixed(2)+'</b>,'+
                     '<br />'+z+' => <b>'+d[z].toFixed(2)+'</b>,'+
                     '<br />'+w+' => <b>'+d[w].toFixed(2)+'</b>,'+
@@ -250,6 +248,8 @@ class CompareLineChart extends React.Component {
     var x = this.props.x
     var y = this.props.y
     var z = this.props.z
+    var w = this.props.w
+    var j = this.props.j
     return(
       <div>
         { this.props.data.length ? 
@@ -286,21 +286,21 @@ class CompareLineChart extends React.Component {
         <br />
         <svg className={this.props.selector} width="1000" height="500"> </svg>
         <br />
-        <strong style={{color: 'steelblue'}}>Cohen's K</strong>:
+        <strong style={{color: 'steelblue'}}>{y}</strong>:
         <br />
-        {"   "}<strong>percentage</strong> of inter-rater agreement for categorical tasks, that takes in account possible agreement happening <strong>by chance</strong>.
+        
         <br />
-        <strong style={{color: 'red'}}>Weighted Agreement</strong>:
+        <strong style={{color: 'red'}}>{z}</strong>:
         <br />
-        {"   "}<strong>percentage</strong> of inter-worker basic agreement, considering just when <strong>they vote the same</strong> or agree in voting against the crowd.
+        
         <br />
-        <strong style={{color: 'lightgreen'}}>Bennett's et al S</strong>:
+        <strong style={{color: 'lightgreen'}}>{w}</strong>:
         <br />
-        {"   "}<strong>percentage</strong> of rater agreement that might be expected <strong>by chance</strong>, basing on the number of categories available.
+        
         <br />
-        <strong style={{color: 'orange'}}>Kendall's tau</strong>:
+        <strong style={{color: 'orange'}}>{j}</strong>:
         <br />
-        {"   "}<strong>ordinal association</strong> of each worker couple representing the relation between how much they answered the same vs how much they answered the opposite.
+
       </div>
     )
   }

@@ -42,15 +42,16 @@ class HeatMap extends React.Component {
     var y = this.props.y
     var z = this.props.z
     var param = this.props.param
-    
-    var xelems = Array.from(new Set(this.props.data.map(d => d[x]))).sort( 
-        (a,b) => a > b ? 1 : a < b ? -1 : 0);
-    var yelems = Array.from(new Set(this.props.data.map(d => d[y]))).sort();
+    var data = this.props.data
+    var xelems = Array.from(new Set(this.props.data.map(d => d[x])))
+        //.sort((a,b) => a > b ? 1 : a < b ? -1 : 0);
+    var yelems = Array.from(new Set(this.props.data.map(d => d[y])))
+        //.sort((a,b) => a > b ? 1 : a < b ? -1 : 0);
     var colors = ['#FFE5CC', '#FFCC77', '#FFB266', '#FF7733', '#FF8000', '#CC6600']
 
     var xscale = d3.scaleBand()
         .domain(xelems)
-        .range([0,xelems.length*16])
+        .range([xelems.length*(width/xelems.length),0])
         .paddingInner(20).paddingOuter(7)
     
     var xAxis = d3.axisTop()
@@ -59,7 +60,7 @@ class HeatMap extends React.Component {
     
     var yscale = d3.scaleBand()
         .domain(yelems)
-        .range([yelems.length*16, 0])
+        .range([yelems.length*(width/yelems.length), 0])
         .paddingInner(.2).paddingOuter(.2)
 
     var yAxis = d3.axisLeft()
@@ -71,13 +72,13 @@ class HeatMap extends React.Component {
 
     var tooltip = d3.select('body')
         .append('div')
-        .style('width','240px')
-        .style('height','80px')
-        .style('background','steelblue')
+        .style('width','300px')
+        .style('height','110px')
+        .style('background','#A7DEF2')
         .style('opacity','0.90')
         .style('position','absolute')
         .style('visibility','hidden')
-        .style('padding','10px')
+        .style('padding','5px')
         .style('box-shadow','0px 0px 6px #7861A5')
 
     var toolval = tooltip.append('div')
@@ -86,8 +87,8 @@ class HeatMap extends React.Component {
         .data(this.props.data)
         .enter().append('g').append('rect')
         .attr('class', 'cell')
-        .attr('width', 15)
-        .attr('height', 15)
+        .attr('width', (width/xelems.length)-1)
+        .attr('height', (width/yelems.length)-1)
         .attr('y', d => yscale(d[y]))
         .attr('x', d => xscale(d[x])-7)
         .attr('fill', d => d[z]/param==0 ? 'lightgreen' : d[z]/param==1 ? 'red' : colorScale(d[z]/param))
@@ -106,8 +107,8 @@ class HeatMap extends React.Component {
         })
         .on("mousemove", d => {
           tooltip.style('visibility', 'visible')
-              .style('top',(d3.event.pageY-30)+'px')
-              .style('left',(d3.event.pageX-260)+'px')
+              .style('top',(d3.event.pageY-50)+'px')
+              .style('left',(d3.event.pageX-310)+'px')
           tooltip.select('div')
               .html('Worker A: <b>'+d[x].toUpperCase()+'</b>,'+
                   '<br />Worker B: <b>'+d[y].toUpperCase()+'</b>,'+
@@ -148,7 +149,7 @@ class HeatMap extends React.Component {
 		return(
 			<div>
 			<br />
-			<svg className={this.props.selector} height='1000' width='1000'> </svg>
+			<svg className={this.props.selector} height='1100' width='1000'> </svg>
 			</div>
 		);
 	}

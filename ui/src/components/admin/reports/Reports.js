@@ -9,11 +9,11 @@ import ItemChooser from './ItemChooser';
 import CritChooser from './CritChooser';
 import MetricChooser from './MetricChooser';
 import MetricMenu from './MetricMenu';
-import { Button, Dimmer, Loader, Item, Form } from 'semantic-ui-react';
+import { Dimmer, Loader } from 'semantic-ui-react';
 
 import './reports.css';
 import { actions } from './actions';
-import { actions as jobactions } from '../jobs/actions';
+//import { actions as jobactions } from '../jobs/actions';
 
 class Reports extends React.Component {
 	constructor(props) {
@@ -74,6 +74,9 @@ class Reports extends React.Component {
 				this.props.reports.tasks=[]
 				this.props.fetchMetric('worker/job/'+this.props.match.params.jobid+'/m2');
 				break;
+			case 'Global':
+				this.props.reports.tasks=[]
+				this.props.fetchMetric('global/job/'+this.props.match.params.jobid+'/stats')
 			default:
 				console.log('Metric to implement: ', value)
 				break;
@@ -258,7 +261,7 @@ renderChart(chart,x,y,z,w,j,param) {
 				chart='heatmap'
 				x='worker A'
 				y='worker B'
-				z='weighted agreement'
+				z='basic agreement'
 				param=1
 				break;
 
@@ -297,16 +300,18 @@ renderChart(chart,x,y,z,w,j,param) {
 			case 'M2':
 				chart='histogram'
 				x='contribution to crowd error'
-				y='worker A'
+				y='id'
 				z=''
 				param=1
 				break;
 
-			case 'SingleWorker':
-				chart=''
-				x=''
-				y=''
-				z=''
+			case 'Global':
+				chart='linemetricchart'
+				x=['item_id','job_id']
+				y='F1-score'
+				z='Matthews Correlation Coefficient'
+				w='Diagnostic Odds Ratio'
+				j='Specificity'
 				param=1
 				break;
 
@@ -314,7 +319,7 @@ renderChart(chart,x,y,z,w,j,param) {
 				chart='linemetricchart'
 				x=['worker A','worker B']
 				y="cohen's kappa correlation"
-				z="weighted kappa"
+				z="basic agreement"
 				w="bennett\'s s"
 				j="kendall's t"
 				param=1

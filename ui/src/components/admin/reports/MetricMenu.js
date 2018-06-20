@@ -54,6 +54,13 @@ class MetricMenu extends React.Component {
 					onClick={this.props.onChange}
 				>Task Classification and Worker Agreement</Button>
 				<br />
+				<Button 
+					value='Global'
+					className='metrics' 
+					style={{marginBottom: '5px'}}
+					onClick={this.props.onChange}
+				>Item Classification Efficiency</Button>
+				<br />
 				Correlation Metrics: 
 				<br />
 				<Button 

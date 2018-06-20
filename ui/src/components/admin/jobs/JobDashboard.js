@@ -226,37 +226,6 @@ class JobDashboard extends React.Component {
   }
 
   renderFinalResults() {
-    let results = [
-      {
-        votes: {
-          C1: {in: 2, out: 1},
-          C2: {in: 1, out: 0},
-          C3: {in: 2, out: 1}
-        },
-        pout: 0.15,
-        in: true
-      },
-      {
-        votes: {
-          C1: {in: 1, out: 2},
-          C2: {in: 1, out: 2},
-          C3: {in: 1, out: 2}
-        },
-        pout: 0.99,
-        in: false,
-        reason: 'not on 75+ older adults'
-      },
-      {
-        votes: {
-          C1: {in: 2, out: 1},
-          C2: {in: 1, out: 2},
-          C3: {in: 2, out: 1}
-        },
-        pout: 0.03,
-        in: true
-      }
-    ];
-
     return (
       <Form>
         <div hidden={!isExpertMode(this.props.profile)} style={{marginBottom: '20px'}}>
@@ -272,6 +241,7 @@ class JobDashboard extends React.Component {
     this.props.fetchItem(jobId);
     this.props.fetchJobState(jobId);
     this.props.fetchAggregationStrategies();
+    this.props.cleanResults(jobId);
   }
 
   componentDidUpdate(prevProps, prevState, snapshot) {
@@ -374,7 +344,8 @@ JobDashboard.propTypes = {
   profile: PropTypes.object,
   fetchResults: PropTypes.func,
   aggregationStrategies: PropTypes.arrayOf(PropTypes.object),
-  fetchAggregationStrategies: PropTypes.func
+  fetchAggregationStrategies: PropTypes.func,
+  cleanResults: PropTypes.func
 };
 
 const mapStateToProps = state => ({
@@ -399,6 +370,7 @@ const mapDispatchToProps = dispatch => ({
   pollJobStateDone: () => dispatch(actions.pollJobStateDone()),
   cleanJobState: () => dispatch(actions.cleanJobState()),
   fetchResults: id => dispatch(actions.fetchResults(id)),
+  cleanResults: id => dispatch(actions.cleanResults(id)),
   fetchAggregationStrategies: () => dispatch(actions.fetchAggregationStrategies())
 });
 

@@ -86,6 +86,20 @@ const fetchMetric = (action$, store) =>
       .catch(error => Observable.of(actions.fetchItemError(flattenError(error))));
 });
 
+const getCrowdGolds = (action$, store) =>
+  action$.ofType(actionTypes.FETCH_CROWDGOLDS).switchMap(action => {
+    return Observable.defer(() => requestersApi.get('getCrowdGolds/'+action.jobId))
+      .mergeMap(response => Observable.of(actions.fetchCrowdGoldsSuccess(response.data)))
+      .catch(error => Observable.of(actions.fetchCrowdGoldsError(flattenError(error))));
+});
+
+const fetchCrowdGolds = (action$, store) =>
+  action$.ofType(actionTypes.FETCH_ITEM).switchMap(action => {
+    return Observable.defer(() => requestersApi.get('getCrowdGolds/'+action.jobId))
+      .mergeMap(response => Observable.of(actions.fetchItemSuccess(response.data)))
+      .catch(error => Observable.of(actions.fetchItemError(flattenError(error))));
+});
+
 const getWorkers = (action$, store) =>
   action$.ofType(actionTypes.FETCH_WORKERS).switchMap(action => {
     return Observable.defer(() => requestersApi.get('getWorkersByJob/'+action.jobId))
@@ -107,4 +121,5 @@ export default combineEpics(getTaskTime, fetchTaskTime,
                             getTasksAgreements, fetchTasksAgreements,
                             getWorkersAgreements, fetchWorkersAgreements,
                             getMetric, fetchMetric,
+                            getCrowdGolds, fetchCrowdGolds
                           );

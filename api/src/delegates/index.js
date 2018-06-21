@@ -9,4 +9,3 @@ exports.reports = require('./reports');
 exports.taskAssignmentApi = require('./task-assignment-api');
 exports.results = require('./results');
 exports.aggregationApi = require('./aggregation-api');
-exports.testAgreement = require('./testAgreement');

@@ -9,8 +9,9 @@ import HeatMap from './HeatMap.js'
 import AreaChart from './AreaChart.js'
 import NestChart from './NestChart.js'
 import StackedBar from './StackedBar.js'
-import DonutChart from './DonutChart.js';
-import CompareLineChart from './CompareLineChart';
+import DonutChart from './DonutChart.js'
+import CompareLineChart from './CompareLineChart'
+import TreeChart from './TreeChart'
 
 var count = 0;
 
@@ -102,6 +103,15 @@ class ChartWrapper extends React.Component {
         return(
           <div>
             <CompareLineChart
+              {...this.props}
+            />
+          </div>
+        )
+        break;
+      case 'treechart':
+        return(
+          <div>
+            <TreeChart
               {...this.props}
             />
           </div>

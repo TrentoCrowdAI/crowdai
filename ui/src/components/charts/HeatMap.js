@@ -47,7 +47,7 @@ class HeatMap extends React.Component {
         //.sort((a,b) => a > b ? 1 : a < b ? -1 : 0);
     var yelems = Array.from(new Set(this.props.data.map(d => d[y])))
         //.sort((a,b) => a > b ? 1 : a < b ? -1 : 0);
-    var colors = ['#FFE5CC', '#FFCC77', '#FFB266', '#FF7733', '#FF8000', '#CC6600']
+    var colors = ['#FFE6CD', '#FFCD9A', '#FFB366', '#FF9A33', '#FF8000']
 
     var xscale = d3.scaleBand()
         .domain(xelems)
@@ -110,8 +110,8 @@ class HeatMap extends React.Component {
               .style('top',(d3.event.pageY-50)+'px')
               .style('left',(d3.event.pageX-310)+'px')
           tooltip.select('div')
-              .html('Worker A: <b>'+d[x].toUpperCase()+'</b>,'+
-                  '<br />Worker B: <b>'+d[y].toUpperCase()+'</b>,'+
+              .html(x+': <b>'+d[x].toUpperCase()+'</b>,'+
+                  '<br />'+y+': <b>'+d[y].toUpperCase()+'</b>,'+
                   '<br />'+z+' => <b>'+d[z].toFixed(2)+'</b>')
         })
 
@@ -148,6 +148,17 @@ class HeatMap extends React.Component {
 	render() {
 		return(
 			<div>
+                <ul className={'legend'}>
+                    <li><span style={{'background-color':'#FFE6CD'}}></span>{this.props.z} {" < 0.20"}</li>
+                    <li><span style={{'background-color':'#FFCD9A'}}></span>{this.props.z} {" < 0.40"}</li>
+                    <li><span style={{'background-color':'#FFB366'}}></span>{this.props.z} {" < 0.60"}</li>
+                </ul>
+                <br />
+                <ul className={'legend'}>
+                    <li><span style={{'background-color':'#FF9A33'}}></span>{this.props.z} {" < 0.80"}</li>
+                    <li><span style={{'background-color':'#FF8000'}}></span>{this.props.z} {" < 1"}</li>    
+                    <li><span style={{'background-color':'red'}}></span>{this.props.z} = 1</li>
+                </ul>
 			<br />
 			<svg className={this.props.selector} height='1100' width='1000'> </svg>
 			</div>

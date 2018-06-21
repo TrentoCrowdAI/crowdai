@@ -10,9 +10,6 @@ import EstimatedCostDetails from './EstimatedCostDetails';
 import {isExpertMode} from 'src/utils';
 
 class JobDashboardButtons extends React.Component {
-  constructor(props) {
-    super(props);
-  }
   render() {
     const {taskAssignmentStrategy} = this.props.job;
 

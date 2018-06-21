@@ -1,7 +1,7 @@
 import React from 'react';
 import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
-import {Container, Form, Button, Grid, Message} from 'semantic-ui-react';
+import {Container, Form, Button, Grid} from 'semantic-ui-react';
 
 import {actions} from './actions';
 import {UserModes} from 'src/utils/constants';

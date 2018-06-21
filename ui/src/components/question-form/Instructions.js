@@ -1,6 +1,6 @@
 import React from 'react';
 import {connect} from 'react-redux';
-import {Accordion, Header, Segment} from 'semantic-ui-react';
+import {Accordion, Header} from 'semantic-ui-react';
 import PropTypes from 'prop-types';
 
 import FileRenderer from 'src/components/core/FileRenderer';

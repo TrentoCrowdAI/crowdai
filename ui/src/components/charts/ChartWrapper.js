@@ -12,6 +12,7 @@ import StackedBar from './StackedBar.js'
 import DonutChart from './DonutChart.js'
 import CompareLineChart from './CompareLineChart'
 import TreeChart from './TreeChart'
+import GroupedChart from './GroupedChart'
 
 var count = 0;
 
@@ -112,6 +113,15 @@ class ChartWrapper extends React.Component {
         return(
           <div>
             <TreeChart
+              {...this.props}
+            />
+          </div>
+        )
+        break;
+      case 'grouped':
+        return(
+          <div>
+            <GroupedChart
               {...this.props}
             />
           </div>

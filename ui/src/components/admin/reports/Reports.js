@@ -304,8 +304,8 @@ renderChart(chart,x,y,z,w,param) {
 				break;
 
 			case 'Global':
-				chart='linemetricchart'
-				x=['item_id','job_id']
+				chart='grouped'
+				x=['item_id','null']
 				y='F1-score'
 				z='Matthews Correlation Coefficient'
 				w='Diagnostic Odds Ratio'
@@ -314,7 +314,7 @@ renderChart(chart,x,y,z,w,param) {
 				break;
 
 			case 'compare':
-				chart='linemetricchart'
+				chart='grouped'
 				x=['worker A','worker B']
 				y="cohen's kappa correlation"
 				z="basic agreement"
@@ -327,43 +327,20 @@ renderChart(chart,x,y,z,w,param) {
 				break;
 		}
 
-		return(
-			<div style={{margin: '20px'}}>
-
-				<div className="rowC">
-					<h3 style={{color: 'steelblue'}}>
+		/**
+		 * <h3 style={{color: 'steelblue'}}>
 						Selected Job_id: <i>{this.props.match.params.jobid}</i><br />
 						Selected Worker_id: <i>{this.state.chosenworker}</i><br />
 						Selected Item_id: <i>{this.state.chosenitem}</i><br />
 						Selected Criteria_id: <i>{this.state.chosencriteria}</i>
 					</h3>
 					<div style={{width: "20%"}} className='empty'></div>
-					<div>
-					<WorkerChooser 
-						disabled={(!this.state.activeworker)}
-						options={WorkerOptions}
-						onChange={this.chooseWorker}
-						chosenworker={this.state.chosenworker}
-					/>
-					<ItemChooser 
-						disabled={(!this.state.activeitem)}
-						options={ItemOptions}
-						onChange={this.chooseItem}
-						chosenitem={this.state.chosenitem}
-					/>
-					<CritChooser 
-						disabled={(!this.state.activecriteria)}
-						options={CritOptions}
-						onChange={this.chooseCriteria}
-						chosencriteria={this.state.chosencriteria}
-					/>
-					</div>
-				</div>
+		 */
 
-				<hr />
-
-				<div className='row'>
-					{
+		return(
+			<div style={{margin: '20px'}}>
+				<div className="rowC">
+				{
 							(this.state.chosenmetric=="cohen"
 							||this.state.chosenmetric=="m1"
 							//||this.state.chosenmetric=="kendall"
@@ -372,6 +349,7 @@ renderChart(chart,x,y,z,w,param) {
 							||this.state.chosenmetric=="wwm2(b|a)"
 							||this.state.chosenmetric=="TwoWorkers"
 							||this.state.chosenmetric=="compare") && 
+							<React.Fragment>
 							<div className='row' style={{'display': 'flex', 'color': 'red'}}>
 								<br />
 								<MetricChooser 
@@ -381,8 +359,32 @@ renderChart(chart,x,y,z,w,param) {
 								/>
 								<br />
 							</div>
-						}
+							<div style={{width: "5%"}} className='empty'></div>
+							</React.Fragment>
+					}
+					<WorkerChooser 
+						disabled={(!this.state.activeworker)}
+						options={WorkerOptions}
+						onChange={this.chooseWorker}
+						chosenworker={this.state.chosenworker}
+					/>
+					<div style={{width: "5%"}} className='empty'></div>
+					<ItemChooser 
+						disabled={(!this.state.activeitem)}
+						options={ItemOptions}
+						onChange={this.chooseItem}
+						chosenitem={this.state.chosenitem}
+					/>
+					<div style={{width: "5%"}} className='empty'></div>
+					<CritChooser 
+						disabled={(!this.state.activecriteria)}
+						options={CritOptions}
+						onChange={this.chooseCriteria}
+						chosencriteria={this.state.chosencriteria}
+					/>
 				</div>
+
+				<br />
 
 				<div className="rowC">
 					<div className='options'>

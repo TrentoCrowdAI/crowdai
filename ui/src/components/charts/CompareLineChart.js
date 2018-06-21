@@ -2,7 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import * as d3 from 'd3'
 import {connect} from 'react-redux'
-
+import { Button } from 'semantic-ui-react'
 
 class CompareLineChart extends React.Component {
   constructor(props) {
@@ -183,7 +183,7 @@ class CompareLineChart extends React.Component {
         .data(data).enter()
           .append("circle")
           .style("fill", 'steelblue')
-          .attr("class","dot2")
+          .attr("class","dot")
           .attr("cx", d => xscale(d[x[0]]+", "+d[x[1]]) )
           .attr("cy", d => yscale(d[y]) )
           .attr("r",2)
@@ -249,32 +249,27 @@ class CompareLineChart extends React.Component {
     //var j = this.props.j
     return(
       <div>
-        { this.props.data.length ? 
-        <React.Fragment>
-        <button
-          onClick={(event) => this.setState({
-              order: this.props.y
-            })
-          }
-        ><strong>Sort {this.props.y}</strong></button>
-
-        <button
-          onClick={(event) => this.setState({
-              order: this.props.z
-            })
-          }
-        ><strong>Sort {this.props.z}</strong></button>
-
-        <button
-          onClick={(event) => this.setState({
-              order: this.props.w
-            })
-          }
-        ><strong>Sort {this.props.w}</strong></button>
-        </React.Fragment> : " "
-        }
         <br />
         <svg className={this.props.selector} width="1000" height="500"> </svg>
+        <br />
+        { this.props.data.length ? 
+        <React.Fragment>
+        <Button
+          onClick={(event) => this.setState({ order: this.props.y }) }
+          style={{marginBottom: '5px'}}
+        >Sort {this.props.y}</Button>
+
+        <Button
+          onClick={(event) => this.setState({ order: this.props.z }) }
+          style={{marginBottom: '5px'}}
+        >Sort {this.props.z}</Button>
+
+        <Button
+          onClick={(event) => this.setState({ order: this.props.w }) }
+          style={{marginBottom: '5px'}}
+        >Sort {this.props.w}</Button>
+        </React.Fragment> : " "
+        }
         <br />
         <strong style={{color: 'steelblue'}}>> {y.toUpperCase()}</strong>:
         <br />

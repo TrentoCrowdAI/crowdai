@@ -7,7 +7,7 @@ import JobChooser from './JobChooser';
 import WorkerChooser from './WorkerChooser';
 import ItemChooser from './ItemChooser';
 import CritChooser from './CritChooser';
-import { Button, Dimmer, Loader, Item, Form } from 'semantic-ui-react';
+import { Button } from 'semantic-ui-react';
 import './reports.css';
 
 import { actions } from './actions';

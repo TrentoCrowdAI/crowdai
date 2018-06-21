@@ -6,17 +6,16 @@ import { Form, Button } from 'semantic-ui-react';
 class JobChooser extends React.Component {
   
   render() {
-    //console.log(this.props)
     return(
-      <div
-      style={{textAlign: 'right'}}>
+      <React.Fragment
+      style={{textAlign: 'left'}}>
       <Form.Select 
           label="Select Job  "
           value={this.props.chosenjob}
           options={Object.entries(this.props.options).map(([key, val]) => ({text: val, value: key}))}
           onChange={this.props.onChange}
         />
-      </div>
+      </React.Fragment>
     )
   }
 

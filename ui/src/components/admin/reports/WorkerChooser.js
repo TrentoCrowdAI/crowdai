@@ -7,8 +7,8 @@ class WorkerChooser extends React.Component {
   
   render() {
     return(
-      <div
-      style={{textAlign: 'right'}}>
+      <React.Fragment
+      style={{textAlign: 'left'}}>
       <Form.Select 
           disabled={this.props.disabled}
           label="Select Worker  "
@@ -16,7 +16,7 @@ class WorkerChooser extends React.Component {
           options={Object.entries(this.props.options).map(([key, val]) => ({text: val, value: key}))}
           onChange={this.props.onChange}
         />
-      </div>
+      </React.Fragment>
     )
   }
 

@@ -143,44 +143,44 @@ class TreeChart extends React.Component {
     console.log(dymo)*/
 
     var treeData = {
-      'name': x,
-      'answer': 'all',
+      'name': 'Item Id',
+      'answer': 'All',
       'num': y1.length+n1.length,
       'items': Array.from(new Set(data.map(d => d[x]))),
       'children': [
         {
-          'name': 'criteria '+criteria[0],
+          'name': 'Criteria '+criteria[0],
           'answer': z[0],
           'num': y1.length,
           'items': y1,
           'children': [
             {
-              'name': 'criteria '+criteria[1],
+              'name': 'Criteria '+criteria[1],
               'answer': z[0],
               'num': yy.length,
               'items': yy,
               'children': [
-                {'name': 'criteria '+criteria[2],
+                {'name': 'Criteria '+criteria[2],
                 'num': yyy.length,
                 'items': yyy,
                 'answer': z[0]},
-                {'name': 'criteria '+criteria[2],
+                {'name': 'Criteria '+criteria[2],
                 'num': yyn.length,
                 'items': yyn,
                 'answer': z[1]}
               ]
             },
             {
-              'name': 'criteria '+criteria[1],
+              'name': 'Criteria '+criteria[1],
               'answer': z[1],
               'num': yn.length,
               'items': yn,
               'children': [
-                {'name': 'criteria '+criteria[2],
+                {'name': 'Criteria '+criteria[2],
                 'num': yny.length,
                 'items': yny,
                 'answer': z[0]},
-                {'name': 'criteria '+criteria[2],
+                {'name': 'Criteria '+criteria[2],
                 'num': ynn.length,
                 'items': ynn,
                 'answer': z[1]}
@@ -189,38 +189,38 @@ class TreeChart extends React.Component {
           ]
         },
         {
-          'name': 'criteria '+criteria[0],
+          'name': 'Criteria '+criteria[0],
           'num': n1.length,
           'items': n1,
           'answer': z[1],
           'children': [
             {
-              'name': 'criteria '+criteria[1],
+              'name': 'Criteria '+criteria[1],
               'answer': z[0],
               'num': ny.length,
               'items': ny,
               'children': [
-                {'name': 'criteria '+criteria[2],
+                {'name': 'Criteria '+criteria[2],
                 'num': nyy.length,
                 'items': nyy,
                 'answer': z[0]},
-                {'name': 'criteria '+criteria[2],
+                {'name': 'Criteria '+criteria[2],
                 'num': nyn.length,
                 'items': nyn,
                 'answer': z[1]}
               ]
             },
             {
-              'name': 'criteria '+criteria[1],
+              'name': 'Criteria '+criteria[1],
               'answer': z[1],
               'num': nn.length,
               'items': nn,
               'children': [
-                {'name': 'criteria '+criteria[2],
+                {'name': 'Criteria '+criteria[2],
                 'num': nny.length,
                 'items': nny,
                 'answer': z[0]},
-                {'name': 'criteria '+criteria[2],
+                {'name': 'Criteria '+criteria[2],
                 'num': nnn.length,
                 'items': nnn,
                 'answer': z[1]}
@@ -297,9 +297,11 @@ class TreeChart extends React.Component {
         .style('opacity','0.8')
       nodeEnter.append('text')
         .attr('dy','.50em')
-        .attr('x', d => (d.children || d._children) ? -13 : 13)
-        .attr('text-anchor', d => (d.children || d._children) ? 'end' : 'start')
-        .text(d => d.data.name+'= \''+d.data.answer+'\', '+d.data.num)
+        .attr('x', d => (d.children || d._children) ? 0 : 13)
+        .attr('y', d => (d.children || d._children) ? -20 : 0)
+        .attr('text-anchor', d => (d.children || d._children) ? 'middle' : 'start')
+        .text(d => d.data.name+' =\''+d.data.answer+'\', '+d.data.num+' items')
+          .style('font-weight', 'bold')
       
       var nodeUpdate = nodeEnter.merge(node)
       nodeUpdate.transition()

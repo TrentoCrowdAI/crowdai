@@ -170,8 +170,8 @@ class CompareLineChart extends React.Component {
               .style('top',(d3.event.pageY-50)+'px')
               .style('left',(d3.event.pageX-310)+'px')
             tooltip.select('div')
-                .html(x[0]+': <b>'+d[x[0]].toUpperCase()+'</b>,'+
-                  '<br />'+x[1]+': <b>'+d[x[1]].toUpperCase()+'</b>,'+
+                .html(x[0]+': <b>'+d[x[0]]+'</b>,'+
+                  '<br />'+x[1]+': <b>'+d[x[1]]+'</b>,'+
                   '<br />'+y+' => <b>'+d[y].toFixed(2)+'</b>,'+
                   '<br />'+z+' => <b>'+d[z].toFixed(2)+'</b>,'+
                   '<br />'+w+' => <b>'+d[w].toFixed(2)+'</b>')

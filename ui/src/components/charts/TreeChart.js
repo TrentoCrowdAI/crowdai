@@ -37,17 +37,18 @@ class TreeChart extends React.Component {
       .attr('class','innerspace')
       .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
     
-    var color = this.props.color
     var x = this.props.x //item_id
     var y = this.props.y //criteria_id
     var z = this.props.z //[z[0],z[1]] = ['yes','no']
     var w = this.props.w //answer
-    var param = this.props.param //chosenitem
+    //var param = this.props.param //chosenitem
 
     var data = this.props.data//.filter( d => d[x]===this.props.param )
     //(a,b) => a[this.state.order]<b[this.state.order] ? 1 : a[this.state.order]>b[this.state.order] ? -1 : 0 )
     
-    var criteria = Array.from(new Set(data.map(d => d[y]))) //[1,2,3]
+    var criteria = Array.from(new Set(data.map(d => d[y])
+      //.sort((a,b) => a<b ? -1 : a>b ? 1 : 0)
+      ))
 
     var y1 = Array.from(new Set(data.filter(d => d[y]===criteria[0] && d[w]===z[0]).map(d => d[x])))
     var n1 = Array.from(new Set(data.filter(d => d[y]===criteria[0] && d[w]===z[1]).map(d => d[x])))
@@ -137,30 +138,35 @@ class TreeChart extends React.Component {
         )))
     }
     
-    var dymo = {}
-    dymo.push({'name': x, 'answer': 'gg'})
-    console.log(dymo)
+    /*var dymo = {}
+    dymo[0]={'name': x, 'answer': 'gg'}
+    console.log(dymo)*/
 
     var treeData = {
       'name': x,
       'answer': 'all',
       'num': y1.length+n1.length,
+      'items': Array.from(new Set(data.map(d => d[x]))),
       'children': [
         {
           'name': 'criteria '+criteria[0],
           'answer': z[0],
           'num': y1.length,
+          'items': y1,
           'children': [
             {
               'name': 'criteria '+criteria[1],
               'answer': z[0],
               'num': yy.length,
+              'items': yy,
               'children': [
                 {'name': 'criteria '+criteria[2],
                 'num': yyy.length,
+                'items': yyy,
                 'answer': z[0]},
                 {'name': 'criteria '+criteria[2],
                 'num': yyn.length,
+                'items': yyn,
                 'answer': z[1]}
               ]
             },
@@ -168,12 +174,15 @@ class TreeChart extends React.Component {
               'name': 'criteria '+criteria[1],
               'answer': z[1],
               'num': yn.length,
+              'items': yn,
               'children': [
                 {'name': 'criteria '+criteria[2],
                 'num': yny.length,
+                'items': yny,
                 'answer': z[0]},
                 {'name': 'criteria '+criteria[2],
                 'num': ynn.length,
+                'items': ynn,
                 'answer': z[1]}
               ]
             }
@@ -182,18 +191,22 @@ class TreeChart extends React.Component {
         {
           'name': 'criteria '+criteria[0],
           'num': n1.length,
+          'items': n1,
           'answer': z[1],
           'children': [
             {
               'name': 'criteria '+criteria[1],
               'answer': z[0],
               'num': ny.length,
+              'items': ny,
               'children': [
                 {'name': 'criteria '+criteria[2],
                 'num': nyy.length,
+                'items': nyy,
                 'answer': z[0]},
                 {'name': 'criteria '+criteria[2],
                 'num': nyn.length,
+                'items': nyn,
                 'answer': z[1]}
               ]
             },
@@ -201,12 +214,15 @@ class TreeChart extends React.Component {
               'name': 'criteria '+criteria[1],
               'answer': z[1],
               'num': nn.length,
+              'items': nn,
               'children': [
                 {'name': 'criteria '+criteria[2],
                 'num': nny.length,
+                'items': nny,
                 'answer': z[0]},
                 {'name': 'criteria '+criteria[2],
                 'num': nnn.length,
+                'items': nnn,
                 'answer': z[1]}
               ]
             }
@@ -240,6 +256,19 @@ class TreeChart extends React.Component {
       var nodes = treeData.descendants()
       var links = treeData.descendants().slice(1)
 
+      var tooltip = d3.select('body')
+        .append('div')
+        .style('width', '200px')
+        .style('height','50px')
+        .style('background','#A7DEF2')
+        .style('opacity','0.90')
+        .style('position','absolute')
+        .style('visibility','hidden')
+        .style('padding','5px')
+        .style('box-shadow','0px 0px 6px #7861A5')
+
+    tooltip.append('div')
+
       nodes.forEach(d => d.y = d.depth*180)
 
       var node = g.selectAll('g.node')
@@ -249,7 +278,18 @@ class TreeChart extends React.Component {
         .attr('class','node')
         .attr('transform', d => 'translate('+source.y0+','+source.x0+')')
         .on('click',click)
-        .on('mouseover',  d => console.log(d))
+        .on('mousemove', d => {
+          tooltip.style('visibility', 'visible')
+            .style('width', d.data.items.length>7 ? ((20*d.data.items.length)+'px') : '200px')
+            .style('top',(d3.event.pageY-80)+'px')
+            .style('left',(d3.event.pageX-220)+'px')
+          tooltip.select('div')
+            .html('Classified Items: <br/><b>'+d.data.items+'</b>')
+        })
+        .on('mouseout', d => {
+          tooltip.style('visibility', 'hidden')
+        })
+
       nodeEnter.append('circle')
         .attr('class','node')
         .attr('r',1e-6)

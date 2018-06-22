@@ -1,5 +1,4 @@
 import React from 'react'
-import PropTypes from 'prop-types'
 import * as d3 from 'd3'
 import {connect} from 'react-redux'
 
@@ -15,7 +14,7 @@ class TreeChart extends React.Component {
   }
 
   dataWrapper() {
-    /*if(this.props.param=='all') {
+    /*if(this.props.param==='all') {
       var svg = d3.select('.'+this.props.selector)
       var margin = {top: 10, right: 30, bottom: 30, left: 30};
       var g = svg.append('g')
@@ -45,16 +44,13 @@ class TreeChart extends React.Component {
     var w = this.props.w //answer
     var param = this.props.param //chosenitem
 
-    var data = this.props.data//.filter( d => d[x]==this.props.param )
+    var data = this.props.data//.filter( d => d[x]===this.props.param )
     //(a,b) => a[this.state.order]<b[this.state.order] ? 1 : a[this.state.order]>b[this.state.order] ? -1 : 0 )
     
     var criteria = Array.from(new Set(data.map(d => d[y]))) //[1,2,3]
-    var items = Array.from(new Set(data.map(d => d[x]))) //[...]
-    //console.log(criteria)
-    //console.log(items)
 
-    var y1 = Array.from(new Set(data.filter(d => d[y]==criteria[0] && d[w]==z[0]).map(d => d[x])))
-    var n1 = Array.from(new Set(data.filter(d => d[y]==criteria[0] && d[w]==z[1]).map(d => d[x])))
+    var y1 = Array.from(new Set(data.filter(d => d[y]===criteria[0] && d[w]===z[0]).map(d => d[x])))
+    var n1 = Array.from(new Set(data.filter(d => d[y]===criteria[0] && d[w]===z[1]).map(d => d[x])))
     var yy = []
     var yn = []
     var ny = []
@@ -71,80 +67,84 @@ class TreeChart extends React.Component {
     for(var a in y1) {
       yy = yy.concat(Array.from(new Set(
           data
-          .filter(d => d[x]==y1[a] && d[y]==criteria[1] && d[w]==z[0])
+          .filter(d => d[x]===y1[a] && d[y]===criteria[1] && d[w]===z[0])
           .map(d => d[x])
         )))
       yn = yn.concat(Array.from(new Set(
           data
-          .filter(d => d[x]==y1[a] && d[y]==criteria[1] && d[w]==z[1])
+          .filter(d => d[x]===y1[a] && d[y]===criteria[1] && d[w]===z[1])
           .map(d => d[x])
         )))
     }
     for(var a in n1) {
       ny = ny.concat(Array.from(new Set(
           data
-          .filter(d => d[x]==y1[a] && d[y]==criteria[1] && d[w]==z[0])
+          .filter(d => d[x]===n1[a] && d[y]===criteria[1] && d[w]===z[0])
           .map(d => d[x])
         )))
       nn = nn.concat(Array.from(new Set(
           data
-          .filter(d => d[x]==y1[a] && d[y]==criteria[1] && d[w]==z[1])
+          .filter(d => d[x]===n1[a] && d[y]===criteria[1] && d[w]===z[1])
           .map(d => d[x])
         )))
     }
     for(var a in yy) {
       yyy = yyy.concat(Array.from(new Set(
           data
-          .filter(d => d[x]==yy[a] && d[y]==criteria[2] && d[w]==z[0])
+          .filter(d => d[x]===yy[a] && d[y]===criteria[2] && d[w]===z[0])
           .map(d => d[x])
         )))
       yyn = yyn.concat(Array.from(new Set(
           data
-          .filter(d => d[x]==yy[a] && d[y]==criteria[2] && d[w]==z[1])
+          .filter(d => d[x]===yy[a] && d[y]===criteria[2] && d[w]===z[1])
           .map(d => d[x])
         )))
     }
     for(var a in yn) {
       yny = yny.concat(Array.from(new Set(
           data
-          .filter(d => d[x]==yn[a] && d[y]==criteria[2] && d[w]==z[0])
+          .filter(d => d[x]===yn[a] && d[y]===criteria[2] && d[w]===z[0])
           .map(d => d[x])
         )))
       ynn = ynn.concat(Array.from(new Set(
           data
-          .filter(d => d[x]==yn[a] && d[y]==criteria[2] && d[w]==z[1])
+          .filter(d => d[x]===yn[a] && d[y]===criteria[2] && d[w]===z[1])
           .map(d => d[x])
         )))
     }
     for(var a in ny) {
       nyy = nyy.concat(Array.from(new Set(
           data
-          .filter(d => d[x]==ny[a] && d[y]==criteria[2] && d[w]==z[0])
+          .filter(d => d[x]===ny[a] && d[y]===criteria[2] && d[w]===z[0])
           .map(d => d[x])
         )))
       nyn = nyn.concat(Array.from(new Set(
           data
-          .filter(d => d[x]==ny[a] && d[y]==criteria[2] && d[w]==z[1])
+          .filter(d => d[x]===ny[a] && d[y]===criteria[2] && d[w]===z[1])
           .map(d => d[x])
         )))
     }
     for(var a in nn) {
       nny = nny.concat(Array.from(new Set(
           data
-          .filter(d => d[x]==nn[a] && d[y]==criteria[2] && d[w]==z[0])
+          .filter(d => d[x]===nn[a] && d[y]===criteria[2] && d[w]===z[0])
           .map(d => d[x])
         )))
       nnn = nnn.concat(Array.from(new Set(
           data
-          .filter(d => d[x]==nn[a] && d[y]==criteria[2] && d[w]==z[1])
+          .filter(d => d[x]===nn[a] && d[y]===criteria[2] && d[w]===z[1])
           .map(d => d[x])
         )))
     }
+    
+    var dymo = {}
+    dymo.push({'name': x, 'answer': 'gg'})
+    console.log(dymo)
 
     var treeData = {
       'name': x,
       'answer': 'all',
-      'num': data.length,
+      'num': y1.length+n1.length,
       'children': [
         {
           'name': 'criteria '+criteria[0],
@@ -249,6 +249,7 @@ class TreeChart extends React.Component {
         .attr('class','node')
         .attr('transform', d => 'translate('+source.y0+','+source.x0+')')
         .on('click',click)
+        .on('mouseover',  d => console.log(d))
       nodeEnter.append('circle')
         .attr('class','node')
         .attr('r',1e-6)

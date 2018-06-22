@@ -61,7 +61,7 @@ class NestChart extends React.Component {
     var height = +svg.attr("height") - margin.top - margin.bottom;
     var g = svg.append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-    var color = this.props.color
+    var color = 'steelblue'
 
     var yscale = d3.scaleLinear()
         .rangeRound([height, 0])

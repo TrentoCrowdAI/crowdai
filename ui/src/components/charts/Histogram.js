@@ -48,7 +48,7 @@ class Histogram extends React.Component {
     var width = +svg.attr("width") - margin.left - margin.right;
     var height = +svg.attr("height") - margin.top - margin.bottom;
     var g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-    var color = this.props.color
+    var color = 'steelblue'
 
     var xscale = d3.scaleLinear()
       .range([0, width])

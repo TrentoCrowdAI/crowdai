@@ -152,7 +152,6 @@ renderChart(chart,x,y,z,w,param) {
 				z={z}
 				w={w}
         selector={'chart1'}
-				color={'steelblue'}
 				param={param}
 				data={Object.values(this.props.reports.tasks)}
       />

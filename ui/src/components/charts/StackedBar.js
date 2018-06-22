@@ -17,9 +17,6 @@ class StackedBar extends React.Component {
   	var svg = d3.select("."+this.props.selector);
   	
   	var criteria = this.props.param
-  	/*this.props.param.map( (step,i) => criteria['c'+(i+1)] = step )
-  	console.log("criteria",criteria)*/
-
     var x = this.props.x
     var z = this.props.z
 
@@ -41,8 +38,8 @@ class StackedBar extends React.Component {
     var xscale = d3.scaleLinear()
     		.range([0, width])
 
-    var xAxis = d3.axisTop().scale(xscale)//.tickFormat(d3.format(",%"))
-    var yAxis = d3.axisLeft().scale(yscale)//.tickSize(0)
+    var xAxis = d3.axisTop().scale(xscale)
+    var yAxis = d3.axisLeft().scale(yscale)
 
     var rowsNames = data.map( d => d[x]+','+d[z])
     var neutralIndex = Math.floor(Object.values(criteria).length/2)

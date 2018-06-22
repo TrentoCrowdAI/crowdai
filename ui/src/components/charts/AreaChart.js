@@ -1,5 +1,4 @@
 import React from 'react'
-import PropTypes from 'prop-types'
 import * as d3 from 'd3'
 import {connect} from 'react-redux'
 
@@ -23,7 +22,7 @@ class AreaChart extends React.Component {
     var width = +svg.attr("width") - margin.left - margin.right;
     var height = +svg.attr("height") - margin.top - margin.bottom;
     var g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-    var color = this.props.color
+    var color = 'steelblue'
 
     var xscale = d3.scaleLinear()
         .range([0, width])
@@ -32,12 +31,6 @@ class AreaChart extends React.Component {
     var yscale = d3.scaleLinear()
         .range([height,0])
     var yAxis = d3.axisLeft(yscale);
-
-    var zoom = d3.zoom()
-    		.scaleExtent([1,5])
-    		.translateExtent([[0,0],[width,height]])
-    		.extent([[0,0],[width,height]])
-    		.on("zoom",zoomed)
 
     var area = d3.area()
     		.curve(d3.curveMonotoneX)
@@ -68,15 +61,8 @@ class AreaChart extends React.Component {
 
     g.append("g")
     		.attr("class","axis axis--y")
-    		.call(yAxis)
-
-		function zoomed() {
-			var t = d3.event.transform;
-			var xt = t.rescaleX(xscale);
-			g.select(".area").attr("d", area.x( d => xt(d[x]) ));
-			g.select(".axis--x").call(xAxis.scale(xt));
-		}
-
+				.call(yAxis)
+				
 	}
 
 	componentDidMount() {
@@ -101,7 +87,6 @@ class AreaChart extends React.Component {
 }
 
 AreaChart.propTypes = {
-  data : PropTypes.array
 }
 
 const mapStateToProps = state => ({

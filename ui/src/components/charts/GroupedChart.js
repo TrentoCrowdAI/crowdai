@@ -1,5 +1,4 @@
 import React from 'react'
-import PropTypes from 'prop-types'
 import * as d3 from 'd3'
 import {connect} from 'react-redux'
 import { Button } from 'semantic-ui-react'
@@ -15,7 +14,7 @@ class GroupedChart extends React.Component {
   }
 
   dataWrapper() {
-    if(this.props.data.length==0) {
+    if(this.props.data.length===0) {
       var svg = d3.select("."+this.props.selector)
       var margin = {top: 10, right: 30, bottom: 30, left: 30};
       var g = svg.append("g")
@@ -42,12 +41,10 @@ class GroupedChart extends React.Component {
       .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
       .call(zoom)
 
-    var color = this.props.color
     var x = this.props.x
     var y = this.props.y
     var z = this.props.z
     var w = this.props.w
-    //var j = this.props.j
     
     var data = this.props.data.sort( (a,b) => a[this.state.order]<b[this.state.order] ? 1 : a[this.state.order]>b[this.state.order] ? -1 : 0 )
     
@@ -66,7 +63,7 @@ class GroupedChart extends React.Component {
 
     var keys = [y,z,w]
 
-    x0scale.domain( data.map(d => (d[x[0]]+ (x[1]!='null' ? (', '+d[x[1]]) : '' )) ))
+    x0scale.domain( data.map(d => (d[x[0]]+ (x[1]!=='null' ? (', '+d[x[1]]) : '' )) ))
     x1scale.domain(keys).range([0, x0scale.bandwidth()])
     yscale.domain([
       -1,
@@ -76,7 +73,7 @@ class GroupedChart extends React.Component {
     var tooltip = d3.select('body')
         .append('div')
         .style('width', '300px')
-        .style('height',(x[1]=='null'? '90' : '150') +'px')
+        .style('height',(x[1]==='null'? '90' : '150') +'px')
         .style('background','#A7DEF2')
         .style('opacity','0.90')
         .style('position','absolute')
@@ -84,20 +81,20 @@ class GroupedChart extends React.Component {
         .style('padding','5px')
         .style('box-shadow','0px 0px 6px #7861A5')
 
-    var toolval = tooltip.append('div')
+    tooltip.append('div')
 
     var bars = g.append('g')
       .selectAll('g')
       .data(data)
       .enter().append('g')
-        .attr('transform', d => 'translate('+x0scale(d[x[0]]+ (x[1]!='null' ? (', '+d[x[1]] ) : '') )+',0)')
+        .attr('transform', d => 'translate('+x0scale(d[x[0]]+ (x[1]!=='null' ? (', '+d[x[1]] ) : '') )+',0)')
         .on('mousemove', d => {
           tooltip.style('visibility', 'visible')
             .style('top',(d3.event.pageY-50)+'px')
             .style('left',(d3.event.pageX-310)+'px')
           tooltip.select('div')
             .html(x[0]+': <b>'+d[x[0]].toUpperCase()+'</b>,'+
-              (x[1]!='null' ? ('<br />'+x[1]+': <b>'+d[x[1]].toUpperCase()+'</b>,') : '')+
+              (x[1]!=='null' ? ('<br />'+x[1]+': <b>'+d[x[1]].toUpperCase()+'</b>,') : '')+
               '<br />'+y+' => <b>'+d[y].toFixed(2)+'</b>,'+
               '<br />'+z+' => <b>'+d[z].toFixed(2)+'</b>,'+
               '<br />'+w+' => <b>'+d[w].toFixed(2)+'</b>')
@@ -123,13 +120,13 @@ class GroupedChart extends React.Component {
         .tickFormat("")
       )
 
-    var xlab = gx.selectAll("text")
+    gx.selectAll("text")
           .attr("text-anchor","end")
           .attr("dx","-.8em")
           .attr("dy","-.5em")
           .attr("transform","rotate(-65)")
 
-    var gy = g.append('g')
+    g.append('g')
         .attr('class','y axis')
         .call(d3.axisLeft(yscale).ticks(null,'s'))
       .append('text')
@@ -149,7 +146,7 @@ class GroupedChart extends React.Component {
         .axisBottom(x0scale)
         .tickFormat(""))
 
-      bars.attr('transform', d => 'translate('+x0scale(d[x[0]]+ (x[1]!='null' ? (', '+d[x[1]]) : '') )+',0)')
+      bars.attr('transform', d => 'translate('+x0scale(d[x[0]]+ (x[1]!=='null' ? (', '+d[x[1]]) : '') )+',0)')
       rects.attr('x', d => x1scale(d.key))
       rects.attr('width', d => x1scale.bandwidth())
     }
@@ -170,7 +167,6 @@ class GroupedChart extends React.Component {
     var y = this.props.y
     var z = this.props.z
     var w = this.props.w
-    //var j = this.props.j
     return(
       <div>
         <br />
@@ -197,7 +193,7 @@ class GroupedChart extends React.Component {
         <br />
         <strong style={{color: 'steelblue'}}>> {y.toUpperCase()}</strong>:
         <br />
-        {y=="cohen's kappa correlation" ?
+        {y==="cohen's kappa correlation" ?
           <div>
           Correlation coefficient that represents total agreement between two workers, also taking in acocunt agreement happening by chance.
           <br />= -1, No Agreement at all, worst than random
@@ -208,7 +204,7 @@ class GroupedChart extends React.Component {
         <br />
         <strong style={{color: 'orange'}}>> {z.toUpperCase()}</strong>:
         <br />
-        {z=="basic agreement" ?
+        {z==="basic agreement" ?
           <div>
           Agreement metric just taking in account observed answers,
           <br/>
@@ -218,7 +214,7 @@ class GroupedChart extends React.Component {
         <br />
         <strong style={{color: 'lightgreen'}}>> {w.toUpperCase()}</strong>:
         <br />
-        {w=="bennett's s" ?
+        {w==="bennett's s" ?
           <div>
           Correlation coefficient computing Expected Agreement for the couple of workers taking in coount the pattern of their answers.
           </div>

@@ -1,7 +1,6 @@
 import {combineReducers} from 'redux';
-
-import {getReducer} from 'src/utils/form';
-import {scopes, FileFormats} from 'src/utils/constants';
+//import {getReducer} from 'src/utils/form';
+//import {scopes, FileFormats} from 'src/utils/constants';
 import {actionTypes} from './actions';
 
 const defaultState = {
@@ -121,43 +120,37 @@ const chart_reducer = (state = defaultState, action) => {
         ...state,
         error: undefined,
         loading: true,
-      }
-      break;
+      };
     case actionTypes.FETCH_METRIC_SUCCESS:
       return {
         ...state,
         reports: action.response,
         loading: false,
-      }
-      break;
+      };
     case actionTypes.FETCH_METRIC_ERROR:
       return {
         ...state,
         error: action.error,
         loading: false,
-      }
-      break;
+      };
     case actionTypes.FETCH_CROWDGOLDS:
       return {
         ...state,
         error: undefined,
         loading: true,
-      }
-      break;
+      };
     case actionTypes.FETCH_CROWDGOLDS_SUCCESS:
       return {
         ...state,
         reports: action.response,
         loading: false,
-      }
-      break;
+      };
     case actionTypes.FETCH_CROWDGOLDS_ERROR:
       return {
         ...state,
         error: action.error,
         loading: false,
-      }
-      break;
+      };
 
     default:
       return state;

@@ -1,16 +1,10 @@
 import React from 'react';
 import {connect} from 'react-redux';
-import PropTypes from 'prop-types';
-
-import ChartWrapper from 'src/components/charts/ChartWrapper';
-import JobChooser from './JobChooser';
-import WorkerChooser from './WorkerChooser';
-import ItemChooser from './ItemChooser';
-import CritChooser from './CritChooser';
+//import PropTypes from 'prop-types';
 import { Button } from 'semantic-ui-react';
 import './reports.css';
 
-import { actions } from './actions';
+//import { actions } from './actions';
 
 class MetricMenu extends React.Component {
 

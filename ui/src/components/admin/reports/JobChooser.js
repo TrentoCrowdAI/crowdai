@@ -1,14 +1,12 @@
 import React from 'react';
 import {connect} from 'react-redux';
-import PropTypes from 'prop-types';
-import { Form, Button } from 'semantic-ui-react';
+import { Form } from 'semantic-ui-react';
 
 class JobChooser extends React.Component {
   
   render() {
     return(
-      <React.Fragment
-      style={{textAlign: 'left'}}>
+      <React.Fragment>
       <Form.Select 
           label="Select Job  "
           value={this.props.chosenjob}

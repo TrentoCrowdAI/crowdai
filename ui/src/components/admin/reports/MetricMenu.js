@@ -3,7 +3,6 @@ import {connect} from 'react-redux';
 //import PropTypes from 'prop-types';
 import { Button } from 'semantic-ui-react';
 import './reports.css';
-
 //import { actions } from './actions';
 
 class MetricMenu extends React.Component {
@@ -11,28 +10,28 @@ class MetricMenu extends React.Component {
   render() {
     return(
 			<React.Fragment>
-				Available Reports:
+				<strong style={{'color': 'steelblue'}}>Job Reports:</strong>
 				<br />
 				<Button 
 					value='T_CompleteTime'
 					className='metrics'
 					style={{marginBottom: '5px'}}
 					onClick={this.props.onChange}
-				>Time to complete per Job</Button>
+				>Time to Complete per Job</Button>
 				<br />
 				<Button 
 					value='W_CompleteTime'
 					className='metrics'
 					style={{marginBottom: '5px'}}
 					onClick={this.props.onChange}
-				>Time to complete per Worker</Button>
+				>Time to Complete per Worker</Button>
 				<br />
 				<Button 
 					value='Percentage'
 					className='metrics' 
 					style={{marginBottom: '5px'}}
 					onClick={this.props.onChange}
-				>Percentage % of Votes</Button>
+				>Votes Distribution per Worker</Button>
 				<br />
 				<Button 
 					value='Distribution'
@@ -46,23 +45,23 @@ class MetricMenu extends React.Component {
 					className='metrics' 
 					style={{marginBottom: '5px'}}
 					onClick={this.props.onChange}
-				>Task Classification and Worker Agreement</Button>
+				>Items Classification Tree</Button>
+				<br />
+				<strong style={{'color': 'steelblue'}}>Correlation Metrics [ Reporting API ]:</strong> 
 				<br />
 				<Button 
 					value='Global'
 					className='metrics' 
 					style={{marginBottom: '5px'}}
 					onClick={this.props.onChange}
-				>Item Classification Efficiency</Button>
-				<br />
-				Correlation Metrics: 
+				>Job Classification Efficiency</Button>
 				<br />
 				<Button 
 					value='TwoWorkers'
 					className='metrics'
 					style={{marginBottom: '5px'}}
 					onClick={this.props.onChange}
-				>Worker Worker Metrics</Button>	
+				>Worker-Worker Metrics</Button>	
 				<br />
 				<Button 
 					value='SingleWorker'

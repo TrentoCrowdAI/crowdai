@@ -87,29 +87,29 @@ class Reports extends React.Component {
 			chosenmetric: value,
 			activeworker: value==='W_CompleteTime'||value==='Percentage'||value==='SingleWorker' ? true : false,
 			chosenworker: value==='W_CompleteTime'||value==='Percentage'||value==='SingleWorker' ? this.state.chosenworker : 'all',
-			//chosenitem: value==='Classification' ? this.state.chosenitem : 'all',
-			chosencriteria: value==='Percentage' ? this.state.chosencriteria : 'all',
-			//activeitem: value==='Classification' ? true : false,
-			activecriteria: value==='Percentage' ? true : false
+			chosenitem: value==='Distribution' ? this.state.chosenitem : 'all',
+			chosencriteria: value==='Percentage'||value==='Distribution' ? this.state.chosencriteria : 'all',
+			activeitem: value==='Distribution' ? true : false,
+			activecriteria: value==='Percentage'||value==='Distribution' ? true : false
 		})
 	}
 
 	chooseWorker(e, {value}) {
 		switch(this.state.chosenmetric) {
 			case 'Percentage':
-				if (value=='all')
+				if (value==='all')
 					this.props.reports.tasks = []
 				else
 					this.props.fetchAnswers(this.props.match.params.jobid,Number(value))
 				break;
 			case 'W_CompleteTime':
-				if (value=='all')
+				if (value==='all')
 					this.props.reports.tasks = []
 				else
 					this.props.fetchWorkerTimes(this.props.match.params.jobid,Number(value))
 				break;
 			case 'SingleWorker':
-				if (value=='all')
+				if (value==='all')
 					this.props.reports.tasks = []
 				else
 					this.props.fetchMetric('worker/'+value+'/job/'+this.props.match.params.jobid+'/stats')
@@ -179,13 +179,12 @@ renderChart(chart,x,y,z,w,param) {
 		});
 
 		var MetricOptions = {
-			'cohen': "Cohen's Kappa",
-			'm1': "Basic Agreement [ M1 ]",
-			//'kendall': "Kendall's Tau",
-			'bennett': "Bennett's S",
-			'wwm2(a|b)': "Probability in Errors [ P_err(A|B) ]",
-			'wwm2(b|a)': "Probability in Errors [ P_err(B|A) ]",
-			'compare': "Comparing Correlation Metrics"
+			'Cohen': "Cohen's Kappa",
+			'M1': "Basic Agreement [ M1 ]",
+			'Bennett': "Bennett's S",
+			'WWM2(a|b)': "Probability in Errors [ P_err(A|B) ]",
+			'WWM2(b|a)': "Probability in Errors [ P_err(B|A) ]",
+			'Comparing': "Comparing Correlation Metrics"
 		}
 		//parameters for reusable charts
 		var chart //to define kind of chart
@@ -217,9 +216,9 @@ renderChart(chart,x,y,z,w,param) {
 			case 'Distribution':
 				chart='stacked'
 				x='item_id'
-				y=''
+				y=['no','not clear','yes']
 				z='criteria_id'
-				param=['yes','no','not clear']
+				param=[this.state.chosenitem,this.state.chosencriteria]
 				break;
 
 			case 'Percentage':
@@ -246,7 +245,7 @@ renderChart(chart,x,y,z,w,param) {
 				param=1
 				break;
 
-			case 'cohen':
+			case 'Cohen':
 				chart='heatmap'
 				x='worker A'
 				y='worker B'
@@ -254,7 +253,7 @@ renderChart(chart,x,y,z,w,param) {
 				param=1
 				break;
 
-			case 'm1':
+			case 'M1':
 				chart='heatmap'
 				x='worker A'
 				y='worker B'
@@ -262,15 +261,7 @@ renderChart(chart,x,y,z,w,param) {
 				param=1
 				break;
 
-			/*case 'kendall':
-				chart='heatmap'
-				x='worker A'
-				y='worker B'
-				z='kendall\'s t'
-				param=1
-				break;
-			*/
-			case 'bennett':
+			case 'Bennett':
 				chart='heatmap'
 				x='worker A'
 				y='worker B'
@@ -278,7 +269,7 @@ renderChart(chart,x,y,z,w,param) {
 				param=1
 				break;
 
-			case 'wwm2(a|b)':
+			case 'WWM2(a|b)':
 				chart='heatmap'
 				x='worker A'
 				y='worker B'
@@ -286,7 +277,7 @@ renderChart(chart,x,y,z,w,param) {
 				param=1
 				break;
 
-			case 'wwm2(b|a)':
+			case 'WWM2(b|a)':
 				chart='heatmap'
 				x='worker A'
 				y='worker B'
@@ -308,17 +299,15 @@ renderChart(chart,x,y,z,w,param) {
 				y='F1-score'
 				z='Matthews Correlation Coefficient'
 				w='Diagnostic Odds Ratio'
-				//j='Specificity'
 				param=1
 				break;
 
-			case 'compare':
+			case 'Comparing':
 				chart='grouped'
 				x=['worker A','worker B']
 				y="cohen's kappa correlation"
 				z="basic agreement"
 				w="bennett\'s s"
-				//j="kendall's t"
 				param=1
 				break;
 
@@ -326,30 +315,19 @@ renderChart(chart,x,y,z,w,param) {
 				break;
 		}
 
-		/**
-		 * <h3 style={{color: 'steelblue'}}>
-						Selected Job_id: <i>{this.props.match.params.jobid}</i><br />
-						Selected Worker_id: <i>{this.state.chosenworker}</i><br />
-						Selected Item_id: <i>{this.state.chosenitem}</i><br />
-						Selected Criteria_id: <i>{this.state.chosencriteria}</i>
-					</h3>
-					<div style={{width: "20%"}} className='empty'></div>
-		 */
-
 		return(
 			<div style={{margin: '20px'}}>
 				<div className="rowC">
 				{
-							(this.state.chosenmetric=="cohen"
-							||this.state.chosenmetric=="m1"
-							//||this.state.chosenmetric=="kendall"
-							||this.state.chosenmetric=="bennett"
-							||this.state.chosenmetric=="wwm2(a|b)"
-							||this.state.chosenmetric=="wwm2(b|a)"
-							||this.state.chosenmetric=="TwoWorkers"
-							||this.state.chosenmetric=="compare") && 
+							(this.state.chosenmetric==="Cohen"
+							||this.state.chosenmetric==="M1"
+							||this.state.chosenmetric==="Bennett"
+							||this.state.chosenmetric==="WWM2(a|b)"
+							||this.state.chosenmetric==="WWM2(b|a)"
+							||this.state.chosenmetric==="TwoWorkers"
+							||this.state.chosenmetric==="Comparing") && 
 							<React.Fragment>
-							<div className='row' style={{'display': 'flex', 'color': 'red'}}>
+							<div className='row' style={{'display': 'flex', 'color': 'steelblue'}}>
 								<br />
 								<MetricChooser 
 									options={MetricOptions}

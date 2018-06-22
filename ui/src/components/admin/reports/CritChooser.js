@@ -7,8 +7,7 @@ class CritChooser extends React.Component {
   
   render() {
     return(
-      <React.Fragment
-      style={{textAlign: 'left'}}>
+      <React.Fragment>
       <Form.Select 
           disabled={this.props.disabled}
           label="Select Criteria  "

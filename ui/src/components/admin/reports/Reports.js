@@ -289,7 +289,7 @@ renderChart(chart,x,y,z,w,param) {
 				chart='histogram'
 				x='contribution to crowd error'
 				y='id'
-				z=''
+				z='turk_id'
 				param=1
 				break;
 

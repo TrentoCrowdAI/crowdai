@@ -1,8 +1,8 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import * as d3 from 'd3'
-import PropTypes from 'prop-types'
-import Math from 'math'
+//import PropTypes from 'prop-types'
+//import Math from 'math'
 
 class NestChart extends React.Component {
   constructor(props) {
@@ -26,7 +26,6 @@ class NestChart extends React.Component {
           return (a[order] > b[order]) ? 1 : ((b[order] > a[order]) ? -1 : 0)
       }
     )
-      
     
     if(this.props.data.length==0) {
       var svg = d3.select("."+this.props.selector)
@@ -61,7 +60,7 @@ class NestChart extends React.Component {
     var height = +svg.attr("height") - margin.top - margin.bottom;
     var g = svg.append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-    var color = 'steelblue'
+    var color = 'orange'
 
     var yscale = d3.scaleLinear()
         .rangeRound([height, 0])
@@ -70,10 +69,13 @@ class NestChart extends React.Component {
     var xscale = d3.scaleBand()
         .rangeRound([0, width])
         .padding(0.1)
-        .domain(data.map( d => (d[z]!=undefined ? d[x]+","+d[z] : d[x]) ))
+        .domain(data.map( d => (d[z]!=undefined ? d[x]+", "+d[z] : d[x]) ))
 
     var xAxis = d3.axisBottom(xscale)
-    var yAxis = d3.axisLeft(yscale).ticks(10)
+      .tickFormat(d => d.substring(0,10)+'...')
+
+    var yAxis = d3.axisLeft(yscale)
+      .ticks(10)
 
     var bar = g.selectAll(".bar")
         .data(data)
@@ -85,7 +87,7 @@ class NestChart extends React.Component {
           if(d[y]>=media) return color
             else return "lightgreen"
         })
-        .attr("x", d => xscale(d[z]!=undefined ? d[x]+","+d[z] : d[x]))
+        .attr("x", d => xscale(d[z]!=undefined ? d[x]+", "+d[z] : d[x]))
         .attr("y", d => yscale(d[y]/param))
         .attr("width", xscale.bandwidth())
         .attr("height", d => height-yscale(d[y]/param))
@@ -107,11 +109,11 @@ class NestChart extends React.Component {
         //.attr("x", d => xscale(d[z]!=undefined ? d[x]+","+d[z] : d[x])+(xscale.bandwidth()/2) )
         .attr("text-anchor", "end")
         .style("fill", "white")
-        .attr("transform", d => "translate("+(xscale(d[z]!=undefined ? d[x]+","+d[z] : d[x])+(xscale.bandwidth()/2)-5)+","+(yscale(d[y]/param)+10)+") rotate(-90)")
+        .attr("transform", d => "translate("+(xscale(d[z]!=undefined ? d[x]+", "+d[z] : d[x])+(xscale.bandwidth()/2)-5)+","+(yscale(d[y]/param)+10)+") rotate(-90)")
         .text( d => (d[y]/param).toFixed(1))
 
     var line = d3.line()
-        .x( (d) => {return xscale(d[z]!=undefined ? d[x]+","+d[z] : d[x])} )
+        .x( (d) => {return xscale(d[z]!=undefined ? d[x]+", "+d[z] : d[x])} )
         .y( (d) => {return yscale(d[y]/param)} )
 
     //average red line
@@ -157,7 +159,7 @@ class NestChart extends React.Component {
           .attr("fill","black")
           .attr("transform","translate("+(width-15)+",0)")
           .attr("dy","2.5em")
-          .text(this.props.z!='' ? this.props.x+","+this.props.z : this.props.x)
+          .text(this.props.z!='' ? this.props.x+", "+this.props.z : this.props.x)
 
     g.append("g")
         .attr("class","axis axis--y")

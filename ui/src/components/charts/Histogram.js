@@ -53,7 +53,6 @@ class Histogram extends React.Component {
     var xscale = d3.scaleLinear()
       .range([0, width])
       .domain([
-        //necessary to have values from 0 to scale bandwidth low values
         0,
         //d3.min(data, d => Math.floor((d[x]/param)/10)*10), 
         d3.max(data, d => (Math.round((d[x]/param)/10)*10)  )
@@ -62,15 +61,12 @@ class Histogram extends React.Component {
     
     var histo = d3.histogram()
       .thresholds(xscale.ticks(10))
-      (data.map(d => d[x]===0 ? d[x]/param : ((d[x]/param)-1) ));
-
-      //histo.map(d => console.log(d.x0,d.x1,d.length))
-      //console.log(histo)
+      (data.map(d => d[x]===0 ? d[x]/param : ((d[x]/param)-1) ))
 
     var yscale = d3.scaleLinear()
       .domain([0, d3.max(histo, d => d.length)])
       .range([height,0])
-    var yAxis = d3.axisLeft(yscale);
+    var yAxis = d3.axisLeft(yscale)
 
     var bar = g.selectAll(".bar")
       .data(histo)
@@ -96,7 +92,6 @@ class Histogram extends React.Component {
           .style("opacity","1")
       })
       .on("click", (d) => {
-        console.log(d.x0,d.x1,d3.max(xscale.domain())-1)
         this.setState({
           clicked : []
         })

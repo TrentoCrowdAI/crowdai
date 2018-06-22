@@ -72,7 +72,7 @@ class NestChart extends React.Component {
         .domain(data.map( d => (d[z]!=undefined ? d[x]+", "+d[z] : d[x]) ))
 
     var xAxis = d3.axisBottom(xscale)
-      .tickFormat(d => d.substring(0,10)+'...')
+      .tickFormat(d => d!=undefined ? d.substring(0,10)+'...' : "")
 
     var yAxis = d3.axisLeft(yscale)
       .ticks(10)

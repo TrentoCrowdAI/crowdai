@@ -1,18 +1,18 @@
 import React from 'react'
 //import * as d3 from 'd3'
 import {connect} from 'react-redux'
-import PropTypes from 'prop-types'
+//import PropTypes from 'prop-types'
 
-import SimpleLineChart from './SimpleLineChart.js'
+//import SimpleLineChart from './SimpleLineChart.js'
 import Histogram from './Histogram.js'
 import HeatMap from './HeatMap.js'
-import AreaChart from './AreaChart.js'
+//import AreaChart from './AreaChart.js'
 import NestChart from './NestChart.js'
 import StackedBar from './StackedBar.js'
-import DonutChart from './DonutChart.js';
-import CompareLineChart from './CompareLineChart';
-
-var count = 0;
+import DonutChart from './DonutChart.js'
+import CompareLineChart from './CompareLineChart'
+import TreeChart from './TreeChart'
+import GroupedChart from './GroupedChart'
 
 class ChartWrapper extends React.Component {
 
@@ -57,14 +57,6 @@ class ChartWrapper extends React.Component {
             />
           </div>
         );
-      case 'linechart':
-        return(
-          <div>
-          <SimpleLineChart
-            {... this.props}
-            />
-          </div>
-        );
       case 'heatmap':
         return(
           <div>
@@ -96,8 +88,7 @@ class ChartWrapper extends React.Component {
               {... this.props}
             />
           </div>
-        )
-        break;
+        );
       case 'linemetricchart':
         return(
           <div>
@@ -105,8 +96,23 @@ class ChartWrapper extends React.Component {
               {...this.props}
             />
           </div>
-        )
-        break;
+        );
+      case 'treechart':
+        return(
+          <div>
+            <TreeChart
+              {...this.props}
+            />
+          </div>
+        );
+      case 'grouped':
+        return(
+          <div>
+            <GroupedChart
+              {...this.props}
+            />
+          </div>
+        );
       default:
         return(
           <div>

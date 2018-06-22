@@ -14,7 +14,7 @@ class SimpleLineChart extends React.Component {
   }
 
   dataWrapper() {
-    if(this.props.data.length==0) {
+    if(this.props.data.length===0) {
       var svg = d3.select("."+this.props.selector)
       var margin = {top: 10, right: 30, bottom: 30, left: 30};
       var g = svg.append("g")
@@ -22,7 +22,7 @@ class SimpleLineChart extends React.Component {
         .text("No data to display yet")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-    } else if(this.props.param[0]=='all') {
+    } else if(this.props.param[0]==='all') {
       var svg = d3.select("."+this.props.selector)
       var margin = {top: 10, right: 30, bottom: 30, left: 30};
       var g = svg.append("g")
@@ -30,7 +30,7 @@ class SimpleLineChart extends React.Component {
         .text("Choose an Item")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-    } else if(this.props.param[1]=='all') {
+    } else if(this.props.param[1]==='all') {
           var svg = d3.select("."+this.props.selector)
           var margin = {top: 10, right: 30, bottom: 30, left: 30};
           var g = svg.append("g")
@@ -48,8 +48,7 @@ class SimpleLineChart extends React.Component {
     var width = +svg.attr("width") - margin.left - margin.right;
     var height = +svg.attr("height") - margin.top - margin.bottom;
     var g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-    var color = this.props.color
-
+    
     var x = this.props.x //worker_id
     var y = this.props.y //answer
     var z = this.props.z //yes,no,not clear
@@ -59,12 +58,12 @@ class SimpleLineChart extends React.Component {
     var data = this.props.data.sort( function(a,b) {
       return (Number(a[x]) > Number(b[x])) ? 1 : ((Number(b[x]) > Number(a[x])) ? -1 : 0);
     })
-    .filter(d => (d.item_id==param[0] && d.criteria_id==param[1]) )
+    .filter(d => (d.item_id===param[0] && d.criteria_id===param[1]) )
 
     var datan = {}
     var datas = data
     function cc(i) {
-      datan = datas.filter(d => d[y]==z[i])
+      datan = datas.filter(d => d[y]===z[i])
       return datan.length
     }
 
@@ -118,7 +117,7 @@ class SimpleLineChart extends React.Component {
 
     var xtggold = Math.max( labels[z[0]].xtg, labels[z[1]].xtg, labels[z[2]].xtg )
     var labelgold
-    z.map(d => labels[d].xtg==xtggold ? labelgold=labels[d].label : null )
+    z.map(d => labels[d].xtg===xtggold ? labelgold=labels[d].label : null )
     
     //console.log(labelgold, xtggold)
 

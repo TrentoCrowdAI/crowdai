@@ -26,6 +26,9 @@ const actionTypes = {
   FETCH_METRIC: 'C_FETCH_METRIC',
   FETCH_METRIC_SUCCESS: 'C_FETCH_METRIC_SUCCESS',
   FETCH_METRIC_ERROR: 'C_FETCH_METRIC_ERROR',
+  FETCH_CROWDGOLDS: 'C_FETCH_CROWDGOLDS',
+  FETCH_CROWDGOLDS_SUCCESS:'C_FETCH_CROWDGOLDS_SUCCESS',
+  FETCH_CROWDGOLDS_ERROR: 'C_FETCH_CROWDGOLDS_ERROR',
   ...getActionTypes(scopes.REPORTS)
 };
 
@@ -180,6 +183,25 @@ const actions = {
   fetchMetricError(error) {
     return {
       type: actionTypes.FETCH_METRIC_ERROR,
+      error
+    };
+  },
+
+  fetchCrowdGolds(jobId) {
+    return {
+      type: actionTypes.FETCH_CROWDGOLDS,
+      jobId
+    };
+  },
+  fetchCrowdGoldsSuccess(response) {
+    return {
+      type: actionTypes.FETCH_CROWDGOLDS_SUCCESS,
+      response
+    };
+  },
+  fetchCrowdGoldsError(error) {
+    return {
+      type: actionTypes.FETCH_CROWDGOLDS_ERROR,
       error
     };
   },

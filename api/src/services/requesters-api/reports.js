@@ -26,6 +26,10 @@ const getWorkersAgreements = async ctx => {
   ctx.response.body = await delegates.reports.getWorkersAgreements(ctx.params.jobId);
 };
 
+const getCrowdGolds = async ctx => {
+  ctx.response.body = await delegates.reports.getCrowdGolds(ctx.params.jobId);
+};
+
 exports.register = router => {
   router.get('/getAllTasksTImesByJob/:id', getAllTasksTimesByJob);
   router.get('/getWorkerTimes/:jobId/:workerId', getWorkerTimes);
@@ -33,4 +37,5 @@ exports.register = router => {
   router.get('/getWorkerAnswers/:jobId/:workerId', getWorkerAnswers);
   router.get('/getTasksAgreements/:id', getTasksAgreements);
   router.get('/getWorkersAgreements/:jobId', getWorkersAgreements);
+  router.get('/getCrowdGolds/:jobId', getCrowdGolds)
 };

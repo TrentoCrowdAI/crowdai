@@ -14,26 +14,29 @@ class StackedBar extends React.Component {
   }
 
   buildGraph() {
-  	var svg = d3.select("."+this.props.selector);
-  	
-  	var criteria = this.props.param
-  	/*this.props.param.map( (step,i) => criteria['c'+(i+1)] = step )
-  	console.log("criteria",criteria)*/
-
+		var svg = d3.select("."+this.props.selector);
+		
+  	var y = this.props.y
     var x = this.props.x
     var z = this.props.z
+		var param = this.props.param
 
-    var data = this.props.data.sort( function(a,b) {
-      return (a[x] > b[x]) ? 1 : ((b[x] > a[x]) ? -1 : 0);
-    })
+		var data = this.props.data
+			.sort( (a,b) => Number(a[x])>Number(b[x]) ? 1 : Number(a[x])<Number(b[x]) ? -1 : Number(a[z])>Number(b[z]) ? 1 : Number(a[z])<Number(b[z]) ? -1 : 0 )
+			.filter(d => param[0]==='all' && param[1]==='all' ? true 
+				: param[0]!=='all' && param[1]==='all' ? d[x]===param[0]
+				: param[0]==='all' && param[1]!=='all' ? d[z]===param[1]
+				: param[0]!=='all' && param[1]!=='all' ? d[x]===param[0] && d[z]===param[1] 
+				: false )
 
     var margin = {top: 30, right: 30, bottom: 30, left: 50};
-    var width = +svg.attr("width") - margin.left - margin.right;
+		var width = +svg.attr("width") - margin.left - margin.right;
+		svg.attr('height',(data.length+1)*50)
     var height = +svg.attr("height") - margin.top - margin.bottom;
     var g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
     
     var color = d3.scaleOrdinal()
-    		.range(["orange", "lightgreen", "steelblue"])
+    		.range(['orange','lightgreen','steelblue'])
 
     var yscale = d3.scaleBand()
     		.rangeRound([0, height])
@@ -41,23 +44,23 @@ class StackedBar extends React.Component {
     var xscale = d3.scaleLinear()
     		.range([0, width])
 
-    var xAxis = d3.axisTop().scale(xscale)//.tickFormat(d3.format(",%"))
-    var yAxis = d3.axisLeft().scale(yscale)//.tickSize(0)
+    var xAxis = d3.axisTop().scale(xscale)
+    var yAxis = d3.axisLeft().scale(yscale)
 
     var rowsNames = data.map( d => d[x]+','+d[z])
-    var neutralIndex = Math.floor(Object.values(criteria).length/2)
+    var neutralIndex = Math.floor(Object.values(y).length/2)
 
-    color.domain(criteria)
+    color.domain(y)
 
     data.forEach( function(row) {
-    		row.total = d3.sum(criteria.map(name => +row[name]))
-    		criteria.forEach(name => row['relative'+name]=(row.total!==0 ? +row[name]/row.total : 0))
+    		row.total = d3.sum(y.map(name => +row[name]))
+    		y.forEach(name => row['relative'+name]=(row.total!==0 ? +row[name]/row.total : 0))
 
-    		var x0 = -1*d3.sum(criteria.map((name,i) => i<neutralIndex ? +row['relative'+name] : 0))
-    		if(criteria.length & 1) { x0 += -1*row['relative'+criteria[neutralIndex]]/2 }
+    		var x0 = -1*d3.sum(y.map((name,i) => i<neutralIndex ? +row['relative'+name] : 0))
+    		if(y.length & 1) { x0 += -1*row['relative'+y[neutralIndex]]/2 }
     		var idx = 0
 
-    		row.boxes = criteria.map( function(name) {
+    		row.boxes = y.map( function(name) {
     			return {
     			name: name,
     			x0: x0,
@@ -116,7 +119,7 @@ class StackedBar extends React.Component {
     		.attr("dx", "0.5em")
 				.style("text-anchor","begin")
 				.attr("fill","white")
-    		.text(d => d.absolute !==0 && (d.x1-d.x0)>0.04 ? d.absolute+",\t"+d.name : "")
+    		.text(d => d.absolute !==0 && (d.x1-d.x0)>0.04 ? d.absolute+", "+d.name : "")
 
     	g.append("g")
     			.attr("class", "y axis")
@@ -138,9 +141,9 @@ class StackedBar extends React.Component {
   }
 
   render() {
-    return (
+		return (
     	<div>
-    		<svg className={this.props.selector} width="1000" height={this.props.data.length*60}> </svg>
+    		<svg className={this.props.selector} width="1000" height="600"> </svg>
     	</div>
     );
   }

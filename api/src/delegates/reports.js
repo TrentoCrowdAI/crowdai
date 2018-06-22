@@ -24,6 +24,7 @@ const getAllTasksTimesByJob = (exports.getAllTasksTimesByJob = async id => {
   ORDER BY
     times_table.item_id,
     times_table.criteria_id`, [id]);
+    console.log(res.rows)
     return tasks = { tasks: res.rows };
   } catch (error) {
     console.error(error);
@@ -115,6 +116,33 @@ const getWorkersAgreements = (exports.getWorkersAgreements = async (jobId) => {
       FROM ${db.TABLES.Task}
       WHERE job_id=$1 AND (data->'answered')='true'
     `, [jobId])
+    return tasks = { tasks: res.rows }
+  } catch (error) {
+    console.error(error);
+    throw Boom.badImplementation('Error while trying to fetch record');
+  }
+});
+
+const getCrowdGolds = (exports.getCrowdGolds = async (jobId) => {
+  try {
+    let res = await db.query(`
+      select distinct a.item_id, cast((a.data->'criteria')::json#>>'{0,id}' as bigint) as criteria_id,
+        (
+          select (b.data->'criteria')::json#>>'{0,workerAnswer}' as answer
+          from ${db.TABLES.Task} b
+          where b.item_id=a.item_id 
+          and (b.data->'criteria')::json#>>'{0,id}'=(a.data->'criteria')::json#>>'{0,id}'
+          and b.job_id=$1
+          group by b.item_id, b.data
+          order by count(*) desc
+          limit 1
+        ) as answer
+      from ${db.TABLES.Task} a
+      where a.job_id=$1
+      group by a.item_id, a.data,(a.data->'criteria')::json#>>'{0,id}'
+      order by a.item_id, criteria_id
+    `, [jobId])
+    console.log(res.rows)
     return tasks = { tasks: res.rows }
   } catch (error) {
     console.error(error);

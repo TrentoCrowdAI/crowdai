@@ -34,7 +34,7 @@ class HeatMap extends React.Component {
 	buildGraph() {
 	var svg = d3.select("."+this.props.selector);
 
-    var margin = {top: 10, right: 30, bottom: 30, left: 110};
+    var margin = {top: 10, right: 30, bottom: 30, left: 100};
     var width = +svg.attr("width") - margin.left - margin.right;
     var height = +svg.attr("height") - margin.top - margin.bottom;
     var g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
@@ -47,7 +47,7 @@ class HeatMap extends React.Component {
         //.sort((a,b) => a > b ? 1 : a < b ? -1 : 0);
     var yelems = Array.from(new Set(this.props.data.map(d => d[y])))
         //.sort((a,b) => a > b ? 1 : a < b ? -1 : 0);
-    var colors = ['#FFE5CC', '#FFCC77', '#FFB266', '#FF7733', '#FF8000', '#CC6600']
+    var colors = ['#FFE6CD', '#FFCD9A', '#FFB366', '#FF9A33', '#FF8000']
 
     var xscale = d3.scaleBand()
         .domain(xelems)
@@ -65,6 +65,7 @@ class HeatMap extends React.Component {
 
     var yAxis = d3.axisLeft()
         .scale(yscale)
+        .tickFormat(d => d.substring(0,15)+'...')
 
     var colorScale = d3.scaleQuantile()
         .domain([0,1])
@@ -94,24 +95,23 @@ class HeatMap extends React.Component {
         .attr('fill', d => d[z]/param==0 ? 'lightgreen' : d[z]/param==1 ? 'red' : colorScale(d[z]/param))
         .attr('rx', 2)
         .attr('ry', 2)
-        .on("mouseover", function(d) {
+        /*.on("mouseover", function(d) {
             g.selectAll(".yaxis").selectAll("text").filter( function(text) {
                 return text === d[y] })
                 .transition().duration(100).style('font','15px arial').attr('font-weight', 'bold')
-    	})
-    	.on("mouseout", function(d) {
+    	})*/
+    	.on("mouseout", () => 
             tooltip.style('visibility', 'hidden')
-            g.selectAll(".yaxis").selectAll("text").filter( function(text) {
-                return text === d[y] })
-                .transition().style('font','10px arial').attr('font-weight', 'normal')
-        })
+            /*g.selectAll(".yaxis").selectAll("text").filter( text => text === d[y] )
+                .transition().style('font','10px arial').attr('font-weight', 'normal')*/
+        )
         .on("mousemove", d => {
           tooltip.style('visibility', 'visible')
               .style('top',(d3.event.pageY-50)+'px')
               .style('left',(d3.event.pageX-310)+'px')
           tooltip.select('div')
-              .html('Worker A: <b>'+d[x].toUpperCase()+'</b>,'+
-                  '<br />Worker B: <b>'+d[y].toUpperCase()+'</b>,'+
+              .html(x+': <b>'+d[x]+'</b>,'+
+                  '<br />'+y+': <b>'+d[y]+'</b>,'+
                   '<br />'+z+' => <b>'+d[z].toFixed(2)+'</b>')
         })
 
@@ -131,8 +131,8 @@ class HeatMap extends React.Component {
         .attr('class', 'yaxis')
         .call(yAxis)
         .selectAll('text')
-        .attr('font-weight', 'normal')
-        .style('font', '10px arial')
+            .attr('font-weight', 'normal')
+            .style('font', '10px arial')
 
 	}
 
@@ -148,6 +148,17 @@ class HeatMap extends React.Component {
 	render() {
 		return(
 			<div>
+                <ul className={'legend'}>
+                    <li><span style={{'background-color':'#FFE6CD'}}></span>{this.props.z} {" < 0.20"}</li>
+                    <li><span style={{'background-color':'#FFCD9A'}}></span>{this.props.z} {" < 0.40"}</li>
+                    <li><span style={{'background-color':'#FFB366'}}></span>{this.props.z} {" < 0.60"}</li>
+                </ul>
+                <br />
+                <ul className={'legend'}>
+                    <li><span style={{'background-color':'#FF9A33'}}></span>{this.props.z} {" < 0.80"}</li>
+                    <li><span style={{'background-color':'#FF8000'}}></span>{this.props.z} {" < 1"}</li>    
+                    <li><span style={{'background-color':'red'}}></span>{this.props.z} = 1</li>
+                </ul>
 			<br />
 			<svg className={this.props.selector} height='1100' width='1000'> </svg>
 			</div>

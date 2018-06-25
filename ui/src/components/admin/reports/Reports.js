@@ -69,11 +69,11 @@ class Reports extends React.Component {
 				break;
 			case 'SingleWorker':
 				this.props.reports.tasks=[]
-				this.props.fetchMetric('worker/job/'+this.props.match.params.jobid+'/m2');
+				this.props.fetchMetric('worker/job/'+this.props.match.params.jobid+'/contribution');
 				break;
 			case 'M2':
 				this.props.reports.tasks=[]
-				this.props.fetchMetric('worker/job/'+this.props.match.params.jobid+'/m2');
+				this.props.fetchMetric('worker/job/'+this.props.match.params.jobid+'/contribution');
 				break;
 			case 'Global':
 				this.props.reports.tasks=[]

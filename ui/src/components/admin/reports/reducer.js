@@ -151,6 +151,24 @@ const chart_reducer = (state = defaultState, action) => {
         error: action.error,
         loading: false,
       };
+    case actionTypes.FETCH_PAIRS:
+      return {
+        ...state,
+        error: undefined,
+        loading: true,
+      };
+    case actionTypes.FETCH_PAIRS_SUCCESS:
+      return {
+        ...state,
+        reports: action.response,
+        loading: false,
+      };
+    case actionTypes.FETCH_PAIRS_ERROR:
+      return {
+        ...state,
+        error: action.error,
+        loading: false,
+      };
 
     default:
       return state;

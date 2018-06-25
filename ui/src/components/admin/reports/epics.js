@@ -113,6 +113,19 @@ const fetchWorkers = (action$, store) =>
       .catch(error => Observable.of(actions.fetchItemError(flattenError(error))));
 });
 
+const getWorkersPairs = (action$, store) =>
+  action$.ofType(actionTypes.FETCH_PAIRS).switchMap(action => {
+    return Observable.defer(() => requestersApi.get('ww/job/'+action.jobId+'/stats'))
+      .mergeMap(response => Observable.of(actions.fetchWorkersPairsSuccess(response.data)))
+      .catch(error => Observable.of(actions.fetchWorkersPairsError(flattenError(error))));
+});
+const fetchWorkersPairs = (action$, store) =>
+  action$.ofType(actionTypes.FETCH_ITEM).switchMap(action => {
+    return Observable.defer(() => requestersApi.get(`ww/job/`+action.jobId+'/stats'))
+      .mergeMap(response => Observable.of(actions.fetchItemSuccess(response.data)))
+      .catch(error => Observable.of(actions.fetchItemError(flattenError(error))));
+});
+
 export default combineEpics(getTaskTime, fetchTaskTime,
                             getWorkers, fetchWorkers, 
                             getWorkerTimes, fetchWorkerTimes, 
@@ -121,5 +134,6 @@ export default combineEpics(getTaskTime, fetchTaskTime,
                             getTasksAgreements, fetchTasksAgreements,
                             getWorkersAgreements, fetchWorkersAgreements,
                             getMetric, fetchMetric,
-                            getCrowdGolds, fetchCrowdGolds
+                            getCrowdGolds, fetchCrowdGolds,
+                            getWorkersPairs, fetchWorkersPairs
                           );

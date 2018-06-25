@@ -165,7 +165,7 @@ const getCrowdGolds = (exports.getCrowdGolds = async jobId => {
   }
 });
 
-const getStatsPairOfWorkerSameJob = (exports.getStatsPairOfWorkerSameJob = async jobId => {
+const getWorkersPairs = (exports.getWorkersPairs = async jobId => {
   try {
     var workersCouples = [];
     const query = await db.query(

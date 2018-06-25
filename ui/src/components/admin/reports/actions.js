@@ -29,6 +29,9 @@ const actionTypes = {
   FETCH_CROWDGOLDS: 'C_FETCH_CROWDGOLDS',
   FETCH_CROWDGOLDS_SUCCESS:'C_FETCH_CROWDGOLDS_SUCCESS',
   FETCH_CROWDGOLDS_ERROR: 'C_FETCH_CROWDGOLDS_ERROR',
+  FETCH_PAIRS: 'C_FETCH_PAIRS',
+  FETCH_PAIRS_SUCCESS: 'C_FETCH_PAIRS_SUCCESS',
+  FETCH_PAIRS_ERROR: 'C_FETCH_PAIRS_ERROR',
   ...getActionTypes(scopes.REPORTS)
 };
 
@@ -202,6 +205,25 @@ const actions = {
   fetchCrowdGoldsError(error) {
     return {
       type: actionTypes.FETCH_CROWDGOLDS_ERROR,
+      error
+    };
+  },
+
+  fetchWorkersPairs(jobId) {
+    return {
+      type: actionTypes.FETCH_PAIRS,
+      jobId
+    };
+  },
+  fetchWorkersPairsSuccess(response) {
+    return {
+      type: actionTypes.FETCH_PAIRS_SUCCESS,
+      response
+    };
+  },
+  fetchWorkersPairsError(error) {
+    return {
+      type: actionTypes.FETCH_PAIRS_ERROR,
       error
     };
   },

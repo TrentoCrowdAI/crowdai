@@ -30,10 +30,10 @@ const getCrowdGolds = async ctx => {
   ctx.response.body = await delegates.reports.getCrowdGolds(ctx.params.jobId);
 };
 
-const getStatsPairOfWorkerSameJob = async ctx => {
+const getWorkersPairs = async ctx => {
   //let risposta = await delegates.reports.getStatsPairOfWorkerSameJob(ctx.params.jobId);
   //ctx.response.body = JSON.stringify(risposta, null, 2);
-  ctx.response.body = await delegates.reports.getStatsPairOfWorkerSameJob(ctx.params.jobId);
+  ctx.response.body = await delegates.reports.getWorkersPairs(ctx.params.jobId);
 };
 
 exports.register = router => {
@@ -44,5 +44,5 @@ exports.register = router => {
   router.get('/getTasksAgreements/:id', getTasksAgreements);
   router.get('/getWorkersAgreements/:jobId', getWorkersAgreements);
   router.get('/getCrowdGolds/:jobId', getCrowdGolds);
-  router.get('/ww/job/:jobId/stats', getStatsPairOfWorkerSameJob);
+  router.get('/ww/job/:jobId/stats', getWorkersPairs);
 };

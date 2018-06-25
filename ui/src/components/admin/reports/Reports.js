@@ -64,7 +64,8 @@ class Reports extends React.Component {
 				break;
 			case 'TwoWorkers':
 				this.props.reports.tasks=[]
-				this.props.fetchMetric('ww/job/'+this.props.match.params.jobid+'/stats');
+				//this.props.fetchMetric('ww/job/'+this.props.match.params.jobid+'/stats');
+				this.props.fetchWorkersPairs(this.props.match.params.jobid)
 				break;
 			case 'SingleWorker':
 				this.props.reports.tasks=[]
@@ -392,6 +393,7 @@ Reports.propTypes = {
 	fetchTasksAgreements: PropTypes.func,
 	fetchWorkersAgreements: PropTypes.func,
 	fetchCrowdGolds: PropTypes.func,
+	fetchWorkersPairs: PropTypes.func,
 
 	fetchItems: PropTypes.func,
 	fetchCriteria: PropTypes.func,
@@ -414,7 +416,8 @@ const mapDispatchToProps = dispatch => ({
 	fetchTasksAgreements: jobId => dispatch(actions.fetchTasksAgreements(jobId)),
 	fetchWorkersAgreements: jobId => dispatch(actions.fetchWorkersAgreements(jobId)),
 	fetchMetric : metric => dispatch(actions.fetchMetric(metric)),
-	fetchCrowdGolds: jobId => dispatch(actions.fetchCrowdGolds(jobId))
+	fetchCrowdGolds: jobId => dispatch(actions.fetchCrowdGolds(jobId)),
+	fetchWorkersPairs: jobId => dispatch(actions.fetchWorkersPairs(jobId))
 })
 
 const mapStateToProps = state => ({

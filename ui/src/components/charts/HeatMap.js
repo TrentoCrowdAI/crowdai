@@ -160,7 +160,7 @@ class HeatMap extends React.Component {
                     <li><span style={{'background-color':'red'}}></span>{this.props.z} = 1</li>
                 </ul>
 			<br />
-			<svg className={this.props.selector} height='1100' width='1000'> </svg>
+			<svg className={this.props.selector} height='1000' width='1000'> </svg>
 			</div>
 		);
 	}

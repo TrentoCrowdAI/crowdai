@@ -63,7 +63,7 @@ class DonutChart extends React.Component {
     
     var radius = Math.min(width, height)/2
     var color = d3.scaleOrdinal(['lightgreen','orange','steelblue'])
-    var donutWidth = 70
+    var donutWidth = 40
     var arc = d3.arc()
       .innerRadius(radius-donutWidth)
       .outerRadius(radius)
@@ -168,7 +168,7 @@ class DonutChart extends React.Component {
       <div>
         <br />
         
-      <svg className={this.props.selector} width="1000" height="400"> </svg>  
+      <svg className={this.props.selector} width="200" height="200"> </svg>  
       <br />
       { this.props.data.length ? 
         <React.Fragment>

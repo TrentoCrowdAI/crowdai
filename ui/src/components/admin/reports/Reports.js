@@ -13,7 +13,7 @@ import { Dimmer, Loader } from 'semantic-ui-react';
 
 import './reports.css';
 import { actions } from './actions';
-//import { actions as jobactions } from '../jobs/actions';
+import { actions as jobactions } from '../jobs/actions';
 
 class Reports extends React.Component {
 	constructor(props) {
@@ -69,7 +69,8 @@ class Reports extends React.Component {
 				break;
 			case 'SingleWorker':
 				this.props.reports.tasks=[]
-				this.props.fetchMetric('worker/job/'+this.props.match.params.jobid+'/contribution');
+				//this.props.fetchMetric('worker/job/'+this.props.match.params.jobid+'/contribution');
+				this.props.fetchAnswers(this.props.match.params.jobid,Number(this.state.chosenworker))
 				break;
 			case 'M2':
 				this.props.reports.tasks=[]
@@ -89,15 +90,16 @@ class Reports extends React.Component {
 			activeworker: value==='W_CompleteTime'||value==='Percentage'||value==='SingleWorker' ? true : false,
 			chosenworker: value==='W_CompleteTime'||value==='Percentage'||value==='SingleWorker' ? this.state.chosenworker : 'all',
 			chosenitem: value==='Distribution' ? this.state.chosenitem : 'all',
-			chosencriteria: value==='Percentage'||value==='Distribution' ? this.state.chosencriteria : 'all',
+			chosencriteria: value==='Percentage'||value==='Distribution'||value==='SingleWorker' ? this.state.chosencriteria : 'all',
 			activeitem: value==='Distribution' ? true : false,
-			activecriteria: value==='Percentage'||value==='Distribution' ? true : false
+			activecriteria: value==='Percentage'||value==='Distribution'||value==='SingleWorker' ? true : false
 		})
 	}
 
 	chooseWorker(e, {value}) {
 		switch(this.state.chosenmetric) {
 			case 'Percentage':
+			case 'SingleWorker':
 				if (value==='all')
 					this.props.reports.tasks = []
 				else
@@ -109,12 +111,12 @@ class Reports extends React.Component {
 				else
 					this.props.fetchWorkerTimes(this.props.match.params.jobid,Number(value))
 				break;
-			case 'SingleWorker':
+			/*case 'SingleWorker':
 				if (value==='all')
 					this.props.reports.tasks = []
 				else
 					this.props.fetchMetric('worker/'+value+'/job/'+this.props.match.params.jobid+'/stats')
-				break;
+				break;*/
 			default:
 				break;
 		}
@@ -161,14 +163,14 @@ renderChart(chart,x,y,z,w,param) {
 	}
 
 	render() {
-		console.log(this.props.reports)
-
+		console.log(this.props.reports.tasks)
+		
 		//refresh options for charts with new loaded data every time
 		var WorkerOptions =  { 'all' : 'All Workers' }
 		Object.values(this.props.workers.workers).map( step => {
       WorkerOptions[step.worker_id] = step.turk_id
 		});
-
+		
 		var ItemOptions = { 'all': 'All Items' }
 		Object.values(this.props.reports.tasks).map( step => {
       ItemOptions[step.item_id] = step.item_id
@@ -224,7 +226,7 @@ renderChart(chart,x,y,z,w,param) {
 
 			case 'Percentage':
 				chart='pie'
-				x='id'
+				x='turk_id'
 				y='answer'
 				z=['item_id','criteria_id']
 				param=this.state.chosencriteria
@@ -313,12 +315,12 @@ renderChart(chart,x,y,z,w,param) {
 				break;
 
 			case 'SingleWorker':
-				chart='multiple'
+				chart='singleworker'
 				x=''
 				y=''
 				z=''
-				w=''
-				param=''
+				w=this.state
+				param=this.props
 				break;
 
 			default:

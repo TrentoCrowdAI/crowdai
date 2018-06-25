@@ -13,6 +13,7 @@ import DonutChart from './DonutChart.js'
 import CompareLineChart from './CompareLineChart'
 import TreeChart from './TreeChart'
 import GroupedChart from './GroupedChart'
+import SingleWorker from './SingleWorker'
 
 class ChartWrapper extends React.Component {
 
@@ -109,6 +110,14 @@ class ChartWrapper extends React.Component {
         return(
           <div>
             <GroupedChart
+              {...this.props}
+            />
+          </div>
+        );
+      case 'singleworker':
+        return(
+          <div>
+            <SingleWorker
               {...this.props}
             />
           </div>

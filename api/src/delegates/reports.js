@@ -87,11 +87,13 @@ const getWorkerTimes = (exports.getWorkerTimes = async (jobId, workerId) => {
 const getWorkerAnswers = (exports.getWorkerAnswers = async (jobId, workerId) => {
   try {
     let res = await db.query(
-      `SELECT id, item_id, (data->'criteria')::json#>>'{0,id}' AS criteria_id, (data->'criteria')::json#>>'{0,workerAnswer}' AS answer
-    FROM ${db.TABLES.Task} 
-    WHERE worker_id=$2 AND job_id=$1 AND (data->'answered')='true'`,
+      `SELECT u.turk_id, t.item_id, (t.data->'criteria')::json#>>'{0,id}' AS criteria_id, (t.data->'criteria')::json#>>'{0,workerAnswer}' AS answer
+    FROM ${db.TABLES.Task} t JOIN ${db.TABLES.Worker} u
+    ON t.worker_id=u.id
+    WHERE t.worker_id=$2 AND t.job_id=$1 AND (t.data->'answered')='true'`,
       [jobId, workerId]
     );
+    console.log(res.rows)
     return (tasks = { tasks: res.rows });
   } catch (error) {
     console.error(error);

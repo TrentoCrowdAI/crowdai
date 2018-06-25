@@ -311,6 +311,15 @@ renderChart(chart,x,y,z,w,param) {
 				param=1
 				break;
 
+			case 'SingleWorker':
+				chart='multiple'
+				x=''
+				y=''
+				z=''
+				w=''
+				param=''
+				break;
+
 			default:
 				break;
 		}

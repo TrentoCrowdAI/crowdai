@@ -72,8 +72,8 @@ class Histogram extends React.Component {
       .data(histo)
       .enter().append("g")
       .attr("class", "bar")
-      .attr("transform", d => "translate("+xscale(d.x0)
-        //(d.x1==d3.max(data, d => d[x]/param) ? xscale(d.x0) : (xscale( (d.x1) - ( d3.max(xscale.domain()) / ((xscale.ticks().length)-1) ) )))
+      .attr("transform", d => "translate("+
+        ( d.x0===d3.min(data, d => ((d[x]/param)-1)) ? xscale(d3.min(xscale.domain())) : xscale(d.x0) )
         +","+yscale(d.length)+")")
 
     bar.append("rect")
@@ -96,7 +96,7 @@ class Histogram extends React.Component {
           clicked : []
         })
         var nuovo = []
-        
+        console.log(d.x0,d.x1)
         data.map( step => (
           d.x0===d3.min(xscale.domain()) ? (step[x]/param>=d.x0 && step[x]/param<=d.x1)
           : d.x1===d3.max(xscale.domain())-1 ? (step[x]/param>d.x0)

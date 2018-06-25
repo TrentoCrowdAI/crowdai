@@ -17,7 +17,7 @@ class MetricMenu extends React.Component {
 					className='metrics'
 					style={{marginBottom: '5px'}}
 					onClick={this.props.onChange}
-				>Time to Complete per Job</Button>
+				>Time to Complete per Task</Button>
 				<br />
 				<Button 
 					value='W_CompleteTime'

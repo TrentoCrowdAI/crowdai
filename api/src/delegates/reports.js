@@ -132,17 +132,16 @@ const getCrowdGolds = (exports.getCrowdGolds = async (jobId) => {
           from ${db.TABLES.Task} b
           where b.item_id=a.item_id 
           and (b.data->'criteria')::json#>>'{0,id}'=(a.data->'criteria')::json#>>'{0,id}'
-          and b.job_id=$1
+          and b.job_id=$1 and (b.data->'answered')='true'
           group by b.item_id, b.data
           order by count(*) desc
           limit 1
         ) as answer
       from ${db.TABLES.Task} a
-      where a.job_id=$1
+      where a.job_id=$1 and (a.data->'answered')='true'
       group by a.item_id, a.data,(a.data->'criteria')::json#>>'{0,id}'
       order by a.item_id, criteria_id
     `, [jobId])
-    console.log(res.rows)
     return tasks = { tasks: res.rows }
   } catch (error) {
     console.error(error);

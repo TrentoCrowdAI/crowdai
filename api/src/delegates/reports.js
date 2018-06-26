@@ -27,7 +27,6 @@ const getAllTasksTimesByJob = (exports.getAllTasksTimesByJob = async id => {
     times_table.criteria_id`,
       [id]
     );
-    console.log(res.rows);
     return (tasks = { tasks: res.rows });
   } catch (error) {
     console.error(error);
@@ -342,7 +341,7 @@ const getSingleWorker = (exports.getSingleWorker = async (jobId, workerId) => {
             : (query.rows[x].votes_as_crowd / query.rows[x].votes_on_wronglyclassified).toFixed(5) * 100,
         'precision toward gold truth': (Number(query.rows[x].right_by_gold) / Number(query.rows[x].voted_tasks)).toFixed(5) * 100
       };
-      console.log(query.rows)
+      //console.log(query.rows)
       workersCouples.push(workerCouple);
     }
     return (tasks = { tasks: workersCouples });

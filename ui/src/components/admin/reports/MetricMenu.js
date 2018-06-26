@@ -27,13 +27,6 @@ class MetricMenu extends React.Component {
 				>Time to Complete per Worker</Button>
 				<br />
 				<Button 
-					value='Percentage'
-					className='metrics' 
-					style={{marginBottom: '5px'}}
-					onClick={this.props.onChange}
-				>Votes Distribution per Worker</Button>
-				<br />
-				<Button 
 					value='Distribution'
 					className='metrics' 
 					style={{marginBottom: '5px'}}
@@ -128,6 +121,14 @@ class MetricMenu extends React.Component {
 					onClick={this.props.onChange}
 				>Basic Agreement between Workers<br />[ WWM1 ]</Button>
 				<br />
+				<Button 
+					value='Percentage'
+					className='metrics' 
+					style={{marginBottom: '5px'}}
+					onClick={this.props.onChange}
+				>Votes Distribution per Worker</Button>
+				<br />
+				
  */
 
 const mapStateToProps = state => ({

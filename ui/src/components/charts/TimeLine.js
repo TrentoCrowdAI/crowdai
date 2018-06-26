@@ -21,7 +21,7 @@ class TimeLine extends React.Component {
       var g = svg.append("g")
 
       g.append("text")
-        .text("Choose a Metric")
+        .text("Choose a Worker")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
     } else {
       this.buildGraph()
@@ -42,10 +42,10 @@ class TimeLine extends React.Component {
       .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
       //.call(zoom)
 
-    var x = this.props.x //item_id
-    var y = this.props.y //delivery
-    var z = this.props.z //criteria_id
-    var w = this.props.w //answer
+    var x = this.props.x
+    var y = this.props.y
+    var z = this.props.z
+    var w = this.props.w
     
     var data = this.props.data
     //.sort( (a,b) => a[this.state.order]<b[this.state.order] ? 1 : a[this.state.order]>b[this.state.order] ? -1 : 0 )
@@ -61,7 +61,6 @@ class TimeLine extends React.Component {
 
     var xAxis = d3.axisBottom(xscale)
       .tickFormat("")
-      /*d => new Date(d).getDate()+'/'+new Date(d).getMonth()+'/'+new Date(d).getFullYear()+' at '+new Date(d).getHours()+':'+new Date(d).getMinutes()*/
     
     var yscale = d3.scaleBand()
       .range([0,height])
@@ -106,8 +105,8 @@ class TimeLine extends React.Component {
           .style('top',(d3.event.pageY-50)+'px')
           .style('left',(d3.event.pageX-180)+'px')
         tooltip.select('div')
-          .html(x+' '+d[x]+', <br />'+
-          z+' '+d[z]+', <br />'+
+          .html(x+' <b>'+d[x]+'</b>, <br />'+
+          z+' <b>'+d[z]+'</b>, <br />'+
           'Task completed at: <br />'+
           '<strong>'+new Date(d[y]).getDate()
           +'/'+new Date(d[y]).getMonth()
@@ -129,12 +128,13 @@ class TimeLine extends React.Component {
       .text(d => d[x]+', '+d[z])
 
     bars.append('text')
-      .attr('text-anchor','end')
+      .attr('text-anchor','middle')
       .attr('font-size','12px')
+      .attr('font-weight','bold')
       .style('fill','black')
       .attr('font','10px')
       .attr('transform', d =>
-        'translate('+(xscale(d[y]*1000)+5)+', '+(yscale.bandwidth()*1.3)+') rotate(-65)')
+        'translate('+(xscale(d[y]*1000)+2.5)+', '+(yscale.bandwidth()*1.4)+')')
       .text(d => d[w])
 
     var gx = g.append('g')

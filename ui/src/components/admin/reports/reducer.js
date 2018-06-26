@@ -169,36 +169,65 @@ const chart_reducer = (state = defaultState, action) => {
         error: action.error,
         loading: false,
       };
+    case actionTypes.FETCH_SINGLE:
+      return {
+        ...state,
+        error: undefined,
+        loading: true,
+      };
+    case actionTypes.FETCH_SINGLE_SUCCESS:
+      return {
+        ...state,
+        reports: action.response,
+        loading: false,
+      };
+    case actionTypes.FETCH_SINGLE_ERROR:
+      return {
+        ...state,
+        error: action.error,
+        loading: false,
+      };
+    case actionTypes.FETCH_CONTRIBUTION:
+      return {
+        ...state,
+        error: undefined,
+        loading: true,
+      };
+    case actionTypes.FETCH_CONTRIBUTION_SUCCESS:
+      return {
+        ...state,
+        reports: action.response,
+        loading: false,
+      };
+    case actionTypes.FETCH_CONTRIBUTION_ERROR:
+      return {
+        ...state,
+        error: action.error,
+        loading: false,
+      };
+    case actionTypes.FETCH_GLOBAL:
+      return {
+        ...state,
+        error: undefined,
+        loading: true,
+      };
+    case actionTypes.FETCH_GLOBAL_SUCCESS:
+      return {
+        ...state,
+        reports: action.response,
+        loading: false,
+      };
+    case actionTypes.FETCH_GLOBAL_ERROR:
+      return {
+        ...state,
+        error: action.error,
+        loading: false,
+      };
 
     default:
       return state;
   }
 };
-
-const single_reducer = (state = defaultState, action) => {
-  switch(action.type) {
-    case actionTypes.FETCH_WANSWERS:
-      return {
-        ...state,
-        error: undefined,
-        loading: true
-      };
-    case actionTypes.FETCH_WANSWERS_SUCCESS:
-      return {
-        ...state,
-        reports: action.response,
-        loading: false
-      };
-    case actionTypes.FETCH_WANSWERS_ERROR:
-      return {
-        ...state,
-        error: action.error,
-        loading: false
-      };
-    default: 
-      return state;
-  }
-}
 
 const worker_reducer = (state = worker_defaultState, action) => {
   switch(action.type) {
@@ -227,6 +256,5 @@ const worker_reducer = (state = worker_defaultState, action) => {
 
 export default combineReducers({
   list: chart_reducer,
-  wlist: worker_reducer,
-  single_list: single_reducer
+  wlist: worker_reducer
 });

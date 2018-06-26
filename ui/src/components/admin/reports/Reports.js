@@ -70,15 +70,18 @@ class Reports extends React.Component {
 			case 'SingleWorker':
 				this.props.reports.tasks=[]
 				//this.props.fetchMetric('worker/job/'+this.props.match.params.jobid+'/contribution');
-				this.props.fetchAnswers(this.props.match.params.jobid,Number(this.state.chosenworker))
+				//this.props.fetchAnswers(this.props.match.params.jobid,Number(this.state.chosenworker))
+				this.props.fetchSingleWorker(this.props.match.params.jobid,Number(this.state.chosenworker))
 				break;
 			case 'M2':
 				this.props.reports.tasks=[]
-				this.props.fetchMetric('worker/job/'+this.props.match.params.jobid+'/contribution');
+				this.props.fetchContribution(this.props.match.params.jobid)
+				//this.props.fetchMetric('worker/job/'+this.props.match.params.jobid+'/contribution');
 				break;
 			case 'Global':
 				this.props.reports.tasks=[]
-				this.props.fetchMetric('global/job/'+this.props.match.params.jobid+'/stats')
+				this.props.fetchJobStats(this.props.match.params.jobid)
+				//this.props.fetchMetric('global/job/'+this.props.match.params.jobid+'/stats')
 			default:
 				console.log('Metric to implement: ', value)
 				break;
@@ -396,6 +399,9 @@ Reports.propTypes = {
 	fetchWorkersAgreements: PropTypes.func,
 	fetchCrowdGolds: PropTypes.func,
 	fetchWorkersPairs: PropTypes.func,
+	fetchSingleWorker: PropTypes.func,
+	fetchJobStats: PropTypes.func,
+	fetchContribution: PropTypes.func,
 
 	fetchItems: PropTypes.func,
 	fetchCriteria: PropTypes.func,
@@ -417,9 +423,12 @@ const mapDispatchToProps = dispatch => ({
 	fetchWorkers: jobId => dispatch(actions.fetchWorkers(jobId)),
 	fetchTasksAgreements: jobId => dispatch(actions.fetchTasksAgreements(jobId)),
 	fetchWorkersAgreements: jobId => dispatch(actions.fetchWorkersAgreements(jobId)),
-	fetchMetric : metric => dispatch(actions.fetchMetric(metric)),
+	//fetchMetric : metric => dispatch(actions.fetchMetric(metric)),
 	fetchCrowdGolds: jobId => dispatch(actions.fetchCrowdGolds(jobId)),
-	fetchWorkersPairs: jobId => dispatch(actions.fetchWorkersPairs(jobId))
+	fetchWorkersPairs: jobId => dispatch(actions.fetchWorkersPairs(jobId)),
+	fetchSingleWorker: (jobId,workerId) => dispatch(actions.fetchSingleWorker(workerId,jobId)),
+	fetchJobStats: jobId => dispatch(actions.fetchJobStats(jobId)),
+	fetchContribution: jobId => dispatch(actions.fetchContribution(jobId))
 })
 
 const mapStateToProps = state => ({

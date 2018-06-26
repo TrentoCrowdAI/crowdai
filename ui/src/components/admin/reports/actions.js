@@ -32,6 +32,15 @@ const actionTypes = {
   FETCH_PAIRS: 'C_FETCH_PAIRS',
   FETCH_PAIRS_SUCCESS: 'C_FETCH_PAIRS_SUCCESS',
   FETCH_PAIRS_ERROR: 'C_FETCH_PAIRS_ERROR',
+  FETCH_SINGLE: 'C_FETCH_SINGLE',
+  FETCH_SINGLE_SUCCESS: 'C_FETCH_SINGLE_SUCCESS',
+  FETCH_SINGLE_ERROR: 'C_FETCH_SINGLE_ERROR',
+  FETCH_CONTRIBUTION: 'C_FETCH_CONTRIBUTION',
+  FETCH_CONTRIBUTION_SUCCESS: 'C_FETCH_CONTRIBUTION_SUCCESS',
+  FETCH_CONTRIBUTION_ERROR: 'C_FETCH_CONTRIBUTION_ERROR',
+  FETCH_GLOBAL: 'C_FETCH_GLOBAL',
+  FETCH_GLOBAL_SUCCESS: 'C_FETCH_GLOBAL_SUCCESS',
+  FETCH_GLOBAL_ERROR: 'C_FETCH_GLOBAL_ERROR',
   ...getActionTypes(scopes.REPORTS)
 };
 
@@ -227,6 +236,65 @@ const actions = {
       error
     };
   },
+
+  fetchSingleWorker(jobId,workerId) {
+    return {
+      type: actionTypes.FETCH_SINGLE,
+      jobId,
+      workerId
+    };
+  },
+  fetchSingleWorkerSuccess(response) {
+    return {
+      type: actionTypes.FETCH_SINGLE_SUCCESS,
+      response
+    };
+  },
+  fetchSingleWorkerError(error) {
+    return {
+      type: actionTypes.FETCH_SINGLE_ERROR,
+      error
+    };
+  },
+
+  fetchContribution(jobId) {
+    return {
+      type: actionTypes.FETCH_CONTRIBUTION,
+      jobId
+    };
+  },
+  fetchContributionSuccess(response) {
+    return {
+      type: actionTypes.FETCH_CONTRIBUTION_SUCCESS,
+      response
+    };
+  },
+  fetchContributionError(error) {
+    return {
+      type: actionTypes.FETCH_CONTRIBUTION_ERROR,
+      error
+    };
+  },
+
+  fetchJobStats(jobId) {
+    return {
+      type: actionTypes.FETCH_GLOBAL,
+      jobId
+    };
+  },
+  fetchJobStatsSuccess(response) {
+    return {
+      type: actionTypes.FETCH_GLOBAL_SUCCESS,
+      response
+    };
+  },
+  fetchJobStatsError(error) {
+    return {
+      type: actionTypes.FETCH_GLOBAL_ERROR,
+      error
+    };
+  },
+
 
   ...getActions(scopes.REPORTS),
 };

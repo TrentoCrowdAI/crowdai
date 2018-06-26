@@ -31,20 +31,18 @@ const getCrowdGolds = async ctx => {
 };
 
 const getWorkersPairs = async ctx => {
-  //let risposta = await delegates.reports.getStatsPairOfWorkerSameJob(ctx.params.jobId);
-  //ctx.response.body = JSON.stringify(risposta, null, 2);
   ctx.response.body = await delegates.reports.getWorkersPairs(ctx.params.jobId);
 };
 
-const singleWorker = async ctx => {
+const getSingleWorker = async ctx => {
   ctx.response.body = await delegates.reports.singleWorker(ctx.params.jobId, ctx.params.workerId);
 };
 
-const contribution = async ctx => {
+const getContribution = async ctx => {
   ctx.response.body = await delegates.reports.contribution(ctx.params.jobId);
 };
 
-const jobStats = async ctx => {
+const getJobStats = async ctx => {
   ctx.response.body = await delegates.reports.jobStats(ctx.params.jobId);
 };
 
@@ -57,7 +55,7 @@ exports.register = router => {
   router.get('/getWorkersAgreements/:jobId', getWorkersAgreements);
   router.get('/getCrowdGolds/:jobId', getCrowdGolds);
   router.get('/ww/job/:jobId/stats', getWorkersPairs);
-  router.get('/worker/:workerId/job/:jobId/stats', singleWorker);
-  router.get('/worker/job/:jobId/contribution', contribution);
-  router.get('/global/job/:jobId/stats', jobStats);
+  router.get('/worker/:workerId/job/:jobId/stats', getSingleWorker);
+  router.get('/worker/job/:jobId/contribution', getContribution);
+  router.get('/global/job/:jobId/stats', getJobStats);
 };

@@ -288,7 +288,7 @@ const getWorkersPairs = (exports.getWorkersPairs = async jobId => {
   }
 });
 
-const singleWorker = (exports.singleWorker = async (jobId, workerId) => {
+const getSingleWorker = (exports.singleWorker = async (jobId, workerId) => {
   try {
     var workersCouples = [];
     var query = await db.query(
@@ -347,7 +347,7 @@ const singleWorker = (exports.singleWorker = async (jobId, workerId) => {
   }
 });
 
-const contribution = (exports.contribution = async jobId => {
+const getContribution = (exports.contribution = async jobId => {
   try {
     var workersCouples = [];
     var query = await db.query(
@@ -384,8 +384,7 @@ const contribution = (exports.contribution = async jobId => {
     for (var x in query.rows) {
       let workerCouple = {
         'worker A': query.rows[x].turk_id,
-        id: query.rows[x].worker_id,
-        //'votes on wrongly classified tasks': Number(query.rows[x].votes_on_wronglyclassified),
+        'id': query.rows[x].worker_id,
         'number of completed tasks': Number(query.rows[x].voted_tasks),
         'precision toward crowd truth': Number((Number(query.rows[x].rights) / Number(query.rows[x].voted_tasks)).toFixed(5) * 100),
         'contribution to crowd error':
@@ -402,7 +401,7 @@ const contribution = (exports.contribution = async jobId => {
   }
 });
 
-const jobStats = (exports.jobStats = async jobId => {
+const getJobStats = (exports.jobStats = async jobId => {
   try {
     var jobRows = [];
     var query = await db.query(

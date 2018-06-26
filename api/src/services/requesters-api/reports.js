@@ -36,6 +36,18 @@ const getWorkersPairs = async ctx => {
   ctx.response.body = await delegates.reports.getWorkersPairs(ctx.params.jobId);
 };
 
+const singleWorker = async ctx => {
+  ctx.response.body = await delegates.reports.singleWorker(ctx.params.jobId, ctx.params.workerId);
+};
+
+const contribution = async ctx => {
+  ctx.response.body = await delegates.reports.contribution(ctx.params.jobId);
+};
+
+const jobStats = async ctx => {
+  ctx.response.body = await delegates.reports.jobStats(ctx.params.jobId);
+};
+
 exports.register = router => {
   router.get('/getAllTasksTImesByJob/:id', getAllTasksTimesByJob);
   router.get('/getWorkerTimes/:jobId/:workerId', getWorkerTimes);
@@ -45,4 +57,7 @@ exports.register = router => {
   router.get('/getWorkersAgreements/:jobId', getWorkersAgreements);
   router.get('/getCrowdGolds/:jobId', getCrowdGolds);
   router.get('/ww/job/:jobId/stats', getWorkersPairs);
+  router.get('/worker/:workerId/job/:jobId/stats', singleWorker);
+  router.get('/worker/job/:jobId/contribution', contribution);
+  router.get('/global/job/:jobId/stats', jobStats);
 };

@@ -285,3 +285,215 @@ const getWorkersPairs = (exports.getWorkersPairs = async jobId => {
     throw Boom.badImplementation('Error while trying to fetch record');
   }
 });
+
+const singleWorker = (exports.singleWorker = async (jobId, workerId) => {
+  try {
+    var workersCouples = [];
+    var query = await db.query(
+      `select u.turk_id, t.worker_id, 
+        sum(case when (t.data->'criteria')::json#>>'{0,workerAnswer}'<>g.gold and crowd.answer<>g.gold then 1 else 0 end) as votes_as_crowd, 
+        sum(case when crowd.answer<>g.gold then 1 else 0 end) as votes_on_wronglyclassified,
+        sum(case when ((t.data->'criteria')::json#>>'{0,workerAnswer}')=crowd.answer then 1 else 0 end) as rights,
+        sum(case when ((t.data->'criteria')::json#>>'{0,workerAnswer}')=g.gold then 1 else 0 end) as right_by_gold,
+        count((t.item_id, (t.data->'criteria')::json#>>'{0,id}')) as voted_tasks
+      from task t, worker u, gold g, (
+        select a.item_id, (a.data->'criteria')::json#>>'{0,id}' as criteria_id,
+          (select (b.data->'criteria')::json#>>'{0,workerAnswer}'
+          from task b
+          where b.item_id=a.item_id and (b.data->'answered')='true'
+          --and b.worker_id not in (select * from excluded) and b.job_id=$1
+          group by b.item_id,(b.data->'criteria')::json#>>'{0,id}',(b.data->'criteria')::json#>>'{0,workerAnswer}'
+          order by count(*) desc
+          limit 1) as answer
+        from task a
+        where a.job_id=$1 and (a.data->'answered')='true'
+        --and a.worker_id not in (select * from excluded)
+        group by a.item_id, (a.data->'criteria')::json#>>'{0,id}'
+        order by a.item_id, (a.data->'criteria')::json#>>'{0,id}'
+        ) as crowd
+      where t.item_id=crowd.item_id and g.item_id=t.item_id and u.id=t.worker_id
+      and t.job_id=$1 and u.turk_id=$2 and (t.data->'answered')='true'
+      and crowd.criteria_id=(t.data->'criteria')::json#>>'{0,id}' 
+      and g.criteria_id=cast((t.data->'criteria')::json#>>'{0,id}' as bigint)
+      --and t.worker_id not in (select * from excluded)
+      group by t.worker_id, u.turk_id
+      order by t.worker_id`,
+      [jobId, workerId]
+    );
+
+    for (var x in query.rows) {
+      let workerCouple = {
+        'worker A': query.rows[x].turk_id,
+        id: query.rows[x].worker_id,
+        'number of completed tasks': Number(query.rows[x].voted_tasks),
+        'times voted right comparing with crowd truth': Number(query.rows[x].rights),
+        'times voted right comparing with gold truth': Number(query.rows[x].right_by_gold),
+        //'votes as crowd': Number(query.rows[x].votes_as_crowd),
+        'votes on wrongly classified tasks': Number(query.rows[x].votes_on_wronglyclassified),
+        'contribution to crowd error':
+          query.rows[x].votes_on_wronglyclassified == 0
+            ? 0
+            : (query.rows[x].votes_as_crowd / query.rows[x].votes_on_wronglyclassified).toFixed(5) * 100,
+        'precision toward gold truth': (Number(query.rows[x].right_by_gold) / Number(query.rows[x].voted_tasks)).toFixed(5) * 100
+      };
+      workersCouples.push(workerCouple);
+    }
+    return (tasks = { tasks: workersCouples });
+  } catch (error) {
+    console.error(error);
+    throw Boom.badImplementation('Error while trying to fetch record');
+  }
+});
+
+const contribution = (exports.contribution = async jobId => {
+  try {
+    var workersCouples = [];
+    var query = await db.query(
+      `select u.turk_id, t.worker_id, 
+        sum(case when (t.data->'criteria')::json#>>'{0,workerAnswer}'<>g.gold and crowd.answer<>g.gold then 1 else 0 end) as votes_as_crowd, 
+        sum(case when crowd.answer<>g.gold then 1 else 0 end) as votes_on_wronglyclassified,
+        sum(case when ((t.data->'criteria')::json#>>'{0,workerAnswer}')=crowd.answer then 1 else 0 end) as rights,
+        count((t.item_id, (t.data->'criteria')::json#>>'{0,id}')) as voted_tasks
+      from task t, worker u, gold g, (
+        select a.item_id, (a.data->'criteria')::json#>>'{0,id}' as criteria_id,
+          (select (b.data->'criteria')::json#>>'{0,workerAnswer}'
+          from task b
+          where b.item_id=a.item_id and (b.data->'answered')='true'
+          --and b.worker_id not in (select * from excluded) and b.job_id=$1
+          group by b.item_id,(b.data->'criteria')::json#>>'{0,id}',(b.data->'criteria')::json#>>'{0,workerAnswer}'
+          order by count(*) desc
+          limit 1) as answer
+        from task a
+        where a.job_id=$1 and (a.data->'answered')='true'
+        --and a.worker_id not in (select * from excluded)
+        group by a.item_id, (a.data->'criteria')::json#>>'{0,id}'
+        order by a.item_id, (a.data->'criteria')::json#>>'{0,id}'
+        ) as crowd
+      where t.item_id=crowd.item_id and g.item_id=t.item_id and t.job_id=$1
+      and u.id=t.worker_id and (t.data->'answered')='true'
+      and crowd.criteria_id=(t.data->'criteria')::json#>>'{0,id}' 
+      and g.criteria_id=cast((t.data->'criteria')::json#>>'{0,id}' as bigint)
+      --and t.worker_id not in (select * from excluded)
+      group by t.worker_id, u.turk_id
+      order by t.worker_id`,
+      [jobId]
+    );
+
+    for (var x in query.rows) {
+      let workerCouple = {
+        'worker A': query.rows[x].turk_id,
+        id: query.rows[x].worker_id,
+        //'votes on wrongly classified tasks': Number(query.rows[x].votes_on_wronglyclassified),
+        'number of completed tasks': Number(query.rows[x].voted_tasks),
+        'precision toward crowd truth': Number((Number(query.rows[x].rights) / Number(query.rows[x].voted_tasks)).toFixed(5) * 100),
+        'contribution to crowd error':
+          query.rows[x].votes_on_wronglyclassified == 0
+            ? 0
+            : (query.rows[x].votes_as_crowd / query.rows[x].votes_on_wronglyclassified).toFixed(4) * 100
+      };
+      workersCouples.push(workerCouple);
+    }
+    return (tasks = { tasks: workersCouples });
+  } catch (error) {
+    console.error(error);
+    throw Boom.badImplementation('Error while trying to fetch record');
+  }
+});
+
+const jobStats = (exports.jobStats = async jobId => {
+  try {
+    var jobRows = [];
+    var query = await db.query(
+      `
+      select t.item_id,
+        sum(case when (t.data->'criteria')::json#>>'{0,workerAnswer}'='yes' and g.gold='yes' then 1 else 0 end) as tp,
+        sum(case when (t.data->'criteria')::json#>>'{0,workerAnswer}'='yes' and g.gold='no' then 1 else 0 end) as fp,
+        sum(case when (t.data->'criteria')::json#>>'{0,workerAnswer}'='no' and g.gold='yes' then 1 else 0 end) as fn,
+        sum(case when (t.data->'criteria')::json#>>'{0,workerAnswer}'='no' and g.gold='no' then 1 else 0 end) as tn
+      from task t, gold g,
+        (
+        select distinct a.item_id, (a.data->'criteria')::json#>>'{0,id}' as criteria_id,
+          (select (b.data->'criteria')::json#>>'{0,workerAnswer}' as answer
+          from task b
+          where b.item_id=a.item_id 
+          and (b.data->'criteria')::json#>>'{0,id}'=(a.data->'criteria')::json#>>'{0,id}'
+          and b.job_id=$1 and (b.data->'answered')='true'
+          --and b.worker_id not in (select * from excluded)
+          group by b.item_id, b.data
+          order by count(*) desc
+          limit 1) as answer
+        from task a
+        where a.job_id=$1 and (a.data->'answered')='true'
+        --where a.worker_id not in (select * from excluded)
+        group by a.item_id, a.data,(a.data->'criteria')::json#>>'{0,id}'
+        order by a.item_id, (a.data->'criteria')::json#>>'{0,id}'
+        ) as crowd
+      where t.item_id=g.item_id and (t.data->'criteria')::json#>>'{0,id}'=cast(g.criteria_id as text)
+      and t.item_id=crowd.item_id and (t.data->'criteria')::json#>>'{0,id}'=crowd.criteria_id
+      and t.job_id=$1 and (t.data->'answered')='true'
+      group by t.item_id
+      order by t.item_id
+    `,
+      [jobId]
+    );
+
+    for (var x in query.rows) {
+      var p = Number(query.rows[x].tp) / (Number(query.rows[x].tp) + Number(query.rows[x].fp));
+      var r = Number(query.rows[x].tp) / (Number(query.rows[x].fn) + Number(query.rows[x].tp));
+      let row = {
+        item_id: query.rows[x].item_id,
+        job_id: jobId,
+        'F1-score':
+          Number(query.rows[x].fn) + Number(query.rows[x].tp) == 0 || Number(query.rows[x].tp) + Number(query.rows[x].fp) == 0
+            ? 1
+            : Number(((2 * p * r) / (p + r)).toFixed(3)),
+        'Diagnostic Odds Ratio':
+          Number(query.rows[x].fp) * Number(query.rows[x].fn) == 0
+            ? 1
+            : Number(((Number(query.rows[x].tp) * Number(query.rows[x].tn)) / (Number(query.rows[x].fp) * Number(query.rows[x].fn))).toFixed(3)),
+        Sensitivity:
+          Number(query.rows[x].tp) + Number(query.rows[x].tn) == 0
+            ? 1
+            : Number((Number(query.rows[x].tp) / (Number(query.rows[x].tp) + Number(query.rows[x].tn))).toFixed(3)),
+        Specificity:
+          Number(query.rows[x].fp) + Number(query.rows[x].tn) == 0
+            ? 1
+            : Number((Number(query.rows[x].tn) / (Number(query.rows[x].fp) + Number(query.rows[x].tn))).toFixed(3)),
+        "Youden's J":
+          Number(query.rows[x].fp) + Number(query.rows[x].tn) == 0 || Number(query.rows[x].tp) + Number(query.rows[x].tn) == 0
+            ? 1
+            : Number(
+                (
+                  Number(query.rows[x].tp) / (Number(query.rows[x].tp) + Number(query.rows[x].tn)) +
+                  Number(query.rows[x].tn) / (Number(query.rows[x].fp) + Number(query.rows[x].tn)) -
+                  1
+                ).toFixed(3)
+              ),
+        'Matthews Correlation Coefficient':
+          Math.sqrt(
+            (Number(query.rows[x].tp) + Number(query.rows[x].fp)) *
+              (Number(query.rows[x].tp) + Number(query.rows[x].fn)) *
+              (Number(query.rows[x].tn) + Number(query.rows[x].fp)) *
+              (Number(query.rows[x].tn) + Number(query.rows[x].fn))
+          ) == 0
+            ? 1
+            : Number(
+                (
+                  (Number(query.rows[x].tp) * Number(query.rows[x].tn) - Number(query.rows[x].fp) * Number(query.rows[x].fn)) /
+                  Math.sqrt(
+                    (Number(query.rows[x].tp) + Number(query.rows[x].fp)) *
+                      (Number(query.rows[x].tp) + Number(query.rows[x].fn)) *
+                      (Number(query.rows[x].tn) + Number(query.rows[x].fp)) *
+                      (Number(query.rows[x].tn) + Number(query.rows[x].fn))
+                  )
+                ).toFixed(3)
+              )
+      };
+      jobRows.push(row);
+    }
+    return (tasks = { tasks: jobRows });
+  } catch (error) {
+    console.error(error);
+    throw Boom.badImplementation('Error while trying to fetch record');
+  }
+});

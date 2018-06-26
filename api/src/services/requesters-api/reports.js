@@ -35,15 +35,15 @@ const getWorkersPairs = async ctx => {
 };
 
 const getSingleWorker = async ctx => {
-  ctx.response.body = await delegates.reports.singleWorker(ctx.params.jobId, ctx.params.workerId);
+  ctx.response.body = await delegates.reports.getSingleWorker(ctx.params.jobId, ctx.params.workerId);
 };
 
 const getContribution = async ctx => {
-  ctx.response.body = await delegates.reports.contribution(ctx.params.jobId);
+  ctx.response.body = await delegates.reports.getContribution(ctx.params.jobId);
 };
 
 const getJobStats = async ctx => {
-  ctx.response.body = await delegates.reports.jobStats(ctx.params.jobId);
+  ctx.response.body = await delegates.reports.getJobStats(ctx.params.jobId);
 };
 
 exports.register = router => {

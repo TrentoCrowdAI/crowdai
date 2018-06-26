@@ -88,7 +88,7 @@ const getWorkerAnswers = (exports.getWorkerAnswers = async (jobId, workerId) => 
   try {
     let res = await db.query(
       `SELECT u.turk_id, t.item_id, 
-        (t.created_at)::TIMESTAMP WITHOUT TIME ZONE AS delivery, 
+        EXTRACT( EPOCH FROM (t.created_at)::TIMESTAMP WITHOUT TIME ZONE) AS delivery, 
         (t.data->'criteria')::json#>>'{0,id}' AS criteria_id, 
         (t.data->'criteria')::json#>>'{0,workerAnswer}' AS answer,
         (CASE WHEN g.gold=(t.data->'criteria')::json#>>'{0,workerAnswer}' THEN true ELSE false END) AS correct

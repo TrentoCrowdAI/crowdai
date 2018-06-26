@@ -14,6 +14,7 @@ import CompareLineChart from './CompareLineChart'
 import TreeChart from './TreeChart'
 import GroupedChart from './GroupedChart'
 import SingleWorker from './SingleWorker'
+import TimeLine from './TimeLine'
 
 class ChartWrapper extends React.Component {
 
@@ -122,6 +123,14 @@ class ChartWrapper extends React.Component {
             />
           </div>
         );
+      case 'timeline':
+        return(
+          <div>
+            <TimeLine
+              {...this.props}
+            />
+          </div>
+        )
       default:
         return(
           <div>

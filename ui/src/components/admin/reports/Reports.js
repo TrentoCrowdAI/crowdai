@@ -70,7 +70,7 @@ class Reports extends React.Component {
 			case 'SingleWorker':
 				this.props.reports.tasks=[]
 				//this.props.fetchMetric('worker/job/'+this.props.match.params.jobid+'/contribution');
-				//this.props.fetchAnswers(this.props.match.params.jobid,Number(this.state.chosenworker))
+				this.props.fetchAnswers(this.props.match.params.jobid,Number(this.state.chosenworker))
 				this.props.fetchSingleWorker(this.props.match.params.jobid,Number(this.state.chosenworker))
 				break;
 			case 'M2':
@@ -102,11 +102,19 @@ class Reports extends React.Component {
 	chooseWorker(e, {value}) {
 		switch(this.state.chosenmetric) {
 			case 'Percentage':
-			case 'SingleWorker':
 				if (value==='all')
 					this.props.reports.tasks = []
 				else
 					this.props.fetchAnswers(this.props.match.params.jobid,Number(value))
+				break;
+			case 'SingleWorker':
+				if (value==='all') {
+					this.props.reports.tasks = []
+					this.props.single.tasks = []
+				} else {
+					this.props.fetchAnswers(this.props.match.params.jobid,Number(value))
+					this.props.fetchSingleWorker(this.props.match.params.jobid,Number(value))
+				}
 				break;
 			case 'W_CompleteTime':
 				if (value==='all')
@@ -167,6 +175,7 @@ renderChart(chart,x,y,z,w,param) {
 
 	render() {
 		console.log(this.props.reports.tasks)
+		console.log(this.props.single)
 		
 		//refresh options for charts with new loaded data every time
 		var WorkerOptions =  { 'all' : 'All Workers' }
@@ -228,10 +237,11 @@ renderChart(chart,x,y,z,w,param) {
 				break;
 
 			case 'Percentage':
-				chart='pie'
-				x='turk_id'
-				y='answer'
-				z=['item_id','criteria_id']
+				chart='timeline'
+				x='item_id'
+				y='delivery'
+				z='criteria_id'
+				w='answer'
 				param=this.state.chosencriteria
 				break;
 
@@ -319,11 +329,11 @@ renderChart(chart,x,y,z,w,param) {
 
 			case 'SingleWorker':
 				chart='singleworker'
-				x=''
-				y=''
-				z=''
+				x='number of completed tasks'
+				y='times voted right comparing with gold truth'
+				z=this.props.single.tasks[0]
 				w=this.state
-				param=this.props
+				param=this.props.match
 				break;
 
 			default:
@@ -426,7 +436,7 @@ const mapDispatchToProps = dispatch => ({
 	//fetchMetric : metric => dispatch(actions.fetchMetric(metric)),
 	fetchCrowdGolds: jobId => dispatch(actions.fetchCrowdGolds(jobId)),
 	fetchWorkersPairs: jobId => dispatch(actions.fetchWorkersPairs(jobId)),
-	fetchSingleWorker: (jobId,workerId) => dispatch(actions.fetchSingleWorker(workerId,jobId)),
+	fetchSingleWorker: (jobId,workerId) => dispatch(actions.fetchSingleWorker(jobId,workerId)),
 	fetchJobStats: jobId => dispatch(actions.fetchJobStats(jobId)),
 	fetchContribution: jobId => dispatch(actions.fetchContribution(jobId))
 })
@@ -438,7 +448,11 @@ const mapStateToProps = state => ({
 
 	workers: state.report.wlist.workers,
 	worker_error: state.report.wlist.error,
-	worker_loading: state.report.wlist.loading
+	worker_loading: state.report.wlist.loading,
+
+	single: state.report.single_list.reports,
+	single_error: state.report.single_list.error,
+	single_loading: state.report.single_list.loading,
 })
 
 export default connect(mapStateToProps,mapDispatchToProps)(Reports)

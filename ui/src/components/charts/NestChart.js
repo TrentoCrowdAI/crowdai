@@ -78,43 +78,40 @@ class NestChart extends React.Component {
       .ticks(10)
 
     var bar = g.selectAll(".bar")
-        .data(data)
-        .enter().append("g")
-          .attr("class","bar")
+      .data(data)
+      .enter().append("g")
+        .attr("class","bar")
           
     bar.append("rect")
-        .style("fill", d => {
-          if(d[y]>=media) return color
-            else return "lightgreen"
-        })
-        .attr("x", d => xscale(d[z]!=undefined ? d[x]+", "+d[z] : d[x]))
-        .attr("y", d => yscale(d[y]/param))
-        .attr("width", xscale.bandwidth())
-        .attr("height", d => height-yscale(d[y]/param))
-        .on("mouseover", function() {
-          d3.select(this)
-            .style("opacity","0.8")
-        })
-        .on("mouseout", function() {
-          d3.select(this)
-            .style("opacity","1")
-        })
-        /*.on("click", function() {
-            //add onClick here
-        })*/
+      .style("fill", d => {
+        if(d[y]>=media) return color
+          else return "lightgreen"
+      })
+      .attr("x", d => xscale(d[z]!=undefined ? d[x]+", "+d[z] : d[x]))
+      .attr("y", d => yscale(d[y]/param))
+      .attr("width", xscale.bandwidth())
+      .attr("height", d => height-yscale(d[y]/param))
+      .on("mouseover", function() {
+        d3.select(this)
+          .style("opacity","0.8")
+      })
+      .on("mouseout", function() {
+        d3.select(this)
+          .style("opacity","1")
+      })
         
     bar.append("text")
-        .attr("dy", ".75em")
-        //.attr("y", d => yscale(d[y]/param)+10 )
-        //.attr("x", d => xscale(d[z]!=undefined ? d[x]+","+d[z] : d[x])+(xscale.bandwidth()/2) )
-        .attr("text-anchor", "end")
-        .style("fill", "white")
-        .attr("transform", d => "translate("+(xscale(d[z]!=undefined ? d[x]+", "+d[z] : d[x])+(xscale.bandwidth()/2)-5)+","+(yscale(d[y]/param)+10)+") rotate(-90)")
-        .text( d => (d[y]/param).toFixed(1))
+      .attr("dy", ".75em")
+      //.attr("y", d => yscale(d[y]/param)+10 )
+      //.attr("x", d => xscale(d[z]!=undefined ? d[x]+","+d[z] : d[x])+(xscale.bandwidth()/2) )
+      .attr("text-anchor", "end")
+      .style("fill", "white")
+      .attr("transform", d => "translate("+(xscale(d[z]!=undefined ? d[x]+", "+d[z] : d[x])+(xscale.bandwidth()/2)-5)+","+(yscale(d[y]/param)+10)+") rotate(-90)")
+      .text( d => (d[y]/param).toFixed(1))
 
     var line = d3.line()
-        .x( (d) => {return xscale(d[z]!=undefined ? d[x]+", "+d[z] : d[x])} )
-        .y( (d) => {return yscale(d[y]/param)} )
+      .x( (d) => {return xscale(d[z]!=undefined ? d[x]+", "+d[z] : d[x])} )
+      .y( (d) => {return yscale(d[y]/param)} )
 
     //average red line
     /*g.append("path")

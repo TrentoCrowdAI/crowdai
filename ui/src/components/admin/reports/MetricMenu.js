@@ -20,13 +20,6 @@ class MetricMenu extends React.Component {
 				>Time to Complete per Task</Button>
 				<br />
 				<Button 
-					value='W_CompleteTime'
-					className='metrics'
-					style={{marginBottom: '5px'}}
-					onClick={this.props.onChange}
-				>Time to Complete per Worker</Button>
-				<br />
-				<Button 
 					value='Distribution'
 					className='metrics' 
 					style={{marginBottom: '5px'}}
@@ -68,7 +61,7 @@ class MetricMenu extends React.Component {
 					className='metrics' 
 					style={{marginBottom: '5px'}}
 					onClick={this.props.onChange}
-				>Percentage contribution to Crowd Error<br />[ M2 ]</Button>
+				>Percentage contribution to Crowd Error</Button>
 				<br />
 			</React.Fragment>
     )
@@ -110,6 +103,14 @@ class MetricMenu extends React.Component {
 					style={{marginBottom: '5px'}}
 					onClick={this.props.onChange}
 				>Cohen's Kappa vs M1</Button>
+				<br />
+				
+				<Button 
+					value='W_CompleteTime'
+					className='metrics'
+					style={{marginBottom: '5px'}}
+					onClick={this.props.onChange}
+				>Time to Complete per Worker</Button>
 				<br />
  */
 

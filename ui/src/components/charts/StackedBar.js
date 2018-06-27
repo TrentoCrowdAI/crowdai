@@ -7,9 +7,6 @@ import Math from 'math'
 class StackedBar extends React.Component {
   constructor(props) {
     super(props);
-    /*this.state = {
-      data : this.props.data
-    }*/
     this.buildGraph = this.buildGraph.bind(this);
   }
 

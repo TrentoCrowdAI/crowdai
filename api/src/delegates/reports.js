@@ -90,7 +90,10 @@ const getWorkerAnswers = (exports.getWorkerAnswers = async (jobId, workerId) => 
         EXTRACT( EPOCH FROM (t.created_at)::TIMESTAMP WITHOUT TIME ZONE) AS delivery, 
         (t.data->'criteria')::json#>>'{0,id}' AS criteria_id, 
         (t.data->'criteria')::json#>>'{0,workerAnswer}' AS answer,
-        (CASE WHEN g.gold=(t.data->'criteria')::json#>>'{0,workerAnswer}' THEN true ELSE false END) AS correct
+        (CASE WHEN g.gold=(t.data->'criteria')::json#>>'{0,workerAnswer}' THEN true ELSE false END) AS correct,
+          (EXTRACT( EPOCH FROM (t.data->>'end')::TIMESTAMP WITHOUT TIME ZONE)*1000)-
+          (EXTRACT( EPOCH FROM (t.data->>'start')::TIMESTAMP WITHOUT TIME ZONE)*1000) 
+        AS completion
     FROM ${db.TABLES.Task} t, ${db.TABLES.Worker} u, ${db.TABLES.Gold} g
     WHERE t.worker_id=u.id
     AND g.item_id=t.item_id AND g.criteria_id=cast((t.data->'criteria')::json#>>'{0,id}' AS bigint)
@@ -300,7 +303,8 @@ const getSingleWorker = (exports.getSingleWorker = async (jobId, workerId) => {
         SUM(CASE WHEN crowd.answer<>g.gold THEN 1 ELSE 0 END) AS votes_on_wronglyclassified,
         SUM(CASE WHEN ((t.data->'criteria')::json#>>'{0,workerAnswer}')=crowd.answer THEN 1 ELSE 0 END) AS rights,
         SUM(CASE WHEN ((t.data->'criteria')::json#>>'{0,workerAnswer}')=g.gold THEN 1 ELSE 0 END) AS right_by_gold,
-        COUNT((t.item_id, (t.data->'criteria')::json#>>'{0,id}')) AS voted_tasks
+        COUNT((t.item_id, (t.data->'criteria')::json#>>'{0,id}')) AS voted_tasks,
+        EXTRACT( EPOCH FROM (u.created_at)::TIMESTAMP WITHOUT TIME ZONE) AS registered
       FROM ${db.TABLES.Task} t, ${db.TABLES.Worker} u, ${db.TABLES.Gold} g, (
         SELECT a.item_id, (a.data->'criteria')::json#>>'{0,id}' AS criteria_id,
           (SELECT (b.data->'criteria')::json#>>'{0,workerAnswer}'
@@ -321,7 +325,7 @@ const getSingleWorker = (exports.getSingleWorker = async (jobId, workerId) => {
       AND crowd.criteria_id=(t.data->'criteria')::json#>>'{0,id}' 
       AND g.criteria_id=cast((t.data->'criteria')::json#>>'{0,id}' AS bigint)
       --AND t.worker_id NOT IN (SELECT * FROM ${db.TABLES.Excluded})
-      GROUP BY t.worker_id, u.turk_id
+      GROUP BY t.worker_id, u.turk_id, u.created_at
       ORDER BY t.worker_id`,
       [jobId, workerId]
     );
@@ -329,7 +333,8 @@ const getSingleWorker = (exports.getSingleWorker = async (jobId, workerId) => {
     for (var x in query.rows) {
       let workerCouple = {
         'worker A': query.rows[x].turk_id,
-        id: query.rows[x].worker_id,
+        'id': query.rows[x].worker_id,
+        'registered since': query.rows[x].registered,
         'number of completed tasks': Number(query.rows[x].voted_tasks),
         'times voted right comparing with crowd truth': Number(query.rows[x].rights),
         'times voted right comparing with gold truth': Number(query.rows[x].right_by_gold),

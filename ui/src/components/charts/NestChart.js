@@ -1,6 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import * as d3 from 'd3'
+import { Button } from 'semantic-ui-react'
 //import PropTypes from 'prop-types'
 //import Math from 'math'
 
@@ -55,7 +56,7 @@ class NestChart extends React.Component {
     })
     var media = sum/data.length
 
-    var margin = {top: 10, right: 30, bottom: 90, left: 40};
+    var margin = {top: 10, right: 30, bottom: 80, left: 40};
     var width = +svg.attr("width") - margin.left - margin.right;
     var height = +svg.attr("height") - margin.top - margin.bottom;
     var g = svg.append("g")
@@ -72,7 +73,7 @@ class NestChart extends React.Component {
         .domain(data.map( d => (d[z]!=undefined ? d[x]+", "+d[z] : d[x]) ))
 
     var xAxis = d3.axisBottom(xscale)
-      .tickFormat(d => d!=undefined ? d.substring(0,10)+'...' : "")
+      .tickFormat(d => y==='completion' ? d : (d!=undefined ? d.substring(0,10)+'...' : ""))
 
     var yAxis = d3.axisLeft(yscale)
       .ticks(10)
@@ -140,6 +141,7 @@ class NestChart extends React.Component {
           )
           .attr("text-anchor","middle")
           .attr("dy","-0.5em")
+          .attr('font-size', y==='completion' ? '11px' : '13px')
           .text("media ~ "+(media/param).toFixed(3)+" "+this.props.y)
     }
 
@@ -182,23 +184,23 @@ class NestChart extends React.Component {
   render() {
     return (
       <div className='nest'>
-        <svg className={this.props.selector} width="1000" height="500"> </svg>
+        <svg className={this.props.selector} 
+          width={this.props.y==='completion' ? '700' : '1000'} 
+          height={this.props.y==='completion' ? '300' : '500'}> </svg>
         <br />
       { this.props.data.length ? 
         <React.Fragment>
-        <button
-          onClick={(event) => this.setState({
-              order: this.props.y
-            })
-          }
-        ><strong>Sort {this.props.y}</strong></button>
 
-        <button
-          onClick={(event) => this.setState({
-              order: this.props.x
-            })
-          }
-        ><strong>Sort {this.props.x}</strong></button>
+          <Button
+            onClick={(event) => this.setState({ order: this.props.y }) }
+            style={{marginBottom: '5px'}}
+          >Sort {this.props.y}</Button>
+
+          <Button
+            onClick={(event) => this.setState({ order: this.props.x }) }
+            style={{marginBottom: '5px'}}
+          >Sort {this.props.x}</Button>
+
         </React.Fragment> : " "
       }
       </div>

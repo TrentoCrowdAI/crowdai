@@ -92,9 +92,9 @@ class Reports extends React.Component {
 			chosenmetric: value,
 			activeworker: value==='W_CompleteTime'||value==='Percentage'||value==='SingleWorker' ? true : false,
 			chosenworker: value==='W_CompleteTime'||value==='Percentage'||value==='SingleWorker' ? this.state.chosenworker : 'all',
-			chosenitem: value==='Distribution' ? this.state.chosenitem : 'all',
+			chosenitem: value==='Distribution'||value==='SingleWorker' ? this.state.chosenitem : 'all',
 			chosencriteria: value==='Percentage'||value==='Distribution'||value==='SingleWorker' ? this.state.chosencriteria : 'all',
-			activeitem: value==='Distribution' ? true : false,
+			activeitem: value==='Distribution'||value==='SingleWorker' ? true : false,
 			activecriteria: value==='Percentage'||value==='Distribution'||value==='SingleWorker' ? true : false
 		})
 	}
@@ -122,12 +122,6 @@ class Reports extends React.Component {
 				else
 					this.props.fetchWorkerTimes(this.props.match.params.jobid,Number(value))
 				break;
-			/*case 'SingleWorker':
-				if (value==='all')
-					this.props.reports.tasks = []
-				else
-					this.props.fetchMetric('worker/'+value+'/job/'+this.props.match.params.jobid+'/stats')
-				break;*/
 			default:
 				break;
 		}
@@ -174,8 +168,8 @@ renderChart(chart,x,y,z,w,param) {
 	}
 
 	render() {
-		console.log(this.props.reports.tasks)
-		console.log(this.props.single)
+		console.log('reports tasks ',this.props.reports.tasks)
+		console.log('single worker tasks ',this.props.single.tasks)
 		
 		//refresh options for charts with new loaded data every time
 		var WorkerOptions =  { 'all' : 'All Workers' }

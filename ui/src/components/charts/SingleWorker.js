@@ -34,18 +34,28 @@ class SingleWorker extends React.Component {
         <div className='row'>
         {z ? 
             <React.Fragment>
-              <strong style={{'color': 'steelblue', 'font-size': '15px'}}>{'Worker:   '}</strong>
+              {'Worker:   '}
               <strong style={{'color': 'steelblue', 'font-size': '25px'}}>{z['worker A']}</strong>
+              <hr />
+              {'Worker ID:   '}
+              <strong style={{'color': 'steelblue'}}>{z['id']}</strong>
               <br />
-              Worker ID: <span style={{'color': 'steelblue'}}>{z['id']}</span>
+              {'Registered since:   '}
+              <strong style={{'color': 'steelblue'}}>{
+                new Date(z['registered since']).getDate()
+                +'/'+((new Date(z['registered since']).getMonth())+1)
+                +'/'+new Date(z['registered since']).getFullYear()
+                +' at '+new Date(z['registered since']).getHours()
+                +':'+new Date(z['registered since']).getMinutes()
+                }</strong>
             </React.Fragment>
           : "" }
         </div>
-        <br />
+        <hr />
         <div className='rowC'>
 
           <div style={{'width': '70%'}}>
-          <strong style={{'color': 'steelblue', 'font-size': '15px'}}>Completed Tasks timeline :</strong>
+          <strong style={{'color': 'steelblue', 'font-size': '15px'}}>Completed Tasks Timeline :</strong>
           <br />
           <ChartWrapper  
             chart={'timeline'}
@@ -53,8 +63,20 @@ class SingleWorker extends React.Component {
             y={'delivery'}
             z={'criteria_id'}
             w={'answer'}
-            param={w.chosencriteria}
+            param={[w.chosenitem,w.chosencriteria]}
             selector={'timechart'}
+            data={Object.values(this.props.data)}
+          />
+          <strong style={{'color': 'steelblue', 'font-size': '15px'}}>Tasks Completion Times :</strong>
+          <br />
+          <ChartWrapper  
+            chart={'nest'}
+            x={'item_id'}
+            y={'completion'}
+            z={'criteria_id'}
+            w={''}
+            param={1000}
+            selector={'completions_chart'}
             data={Object.values(this.props.data)}
           />
           </div>
@@ -72,7 +94,7 @@ class SingleWorker extends React.Component {
               y={'answer'}
               z={['item_id','criteria_id']}
               color={['orange','steelblue']}
-              param={w.chosencriteria}
+              param={[w.chosenitem,w.chosencriteria]}
               selector={'chart_crowd'}
               data={Object.values(this.props.data)}
             />
@@ -87,7 +109,7 @@ class SingleWorker extends React.Component {
               y={'correct'}
               color={['lightgreen','orange']}
               z={['item_id','criteria_id']}
-              param={w.chosencriteria}
+              param={[w.chosenitem,w.chosencriteria]}
               selector={'chart_gold'}
               data={Object.values(this.props.data)}
             />

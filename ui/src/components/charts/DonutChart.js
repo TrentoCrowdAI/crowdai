@@ -34,14 +34,21 @@ class DonutChart extends React.Component {
     }
   }
 
-  buildGraph(crit_filtered_data) {
+  buildGraph() {
     var svg = d3.select("."+this.props.selector);
     var x = this.props.x
     var y = this.props.y
     var z = this.props.z
+    var w = this.props.w
+    var param = this.props.param
     
-    var data = crit_filtered_data
-
+    var data = this.props.data
+			.filter(d => param[0]==='all' && param[1]==='all' ? true 
+				: param[0]!=='all' && param[1]==='all' ? d[z[0]]===param[0]
+				: param[0]==='all' && param[1]!=='all' ? d[z[1]]===param[1]
+				: param[0]!=='all' && param[1]!=='all' ? d[z[0]]===param[0] && d[z[1]]===param[1] 
+        : false )
+    
     var margin = {top: 10, right: 30, bottom: 20, left: 50};
     var width = +svg.attr('width') - margin.left - margin.right;
     var height = +svg.attr('height') - margin.top - margin.bottom;
@@ -113,12 +120,12 @@ class DonutChart extends React.Component {
   }
 
   componentDidMount() {
-    this.dataWrapper();
+    this.buildGraph();
   }
 
   componentDidUpdate() {
     d3.select("."+this.props.selector).selectAll("g").remove();
-    this.dataWrapper();
+    this.buildGraph();
   }
 
   render() {

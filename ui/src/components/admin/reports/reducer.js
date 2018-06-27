@@ -40,7 +40,7 @@ const chart_reducer = (state = defaultState, action) => {
         loading: false
       };
 
-    case actionTypes.FETCH_WTIME:
+    /*case actionTypes.FETCH_WTIME:
       return {
         ...state,
         error: undefined,
@@ -57,9 +57,9 @@ const chart_reducer = (state = defaultState, action) => {
         ...state,
         error: action.error,
         loading: false
-      };
+      };*/
 
-    case actionTypes.FETCH_WANSWERS:
+    /*case actionTypes.FETCH_WANSWERS:
       return {
         ...state,
         error: undefined,
@@ -76,7 +76,7 @@ const chart_reducer = (state = defaultState, action) => {
         ...state,
         error: action.error,
         loading: false
-      };
+      };*/
 
     case actionTypes.FETCH_AGREEMENTS:
       return {
@@ -97,7 +97,7 @@ const chart_reducer = (state = defaultState, action) => {
         loading: false
       };
     
-    case actionTypes.FETCH_WAGREES:
+    /*case actionTypes.FETCH_WAGREES:
       return {
         ...state,
         error: undefined,
@@ -114,8 +114,8 @@ const chart_reducer = (state = defaultState, action) => {
         ...state,
         error: action.error,
         loading: false
-      };
-    case actionTypes.FETCH_METRIC:
+      };*/
+    /*case actionTypes.FETCH_METRIC:
       return {
         ...state,
         error: undefined,
@@ -132,7 +132,7 @@ const chart_reducer = (state = defaultState, action) => {
         ...state,
         error: action.error,
         loading: false,
-      };
+      };*/
     case actionTypes.FETCH_CROWDGOLDS:
       return {
         ...state,

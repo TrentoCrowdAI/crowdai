@@ -50,7 +50,7 @@ const getWorkersByJob = (exports.getWorkersByJob = async id => {
   }
 });
 
-const getWorkerTimes = (exports.getWorkerTimes = async (jobId, workerId) => {
+/*const getWorkerTimes = (exports.getWorkerTimes = async (jobId, workerId) => {
   try {
     let res = await db.query(
       `
@@ -81,9 +81,9 @@ const getWorkerTimes = (exports.getWorkerTimes = async (jobId, workerId) => {
     console.error(error);
     throw Boom.badImplementation('Error while trying to fetch the record');
   }
-});
+});*/
 
-const getWorkerAnswers = (exports.getWorkerAnswers = async (jobId, workerId) => {
+/*const getWorkerAnswers = (exports.getWorkerAnswers = async (jobId, workerId) => {
   try {
     let res = await db.query(
       `SELECT u.turk_id, t.item_id, 
@@ -105,7 +105,7 @@ const getWorkerAnswers = (exports.getWorkerAnswers = async (jobId, workerId) => 
     console.error(error);
     throw Boom.badImplementation('Error while trying to fetch record');
   }
-});
+});*/
 
 const getTasksAgreements = (exports.getTasksAgreements = async id => {
   try {

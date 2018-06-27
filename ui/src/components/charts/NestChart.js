@@ -47,7 +47,11 @@ class NestChart extends React.Component {
     var x = this.props.x
     var y = this.props.y
     var z = this.props.z
+    var w = this.props.w
     var param = this.props.param
+    var color = w==='correct' ? 
+      this.props.color!=undefined ? d3.scaleOrdinal(this.props.color) : d3.scaleOrdinal(['lightgreen','orange','steelblue'])
+      :  'orange'
 
     //computing average data to display on chart
     var sum = 0
@@ -55,13 +59,13 @@ class NestChart extends React.Component {
       sum += step[y]
     })
     var media = sum/data.length
-
+    var categories = Array.from(new Set(data.map(d => d[w])))
     var margin = {top: 10, right: 30, bottom: 80, left: 40};
     var width = +svg.attr("width") - margin.left - margin.right;
     var height = +svg.attr("height") - margin.top - margin.bottom;
     var g = svg.append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-    var color = 'orange'
+    //var color = 'orange'
 
     var yscale = d3.scaleLinear()
         .rangeRound([height, 0])
@@ -84,10 +88,12 @@ class NestChart extends React.Component {
         .attr("class","bar")
           
     bar.append("rect")
-      .style("fill", d => {
-        if(d[y]>=media) return color
-          else return "lightgreen"
-      })
+      .style("fill", d => 
+        {
+          if(w==='correct') {return color(categories.indexOf(d[w]))}
+          else if(d[y]>=media) {return color}
+          else {return "lightgreen"}
+        })
       .attr("x", d => xscale(d[z]!=undefined ? d[x]+", "+d[z] : d[x]))
       .attr("y", d => yscale(d[y]/param))
       .attr("width", xscale.bandwidth())

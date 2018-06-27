@@ -22,40 +22,43 @@ class SingleWorker extends React.Component {
   }
 
   render() {
+    var data = this.props.data[0]
     var x = this.props.x
     var y = this.props.y
     var z = this.props.z
+    var data = data
     var w = this.props.w
     var param = this.props.param
 
     return (
       <div className='nest'>
         <br />
+
+        {this.props.data.length>0 ?
+        <React.Fragment>
         <div className='row'>
-        {z ? 
-            <React.Fragment>
-              {'Worker:   '}
-              <strong style={{'color': 'steelblue', 'font-size': '25px'}}>{z['worker A']}</strong>
-              <hr />
-              {'Worker ID:   '}
-              <strong style={{'color': 'steelblue'}}>{z['id']}</strong>
-              <br />
-              {'Registered since:   '}
-              <strong style={{'color': 'steelblue'}}>{
-                new Date(z['registered since']).getDate()
-                +'/'+((new Date(z['registered since']).getMonth())+1)
-                +'/'+new Date(z['registered since']).getFullYear()
-                +' at '+new Date(z['registered since']).getHours()
-                +':'+new Date(z['registered since']).getMinutes()
-                }</strong>
-            </React.Fragment>
-          : "" }
+          <React.Fragment>
+            {'Worker:   '}
+            <strong style={{'color': 'steelblue', 'fontSize': '25px'}}>{data['worker A']}</strong>
+            <hr />
+            {'Worker ID:   '}
+            <strong style={{'color': 'steelblue'}}>{data['id']}</strong>
+            <br />
+            {'Registered since:   '}
+            <strong style={{'color': 'steelblue'}}>{
+              new Date(data['registered since']).getDate()
+              +'/'+((new Date(data['registered since']).getMonth())+1)
+              +'/'+new Date(data['registered since']).getFullYear()
+              +' at '+new Date(data['registered since']).getHours()
+              +':'+new Date(data['registered since']).getMinutes()
+              }</strong>
+          </React.Fragment>
         </div>
         <hr />
         <div className='rowC'>
 
-          <div style={{'width': '70%'}}>
-          <strong style={{'color': 'steelblue', 'font-size': '15px'}}>Completed Tasks Timeline :</strong>
+          <div >
+          <strong style={{'color': 'steelblue', 'fontSize': '15px'}}>Completed Tasks Timeline :</strong>
           <br />
           <ChartWrapper  
             chart={'timeline'}
@@ -66,27 +69,28 @@ class SingleWorker extends React.Component {
             color={['orange','steelblue','lightgreen']}
             param={[w.chosenitem,w.chosencriteria]}
             selector={'timechart'}
-            data={Object.values(this.props.data[0].answers)}
+            data={Object.values(data[z])}
           />
-          <strong style={{'color': 'steelblue', 'font-size': '15px'}}>Tasks Completion Times :</strong>
+          <br />
+          <strong style={{'color': 'steelblue', 'fontSize': '15px'}}>Tasks Completion Times :</strong>
           <br />
           <ChartWrapper  
             chart={'nest'}
             x={'item_id'}
             y={'completion'}
             z={'criteria_id'}
-            w={''}
+            w={'correct'}
             param={1000}
+            color={['lightgreen','orange','steelblue']}
             selector={'completions_chart'}
-            data={Object.values(this.props.data[0].answers)}
+            data={Object.values(data[z])}
           />
           </div>
 
-          {z!=undefined &&
           <div className='row'>
 
             <strong style={{'color': 'steelblue'}}>Votes Distribution on Completed Tasks :</strong><br />
-            Total completed tasks: <i>{z[x]}</i>
+            Total completed tasks: <i>{data[x]}</i>
             <br />
 
             <ChartWrapper 
@@ -97,11 +101,11 @@ class SingleWorker extends React.Component {
               color={['orange','steelblue','lightgreen']}
               param={[w.chosenitem,w.chosencriteria]}
               selector={'chart_crowd'}
-              data={Object.values(this.props.data[0].answers)}
+              data={Object.values(data[z])}
             />
             <strong style={{'color': 'steelblue'}}>Precision toward Gold Truth :</strong><br />
             Total: <i>{
-              ((z[y]/z[x])*100).toFixed(3)
+              ((data[y]/data[x])*100).toFixed(3)
               } %</i>
 
             <ChartWrapper 
@@ -112,12 +116,14 @@ class SingleWorker extends React.Component {
               z={['item_id','criteria_id']}
               param={[w.chosenitem,w.chosencriteria]}
               selector={'chart_gold'}
-              data={Object.values(this.props.data[0].answers)}
+              data={Object.values(data[z])}
             />
           </div>
-          }
+
         </div>
-        <svg className={this.props.selector} width="1000" height="800"> </svg>
+        </React.Fragment> : <div>Choose a Worker</div>
+        }
+
       </div>
     );
   }

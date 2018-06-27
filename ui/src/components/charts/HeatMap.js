@@ -149,15 +149,15 @@ class HeatMap extends React.Component {
 		return(
 			<div>
                 <ul className={'legend'}>
-                    <li><span style={{'background-color':'#FFE6CD'}}></span>{this.props.z} {" < 0.20"}</li>
-                    <li><span style={{'background-color':'#FFCD9A'}}></span>{this.props.z} {" < 0.40"}</li>
-                    <li><span style={{'background-color':'#FFB366'}}></span>{this.props.z} {" < 0.60"}</li>
+                    <li><span style={{'backgroundColor':'#FFE6CD'}}></span>{this.props.z} {" < 0.20"}</li>
+                    <li><span style={{'backgroundColor':'#FFCD9A'}}></span>{this.props.z} {" < 0.40"}</li>
+                    <li><span style={{'backgroundColor':'#FFB366'}}></span>{this.props.z} {" < 0.60"}</li>
                 </ul>
                 <br />
                 <ul className={'legend'}>
-                    <li><span style={{'background-color':'#FF9A33'}}></span>{this.props.z} {" < 0.80"}</li>
-                    <li><span style={{'background-color':'#FF8000'}}></span>{this.props.z} {" < 1"}</li>    
-                    <li><span style={{'background-color':'red'}}></span>{this.props.z} = 1</li>
+                    <li><span style={{'backgroundColor':'#FF9A33'}}></span>{this.props.z} {" < 0.80"}</li>
+                    <li><span style={{'backgroundColor':'#FF8000'}}></span>{this.props.z} {" < 1"}</li>    
+                    <li><span style={{'backgroundColor':'red'}}></span>{this.props.z} = 1</li>
                 </ul>
 			<br />
 			<svg className={this.props.selector} height='1000' width='900'> </svg>

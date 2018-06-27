@@ -31,16 +31,16 @@ class TimeLine extends React.Component {
   buildGraph() {
     var svg = d3.select("."+this.props.selector)
 
-    /*var zoom = d3.zoom()
-      .on("zoom", zoomFunction)*/
+    var zoom = d3.zoom()
+      .on("zoom", zoomFunction)
 
-    var margin = {top: 60, right: 30, bottom: 60, left: 40};
+    var margin = {top: 60, right: 30, bottom: 70, left: 40};
     var width = +svg.attr("width") - margin.left - margin.right;
     var height = +svg.attr("height") - margin.top - margin.bottom;
     var g = svg.append("g")
       .attr("class","innerspace")
       .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
-      //.call(zoom)
+      .call(zoom)
 
     var x = this.props.x
     var y = this.props.y
@@ -66,7 +66,11 @@ class TimeLine extends React.Component {
       .range([0,width])
 
     var xAxis = d3.axisBottom(xscale)
-      .tickFormat("")
+      .tickFormat( d => (new Date(d).getDate()+'/'+
+                        (new Date(d).getMonth()+1)+'/'+
+                        new Date(d).getFullYear().toString().substring(2,4)+', '+
+                        new Date(d).getHours()+':'+
+                        new Date(d).getMinutes()).toString().substring(0,20) )
     
     var yscale = d3.scaleBand()
       .range([0,height])
@@ -113,7 +117,7 @@ class TimeLine extends React.Component {
       .enter().append('g')
         .attr('class','bar')
 
-    bars.append('rect')
+    var rects = bars.append('rect')
       .attr('x', d => xscale(d[y]*1000))
       .attr('y', d => -yscale.bandwidth()/4)
       .style('fill','white')
@@ -130,17 +134,18 @@ class TimeLine extends React.Component {
           .html(x+' <b>'+d[x]+'</b>, <br />'+
           z+' <b>'+d[z]+'</b>, <br />'+
           'Task completed at: <br />'+
-          '<strong>'+new Date(d[y]).getDate()
-          +'/'+((new Date(d[y]).getMonth())+1)
-          +'/'+new Date(d[y]).getFullYear()
-          +' at '+new Date(d[y]).getHours()
-          +':'+new Date(d[y]).getMinutes()+'</strong>')
+          '<strong>'+new Date(d[y]*1000).getDate()
+          +'/'+((new Date(d[y]*1000).getMonth())+1)
+          +'/'+new Date(d[y]*1000).getFullYear()
+          +' at '+new Date(d[y]*1000).getHours()
+          +':'+new Date(d[y]*1000).getMinutes()
+          +':'+new Date(d[y]*1000).getSeconds()+'</strong>')
       })
       .on('mouseout', () => {
         tooltip.style('visibility', 'hidden')
       })
         
-    bars.append('text')
+    var txt1 = bars.append('text')
       .attr('text-anchor','start')
       .attr('font-size','12px')
       .style('fill','black')
@@ -149,7 +154,7 @@ class TimeLine extends React.Component {
         'translate('+xscale(d[y]*1000)+', '+(yscale.bandwidth()-(yscale.bandwidth()*1.3))+') rotate(-65)')
       .text(d => d[x]+', '+d[z])
 
-    bars.append('text')
+    var txt2 = bars.append('text')
       .attr('text-anchor','middle')
       .attr('font-size','12px')
       .attr('font-weight','bold')
@@ -161,20 +166,35 @@ class TimeLine extends React.Component {
     var gx = g.append('g')
       .attr('transform', 'translate(0,'+height+')')
       .call(xAxis)
-      .selectAll('text')
+    
+    gx.selectAll('text')
         .attr('transform', 'rotate(-65)')
         .attr('text-anchor', 'end')
+        .style('fill','darkgrey')
       
     gy.call(d3.axisLeft(yscale))
 
-    /*function zoomFunction() {
-        xscale.range([0,width].map(d => d3.event.transform.applyX(d)))
-        xAxis = d3.axisBottom(xscale).tickFormat("")
+    function zoomFunction() {
+        var newscale = d3.event.transform.rescaleX(xscale)
+        xAxis = d3.axisBottom(newscale).tickFormat( 
+          d => (new Date(d).getDate()+'/'+
+                (new Date(d).getMonth()+1)+'/'+
+                new Date(d).getFullYear().toString().substring(2,4)+', '+
+                new Date(d).getHours()+':'+
+                new Date(d).getMinutes()).toString().substring(0,20) )
+        
         gx.call(xAxis)
+        gx.selectAll('text')
+          .attr('transform', 'rotate(-65)')
+          .attr('text-anchor', 'end')
+          .style('fill','darkgrey')
 
-        bars.attr('x', d => xscale(d[y]*1000))
-        bars.attr('width', d3.event.transform.applyX(bars.attr('width')))
-      }*/
+        rects.attr('x', d => newscale(d[y]*1000))
+        txt1.attr('transform', d =>
+          'translate('+newscale(d[y]*1000)+', '+(yscale.bandwidth()-(yscale.bandwidth()*1.3))+') rotate(-65)')
+        txt2.attr('transform', d =>
+          'translate('+(newscale(d[y]*1000)+2.5)+', '+(yscale.bandwidth()*1.4)+')')
+      }
 
   }
 
@@ -188,14 +208,10 @@ class TimeLine extends React.Component {
   }
 
   render() {
-    var x = this.props.x
-    var y = this.props.y
-    var z = this.props.z
-    var w = this.props.w
     return(
       <div>
         <br />
-        <svg className={this.props.selector} width='700' height='200'> </svg>
+        <svg className={this.props.selector} width='700' height='210'> </svg>
       </div>
     )
   }

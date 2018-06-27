@@ -20,7 +20,7 @@ const fetchTaskTime = (action$, store) =>
     .catch(error => Observable.of(actions.fetchItemError(flattenError(error))));
 });
 
-const getWorkerTimes = (action$, store) =>
+/*const getWorkerTimes = (action$, store) =>
   action$.ofType(actionTypes.FETCH_WTIME).switchMap(action => {
     return Observable.defer(() => requestersApi.get('getWorkerTimes/'+action.jobId+'/'+action.workerId))
       .mergeMap(response => Observable.of(actions.fetchWorkerTimesSuccess(response.data)))
@@ -31,9 +31,9 @@ const fetchWorkerTimes = (action$, store) =>
     return Observable.defer(() => requestersApi.get(`getWorkerTimes/`+action.jobId+'/'+action.workerId))
       .mergeMap(response => Observable.of(actions.fetchItemSuccess(response.data)))
       .catch(error => Observable.of(actions.fetchItemError(flattenError(error))));
-});
+});*/
 
-const getAnswers = (action$, store) =>
+/*const getAnswers = (action$, store) =>
   action$.ofType(actionTypes.FETCH_WANSWERS).switchMap(action => {
     return Observable.defer(() => requestersApi.get('getWorkerAnswers/'+action.jobId+'/'+action.workerId))
       .mergeMap(response => Observable.of(actions.fetchAnswersSuccess(response.data)))
@@ -44,7 +44,7 @@ const fetchAnswers = (action$, store) =>
     return Observable.defer(() => requestersApi.get(`getWorkerAnswers/`+action.jobId+'/'+action.workerId))
       .mergeMap(response => Observable.of(actions.fetchItemSuccess(response.data)))
       .catch(error => Observable.of(actions.fetchItemError(flattenError(error))));
-});
+});*/
 
 const getTasksAgreements = (action$, store) =>
   action$.ofType(actionTypes.FETCH_AGREEMENTS).switchMap(action => {
@@ -59,7 +59,7 @@ const fetchTasksAgreements = (action$, store) =>
       .catch(error => Observable.of(actions.fetchItemError(flattenError(error))));
 });
 
-const getWorkersAgreements = (action$, store) =>
+/*const getWorkersAgreements = (action$, store) =>
   action$.ofType(actionTypes.FETCH_WAGREES).switchMap(action => {
   return Observable.defer(() => requestersApi.get('getWorkersAgreements/'+action.jobId))
     .mergeMap(response => Observable.of(actions.fetchWorkersAgreementsSuccess(response.data)))
@@ -70,9 +70,9 @@ const fetchWorkersAgreements = (action$, store) =>
     return Observable.defer(() => requestersApi.get('getWorkersAgreements/'+action.jobId))
       .mergeMap(response => Observable.of(actions.fetchItemSuccess(response.data)))
       .catch(error => Observable.of(actions.fetchItemError(flattenError(error))));
-});
+});*/
 
-const getMetric = (action$, store) =>
+/*const getMetric = (action$, store) =>
   action$.ofType(actionTypes.FETCH_METRIC).switchMap(action => {
     return Observable.defer(() => reportingApi.get(action.metric))
       .mergeMap(response => Observable.of(actions.fetchMetricSuccess(response.data)))
@@ -84,7 +84,7 @@ const fetchMetric = (action$, store) =>
     return Observable.defer(() => reportingApi.get(action.metric))
       .mergeMap(response => Observable.of(actions.fetchItemSuccess(response.data)))
       .catch(error => Observable.of(actions.fetchItemError(flattenError(error))));
-});
+});*/
 
 const getCrowdGolds = (action$, store) =>
   action$.ofType(actionTypes.FETCH_CROWDGOLDS).switchMap(action => {
@@ -167,12 +167,12 @@ const fetchJobStats = (action$, store) =>
 
 export default combineEpics(getTaskTime, fetchTaskTime,
                             getWorkers, fetchWorkers, 
-                            getWorkerTimes, fetchWorkerTimes, 
-                            getAnswers, fetchAnswers,
+                            //getWorkerTimes, fetchWorkerTimes, 
+                            //getAnswers, fetchAnswers,
                             getWorkers, fetchWorkers,
                             getTasksAgreements, fetchTasksAgreements,
-                            getWorkersAgreements, fetchWorkersAgreements,
-                            getMetric, fetchMetric,
+                            //getWorkersAgreements, fetchWorkersAgreements,
+                            //getMetric, fetchMetric,
                             getCrowdGolds, fetchCrowdGolds,
                             getWorkersPairs, fetchWorkersPairs,
                             getSingleWorker, fetchSingleWorker,

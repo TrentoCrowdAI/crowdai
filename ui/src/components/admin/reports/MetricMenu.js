@@ -57,7 +57,7 @@ class MetricMenu extends React.Component {
 				>Single Worker Metrics</Button>	
 				<br />
 				<Button 
-					value='M2'
+					value='Contribution'
 					className='metrics' 
 					style={{marginBottom: '5px'}}
 					onClick={this.props.onChange}

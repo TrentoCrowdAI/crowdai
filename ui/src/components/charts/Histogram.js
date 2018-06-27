@@ -167,7 +167,7 @@ class Histogram extends React.Component {
     return (
       <div>
         <br />
-        <svg className={this.props.selector} width="900" height="500"> </svg>
+        <svg className={this.props.selector} width="900" height="400"> </svg>
         <br />
         {this.props.data.length ? <strong>Clicked data:</strong> : " "} <ul>{stampa}</ul>
 

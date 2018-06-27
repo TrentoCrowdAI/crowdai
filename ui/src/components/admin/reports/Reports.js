@@ -65,7 +65,7 @@ class Reports extends React.Component {
 				//this.props.fetchAnswers(this.props.match.params.jobid,Number(this.state.chosenworker))
 				this.props.fetchSingleWorker(this.props.match.params.jobid,this.state.chosenworker)
 				break;
-			case 'M2':
+			case 'Contribution':
 				this.props.reports.tasks=[]
 				this.props.fetchContribution(this.props.match.params.jobid)
 				//this.props.fetchMetric('worker/job/'+this.props.match.params.jobid+'/contribution');
@@ -82,23 +82,23 @@ class Reports extends React.Component {
 		this.setState({
 			...this.state,
 			chosenmetric: value,
-			activeworker: value==='W_CompleteTime'||value==='Percentage'||value==='SingleWorker' ? true : false,
-			chosenworker: value==='W_CompleteTime'||value==='Percentage'||value==='SingleWorker' ? this.state.chosenworker : 'all',
+			activeworker: /*value==='W_CompleteTime'||value==='Percentage'||*/value==='SingleWorker' ? true : false,
+			chosenworker: /*value==='W_CompleteTime'||value==='Percentage'||*/value==='SingleWorker' ? this.state.chosenworker : 'all',
 			chosenitem: value==='Distribution'||value==='SingleWorker' ? this.state.chosenitem : 'all',
-			chosencriteria: value==='Percentage'||value==='Distribution'||value==='SingleWorker' ? this.state.chosencriteria : 'all',
+			chosencriteria: /*value==='Percentage'||*/value==='Distribution'||value==='SingleWorker' ? this.state.chosencriteria : 'all',
 			activeitem: value==='Distribution'||value==='SingleWorker' ? true : false,
-			activecriteria: value==='Percentage'||value==='Distribution'||value==='SingleWorker' ? true : false
+			activecriteria: /*value==='Percentage'||*/value==='Distribution'||value==='SingleWorker' ? true : false
 		})
 	}
 
 	chooseWorker(e, {value}) {
 		switch(this.state.chosenmetric) {
-			case 'Percentage':
+			/*case 'Percentage':
 				if (value==='all')
 					this.props.reports.tasks = []
 				else
 					this.props.fetchAnswers(this.props.match.params.jobid,Number(value))
-				break;
+				break;*/
 			case 'SingleWorker':
 				if (value==='all') {
 					this.props.reports.tasks = []
@@ -106,12 +106,12 @@ class Reports extends React.Component {
 					this.props.fetchSingleWorker(this.props.match.params.jobid,Number(value))
 				}
 				break;
-			case 'W_CompleteTime':
+			/*case 'W_CompleteTime':
 				if (value==='all')
 					this.props.reports.tasks = []
 				else
 					this.props.fetchWorkerTimes(this.props.match.params.jobid,Number(value))
-				break;
+				break;*/
 			default:
 				break;
 		}
@@ -168,12 +168,18 @@ renderChart(chart,x,y,z,w,param) {
 		});
 		
 		var ItemOptions = { 'all': 'All Items' }
-		Object.values(this.props.reports.tasks).map( step => {
+		Object.values(
+			(this.state.chosenmetric==='SingleWorker' && this.props.reports.tasks.length)
+				? this.props.reports.tasks[0].answers : this.props.reports.tasks
+		).map( step => {
       ItemOptions[step.item_id] = step.item_id
 		});
 
 		var CritOptions = { 'all' : 'All Criteria' }
-		Object.values(this.props.reports.tasks).map( step => {
+		Object.values(
+			(this.state.chosenmetric==='SingleWorker' && this.props.reports.tasks.length)
+				? this.props.reports.tasks[0].answers : this.props.reports.tasks
+		).map( step => {
       CritOptions[step.criteria_id] = step.criteria_id
 		});
 
@@ -204,13 +210,13 @@ renderChart(chart,x,y,z,w,param) {
 				param=1000
 				break;
 
-			case 'W_CompleteTime':
+			/*case 'W_CompleteTime':
 				chart='nest'
 				x='item_id'
 				y='avgtime_ms'
 				z='criteria_id'
 				param=1000
-				break;
+				break;*/
 
 			case 'Distribution':
 				chart='stacked'
@@ -220,14 +226,14 @@ renderChart(chart,x,y,z,w,param) {
 				param=[this.state.chosenitem,this.state.chosencriteria]
 				break;
 
-			case 'Percentage':
+			/*case 'Percentage':
 				chart=''
 				x=''
 				y=''
 				z=''
 				w=''
 				param=''
-				break;
+				break;*/
 
 			case 'Classification' :
 				chart='treechart'
@@ -285,7 +291,7 @@ renderChart(chart,x,y,z,w,param) {
 				param=1
 				break;
 
-			case 'M2':
+			case 'Contribution':
 				chart='histogram'
 				x='contribution to crowd error'
 				y='id'
@@ -387,10 +393,10 @@ renderChart(chart,x,y,z,w,param) {
 Reports.propTypes = {
 	fetchTaskTime: PropTypes.func,
 	fetchWorkers: PropTypes.func,
-	fetchAnswers: PropTypes.func,
-	fetchWorkerTimes: PropTypes.func,
+	//fetchAnswers: PropTypes.func,
+	//fetchWorkerTimes: PropTypes.func,
 	fetchTasksAgreements: PropTypes.func,
-	fetchWorkersAgreements: PropTypes.func,
+	//fetchWorkersAgreements: PropTypes.func,
 	fetchCrowdGolds: PropTypes.func,
 	fetchWorkersPairs: PropTypes.func,
 	fetchSingleWorker: PropTypes.func,
@@ -412,11 +418,11 @@ Reports.propTypes = {
 
 const mapDispatchToProps = dispatch => ({
 	fetchTaskTime: jobId => dispatch(actions.fetchTaskTime(jobId)),
-	fetchWorkerTimes: (jobId,workerId) => dispatch(actions.fetchWorkerTimes(jobId,workerId)),
-	fetchAnswers: (jobId,workerId) => dispatch(actions.fetchAnswers(jobId,workerId)),
+	//fetchWorkerTimes: (jobId,workerId) => dispatch(actions.fetchWorkerTimes(jobId,workerId)),
+	//fetchAnswers: (jobId,workerId) => dispatch(actions.fetchAnswers(jobId,workerId)),
 	fetchWorkers: jobId => dispatch(actions.fetchWorkers(jobId)),
 	fetchTasksAgreements: jobId => dispatch(actions.fetchTasksAgreements(jobId)),
-	fetchWorkersAgreements: jobId => dispatch(actions.fetchWorkersAgreements(jobId)),
+	//fetchWorkersAgreements: jobId => dispatch(actions.fetchWorkersAgreements(jobId)),
 	//fetchMetric : metric => dispatch(actions.fetchMetric(metric)),
 	fetchCrowdGolds: jobId => dispatch(actions.fetchCrowdGolds(jobId)),
 	fetchWorkersPairs: jobId => dispatch(actions.fetchWorkersPairs(jobId)),

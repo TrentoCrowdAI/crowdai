@@ -14,9 +14,9 @@ const getWorkersByJob = async ctx => {
   ctx.response.body = await delegates.reports.getWorkersByJob(ctx.params.id);
 };
 
-const getWorkerTimes = async ctx => {
+/*const getWorkerTimes = async ctx => {
   ctx.response.body = await delegates.reports.getWorkerTimes(ctx.params.jobId, ctx.params.workerId);
-};
+};*/
 
 const getTasksAgreements = async ctx => {
   ctx.response.body = await delegates.reports.getTasksAgreements(ctx.params.id);
@@ -48,7 +48,7 @@ const getJobStats = async ctx => {
 
 exports.register = router => {
   router.get('/getAllTasksTImesByJob/:id', getAllTasksTimesByJob);
-  router.get('/getWorkerTimes/:jobId/:workerId', getWorkerTimes);
+  //router.get('/getWorkerTimes/:jobId/:workerId', getWorkerTimes);
   router.get('/getWorkersByJob/:id', getWorkersByJob);
   router.get('/getWorkerAnswers/:jobId/:workerId', getWorkerAnswers);
   router.get('/getTasksAgreements/:id', getTasksAgreements);

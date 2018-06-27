@@ -46,14 +46,6 @@ class Reports extends React.Component {
 				this.props.reports.tasks=[]
 				this.props.fetchTaskTime(this.props.match.params.jobid)
 				break;
-			case 'W_CompleteTime':
-				this.props.reports.tasks=[]
-				this.props.fetchWorkerTimes(this.props.match.params.jobid,Number(this.state.chosenworker))
-				break;
-			case 'Percentage':
-				this.props.reports.tasks=[]
-				this.props.fetchAnswers(this.props.match.params.jobid,Number(this.state.chosenworker))
-				break;
 			case 'Distribution':
 				this.props.reports.tasks=[]
 				this.props.fetchTasksAgreements(this.props.match.params.jobid)
@@ -70,8 +62,8 @@ class Reports extends React.Component {
 			case 'SingleWorker':
 				this.props.reports.tasks=[]
 				//this.props.fetchMetric('worker/job/'+this.props.match.params.jobid+'/contribution');
-				this.props.fetchAnswers(this.props.match.params.jobid,Number(this.state.chosenworker))
-				this.props.fetchSingleWorker(this.props.match.params.jobid,Number(this.state.chosenworker))
+				//this.props.fetchAnswers(this.props.match.params.jobid,Number(this.state.chosenworker))
+				this.props.fetchSingleWorker(this.props.match.params.jobid,this.state.chosenworker)
 				break;
 			case 'M2':
 				this.props.reports.tasks=[]
@@ -110,9 +102,7 @@ class Reports extends React.Component {
 			case 'SingleWorker':
 				if (value==='all') {
 					this.props.reports.tasks = []
-					this.props.single.tasks = []
 				} else {
-					this.props.fetchAnswers(this.props.match.params.jobid,Number(value))
 					this.props.fetchSingleWorker(this.props.match.params.jobid,Number(value))
 				}
 				break;
@@ -169,7 +159,7 @@ renderChart(chart,x,y,z,w,param) {
 
 	render() {
 		console.log('reports tasks ',this.props.reports.tasks)
-		console.log('single worker tasks ',this.props.single.tasks)
+		//console.log('single worker tasks ',this.props.single.tasks)
 		
 		//refresh options for charts with new loaded data every time
 		var WorkerOptions =  { 'all' : 'All Workers' }
@@ -231,12 +221,12 @@ renderChart(chart,x,y,z,w,param) {
 				break;
 
 			case 'Percentage':
-				chart='timeline'
-				x='item_id'
-				y='delivery'
-				z='criteria_id'
-				w='answer'
-				param=this.state.chosencriteria
+				chart=''
+				x=''
+				y=''
+				z=''
+				w=''
+				param=''
 				break;
 
 			case 'Classification' :
@@ -321,11 +311,11 @@ renderChart(chart,x,y,z,w,param) {
 				param=1
 				break;
 
-			case 'SingleWorker':
+			case 'SingleWorker' && this.state.chosenworker!='all':
 				chart='singleworker'
 				x='number of completed tasks'
 				y='times voted right comparing with gold truth'
-				z=this.props.single.tasks[0]
+				//z=this.props.reports.tasks[0]
 				w=this.state
 				param=this.props.match
 				break;
@@ -444,9 +434,9 @@ const mapStateToProps = state => ({
 	worker_error: state.report.wlist.error,
 	worker_loading: state.report.wlist.loading,
 
-	single: state.report.single_list.reports,
+	/*single: state.report.single_list.reports,
 	single_error: state.report.single_list.error,
-	single_loading: state.report.single_list.loading,
+	single_loading: state.report.single_list.loading,*/
 })
 
 export default connect(mapStateToProps,mapDispatchToProps)(Reports)

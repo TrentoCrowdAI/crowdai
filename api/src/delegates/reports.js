@@ -330,25 +330,40 @@ const getSingleWorker = (exports.getSingleWorker = async (jobId, workerId) => {
       [jobId, workerId]
     );
 
-    for (var x in query.rows) {
-      let workerCouple = {
-        'worker A': query.rows[x].turk_id,
-        'id': query.rows[x].worker_id,
-        'registered since': query.rows[x].registered,
-        'number of completed tasks': Number(query.rows[x].voted_tasks),
-        'times voted right comparing with crowd truth': Number(query.rows[x].rights),
-        'times voted right comparing with gold truth': Number(query.rows[x].right_by_gold),
-        //'votes AS crowd': Number(query.rows[x].votes_as_crowd),
-        'votes on wrongly classified tasks': Number(query.rows[x].votes_on_wronglyclassified),
-        'contribution to crowd error':
-          query.rows[x].votes_on_wronglyclassified == 0
-            ? 0
-            : (query.rows[x].votes_as_crowd / query.rows[x].votes_on_wronglyclassified).toFixed(5) * 100,
-        'precision toward gold truth': (Number(query.rows[x].right_by_gold) / Number(query.rows[x].voted_tasks)).toFixed(5) * 100
-      };
-      //console.log(query.rows)
-      workersCouples.push(workerCouple);
-    }
+    var answers = await db.query(`
+      SELECT t.item_id, 
+          EXTRACT( EPOCH FROM (t.created_at)::TIMESTAMP WITHOUT TIME ZONE) AS delivery, 
+          (t.data->'criteria')::json#>>'{0,id}' AS criteria_id, 
+          (t.data->'criteria')::json#>>'{0,workerAnswer}' AS answer,
+          (CASE WHEN g.gold=(t.data->'criteria')::json#>>'{0,workerAnswer}' THEN true ELSE false END) AS correct,
+            (EXTRACT( EPOCH FROM (t.data->>'end')::TIMESTAMP WITHOUT TIME ZONE)*1000)-
+            (EXTRACT( EPOCH FROM (t.data->>'start')::TIMESTAMP WITHOUT TIME ZONE)*1000) 
+          AS completion
+      FROM ${db.TABLES.Task} t, ${db.TABLES.Worker} u, ${db.TABLES.Gold} g
+      WHERE t.worker_id=u.id
+      AND g.item_id=t.item_id AND g.criteria_id=cast((t.data->'criteria')::json#>>'{0,id}' AS bigint)
+      AND t.worker_id=$2 AND t.job_id=$1 AND (t.data->'answered')='true'`,[jobId,workerId])
+    console.log(answers.rows)
+    //for (var x in query.rows) {
+    let workerCouple = {
+      'worker A': query.rows[0].turk_id,
+      'id': query.rows[0].worker_id,
+      'registered since': query.rows[0].registered,
+      'number of completed tasks': Number(query.rows[0].voted_tasks),
+      'times voted right comparing with crowd truth': Number(query.rows[0].rights),
+      'times voted right comparing with gold truth': Number(query.rows[0].right_by_gold),
+      //'votes AS crowd': Number(query.rows[0].votes_as_crowd),
+      'votes on wrongly classified tasks': Number(query.rows[0].votes_on_wronglyclassified),
+      'contribution to crowd error':
+        query.rows[0].votes_on_wronglyclassified == 0
+          ? 0
+          : (query.rows[0].votes_as_crowd / query.rows[0].votes_on_wronglyclassified).toFixed(5) * 100,
+      'precision toward gold truth': (Number(query.rows[0].right_by_gold) / Number(query.rows[0].voted_tasks)).toFixed(5) * 100,
+      'answers': answers.rows
+    };
+    //console.log(query.rows)
+    workersCouples.push(workerCouple);
+    //}
     return (tasks = { tasks: workersCouples });
   } catch (error) {
     console.error(error);

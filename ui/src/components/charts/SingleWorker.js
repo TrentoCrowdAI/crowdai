@@ -66,7 +66,7 @@ class SingleWorker extends React.Component {
             color={['orange','steelblue','lightgreen']}
             param={[w.chosenitem,w.chosencriteria]}
             selector={'timechart'}
-            data={Object.values(this.props.data)}
+            data={Object.values(this.props.data[0].answers)}
           />
           <strong style={{'color': 'steelblue', 'font-size': '15px'}}>Tasks Completion Times :</strong>
           <br />
@@ -78,7 +78,7 @@ class SingleWorker extends React.Component {
             w={''}
             param={1000}
             selector={'completions_chart'}
-            data={Object.values(this.props.data)}
+            data={Object.values(this.props.data[0].answers)}
           />
           </div>
 
@@ -97,7 +97,7 @@ class SingleWorker extends React.Component {
               color={['orange','steelblue','lightgreen']}
               param={[w.chosenitem,w.chosencriteria]}
               selector={'chart_crowd'}
-              data={Object.values(this.props.data)}
+              data={Object.values(this.props.data[0].answers)}
             />
             <strong style={{'color': 'steelblue'}}>Precision toward Gold Truth :</strong><br />
             Total: <i>{
@@ -112,7 +112,7 @@ class SingleWorker extends React.Component {
               z={['item_id','criteria_id']}
               param={[w.chosenitem,w.chosencriteria]}
               selector={'chart_gold'}
-              data={Object.values(this.props.data)}
+              data={Object.values(this.props.data[0].answers)}
             />
           </div>
           }

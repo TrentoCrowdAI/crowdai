@@ -311,11 +311,11 @@ renderChart(chart,x,y,z,w,param) {
 				param=1
 				break;
 
-			case 'SingleWorker' && this.state.chosenworker!='all':
+			case 'SingleWorker':
 				chart='singleworker'
 				x='number of completed tasks'
 				y='times voted right comparing with gold truth'
-				//z=this.props.reports.tasks[0]
+				z='answers'
 				w=this.state
 				param=this.props.match
 				break;

@@ -24,7 +24,7 @@ class NestChart extends React.Component {
         if (a[order]==b[order] && z!='')
           return (a[z] > b[z]) ? 1 : ((b[z] > a[z]) ? -1 : 0)
         else 
-          return (a[order] > b[order]) ? 1 : ((b[order] > a[order]) ? -1 : 0)
+          return (Number(a[order]) > Number(b[order])) ? 1 : ((Number(b[order]) > Number(a[order])) ? -1 : 0)
       }
     )
     

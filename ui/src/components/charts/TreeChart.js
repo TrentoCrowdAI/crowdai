@@ -402,7 +402,7 @@ class TreeChart extends React.Component {
         </ul>
         <br />
         <br />
-        <svg className={this.props.selector} width='1000' height='500'> </svg>
+        <svg className={this.props.selector} width='900' height='500'> </svg>
         <br />
       </div>
     )

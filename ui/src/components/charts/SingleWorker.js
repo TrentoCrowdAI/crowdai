@@ -63,6 +63,7 @@ class SingleWorker extends React.Component {
             y={'delivery'}
             z={'criteria_id'}
             w={'answer'}
+            color={['orange','steelblue','lightgreen']}
             param={[w.chosenitem,w.chosencriteria]}
             selector={'timechart'}
             data={Object.values(this.props.data)}
@@ -93,7 +94,7 @@ class SingleWorker extends React.Component {
               x={'turk_id'}
               y={'answer'}
               z={['item_id','criteria_id']}
-              color={['orange','steelblue']}
+              color={['orange','steelblue','lightgreen']}
               param={[w.chosenitem,w.chosencriteria]}
               selector={'chart_crowd'}
               data={Object.values(this.props.data)}
@@ -107,7 +108,7 @@ class SingleWorker extends React.Component {
               chart={'pie'}
               x={'turk_id'}
               y={'correct'}
-              color={['lightgreen','orange']}
+              color={['lightgreen','orange','steelblue']}
               z={['item_id','criteria_id']}
               param={[w.chosenitem,w.chosencriteria]}
               selector={'chart_gold'}

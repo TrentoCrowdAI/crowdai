@@ -47,7 +47,8 @@ class TimeLine extends React.Component {
     var z = this.props.z
     var w = this.props.w
     var param = this.props.param
-    
+    var color = this.props.color!=undefined ? d3.scaleOrdinal(this.props.color) : d3.scaleOrdinal(['lightgreen','orange','steelblue'])
+
     var data = this.props.data
 			.filter(d => param[0]==='all' && param[1]==='all' ? true 
 				: param[0]!=='all' && param[1]==='all' ? d[x]===param[0]
@@ -117,7 +118,7 @@ class TimeLine extends React.Component {
       .attr('y', d => -yscale.bandwidth()/4)
       .style('fill','white')
       .style('stroke-width', 2)
-      .style('stroke', d => d[w]===categories[0] ? 'orange' : 'steelblue')
+      .style('stroke', d => color(categories.indexOf(d[w])))
       .attr('width', 5)
       .attr('height', yscale.bandwidth()*1.5)
       .on('mousemove', d => {

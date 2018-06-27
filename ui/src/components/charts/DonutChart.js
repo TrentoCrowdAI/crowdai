@@ -56,7 +56,7 @@ class DonutChart extends React.Component {
         .attr("transform", "translate(" + width/2 + "," + height/2 + ")");
     
     var radius = Math.min(width, height)/2
-    var color = this.props.color!=undefined ? d3.scaleOrdinal(this.props.color) : d3.scaleOrdinal(['lightgreen','orange'])
+    var color = this.props.color!=undefined ? d3.scaleOrdinal(this.props.color) : d3.scaleOrdinal(['lightgreen','orange','steelblue'])
     var donutWidth = 35
     var arc = d3.arc()
       .innerRadius(radius-donutWidth)
@@ -110,7 +110,7 @@ class DonutChart extends React.Component {
       })
         
     donut.append('text')
-      .attr("transform", d => "translate("+arc.centroid(d)+")")
+      .attr("transform", d => "translate("+(arc.centroid(d)+margin.left)+")")
       .attr("fill", "black")
       .style('font-weight','bold')
       .text(d => d.data+", "+d.value)

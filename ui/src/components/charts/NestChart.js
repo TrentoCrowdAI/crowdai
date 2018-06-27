@@ -135,14 +135,12 @@ class NestChart extends React.Component {
     if(data.length>1) {
       g.append("text")
           .attr("fill", "red")
-          .attr("transform", "translate("+width/2+","+
-            ( yscale( (media/param) + d3.max(yscale.domain())/10) )
-            +")"
-          )
+          .attr("transform", "translate("+width/2+","+10+")")
           .attr("text-anchor","middle")
+          .attr('font-weight', 'bold')
           .attr("dy","-0.5em")
           .attr('font-size', y==='completion' ? '11px' : '13px')
-          .text("media ~ "+(media/param).toFixed(3)+" "+this.props.y)
+          .text("average ~ "+(media/param).toFixed(3)+" "+this.props.y)
     }
 
     g.append("g")

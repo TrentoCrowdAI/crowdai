@@ -92,6 +92,7 @@ class DonutChart extends React.Component {
     donut.append('path')
       .attr('d',arc)
       .attr('fill', (d,i) => color(i))
+      .attr('transform','translate('+margin.left+',0)')
       .on('mousemove', d => {
         var stampa = ""
         this.props.data.map(step => step[y]===d.data ? stampa = stampa+
@@ -110,7 +111,7 @@ class DonutChart extends React.Component {
       })
         
     donut.append('text')
-      .attr("transform", d => "translate("+(arc.centroid(d)+margin.left)+")")
+      .attr('transform', d => 'translate('+(arc.centroid(d)[0]+margin.left)+','+arc.centroid(d)[1]+')')
       .attr("fill", "black")
       .style('font-weight','bold')
       .text(d => d.data+", "+d.value)

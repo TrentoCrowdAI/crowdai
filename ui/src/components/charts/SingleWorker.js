@@ -47,11 +47,11 @@ class SingleWorker extends React.Component {
             <br />
             {'Registered since:   '}
             <strong style={{'color': '#2185d0'}}>{
-              new Date(data['registered since']).getDate()
-              +'/'+((new Date(data['registered since']).getMonth())+1)
-              +'/'+new Date(data['registered since']).getFullYear()
-              +' at '+new Date(data['registered since']).getHours()
-              +':'+new Date(data['registered since']).getMinutes()
+              new Date(data['registered since']*1000).getDate()
+              +'/'+((new Date(data['registered since']*1000).getMonth())+1)
+              +'/'+new Date(data['registered since']*1000).getFullYear()
+              +' at '+new Date(data['registered since']*1000).getHours()
+              +':'+new Date(data['registered since']*1000).getMinutes()
               }</strong>
           </React.Fragment>
         </div>

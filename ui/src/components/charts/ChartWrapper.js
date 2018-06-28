@@ -131,7 +131,7 @@ class ChartWrapper extends React.Component {
         )
       default:
         return(
-          <div>
+          <div style={{'padding': 20}}>
             No data to display yet
             <svg width="900"></svg>
           </div>

@@ -244,6 +244,7 @@ renderChart(chart,x,y,z,w,param) {
 				break;
 
 			case 'TwoWorkers':
+				chart=''
 				x=''
 				y=''
 				z=''

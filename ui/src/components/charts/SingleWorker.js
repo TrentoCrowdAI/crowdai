@@ -32,7 +32,7 @@ class SingleWorker extends React.Component {
 
     //buil interface for single worker metrics analysis
     return (
-      <div className='nest'>
+      <div className='nest' style={{'padding': 20}}>
         <br />
 
         {this.props.data.length>0 ?

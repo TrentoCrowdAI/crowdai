@@ -15,7 +15,8 @@ class DonutChart extends React.Component {
   }
 
   dataWrapper() {
-    if(this.props.param=='all') {
+    //to avoid errors before data is retrieved
+    /*if(this.props.param=='all') {
       var crit_filtered_data = this.props.data          
     } else {
       var crit_filtered_data = this.props.data.filter(d => d[this.props.z[1]]==this.props.param )
@@ -29,9 +30,9 @@ class DonutChart extends React.Component {
       g.append("text")
         .text("Choose a Worker")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-    } else {
-      this.buildGraph(crit_filtered_data)
-    }
+    } else {*/
+      this.buildGraph()
+    //}
   }
 
   buildGraph() {
@@ -41,7 +42,9 @@ class DonutChart extends React.Component {
     var z = this.props.z
     var w = this.props.w
     var param = this.props.param
-    
+    var color = this.props.color!=undefined ? d3.scaleOrdinal(this.props.color) : d3.scaleOrdinal(['lightgreen','orange','#2185d0'])
+
+    //dynamic filter of item_id and criteria_id, need param=[0,1]
     var data = this.props.data
 			.filter(d => param[0]==='all' && param[1]==='all' ? true 
 				: param[0]!=='all' && param[1]==='all' ? d[z[0]]===param[0]
@@ -54,9 +57,9 @@ class DonutChart extends React.Component {
     var height = +svg.attr('height') - margin.top - margin.bottom;
     var g = svg.append("g")
         .attr("transform", "translate(" + width/2 + "," + height/2 + ")");
-    
+
+    //build a circle
     var radius = Math.min(width, height)/2
-    var color = this.props.color!=undefined ? d3.scaleOrdinal(this.props.color) : d3.scaleOrdinal(['lightgreen','orange','steelblue'])
     var donutWidth = 35
     var arc = d3.arc()
       .innerRadius(radius-donutWidth)
@@ -64,6 +67,7 @@ class DonutChart extends React.Component {
       .cornerRadius(3)
       .padAngle(0.015)
     
+    //define categories based on parameter
     var categories = Array.from(new Set(data.map(d => d[y])))
 
     var pie = d3.pie()
@@ -72,6 +76,7 @@ class DonutChart extends React.Component {
       })
       .sort(null)
 
+    //append a canvas for each data element
     var donut = g.selectAll('.arc')
       .data(pie(categories))
       .enter().append('g')
@@ -89,6 +94,7 @@ class DonutChart extends React.Component {
 
     tooltip.append('div')
 
+    //fill the circle with percentage sectors
     donut.append('path')
       .attr('d',arc)
       .attr('fill', (d,i) => color(i))
@@ -130,9 +136,6 @@ class DonutChart extends React.Component {
   }
 
   render() {
-    var y = this.props.y
-    var x = this.props.x
-    var z = this.props.z
     return (
       <div>
         <br />

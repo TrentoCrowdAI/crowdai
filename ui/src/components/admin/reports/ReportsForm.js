@@ -64,7 +64,7 @@ class ReportsForm extends React.Component {
       	/>
 
 			<div style={{margin: '20px'}}>
-      	<h3 style={{color: 'steelblue'}}>Chosen Job_id : {this.state.chosenexp}</h3>
+      	<h3 style={{color: '#2185d0'}}>Chosen Job_id : {this.state.chosenexp}</h3>
 
 				<Form.Select 
 					style={{margin: '10px'}}

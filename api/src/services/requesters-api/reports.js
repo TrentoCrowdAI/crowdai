@@ -2,9 +2,9 @@ const Boom = require('boom');
 
 const delegates = require(__base + 'delegates');
 
-const getWorkerAnswers = async ctx => {
+/*const getWorkerAnswers = async ctx => {
   ctx.response.body = await delegates.reports.getWorkerAnswers(ctx.params.jobId, ctx.params.workerId);
-};
+};*/
 
 const getAllTasksTimesByJob = async ctx => {
   ctx.response.body = await delegates.reports.getAllTasksTimesByJob(ctx.params.id);
@@ -22,9 +22,9 @@ const getTasksAgreements = async ctx => {
   ctx.response.body = await delegates.reports.getTasksAgreements(ctx.params.id);
 };
 
-const getWorkersAgreements = async ctx => {
+/*const getWorkersAgreements = async ctx => {
   ctx.response.body = await delegates.reports.getWorkersAgreements(ctx.params.jobId);
-};
+};*/
 
 const getCrowdGolds = async ctx => {
   ctx.response.body = await delegates.reports.getCrowdGolds(ctx.params.jobId);

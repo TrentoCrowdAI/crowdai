@@ -75,7 +75,6 @@ class Reports extends React.Component {
 				this.props.fetchJobStats(this.props.match.params.jobid)
 				//this.props.fetchMetric('global/job/'+this.props.match.params.jobid+'/stats')
 			default:
-				console.log('Metric to implement: ', value)
 				break;
 		}
 
@@ -185,10 +184,10 @@ renderChart(chart,x,y,z,w,param) {
 
 		var MetricOptions = {
 			'Cohen': "Cohen's Kappa",
-			'M1': "Basic Agreement [ M1 ]",
+			'Agreement': "Basic Agreement",
 			'Bennett': "Bennett's S",
-			'WWM2(a|b)': "Probability in Errors [ P_err(A|B) ]",
-			'WWM2(b|a)': "Probability in Errors [ P_err(B|A) ]",
+			'PErr(a|b)': "Probability in Errors [ P_err(A|B) ]",
+			'PErr(b|a)': "Probability in Errors [ P_err(B|A) ]",
 			'Comparing': "Comparing Correlation Metrics"
 		}
 		//parameters for reusable charts
@@ -203,7 +202,7 @@ renderChart(chart,x,y,z,w,param) {
 		switch (this.state.chosenmetric) {
 
 			case 'T_CompleteTime':
-				chart='histogram'
+				chart='histogramChart'
 				x='avgtime_ms'
 				y='item_id'
 				z='criteria_id'
@@ -219,7 +218,7 @@ renderChart(chart,x,y,z,w,param) {
 				break;*/
 
 			case 'Distribution':
-				chart='stacked'
+				chart='stackedBarChart'
 				x='item_id'
 				y=['no','not clear','yes']
 				z='criteria_id'
@@ -236,7 +235,7 @@ renderChart(chart,x,y,z,w,param) {
 				break;*/
 
 			case 'Classification' :
-				chart='treechart'
+				chart='treeChart'
 				x='item_id'
 				y='criteria_id'
 				z=['yes','no']
@@ -252,15 +251,15 @@ renderChart(chart,x,y,z,w,param) {
 				break;
 
 			case 'Cohen':
-				chart='heatmap'
+				chart='heatMapChart'
 				x='worker A'
 				y='worker B'
 				z='cohen\'s kappa correlation'
 				param=1
 				break;
 
-			case 'M1':
-				chart='heatmap'
+			case 'Agreement':
+				chart='heatMapChart'
 				x='worker A'
 				y='worker B'
 				z='basic agreement'
@@ -268,23 +267,23 @@ renderChart(chart,x,y,z,w,param) {
 				break;
 
 			case 'Bennett':
-				chart='heatmap'
+				chart='heatMapChart'
 				x='worker A'
 				y='worker B'
 				z='bennett\'s s'
 				param=1
 				break;
 
-			case 'WWM2(a|b)':
-				chart='heatmap'
+			case 'PErr(a|b)':
+				chart='heatMapChart'
 				x='worker A'
 				y='worker B'
 				z='probability in errors(a|b)'
 				param=1
 				break;
 
-			case 'WWM2(b|a)':
-				chart='heatmap'
+			case 'PErr(b|a)':
+				chart='heatMapChart'
 				x='worker A'
 				y='worker B'
 				z='probability in errors(b|a)'
@@ -292,15 +291,15 @@ renderChart(chart,x,y,z,w,param) {
 				break;
 
 			case 'Contribution':
-				chart='histogram'
-				x='contribution to crowd error'
+				chart='histogramChart'
+				x='% contribution to crowd error'
 				y='id'
 				z='worker A'
 				param=1
 				break;
 
 			case 'Global':
-				chart='grouped'
+				chart='groupedChart'
 				x=['item_id','null']
 				y='F1-score'
 				z='Matthews Correlation Coefficient'
@@ -309,7 +308,7 @@ renderChart(chart,x,y,z,w,param) {
 				break;
 
 			case 'Comparing':
-				chart='grouped'
+				chart='groupedChart'
 				x=['worker A','worker B']
 				y="cohen's kappa correlation"
 				z="basic agreement"
@@ -318,7 +317,7 @@ renderChart(chart,x,y,z,w,param) {
 				break;
 
 			case 'SingleWorker':
-				chart='singleworker'
+				chart='singleWorker'
 				x='number of completed tasks'
 				y='times voted right comparing with gold truth'
 				z='answers'
@@ -335,14 +334,14 @@ renderChart(chart,x,y,z,w,param) {
 				<div className="rowC">
 				{
 							(this.state.chosenmetric==="Cohen"
-							||this.state.chosenmetric==="M1"
+							||this.state.chosenmetric==="Agreement"
 							||this.state.chosenmetric==="Bennett"
-							||this.state.chosenmetric==="WWM2(a|b)"
-							||this.state.chosenmetric==="WWM2(b|a)"
+							||this.state.chosenmetric==="PErr(a|b)"
+							||this.state.chosenmetric==="PErr(b|a)"
 							||this.state.chosenmetric==="TwoWorkers"
 							||this.state.chosenmetric==="Comparing") && 
 							<React.Fragment>
-							<div className='row' style={{'display': 'flex', 'color': 'steelblue'}}>
+							<div className='row' style={{'display': 'flex', 'color': '#2185d0'}}>
 								<br />
 								<MetricChooser 
 									options={MetricOptions}
@@ -380,7 +379,9 @@ renderChart(chart,x,y,z,w,param) {
 
 				<div className="rowC">
 					<div className='options'>
-						<MetricMenu onChange={this.chooseMetric}/>
+						<MetricMenu 
+							chosenmetric={this.state.chosenmetric}
+							onChange={this.chooseMetric}/>
 					</div>
 					{this.renderChart(chart,x,y,z,w,param)}
 				</div>

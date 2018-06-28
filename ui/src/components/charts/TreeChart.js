@@ -50,6 +50,9 @@ class TreeChart extends React.Component {
       //.sort((a,b) => a<b ? -1 : a>b ? 1 : 0)
       ))
 
+    //MAKE ALL THIS DYNAMIC FOR EFFICIENCY
+
+    //compute subset of filtered data
     var y1 = Array.from(new Set(data.filter(d => d[y]===criteria[0] && d[w]===z[0]).map(d => d[x])))
     var n1 = Array.from(new Set(data.filter(d => d[y]===criteria[0] && d[w]===z[1]).map(d => d[x])))
     var yy = []
@@ -64,7 +67,8 @@ class TreeChart extends React.Component {
     var nyn = []
     var nny = []
     var nnn = []
-
+    
+  if (criteria[1]!=undefined) {
     for(var a in y1) {
       yy = yy.concat(Array.from(new Set(
           data
@@ -89,6 +93,8 @@ class TreeChart extends React.Component {
           .map(d => d[x])
         )))
     }
+  }
+  if (criteria[2]!=undefined) {
     for(var a in yy) {
       yyy = yyy.concat(Array.from(new Set(
           data
@@ -137,98 +143,89 @@ class TreeChart extends React.Component {
           .map(d => d[x])
         )))
     }
+  }
     
-    /*var dymo = {}
-    dymo[0]={'name': x, 'answer': 'gg'}
-    console.log(dymo)*/
-
+    //build tree structured data to be displayed
     var treeData = {
       'name': 'Item Id',
       'answer': 'All',
       'num': y1.length+n1.length,
       'items': Array.from(new Set(data.map(d => d[x]))),
-      'children': [
-        {
+      'children': criteria[0]!=undefined ?
+       [{
           'name': 'Criteria '+criteria[0],
           'answer': z[0],
           'num': y1.length,
           'items': y1,
-          'children': [
-            {
+          'children': criteria[1]!=undefined ?
+            [{
               'name': 'Criteria '+criteria[1],
               'answer': z[0],
               'num': yy.length,
               'items': yy,
-              'children': [
-                {'name': 'Criteria '+criteria[2],
-                'num': yyy.length,
-                'items': yyy,
-                'answer': z[0]},
-                {'name': 'Criteria '+criteria[2],
-                'num': yyn.length,
-                'items': yyn,
-                'answer': z[1]}
-              ]
+              'children': criteria[2]!=undefined ?
+                [{'name': 'Criteria '+criteria[2],
+                  'num': yyy.length,
+                  'items': yyy,
+                  'answer': z[0]},
+                  {'name': 'Criteria '+criteria[2],
+                  'num': yyn.length,
+                  'items': yyn,
+                  'answer': z[1]}] : [{}]
             },
             {
               'name': 'Criteria '+criteria[1],
               'answer': z[1],
               'num': yn.length,
               'items': yn,
-              'children': [
-                {'name': 'Criteria '+criteria[2],
-                'num': yny.length,
-                'items': yny,
-                'answer': z[0]},
-                {'name': 'Criteria '+criteria[2],
-                'num': ynn.length,
-                'items': ynn,
-                'answer': z[1]}
-              ]
-            }
-          ]
+              'children': criteria[2]!=undefined ?
+                [{'name': 'Criteria '+criteria[2],
+                  'num': yny.length,
+                  'items': yny,
+                  'answer': z[0]},
+                  {'name': 'Criteria '+criteria[2],
+                  'num': ynn.length,
+                  'items': ynn,
+                  'answer': z[1]}] : [{}]
+            }] : [{}]
         },
         {
           'name': 'Criteria '+criteria[0],
           'num': n1.length,
           'items': n1,
           'answer': z[1],
-          'children': [
-            {
+          'children': criteria[1]!=undefined ?
+            [{
               'name': 'Criteria '+criteria[1],
               'answer': z[0],
               'num': ny.length,
               'items': ny,
-              'children': [
-                {'name': 'Criteria '+criteria[2],
-                'num': nyy.length,
-                'items': nyy,
-                'answer': z[0]},
-                {'name': 'Criteria '+criteria[2],
-                'num': nyn.length,
-                'items': nyn,
-                'answer': z[1]}
-              ]
+              'children': criteria[2]!=undefined ?
+                [{'name': 'Criteria '+criteria[2],
+                  'num': nyy.length,
+                  'items': nyy,
+                  'answer': z[0]},
+                  {'name': 'Criteria '+criteria[2],
+                  'num': nyn.length,
+                  'items': nyn,
+                  'answer': z[1]}] : [{}]
             },
             {
               'name': 'Criteria '+criteria[1],
               'answer': z[1],
               'num': nn.length,
               'items': nn,
-              'children': [
-                {'name': 'Criteria '+criteria[2],
-                'num': nny.length,
-                'items': nny,
-                'answer': z[0]},
-                {'name': 'Criteria '+criteria[2],
-                'num': nnn.length,
-                'items': nnn,
-                'answer': z[1]}
-              ]
-            }
-          ]
-        }
-      ]
+              'children': criteria[2]!=undefined ? 
+                [{'name': 'Criteria '+criteria[2],
+                  'num': nny.length,
+                  'items': nny,
+                  'answer': z[0]},
+                  {'name': 'Criteria '+criteria[2],
+                  'num': nnn.length,
+                  'items': nnn,
+                  'answer': z[1]}] : [{}]
+            }] : [{}]
+        }] : [{}]
     }
 
     var i = 0

@@ -30,11 +30,11 @@ class NestChart extends React.Component {
     
     if(this.props.data.length==0) {
       var svg = d3.select("."+this.props.selector)
-      var margin = {top: 30, right: 30, bottom: 30, left: 30};
+      var margin = {top: 10, right: 30, bottom: 80, left: 40};
       var g = svg.append("g")
 
       g.append("text")
-        .text("Choose a worker")
+        .text("Choose a Worker")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
     } else {
       this.buildGraph()
@@ -48,24 +48,29 @@ class NestChart extends React.Component {
     var y = this.props.y
     var z = this.props.z
     var w = this.props.w
+    var s = this.props.selector
     var param = this.props.param
+
+    //fill color based on specifiec parameter for selecting categories
     var color = w==='correct' ? 
-      this.props.color!=undefined ? d3.scaleOrdinal(this.props.color) : d3.scaleOrdinal(['lightgreen','orange','steelblue'])
+      this.props.color!=undefined ? d3.scaleOrdinal(this.props.color) : d3.scaleOrdinal(['lightgreen','orange','#2185d0'])
       :  'orange'
 
-    //computing average data to display on chart
+    //computing average value of the parameter to display on chart
     var sum = 0
     data.map(step => {
       sum += step[y]
     })
     var media = sum/data.length
+    
+    //choose fill color based on categories of answers, if specified
     var categories = Array.from(new Set(data.map(d => d[w])))
+
     var margin = {top: 10, right: 30, bottom: 80, left: 40};
     var width = +svg.attr("width") - margin.left - margin.right;
     var height = +svg.attr("height") - margin.top - margin.bottom;
     var g = svg.append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-    //var color = 'orange'
 
     var yscale = d3.scaleLinear()
         .rangeRound([height, 0])
@@ -77,16 +82,18 @@ class NestChart extends React.Component {
         .domain(data.map( d => (d[z]!=undefined ? d[x]+", "+d[z] : d[x]) ))
 
     var xAxis = d3.axisBottom(xscale)
-      .tickFormat(d => y==='completion' ? d : (d!=undefined ? d.substring(0,10)+'...' : ""))
+      .tickFormat(d => s==='wcompletion_chart' ? d : (d!=undefined ? d.substring(0,10)+'...' : ""))
 
     var yAxis = d3.axisLeft(yscale)
       .ticks(10)
 
+    //append a canvas for each data element
     var bar = g.selectAll(".bar")
       .data(data)
       .enter().append("g")
         .attr("class","bar")
-          
+    
+    //choose to change fil color on categories or on average value
     bar.append("rect")
       .style("fill", d => 
         {
@@ -108,20 +115,20 @@ class NestChart extends React.Component {
       })
         
     bar.append("text")
-      .attr("dy", ".75em")
-      //.attr("y", d => yscale(d[y]/param)+10 )
-      //.attr("x", d => xscale(d[z]!=undefined ? d[x]+","+d[z] : d[x])+(xscale.bandwidth()/2) )
+      .attr('font-size','12px')
       .attr("text-anchor", "end")
       .style("fill", "white")
-      .attr("transform", d => "translate("+(xscale(d[z]!=undefined ? d[x]+", "+d[z] : d[x])+(xscale.bandwidth()/2)-5)+","+(yscale(d[y]/param)+10)+") rotate(-90)")
+      .attr("transform", d => "translate("+(xscale(d[z]!=undefined ? 
+        d[x]+", "+d[z] : 
+        d[x])+(xscale.bandwidth()/2)-5)+","+(yscale(d[y]/param)+10)+") rotate(-90)")
       .text( d => (d[y]/param).toFixed(1))
 
-    var line = d3.line()
+    //average red line
+    /*var line = d3.line()
       .x( (d) => {return xscale(d[z]!=undefined ? d[x]+", "+d[z] : d[x])} )
       .y( (d) => {return yscale(d[y]/param)} )
 
-    //average red line
-    /*g.append("path")
+    g.append("path")
       .datum([{
         y : media,
         x : data[0][x],
@@ -138,6 +145,7 @@ class NestChart extends React.Component {
       .style("fill","none")
       .style("stroke-width",1)*/
     
+    //if average can be computed, append average value to canvas
     if(data.length>1) {
       g.append("text")
           .attr("fill", "red")
@@ -145,7 +153,7 @@ class NestChart extends React.Component {
           .attr("text-anchor","middle")
           .attr('font-weight', 'bold')
           .attr("dy","-0.5em")
-          .attr('font-size', y==='completion' ? '11px' : '13px')
+          .attr('font-size', s==='wcompletion_chart' ? '11px' : '13px')
           .text("average ~ "+(media/param).toFixed(3)+" "+this.props.y)
     }
 
@@ -186,24 +194,31 @@ class NestChart extends React.Component {
   }
 
   render() {
+    var x = this.props.x
+    var y = this.props.y
+    var s = this.props.selector
+
+    //buttons to sort data on 2 parameters
     return (
       <div className='nest'>
         <svg className={this.props.selector} 
-          width={this.props.y==='completion' ? '700' : '1000'} 
-          height={this.props.y==='completion' ? '300' : '500'}> </svg>
+          width={s==='wcompletion_chart' ? '700' : '900'} 
+          height={'400'}//s==='wcompletion_chart' ? '400' : '400'}
+        > 
+        </svg>
         <br />
       { this.props.data.length ? 
         <React.Fragment>
 
           <Button
-            onClick={(event) => this.setState({ order: this.props.y }) }
+            onClick={(event) => this.setState({ order: y }) }
             style={{marginBottom: '5px'}}
-          >Sort {this.props.y}</Button>
+          >Sort {y}</Button>
 
           <Button
-            onClick={(event) => this.setState({ order: this.props.x }) }
+            onClick={(event) => this.setState({ order: x }) }
             style={{marginBottom: '5px'}}
-          >Sort {this.props.x}</Button>
+          >Sort {x}</Button>
 
         </React.Fragment> : " "
       }

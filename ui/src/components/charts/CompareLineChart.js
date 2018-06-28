@@ -15,13 +15,14 @@ class CompareLineChart extends React.Component {
   }
 
   dataWrapper() {
+    //to avoid error before data is retrieved
     if(this.props.data.length===0) {
       var svg = d3.select("."+this.props.selector)
-      var margin = {top: 10, right: 30, bottom: 30, left: 30};
+      var margin = {top: 30, right: 30, bottom: 30, left: 30};
       var g = svg.append("g")
 
       g.append("text")
-        .text("Choose a Metric")
+        .text("No data on this Job yet")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
     } else {
       this.buildGraph()
@@ -47,7 +48,8 @@ class CompareLineChart extends React.Component {
     var z = this.props.z
     var w = this.props.w
     
-    var data = this.props.data.sort( (a,b) => a[this.state.order]<b[this.state.order] ? 1 : a[this.state.order]>b[this.state.order] ? -1 : 0 )
+    var data = this.props.data.sort( (a,b) => 
+      a[this.state.order]<b[this.state.order] ? 1 : a[this.state.order]>b[this.state.order] ? -1 : 0 )
     
     var xscale = d3.scaleBand()
         .domain( data.map(d => d[x[0]]+", "+d[x[1]]) )
@@ -91,6 +93,7 @@ class CompareLineChart extends React.Component {
        .attr("class","y axis")
        .call(yAxis)
 
+    //build a line and points for every requested parameter
     var line1 = d3.line()
       .x( d => xscale(d[x[0]]+", "+d[x[1]]) )
       .y( d => yscale(d[y]) )
@@ -111,7 +114,7 @@ class CompareLineChart extends React.Component {
       .attr("class","original")
       .attr("id", "cohen")
       .attr("d", line1)
-      .style("stroke", 'steelblue')
+      .style("stroke", '#2185d0')
       .style("fill","none")
       .style("stroke-width",1)
       
@@ -133,6 +136,7 @@ class CompareLineChart extends React.Component {
       .style("fill","none")
       .style("stroke-width",1)
 
+    //zoom event beyond points not to overlap tooltip for data
     g.append("rect")
       .attr("class","zoom")
       .attr("width", width)
@@ -160,7 +164,7 @@ class CompareLineChart extends React.Component {
     var points1 = g.selectAll(".dot1")
         .data(data).enter()
           .append("circle")
-          .style("fill", 'steelblue')
+          .style("fill", '#2185d0')
           .attr("class","dot")
           .attr("cx", d => xscale(d[x[0]]+", "+d[x[1]]) )
           .attr("cy", d => yscale(d[y]) )
@@ -179,10 +183,11 @@ class CompareLineChart extends React.Component {
           .on("mouseout", d => tooltip.style('visibility', 'hidden'))
 
     function zoomFunction() {
+      //create a new scale based on zoom event
       xscale.range([0,width].map(d => d3.event.transform.applyX(d)))
-
       gx.call(d3.axisBottom(xscale))
 
+      //rescale all components that need to be zoomed
       line1.x(d => xscale(d[x[0]]+", "+d[x[1]]))
       line2.x(d => xscale(d[x[0]]+", "+d[x[1]]))
       line3.x(d => xscale(d[x[0]]+", "+d[x[1]]))
@@ -194,16 +199,6 @@ class CompareLineChart extends React.Component {
       points1.attr("cx", d => xscale(d[x[0]]+", "+d[x[1]]) )
       points2.attr("cx", d => xscale(d[x[0]]+", "+d[x[1]]) )
       points3.attr("cx", d => xscale(d[x[0]]+", "+d[x[1]]) )
-
-      //to zoom y axis
-      /*var new_yscale = d3.event.transform.rescaleY(yscale)
-      gy.call(yAxis.scale(d3.event.transform.rescaleY(yscale)))
-
-      line1.y(d => new_yscale(d[y]))
-      line2.y(d => new_yscale(d[z]))
-
-      path1.attr("d",line1)
-      path2.attr("d",line2)*/
     }
 
   }
@@ -222,7 +217,8 @@ class CompareLineChart extends React.Component {
     var y = this.props.y
     var z = this.props.z
     var w = this.props.w
-    //var j = this.props.j
+    
+    //buttons to order data by each parameter
     return(
       <div>
         <br />
@@ -246,7 +242,7 @@ class CompareLineChart extends React.Component {
             >Sort {this.props.w}</Button>
           </React.Fragment> : " " }
         <br />
-        <strong style={{color: 'steelblue'}}>> {y.toUpperCase()}</strong>:
+        <strong style={{color: '#2185d0'}}>> {y.toUpperCase()}</strong>:
         <br />
         {y==="cohen's kappa correlation" ?
           <div>

@@ -338,7 +338,7 @@ const getSingleWorker = (exports.getSingleWorker = async (jobId, workerId) => {
           (CASE WHEN g.gold=(t.data->'criteria')::json#>>'{0,workerAnswer}' THEN true ELSE false END) AS correct,
             (EXTRACT( EPOCH FROM (t.data->>'end')::TIMESTAMP WITHOUT TIME ZONE)*1000)-
             (EXTRACT( EPOCH FROM (t.data->>'start')::TIMESTAMP WITHOUT TIME ZONE)*1000) 
-          AS completion
+          AS "completion time"
       FROM ${db.TABLES.Task} t, ${db.TABLES.Worker} u, ${db.TABLES.Gold} g
       WHERE t.worker_id=u.id
       AND g.item_id=t.item_id AND g.criteria_id=cast((t.data->'criteria')::json#>>'{0,id}' AS bigint)
@@ -411,7 +411,7 @@ const getContribution = (exports.getContribution = async jobId => {
         'id': query.rows[x].worker_id,
         'number of completed tasks': Number(query.rows[x].voted_tasks),
         'precision toward crowd truth': Number((Number(query.rows[x].rights) / Number(query.rows[x].voted_tasks)).toFixed(5) * 100),
-        'contribution to crowd error':
+        '% contribution to crowd error':
           query.rows[x].votes_on_wronglyclassified == 0
             ? 0
             : (query.rows[x].votes_as_crowd / query.rows[x].votes_on_wronglyclassified).toFixed(4) * 100

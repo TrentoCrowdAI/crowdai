@@ -16,11 +16,13 @@ class GroupedChart extends React.Component {
   dataWrapper() {
     if(this.props.data.length===0) {
       var svg = d3.select("."+this.props.selector)
-      var margin = {top: 10, right: 30, bottom: 30, left: 30};
+      var margin = {top: 30, right: 30, bottom: 30, left: 30};
       var g = svg.append("g")
 
       g.append("text")
-        .text("Choose a Metric")
+        .text("No data retrieved, try to Reload or check selected Job")
+        .attr('font-weight', 'bold')
+        .attr('font-size', '15px')
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
     } else {
       this.buildGraph()
@@ -46,8 +48,10 @@ class GroupedChart extends React.Component {
     var z = this.props.z
     var w = this.props.w
     
-    var data = this.props.data.sort( (a,b) => a[this.state.order]<b[this.state.order] ? 1 : a[this.state.order]>b[this.state.order] ? -1 : 0 )
+    var data = this.props.data.sort( (a,b) => 
+      a[this.state.order]<b[this.state.order] ? 1 : a[this.state.order]>b[this.state.order] ? -1 : 0 )
     
+    //in this case we need 2 x scales, one for the element, and one for the 3 bars to place
     var x0scale = d3.scaleBand()
       .range([0,width])
       .paddingInner(0.1)
@@ -59,8 +63,9 @@ class GroupedChart extends React.Component {
       .range([height,0])
     
     var colorscale = d3.scaleOrdinal()
-      .range(['steelblue','orange','lightgreen'])
+      .range(['#2185d0','orange','lightgreen'])
 
+    //define the 3 metrics to represent
     var keys = [y,z,w]
 
     x0scale.domain( data.map(d => (d[x[0]]+ (x[1]!=='null' ? (', '+d[x[1]]) : '' )) ))
@@ -83,6 +88,7 @@ class GroupedChart extends React.Component {
 
     tooltip.append('div')
 
+    //append a canvas for each data element
     var bars = g.append('g')
       .selectAll('g')
       .data(data)
@@ -103,6 +109,7 @@ class GroupedChart extends React.Component {
           tooltip.style('visibility', 'hidden')
         })
     
+    //build one bar per each metric for each element
     var rects = bars.selectAll('rect')
       .data(d => keys.map(k => { return {'key': k, 'value': d[k]} }))
       .enter().append('rect')
@@ -139,6 +146,7 @@ class GroupedChart extends React.Component {
         .text('metrics')
 
     function zoomFunction() {
+      //create both new scales based on zoom event
       x0scale.range([0,width].map(d => d3.event.transform.applyX(d)))
       x1scale.range([0, x0scale.bandwidth()])
 
@@ -146,7 +154,9 @@ class GroupedChart extends React.Component {
         .axisBottom(x0scale)
         .tickFormat(""))
 
+      //rescale all components that need to be zoomed
       bars.attr('transform', d => 'translate('+x0scale(d[x[0]]+ (x[1]!=='null' ? (', '+d[x[1]]) : '') )+',0)')
+
       rects.attr('x', d => x1scale(d.key))
       rects.attr('width', d => x1scale.bandwidth())
     }
@@ -167,8 +177,12 @@ class GroupedChart extends React.Component {
     var y = this.props.y
     var z = this.props.z
     var w = this.props.w
+
+    //buttons to order data by each parameter
     return(
       <div>
+        <br />
+        <svg className={this.props.selector} width='900' height='400'> </svg>
         <br />
         { this.props.data.length ? 
         <React.Fragment>
@@ -189,9 +203,7 @@ class GroupedChart extends React.Component {
         </React.Fragment> : " "
         }
         <br />
-        <svg className={this.props.selector} width='900' height='500'> </svg>
-        <br />
-        <strong style={{color: 'steelblue'}}>> {y.toUpperCase()}</strong>:
+        <strong style={{color: '#2185d0'}}>> {y.toUpperCase()}</strong>:
         <br />
         {y==="cohen's kappa correlation" ?
           <div>

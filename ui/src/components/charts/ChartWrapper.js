@@ -1,20 +1,18 @@
 import React from 'react'
 //import * as d3 from 'd3'
 import {connect} from 'react-redux'
-//import PropTypes from 'prop-types'
+import PropTypes from 'prop-types'
 
-//import SimpleLineChart from './SimpleLineChart.js'
-import Histogram from './Histogram.js'
-import HeatMap from './HeatMap.js'
-//import AreaChart from './AreaChart.js'
+import HistogramChart from './HistogramChart'
+import HeatMapChart from './HeatMapChart'
 import NestChart from './NestChart.js'
-import StackedBar from './StackedBar.js'
+import StackedBarChart from './StackedBarChart.js'
 import DonutChart from './DonutChart.js'
 import CompareLineChart from './CompareLineChart'
 import TreeChart from './TreeChart'
 import GroupedChart from './GroupedChart'
 import SingleWorker from './SingleWorker'
-import TimeLine from './TimeLine'
+import TimeLineChart from './TimeLineChart'
 
 class ChartWrapper extends React.Component {
 
@@ -51,23 +49,23 @@ class ChartWrapper extends React.Component {
 
   render() {
     switch(this.props.chart) {
-      case 'histogram':
+      case 'histogramChart':
         return(
           <div>
-          <Histogram
+          <HistogramChart
             {... this.props}
             />
           </div>
         );
-      case 'heatmap':
+      case 'heatMapChart':
         return(
           <div>
-            <HeatMap 
+            <HeatMapChart
               {... this.props}
               />
           </div>
         );
-      case 'pie': 
+      case 'donutChart': 
         return(
           <div>
             <DonutChart
@@ -75,7 +73,7 @@ class ChartWrapper extends React.Component {
             />
           </div>
         );
-      case 'nest': 
+      case 'nestChart': 
         return(
           <div>
             <NestChart
@@ -83,15 +81,15 @@ class ChartWrapper extends React.Component {
             />
           </div>
         );
-      case 'stacked':
+      case 'stackedBarChart':
         return(
           <div>
-            <StackedBar 
+            <StackedBarChart 
               {... this.props}
             />
           </div>
         );
-      case 'linemetricchart':
+      case 'compareLineChart':
         return(
           <div>
             <CompareLineChart
@@ -99,7 +97,7 @@ class ChartWrapper extends React.Component {
             />
           </div>
         );
-      case 'treechart':
+      case 'treeChart':
         return(
           <div>
             <TreeChart
@@ -107,7 +105,7 @@ class ChartWrapper extends React.Component {
             />
           </div>
         );
-      case 'grouped':
+      case 'groupedChart':
         return(
           <div>
             <GroupedChart
@@ -115,7 +113,7 @@ class ChartWrapper extends React.Component {
             />
           </div>
         );
-      case 'singleworker':
+      case 'singleWorker':
         return(
           <div>
             <SingleWorker
@@ -123,10 +121,10 @@ class ChartWrapper extends React.Component {
             />
           </div>
         );
-      case 'timeline':
+      case 'timeLineChart':
         return(
           <div>
-            <TimeLine
+            <TimeLineChart
               {...this.props}
             />
           </div>

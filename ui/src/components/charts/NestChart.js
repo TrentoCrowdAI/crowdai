@@ -115,12 +115,19 @@ class NestChart extends React.Component {
       })
         
     bar.append("text")
-      .attr('font-size','12px')
-      .attr("text-anchor", "end")
-      .style("fill", "white")
-      .attr("transform", d => "translate("+(xscale(d[z]!=undefined ? 
-        d[x]+", "+d[z] : 
-        d[x])+(xscale.bandwidth()/2)-5)+","+(yscale(d[y]/param)+10)+") rotate(-90)")
+      .attr('font-size','13px')
+      .attr("text-anchor", "start")
+      .style('font-weight','bold')
+      .style("fill", d => 
+        {
+          if(w==='correct') {return color(categories.indexOf(d[w]))}
+          else if(d[y]>=media) {return color}
+          else {return "lightgreen"}
+        })
+      .attr("transform", d => "translate("+(
+          xscale( d[z]!=undefined ? d[x]+", "+d[z] : d[x] )
+          +((xscale.bandwidth()/2)+5)
+        )+","+(yscale(d[y]/param)-10)+") rotate(-65)")
       .text( d => (d[y]/param).toFixed(1))
 
     //average red line

@@ -64,7 +64,7 @@ class HistogramChart extends React.Component {
     //map data on intervals
     var histo = d3.histogram()
       .thresholds(xscale.ticks(10))
-      (data.map(d => d[x]===0 ? d[x]/param : ((d[x]/param)-1) ))
+      (data.map(d => d[x]===0 ? d[x]/param : ((d[x]/param)-param) ))
 
     //every interval bar with a height equal to the number of corresponding elements
     var yscale = d3.scaleLinear()
@@ -78,14 +78,14 @@ class HistogramChart extends React.Component {
       .enter().append("g")
       .attr("class", "bar")
       .attr("transform", d => "translate("+
-        ( d.x0===d3.min(data, d => ((d[x]/param)-1)) ? xscale(d3.min(xscale.domain())) : xscale(d.x0) )
+        ( d.x0===d3.min(data, d => ((d[x]/param)-param)) ? xscale(d3.min(xscale.domain())) : xscale(d.x0) )
         +","+yscale(d.length)+")")
 
     bar.append("rect")
       .style("fill", color )
       .attr("x", 1)
       .attr("width", d => 
-        xscale( (d3.max(xscale.domain()) / ((xscale.ticks().length)-1)) )-1
+        xscale( (d3.max(xscale.domain()) / ((xscale.ticks().length)-1)) )-param
       )
       .attr("height", d => height-yscale(d.length) )
       .on("mouseover", function() {
@@ -106,7 +106,7 @@ class HistogramChart extends React.Component {
         console.log(d.x0,d.x1)
         data.map( step => (
           d.x0===d3.min(xscale.domain()) ? (step[x]/param>=d.x0 && step[x]/param<=d.x1)
-          : d.x1===d3.max(xscale.domain())-1 ? (step[x]/param>d.x0)
+          : d.x1===d3.max(xscale.domain())-param ? (step[x]/param>d.x0)
           : (step[x]/param>d.x0 && step[x]/param<=d.x1)
         ) ? nuovo = nuovo.concat([step]) : null )
 
@@ -120,6 +120,7 @@ class HistogramChart extends React.Component {
           xscale( (d3.max(xscale.domain()) / (xscale.ticks().length-1))/2 )
         )
       .attr("text-anchor", "middle")
+      .style('font-weight','bold')
       .style("fill", "steelblue")
       .text( d => d.length ? d.length : null)
 

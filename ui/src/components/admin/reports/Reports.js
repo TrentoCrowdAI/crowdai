@@ -56,24 +56,19 @@ class Reports extends React.Component {
 				break;
 			case 'TwoWorkers':
 				this.props.reports.tasks=[]
-				//this.props.fetchMetric('ww/job/'+this.props.match.params.jobid+'/stats');
 				this.props.fetchWorkersPairs(this.props.match.params.jobid)
 				break;
 			case 'SingleWorker':
 				this.props.reports.tasks=[]
-				//this.props.fetchMetric('worker/job/'+this.props.match.params.jobid+'/contribution');
-				//this.props.fetchAnswers(this.props.match.params.jobid,Number(this.state.chosenworker))
-				this.props.fetchSingleWorker(this.props.match.params.jobid,this.state.chosenworker)
+				this.props.fetchContribution(this.props.match.params.jobid)
 				break;
 			case 'Contribution':
 				this.props.reports.tasks=[]
 				this.props.fetchContribution(this.props.match.params.jobid)
-				//this.props.fetchMetric('worker/job/'+this.props.match.params.jobid+'/contribution');
 				break;
 			case 'Global':
 				this.props.reports.tasks=[]
 				this.props.fetchJobStats(this.props.match.params.jobid)
-				//this.props.fetchMetric('global/job/'+this.props.match.params.jobid+'/stats')
 			default:
 				break;
 		}
@@ -81,39 +76,29 @@ class Reports extends React.Component {
 		this.setState({
 			...this.state,
 			chosenmetric: value,
-			activeworker: /*value==='W_CompleteTime'||value==='Percentage'||*/value==='SingleWorker' ? true : false,
-			chosenworker: /*value==='W_CompleteTime'||value==='Percentage'||*/value==='SingleWorker' ? this.state.chosenworker : 'all',
+			activeworker: value==='SingleWorker' ? true : false,
+			chosenworker: value==='SingleWorker' ? this.state.chosenworker : 'all',
 			chosenitem: value==='Distribution'||value==='SingleWorker' ? this.state.chosenitem : 'all',
-			chosencriteria: /*value==='Percentage'||*/value==='Distribution'||value==='SingleWorker' ? this.state.chosencriteria : 'all',
+			chosencriteria: value==='Distribution'||value==='SingleWorker' ? this.state.chosencriteria : 'all',
 			activeitem: value==='Distribution'||value==='SingleWorker' ? true : false,
-			activecriteria: /*value==='Percentage'||*/value==='Distribution'||value==='SingleWorker' ? true : false
+			activecriteria: value==='Distribution'||value==='SingleWorker' ? true : false
 		})
 	}
 
 	chooseWorker(e, {value}) {
-		switch(this.state.chosenmetric) {
-			/*case 'Percentage':
-				if (value==='all')
-					this.props.reports.tasks = []
-				else
-					this.props.fetchAnswers(this.props.match.params.jobid,Number(value))
-				break;*/
+		this.props.fetchSingleWorker(this.props.match.params.jobid,Number(value))
+		/*switch(this.state.chosenmetric) {
 			case 'SingleWorker':
 				if (value==='all') {
 					this.props.reports.tasks = []
 				} else {
+					this.props.reports.tasks = []
 					this.props.fetchSingleWorker(this.props.match.params.jobid,Number(value))
 				}
 				break;
-			/*case 'W_CompleteTime':
-				if (value==='all')
-					this.props.reports.tasks = []
-				else
-					this.props.fetchWorkerTimes(this.props.match.params.jobid,Number(value))
-				break;*/
 			default:
 				break;
-		}
+		}*/
 
 		this.setState({
 			...this.state, 
@@ -157,18 +142,16 @@ renderChart(chart,x,y,z,w,param) {
 	}
 
 	render() {
-		console.log('reports tasks ',this.props.reports.tasks)
-		//console.log('single worker tasks ',this.props.single.tasks)
-		
+		console.log('reports tasks ',this.props)
+		console.log(this.state)
 		//refresh options for charts with new loaded data every time
 		var WorkerOptions =  { 'all' : 'All Workers' }
 		Object.values(this.props.workers.workers).map( step => {
       WorkerOptions[step.worker_id] = step.turk_id
 		});
-		
 		var ItemOptions = { 'all': 'All Items' }
 		Object.values(
-			(this.state.chosenmetric==='SingleWorker' && this.props.reports.tasks.length)
+			(this.state.chosenmetric==='SingleWorker' && this.props.reports.tasks.length==1)
 				? this.props.reports.tasks[0].answers : this.props.reports.tasks
 		).map( step => {
       ItemOptions[step.item_id] = step.item_id
@@ -176,7 +159,7 @@ renderChart(chart,x,y,z,w,param) {
 
 		var CritOptions = { 'all' : 'All Criteria' }
 		Object.values(
-			(this.state.chosenmetric==='SingleWorker' && this.props.reports.tasks.length)
+			(this.state.chosenmetric==='SingleWorker' && this.props.reports.tasks.length==1)
 				? this.props.reports.tasks[0].answers : this.props.reports.tasks
 		).map( step => {
       CritOptions[step.criteria_id] = step.criteria_id
@@ -191,12 +174,12 @@ renderChart(chart,x,y,z,w,param) {
 			'Comparing': "Comparing Correlation Metrics"
 		}
 		//parameters for reusable charts
-		var chart //to define kind of chart
-		var x //first group_by
-		var y //categories
-		var z //second group_by if necessary
-		var w
-		var param='' //just used in some charts to add more details
+		var chart = ''
+		var x = ''
+		var y = ''
+		var z = ''
+		var w = ''
+		var param = ''
 
 		//show different reports
 		switch (this.state.chosenmetric) {
@@ -209,14 +192,6 @@ renderChart(chart,x,y,z,w,param) {
 				param=1000
 				break;
 
-			/*case 'W_CompleteTime':
-				chart='nest'
-				x='item_id'
-				y='avgtime_ms'
-				z='criteria_id'
-				param=1000
-				break;*/
-
 			case 'Distribution':
 				chart='stackedBarChart'
 				x='item_id'
@@ -224,15 +199,6 @@ renderChart(chart,x,y,z,w,param) {
 				z='criteria_id'
 				param=[this.state.chosenitem,this.state.chosencriteria]
 				break;
-
-			/*case 'Percentage':
-				chart=''
-				x=''
-				y=''
-				z=''
-				w=''
-				param=''
-				break;*/
 
 			case 'Classification' :
 				chart='treeChart'
@@ -243,87 +209,79 @@ renderChart(chart,x,y,z,w,param) {
 				param=this.state.chosenitem
 				break;
 
-			case 'TwoWorkers':
-				chart=''
-				x=''
-				y=''
-				z=''
-				param=1
-				break;
-
 			case 'Cohen':
 				chart='heatMapChart'
-				x='worker A'
-				y='worker B'
-				z='cohen\'s kappa correlation'
+				x='worker_A'
+				y='worker_B'
+				z='cohen_kappa'
 				param=1
 				break;
 
 			case 'Agreement':
 				chart='heatMapChart'
-				x='worker A'
-				y='worker B'
-				z='basic agreement'
+				x='worker_A'
+				y='worker_B'
+				z='agreement'
 				param=1
 				break;
 
 			case 'Bennett':
 				chart='heatMapChart'
-				x='worker A'
-				y='worker B'
-				z='bennett\'s s'
+				x='worker_A'
+				y='worker_B'
+				z='bennett_S'
 				param=1
 				break;
 
 			case 'PErr(a|b)':
 				chart='heatMapChart'
-				x='worker A'
-				y='worker B'
-				z='probability in errors(a|b)'
+				x='worker_A'
+				y='worker_B'
+				z='a_error_dependency'
 				param=1
 				break;
 
 			case 'PErr(b|a)':
 				chart='heatMapChart'
-				x='worker A'
-				y='worker B'
-				z='probability in errors(b|a)'
+				x='worker_A'
+				y='worker_B'
+				z='b_error_dependency'
 				param=1
 				break;
 
 			case 'Contribution':
 				chart='histogramChart'
-				x='% contribution to crowd error'
+				x='error_contribution'
 				y='id'
-				z='worker A'
+				z='worker_A'
 				param=1
 				break;
 
 			case 'Global':
 				chart='groupedChart'
 				x=['item_id','null']
-				y='F1-score'
-				z='Matthews Correlation Coefficient'
-				w='Diagnostic Odds Ratio'
+				y='f1_score'
+				z='matthews_correlation'
+				w='diagnostic_odds_ratio'
 				param=1
 				break;
 
 			case 'Comparing':
 				chart='groupedChart'
-				x=['worker A','worker B']
-				y="cohen's kappa correlation"
-				z="basic agreement"
-				w="bennett\'s s"
+				x=['worker_A','worker_B']
+				y='cohen_kappa'
+				z='agreement'
+				w='bennett_S'
 				param=1
 				break;
 
 			case 'SingleWorker':
 				chart='singleWorker'
-				x='number of completed tasks'
-				y='times voted right comparing with gold truth'
+				x='total_tasks'
+				y='tasks_right_for_gold'
 				z='answers'
-				w=this.state
-				param=this.props.match
+				w=this.chooseWorker
+				param=this.state
 				break;
 
 			default:
@@ -395,10 +353,7 @@ renderChart(chart,x,y,z,w,param) {
 Reports.propTypes = {
 	fetchTaskTime: PropTypes.func,
 	fetchWorkers: PropTypes.func,
-	//fetchAnswers: PropTypes.func,
-	//fetchWorkerTimes: PropTypes.func,
 	fetchTasksAgreements: PropTypes.func,
-	//fetchWorkersAgreements: PropTypes.func,
 	fetchCrowdGolds: PropTypes.func,
 	fetchWorkersPairs: PropTypes.func,
 	fetchSingleWorker: PropTypes.func,
@@ -420,12 +375,8 @@ Reports.propTypes = {
 
 const mapDispatchToProps = dispatch => ({
 	fetchTaskTime: jobId => dispatch(actions.fetchTaskTime(jobId)),
-	//fetchWorkerTimes: (jobId,workerId) => dispatch(actions.fetchWorkerTimes(jobId,workerId)),
-	//fetchAnswers: (jobId,workerId) => dispatch(actions.fetchAnswers(jobId,workerId)),
 	fetchWorkers: jobId => dispatch(actions.fetchWorkers(jobId)),
 	fetchTasksAgreements: jobId => dispatch(actions.fetchTasksAgreements(jobId)),
-	//fetchWorkersAgreements: jobId => dispatch(actions.fetchWorkersAgreements(jobId)),
-	//fetchMetric : metric => dispatch(actions.fetchMetric(metric)),
 	fetchCrowdGolds: jobId => dispatch(actions.fetchCrowdGolds(jobId)),
 	fetchWorkersPairs: jobId => dispatch(actions.fetchWorkersPairs(jobId)),
 	fetchSingleWorker: (jobId,workerId) => dispatch(actions.fetchSingleWorker(jobId,workerId)),
@@ -441,10 +392,6 @@ const mapStateToProps = state => ({
 	workers: state.report.wlist.workers,
 	worker_error: state.report.wlist.error,
 	worker_loading: state.report.wlist.loading,
-
-	/*single: state.report.single_list.reports,
-	single_error: state.report.single_list.error,
-	single_loading: state.report.single_list.loading,*/
 })
 
 export default connect(mapStateToProps,mapDispatchToProps)(Reports)

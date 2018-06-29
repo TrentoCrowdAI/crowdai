@@ -4,10 +4,11 @@ import {connect} from 'react-redux'
 import PropTypes from 'prop-types'
 
 import HistogramChart from './HistogramChart'
+import BubbleChart from './BubbleChart'
 import HeatMapChart from './HeatMapChart'
 import NestChart from './NestChart.js'
-import StackedBarChart from './StackedBarChart.js'
-import DonutChart from './DonutChart.js'
+import StackedBarChart from './StackedBarChart'
+import DonutChart from './DonutChart'
 import CompareLineChart from './CompareLineChart'
 import TreeChart from './TreeChart'
 import GroupedChart from './GroupedChart'
@@ -125,6 +126,14 @@ class ChartWrapper extends React.Component {
         return(
           <div>
             <TimeLineChart
+              {...this.props}
+            />
+          </div>
+        )
+      case 'bubbleChart':
+        return(
+          <div>
+            <BubbleChart
               {...this.props}
             />
           </div>

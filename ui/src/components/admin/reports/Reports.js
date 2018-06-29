@@ -141,8 +141,7 @@ renderChart(chart,x,y,z,w,param) {
 	}
 
 	render() {
-		console.log('workers',this.props.workers.workers)
-		console.log('tasks',this.props.reports.tasks)
+		console.log('reports data: ',this.props.reports.tasks)
 
 		//refresh options for charts with new loaded data every time
 		var WorkerOptions =  { 'all' : 'All Workers' }
@@ -280,7 +279,7 @@ renderChart(chart,x,y,z,w,param) {
 			case 'SingleWorker':
 				chart='singleWorker'
 				x='total_tasks'
-				y='tasks_right_for_gold'
+				y=['tasks_right_for_gold','tasks_right_for_crowd']
 				z=this.props.workers.workers
 				w=this.chooseWorker
 				param=this.state

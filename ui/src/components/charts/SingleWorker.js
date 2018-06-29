@@ -32,7 +32,6 @@ class SingleWorker extends React.Component {
   }
 
   render() {
-    console.log(this.props)
     var data = this.props.data[0]
     var x = this.props.x
     var y = this.props.y
@@ -146,12 +145,13 @@ class SingleWorker extends React.Component {
               z={['item_id','criteria_id']}
               color={['orange','#2185d0','lightgreen']}
               param={[param.chosenitem,param.chosencriteria]}
-              selector={'chart_crowd'}
+              selector={'chart_distribution'}
               data={param.chosenworker==='all' ? [] : Object.values(data.answers)}
             />
+
             <strong style={{'color': '#2185d0'}}>Precision toward Gold Truth :</strong><br />
             Total: <i>{
-              ((data[y]/data[x])*100).toFixed(3)
+              ((data[y[0]]/data[x])*100).toFixed(3)
               } %</i>
 
             <ChartWrapper 
@@ -164,6 +164,23 @@ class SingleWorker extends React.Component {
               selector={'chart_gold'}
               data={param.chosenworker==='all' ? [] : Object.values(data.answers)}
             />
+
+            <strong style={{'color': '#2185d0'}}>Precision toward Crowd Truth :</strong><br />
+            Total: <i>{
+              ((data[y[1]]/data[x])*100).toFixed(3)
+              } %</i>
+
+            <ChartWrapper 
+              chart={'donutChart'}
+              x={'turk_id'}
+              y={'crowd_correct'}
+              color={['#2185d0','lightgreen','orange']}
+              z={['item_id','criteria_id']}
+              param={[param.chosenitem,param.chosencriteria]}
+              selector={'chart_crowd'}
+              data={param.chosenworker==='all' ? [] : Object.values(data.answers)}
+            />
+
           </div>
 
         </div>

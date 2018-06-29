@@ -265,14 +265,29 @@ const getSingleWorker = (exports.getSingleWorker = async (jobId, workerId) => {
           (t.data->'criteria')::json#>>'{0,id}' AS criteria_id, 
           (t.data->'criteria')::json#>>'{0,workerAnswer}' AS answer,
           (CASE WHEN g.gold=(t.data->'criteria')::json#>>'{0,workerAnswer}' THEN true ELSE false END) AS correct,
+          (CASE WHEN crowd.answer=(t.data->'criteria')::json#>>'{0,workerAnswer}' THEN true ELSE false END) AS crowd_correct,
             (EXTRACT( EPOCH FROM (t.data->>'end')::TIMESTAMP WITHOUT TIME ZONE)*1000)-
             (EXTRACT( EPOCH FROM (t.data->>'start')::TIMESTAMP WITHOUT TIME ZONE)*1000) 
           AS completion_time
-      FROM ${db.TABLES.Task} t, ${db.TABLES.Worker} u, ${db.TABLES.Gold} g
+      FROM ${db.TABLES.Task} t, ${db.TABLES.Worker} u, ${db.TABLES.Gold} g, (
+        SELECT a.item_id, (a.data->'criteria')::json#>>'{0,id}' AS criteria_id,
+          (SELECT (b.data->'criteria')::json#>>'{0,workerAnswer}'
+          FROM ${db.TABLES.Task} b
+          WHERE b.item_id=a.item_id AND (b.data->'answered')='true'
+          --AND b.worker_id NOT IN (SELECT * FROM ${db.TABLES.Excluded}) AND b.job_id=$1
+          GROUP BY b.item_id,(b.data->'criteria')::json#>>'{0,id}',(b.data->'criteria')::json#>>'{0,workerAnswer}'
+          ORDER BY COUNT(*) desc
+          limit 1) AS answer
+        FROM ${db.TABLES.Task} a
+        WHERE a.job_id=$1 AND (a.data->'answered')='true'
+        --AND a.worker_id NOT IN (SELECT * FROM ${db.TABLES.Excluded})
+        GROUP BY a.item_id, (a.data->'criteria')::json#>>'{0,id}'
+        ORDER BY a.item_id, (a.data->'criteria')::json#>>'{0,id}'
+        ) AS crowd
       WHERE t.worker_id=u.id
       AND g.item_id=t.item_id AND g.criteria_id=cast((t.data->'criteria')::json#>>'{0,id}' AS bigint)
+      AND crowd.item_id=t.item_id AND crowd.criteria_id=(t.data->'criteria')::json#>>'{0,id}'
       AND t.worker_id=$2 AND t.job_id=$1 AND (t.data->'answered')='true'`,[jobId,workerId])
-    console.log(answers.rows)
 
     let workerCouple = {
       'worker_A': query.rows[0].turk_id,

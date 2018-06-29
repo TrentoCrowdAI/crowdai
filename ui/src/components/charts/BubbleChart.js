@@ -34,7 +34,7 @@ class BubbleChart extends React.Component {
     var data = this.props.data.sort( (a,b) => 
       a[z]>b[z] ? 1 : a[z]<b[z] ? -1 : 0
     )
-    console.log(data)
+    
     var workers = {
       'children': []
     }
@@ -69,7 +69,7 @@ class BubbleChart extends React.Component {
     var root = d3.hierarchy(workers)
       .sum(d => d.value)
       .sort( (a,b) => b.value-a.value)
-    console.log(root)
+
     bubble(root)
     var node = g.selectAll('.node')
       .data(root.children)

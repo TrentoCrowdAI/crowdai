@@ -13,7 +13,6 @@ import { Dimmer, Loader } from 'semantic-ui-react';
 
 import './reports.css';
 import { actions } from './actions';
-import { actions as jobactions } from '../jobs/actions';
 
 class Reports extends React.Component {
 	constructor(props) {
@@ -60,7 +59,7 @@ class Reports extends React.Component {
 				break;
 			case 'SingleWorker':
 				this.props.reports.tasks=[]
-				this.props.fetchContribution(this.props.match.params.jobid)
+				this.props.fetchSingleWorker(this.props.match.params.jobid,Number(this.state.chosenworker))
 				break;
 			case 'Contribution':
 				this.props.reports.tasks=[]
@@ -76,8 +75,8 @@ class Reports extends React.Component {
 		this.setState({
 			...this.state,
 			chosenmetric: value,
-			activeworker: value==='SingleWorker' ? true : false,
-			chosenworker: value==='SingleWorker' ? this.state.chosenworker : 'all',
+			//activeworker: value==='SingleWorker' ? true : false,
+			//chosenworker: value==='SingleWorker' ? this.state.chosenworker : 'all',
 			chosenitem: value==='Distribution'||value==='SingleWorker' ? this.state.chosenitem : 'all',
 			chosencriteria: value==='Distribution'||value==='SingleWorker' ? this.state.chosencriteria : 'all',
 			activeitem: value==='Distribution'||value==='SingleWorker' ? true : false,
@@ -86,8 +85,8 @@ class Reports extends React.Component {
 	}
 
 	chooseWorker(e, {value}) {
-		this.props.fetchSingleWorker(this.props.match.params.jobid,Number(value))
-		/*switch(this.state.chosenmetric) {
+		//this.props.fetchSingleWorker(this.props.match.params.jobid,Number(value))
+		switch(this.state.chosenmetric) {
 			case 'SingleWorker':
 				if (value==='all') {
 					this.props.reports.tasks = []
@@ -98,7 +97,7 @@ class Reports extends React.Component {
 				break;
 			default:
 				break;
-		}*/
+		}
 
 		this.setState({
 			...this.state, 
@@ -142,16 +141,18 @@ renderChart(chart,x,y,z,w,param) {
 	}
 
 	render() {
-		console.log('reports tasks ',this.props)
-		console.log(this.state)
+		console.log('workers',this.props.workers.workers)
+		console.log('tasks',this.props.reports.tasks)
+
 		//refresh options for charts with new loaded data every time
 		var WorkerOptions =  { 'all' : 'All Workers' }
 		Object.values(this.props.workers.workers).map( step => {
-      WorkerOptions[step.worker_id] = step.turk_id
+      WorkerOptions[step.id] = step.turk_id
 		});
+
 		var ItemOptions = { 'all': 'All Items' }
 		Object.values(
-			(this.state.chosenmetric==='SingleWorker' && this.props.reports.tasks.length==1)
+			(this.state.chosenmetric==='SingleWorker' && this.props.reports.tasks.length==1 && this.state.chosenworker!=='all')
 				? this.props.reports.tasks[0].answers : this.props.reports.tasks
 		).map( step => {
       ItemOptions[step.item_id] = step.item_id
@@ -159,7 +160,7 @@ renderChart(chart,x,y,z,w,param) {
 
 		var CritOptions = { 'all' : 'All Criteria' }
 		Object.values(
-			(this.state.chosenmetric==='SingleWorker' && this.props.reports.tasks.length==1)
+			(this.state.chosenmetric==='SingleWorker' && this.props.reports.tasks.length==1 && this.state.chosenworker!=='all')
 				? this.props.reports.tasks[0].answers : this.props.reports.tasks
 		).map( step => {
       CritOptions[step.criteria_id] = step.criteria_id
@@ -173,6 +174,7 @@ renderChart(chart,x,y,z,w,param) {
 			'PErr(b|a)': "Probability in Errors [ P_err(B|A) ]",
 			'Comparing': "Comparing Correlation Metrics"
 		}
+
 		//parameters for reusable charts
 		var chart = ''
 		var x = ''
@@ -279,7 +281,7 @@ renderChart(chart,x,y,z,w,param) {
 				chart='singleWorker'
 				x='total_tasks'
 				y='tasks_right_for_gold'
-				z='answers'
+				z=this.props.workers.workers
 				w=this.chooseWorker
 				param=this.state
 				break;
@@ -312,13 +314,7 @@ renderChart(chart,x,y,z,w,param) {
 							<div style={{width: "5%"}} className='empty'></div>
 							</React.Fragment>
 					}
-					<WorkerChooser 
-						disabled={(!this.state.activeworker)}
-						options={WorkerOptions}
-						onChange={this.chooseWorker}
-						chosenworker={this.state.chosenworker}
-					/>
-					<div style={{width: "5%"}} className='empty'></div>
+
 					<ItemChooser 
 						disabled={(!this.state.activeitem)}
 						options={ItemOptions}

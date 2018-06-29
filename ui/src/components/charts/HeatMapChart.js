@@ -159,14 +159,14 @@ class HeatMapChart extends React.Component {
                 </ul>
                 <br />
                 <ul className={'legend'}>
-                    <li><span style={{'backgroundColor':'#FFE6CD'}}></span>{this.props.z} {" < 0.20"}</li>
-                    <li><span style={{'backgroundColor':'#FFCD9A'}}></span>{this.props.z} {" < 0.40"}</li>
-                    <li><span style={{'backgroundColor':'#FFB366'}}></span>{this.props.z} {" < 0.60"}</li>
+                    <li><span style={{'backgroundColor':'#FFE6CD'}}></span>{"0.0 < "} {this.props.z} {" < 0.20"}</li>
+                    <li><span style={{'backgroundColor':'#FFCD9A'}}></span>{"0.2 <= "} {this.props.z} {" < 0.40"}</li>
+                    <li><span style={{'backgroundColor':'#FFB366'}}></span>{"0.4 <= "} {this.props.z} {" < 0.60"}</li>
                 </ul>
                 <br />
                 <ul className={'legend'}>
-                    <li><span style={{'backgroundColor':'#FF9A33'}}></span>{this.props.z} {" < 0.80"}</li>
-                    <li><span style={{'backgroundColor':'#FF8000'}}></span>{this.props.z} {" < 1.0"}</li>    
+                    <li><span style={{'backgroundColor':'#FF9A33'}}></span>{"0.6 <= "} {this.props.z} {" < 0.80"}</li>
+                    <li><span style={{'backgroundColor':'#FF8000'}}></span>{"0.8 <= "} {this.props.z} {" < 1.0"}</li>    
                     <li><span style={{'backgroundColor':'red'}}></span>{this.props.z} {" = 1.0"}</li>
                 </ul>
 			<br />

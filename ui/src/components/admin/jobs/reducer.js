@@ -310,6 +310,89 @@ const aggregationStrategiesReducer = (state = defaultAggregationStrategiesState,
   }
 };
 
+const defaultSelectedParameterState = {
+  selected: undefined
+};
+
+const selectedParameterReducer = (state = defaultSelectedParameterState, action) => {
+  switch (action.type) {
+    case actionTypes.SET_SELECTED_PARAMETER:
+      return {
+        selected: action.parameter
+      };
+    default:
+      return state;
+  }
+};
+
+const defaultJobEstimationsState = {
+  // an map of jobId to estimation object ... jobId => {token: <string>, estimation: <object>, status: <string>}
+  estimations: {},
+  loading: false,
+  error: undefined,
+  polling: false
+};
+
+const jobEstimationsReducer = (state = defaultJobEstimationsState, action) => {
+  switch (action.type) {
+    case actionTypes.COMPUTE_JOB_ESTIMATIONS:
+      return {
+        ...state,
+        loading: true
+      };
+    case actionTypes.COMPUTE_JOB_ESTIMATIONS_SUCCESS:
+      return {
+        ...state,
+        estimations: {
+          ...state.estimations,
+          [action.jobId]: action.response
+        },
+        loading: false
+      };
+    case actionTypes.COMPUTE_JOB_ESTIMATIONS_ERROR:
+      return {
+        ...state,
+        loading: false,
+        error: action.error
+      };
+    case actionTypes.FETCH_JOB_ESTIMATIONS_STATUS:
+      return {
+        ...state,
+        loading: true
+      };
+    case actionTypes.FETCH_JOB_ESTIMATIONS_STATUS_SUCCESS:
+      return {
+        ...state,
+        loading: false,
+        estimations: {
+          ...state.estimations,
+          [action.jobId]: {
+            ...state.estimations[action.jobId], // {token: <string>}
+            ...action.response // {status: <string>}
+          }
+        }
+      };
+    case actionTypes.FETCH_JOB_ESTIMATIONS_STATUS_ERROR:
+      return {
+        ...state,
+        loading: false,
+        error: action.error
+      };
+    case actionTypes.CHECK_JOB_ESTIMATIONS_STATUS_POLLED:
+      return {
+        ...state,
+        polling: true
+      };
+    case actionTypes.CHECK_JOB_ESTIMATIONS_STATUS_POLLED_DONE:
+      return {
+        ...state,
+        polling: false
+      };
+    default:
+      return state;
+  }
+};
+
 export default combineReducers({
   list: reducer,
   // finally we combine generic and formReducer that handles
@@ -322,5 +405,7 @@ export default combineReducers({
   copy: copyReducer,
   taskAssignmentStrategies: taskAssignmentStrategiesReducer,
   results: resultsReducer,
-  aggregationStrategies: aggregationStrategiesReducer
+  aggregationStrategies: aggregationStrategiesReducer,
+  selectedParameter: selectedParameterReducer,
+  jobEstimations: jobEstimationsReducer
 });

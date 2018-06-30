@@ -35,6 +35,16 @@ const actionTypes = {
   FETCH_AGGREGATION_STRATEGIES: 'C_FETCH_AGGREGATION_STRATEGIES',
   FETCH_AGGREGATION_STRATEGIES_SUCCESS: 'C_FETCH_AGGREGATION_STRATEGIES_SUCCESS',
   FETCH_AGGREGATION_STRATEGIES_ERROR: 'C_FETCH_AGGREGATION_STRATEGIES_ERROR',
+  SET_SELECTED_PARAMETER: 'C_SET_SELECTED_PARAMETER',
+
+  COMPUTE_JOB_ESTIMATIONS: 'C_COMPUTE_JOB_ESTIMATIONS',
+  COMPUTE_JOB_ESTIMATIONS_SUCCESS: 'C_COMPUTE_JOB_ESTIMATIONS_SUCCESS',
+  COMPUTE_JOB_ESTIMATIONS_ERROR: 'C_COMPUTE_JOB_ESTIMATIONS_ERROR',
+  CHECK_JOB_ESTIMATIONS_STATUS_POLLED: 'C_CHECK_JOB_ESTIMATIONS_STATUS_POLLED',
+  CHECK_JOB_ESTIMATIONS_STATUS_POLLED_DONE: 'C_CHECK_JOB_ESTIMATIONS_STATUS_POLLED_DONE',
+  FETCH_JOB_ESTIMATIONS_STATUS: 'C_FETCH_JOB_ESTIMATIONS_STATUS',
+  FETCH_JOB_ESTIMATIONS_STATUS_SUCCESS: 'C_FETCH_JOB_ESTIMATIONS_STATUS_SUCCESS',
+  FETCH_JOB_ESTIMATIONS_STATUS_ERROR: 'C_FETCH_JOB_ESTIMATIONS_STATUS_ERROR',
   ...getActionTypes(scopes.JOBS)
 };
 
@@ -81,6 +91,21 @@ const actions = {
   },
 
   ...getActions(scopes.JOBS),
+
+  /**
+   * We override the submit action creator to add the redirect boolean flag.
+   *
+   * @param {Boolean} redirect
+   * @param {Function} onSuccessExtraAction - additional action to dispatch onSuccess
+   * @return {Object}
+   */
+  submit(redirect = true, onSuccessExtraAction) {
+    return {
+      type: actionTypes.SUBMIT,
+      redirect,
+      onSuccessExtraAction
+    };
+  },
 
   fetchItem(id, isWorker = false) {
     return {
@@ -279,6 +304,79 @@ const actions = {
     return {
       type: actionTypes.FETCH_AGGREGATION_STRATEGIES_ERROR,
       error
+    };
+  },
+
+  /**
+   * Sets the current selected parameters based on the point clicked in PriceLossChart.
+   *
+   * @param {Object} parameter
+   * @return {Object}
+   */
+  setSelectedParameter(parameter) {
+    return {
+      type: actionTypes.SET_SELECTED_PARAMETER,
+      parameter
+    };
+  },
+
+  computeJobEstimations(jobId, single, onSuccessAction) {
+    return {
+      type: actionTypes.COMPUTE_JOB_ESTIMATIONS,
+      jobId,
+      single,
+      onSuccessAction // a function that should return an action to trigger on success.
+    };
+  },
+
+  computeJobEstimationsSuccess(jobId, response) {
+    return {
+      type: actionTypes.COMPUTE_JOB_ESTIMATIONS_SUCCESS,
+      jobId,
+      response
+    };
+  },
+
+  computeJobEstimationsError(error) {
+    return {
+      type: actionTypes.COMPUTE_JOB_ESTIMATIONS_ERROR,
+      error
+    };
+  },
+
+  fetchJobEstimationsStatus(jobId) {
+    return {
+      type: actionTypes.FETCH_JOB_ESTIMATIONS_STATUS,
+      jobId
+    };
+  },
+
+  fetchJobEstimationsStatusSuccess(jobId, response) {
+    return {
+      type: actionTypes.FETCH_JOB_ESTIMATIONS_STATUS_SUCCESS,
+      jobId,
+      response
+    };
+  },
+
+  fetchJobEstimationsStatusError(error) {
+    return {
+      type: actionTypes.FETCH_JOB_ESTIMATIONS_STATUS_ERROR,
+      error
+    };
+  },
+
+  pollJobEstimationsStatus(jobId) {
+    return {
+      type: actionTypes.CHECK_JOB_ESTIMATIONS_STATUS_POLLED,
+      jobId
+    };
+  },
+
+  pollJobEstimationsStatusDone(jobId) {
+    return {
+      type: actionTypes.CHECK_JOB_ESTIMATIONS_STATUS_POLLED_DONE,
+      jobId
     };
   }
 };

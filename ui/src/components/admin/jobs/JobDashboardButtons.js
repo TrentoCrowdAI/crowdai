@@ -91,10 +91,18 @@ StopButton.propTypes = {
   job: PropTypes.object
 };
 
-const UpdateParametersButton = ({job, profile}) => {
-  if (isExpertMode(profile) && job.data.status === JobStatus.NOT_PUBLISHED) {
+const UpdateParametersButton = ({job, profile, selectedParameter, setInputValue, update}) => {
+  if (isExpertMode(profile) && job.data.status === JobStatus.NOT_PUBLISHED && selectedParameter) {
     return (
-      <Button floated="right" size="large" style={{width: '200px'}}>
+      <Button
+        floated="right"
+        size="large"
+        style={{width: '200px'}}
+        onClick={() => {
+          setInputValue('data.initialTestsRule', selectedParameter.worker_tests);
+          setInputValue('data.votesPerTaskRule', selectedParameter.votes_per_item);
+          update(job);
+        }}>
         Update parameters
       </Button>
     );
@@ -103,7 +111,10 @@ const UpdateParametersButton = ({job, profile}) => {
 };
 UpdateParametersButton.propTypes = {
   job: PropTypes.object,
-  profile: PropTypes.object
+  profile: PropTypes.object,
+  selectedParameter: PropTypes.object,
+  update: PropTypes.func,
+  setInputValue: PropTypes.func
 };
 
 /**
@@ -116,19 +127,30 @@ const canPublish = state => {
   return state.job === JobStatus.NOT_PUBLISHED;
 };
 
-JobDashboardButtons.propTypes = {
+/**
+ * Standard prop-types for the JobDashboardButtons
+ */
+const JobDashboardButtonsPropTypes = {
   jobState: PropTypes.object,
-  job: PropTypes.object
+  job: PropTypes.object,
+  selectedParameter: PropTypes.object,
+  estimationsPolling: PropTypes.bool
 };
 
+JobDashboardButtons.propTypes = JobDashboardButtonsPropTypes;
+
 const mapStateToProps = state => ({
-  profile: state.profile.item
+  profile: state.profile.item,
+  selectedParameter: state.job.selectedParameter.selected,
+  estimationsPolling: state.job.jobEstimations.polling
 });
 
 const mapDispatchToProps = dispatch => ({
-  publish: () => dispatch(actions.publish())
+  publish: () => dispatch(actions.publish()),
+  update: job => dispatch(actions.submit(false, () => actions.fetchItem(job.id))),
+  setInputValue: (name, value) => dispatch(actions.setInputValue(name, value))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(JobDashboardButtons);
 
-export {PublishButton, StopButton, UpdateParametersButton};
+export {PublishButton, StopButton, UpdateParametersButton, JobDashboardButtonsPropTypes};

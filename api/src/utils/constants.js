@@ -14,3 +14,9 @@ exports.UserModes = Object.freeze({
   Author: 'Author',
   Researcher: 'Researcher'
 });
+
+exports.JobEstimationStatus = Object.freeze({
+  IN_PROGRESS: 'IN_PROGRESS',
+  DONE: 'DONE',
+  NONE: 'NONE'
+});

@@ -1,0 +1,4 @@
+/* minor fix for green Label */
+.ui.basic.green.label {
+  background-color: #fff !important;
+}

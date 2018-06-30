@@ -70,7 +70,12 @@ class JobResults extends React.Component {
                 <Accordion.Content active={this.state.activeIndex === idx} style={{textAlign: 'center'}}>
                   {record.data.criteria.map(f => (
                     <div key={f.id} style={{display: 'inline-block', marginRight: '10px'}}>
-                      <Header size="large" content={criteriaMap[f.id].label} textAlign="center" />
+                      <Header size="large" textAlign="center">
+                        <Popup
+                          trigger={<Header.Content style={{padding: 0}}>{criteriaMap[f.id].label}</Header.Content>}
+                          content={<span>{criteriaMap[f.id].description}</span>}
+                        />
+                      </Header>
                       <Button
                         size="mini"
                         content="IN"

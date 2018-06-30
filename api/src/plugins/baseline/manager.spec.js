@@ -11,6 +11,10 @@ test('should define getEstimatedCost', () => {
   expect(baselineManager.getEstimatedCost).toBeDefined();
 });
 
+test('should define processEstimationsPayload', () => {
+  expect(baselineManager.processEstimationsPayload).toBeDefined();
+});
+
 describe('manager.getEstimatedCost', () => {
   let getItemsCountSpy = jest.spyOn(delegates.projects, 'getItemsCount');
   let getCriteriaSpy = jest.spyOn(delegates.projects, 'getCriteria');

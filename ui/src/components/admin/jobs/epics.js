@@ -9,6 +9,7 @@ import config from 'src/config/config.json';
 import {actions as historyActions} from 'src/components/core/history/actions';
 import {actions as toastActions} from 'src/components/core/toast/actions';
 import ToastTypes from 'src/components/core/toast/types';
+import {JobEstimationStatus} from 'src/utils/constants';
 
 const getJobs = (action$, store) =>
   action$.ofType(actionTypes.FETCH_JOBS).switchMap(action => {
@@ -30,6 +31,7 @@ const saveJob = (action$, store) =>
         let msg = 'The CSV files are now being processed.';
         let actionsToConcat = [Observable.of(actions.submitSuccess())];
         let jobSaved = response.data;
+        let csvChanged = true;
 
         if (
           jobSaved.data.itemsUrl === item.data.itemsUrl &&
@@ -39,6 +41,7 @@ const saveJob = (action$, store) =>
           item.id
         ) {
           msg = 'The job was saved correctly.';
+          csvChanged = false;
         } else {
           actionsToConcat.push(Observable.of(actions.checkCSVCreation(jobSaved)));
         }
@@ -51,7 +54,18 @@ const saveJob = (action$, store) =>
             })
           )
         );
-        actionsToConcat.push(Observable.of(historyActions.push('/admin/jobs')));
+        if (action.redirect) {
+          actionsToConcat.push(Observable.of(historyActions.push('/admin/jobs')));
+        }
+
+        if (action.onSuccessExtraAction && typeof action.onSuccessExtraAction === 'function') {
+          actionsToConcat.push(Observable.of(action.onSuccessExtraAction()));
+        }
+        // we start the estimation because it takes time. Only if we do not have a token or
+        // the CSV files has changed.
+        if (csvChanged || !jobSaved.data.estimationToken) {
+          actionsToConcat.push(Observable.of(actions.computeJobEstimations(jobSaved.id, false)));
+        }
         return Observable.concat(...actionsToConcat);
       })
       .catch(error => {
@@ -235,6 +249,54 @@ const fetchAggregationStrategies = (action$, store) =>
       });
   });
 
+const computeJobEstimations = (action$, store) =>
+  action$.ofType(actionTypes.COMPUTE_JOB_ESTIMATIONS).switchMap(action => {
+    return Observable.defer(() => requestersApi.post(`/jobs/${action.jobId}/estimates`, {single: action.single}))
+      .mergeMap(response => {
+        let toConcat = [Observable.of(actions.computeJobEstimationsSuccess(action.jobId, response.data))];
+
+        if (action.onSuccessAction && typeof action.onSuccessAction === 'function') {
+          toConcat.push(Observable.of(action.onSuccessAction()));
+        }
+        return Observable.concat(...toConcat);
+      })
+      .catch(error => {
+        let err = flattenError(error);
+        return Observable.concat(
+          Observable.of(actions.computeJobEstimationsError(flattenError(err))),
+          Observable.of(toastActions.show({message: err.message, type: ToastTypes.ERROR}))
+        );
+      });
+  });
+
+const fetchJobEstimationsStatus = (action$, store) =>
+  action$.ofType(actionTypes.FETCH_JOB_ESTIMATIONS_STATUS).switchMap(action => {
+    return Observable.defer(() => requestersApi.get(`jobs/${action.jobId}/estimates-status`))
+      .mergeMap(response => {
+        let rsp = response.data;
+        let actionsToConcat = [Observable.of(actions.fetchJobEstimationsStatusSuccess(action.jobId, response.data))];
+
+        if (rsp.status === JobEstimationStatus.DONE || rsp.status === JobEstimationStatus.NONE) {
+          actionsToConcat.push(Observable.of(actions.pollJobEstimationsStatusDone(action.jobId)));
+          actionsToConcat.push(Observable.of(actions.fetchItem(action.jobId)));
+        }
+        return Observable.concat(...actionsToConcat);
+      })
+      .catch(error => Observable.of(actions.fetchJobEstimationsStatusError(flattenError(error))));
+  });
+
+const pollJobEstimationsStatus = (action$, store) =>
+  action$.ofType(actionTypes.CHECK_JOB_ESTIMATIONS_STATUS_POLLED).switchMap(action => {
+    return Observable.concat(
+      Observable.of(actions.fetchJobEstimationsStatus(action.jobId)),
+      Observable.interval(config.polling.jobState)
+        .takeUntil(action$.ofType(actionTypes.CHECK_JOB_ESTIMATIONS_STATUS_POLLED_DONE))
+        .mergeMap(() => {
+          return Observable.of(actions.fetchJobEstimationsStatus(action.jobId));
+        })
+    );
+  });
+
 export default combineEpics(
   getJobs,
   saveJob,
@@ -247,5 +309,8 @@ export default combineEpics(
   fetchFiltersCSV,
   fetchTaskAssignmentStrategies,
   fetchResults,
-  fetchAggregationStrategies
+  fetchAggregationStrategies,
+  computeJobEstimations,
+  fetchJobEstimationsStatus,
+  pollJobEstimationsStatus
 );

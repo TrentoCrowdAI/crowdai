@@ -38,6 +38,19 @@ exports.getEstimatedCost = async job => {
 };
 
 /**
+ * This method is a hook for modifying the payload before calling the POST /estimates endpoint
+ * of the estimations-api.
+ *
+ * @param {Object} job
+ * @param {Object} payload
+ * @return {Object} A modified version of the payload
+ */
+exports.processEstimationsPayload = async (job, payload) => {
+  let mngr = await getManager(job);
+  return mngr.processEstimationsPayload(job, payload);
+};
+
+/**
  * Just a private helper to return the manager for the given job.
  *
  * @param {Object} job

@@ -27,7 +27,7 @@ class JobFormPlugin extends React.Component {
   }
 
   componentDidUpdate(prevProps) {
-    const prevStrategy = this.getStrategy(prevProps.job);
+    const prevStrategy = this.getStrategy(prevProps.job) || {};
     let cleanMethod = cleanPropsMap[prevStrategy.name];
 
     if (this.props.job.data.taskAssignmentStrategy !== prevProps.job.data.taskAssignmentStrategy && cleanMethod) {

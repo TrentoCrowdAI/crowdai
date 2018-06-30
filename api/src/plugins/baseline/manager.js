@@ -136,3 +136,8 @@ const getEstimatedCost = (exports.getEstimatedCost = async job => {
     };
   }
 });
+
+// This implementation just returns the payload
+exports.processEstimationsPayload = (job, payload) => {
+  return payload;
+};

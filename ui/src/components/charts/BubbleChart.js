@@ -31,10 +31,10 @@ class BubbleChart extends React.Component {
     var y = this.props.y 
     var z = this.props.z
     var w = this.props.w
-    var data = this.props.data.sort( (a,b) => 
+    var data = this.props.data/*.sort( (a,b) => 
       a[z]>b[z] ? 1 : a[z]<b[z] ? -1 : 0
-    )
-    
+    )*/
+
     var workers = {
       'children': []
     }
@@ -43,16 +43,16 @@ class BubbleChart extends React.Component {
       workers.children.push({
         'name': d[x],
         'value': d[y],
-        'packageName': (d[z]<=30) ? '30%' 
-          : ((d[z]>30 && d[z]<=60) ? '60%'
-          : ((d[z]>60 && d[z]<=80) ? '80%'
-          : ((d[z]>80) ? '100%' : 'null')))
+        'packageName': (d[z]<=30) ? '< 30%' 
+          : ((d[z]>30 && d[z]<=60) ? '30% ~ 60%'
+          : ((d[z]>60 && d[z]<=80) ? '60% ~ 80%'
+          : ((d[z]>80) ? '80% ~ 100%' : 'NaN')))
       })
     })
 
     var diameter = 400
     var format = d3.format(',d')
-    var color = d3.scaleOrdinal(['lightgreen','red','#FFB366','orange','#2185d0'])
+    //var color = d3.scaleOrdinal(['lightgreen','red','#FFB366','orange','#2185d0'])
 
     var bubble = d3.pack()
       .size([diameter*2, diameter])
@@ -80,7 +80,7 @@ class BubbleChart extends React.Component {
         })
 
     node.append('title')
-      .text(d => 'crowd precision ~'+d.data.packageName+'\n #tasks: '+format(d.data.value))
+      .text(d => 'crowd precision: '+d.data.packageName+'\n #tasks: '+format(d.data.value))
   
     var circles = node.append("circle")
       .attr('r', d => d.r)
@@ -88,7 +88,11 @@ class BubbleChart extends React.Component {
       .style('stroke-width', 1)
       .style('stroke', 'white')
       .style('opacity','1')
-      .style('fill', d => color(d.data.packageName))
+      .style('fill', d => d.data.packageName=='< 30%' ? 'lightgreen'
+        : d.data.packageName=='30% ~ 60%' ? '#FFB366' 
+        : d.data.packageName=='60% ~ 80%' ? 'orange'
+        : d.data.packageName=='80% ~ 100%' ? 'red'
+        : '#2185d0')
       .on('mouseover', (d) => {
         d3.selectAll('circle')._groups[0].forEach(c => {
           if(c.id===d.data.name ) {
@@ -105,7 +109,7 @@ class BubbleChart extends React.Component {
       .on('click', d => {
         d3.selectAll('circle')._groups[0].forEach(c => {
           if(c.id===d.data.name ) {
-            w(d, {'value': d.data.name})
+            w(null, {'value': d.data.name})
           }
         })
       })

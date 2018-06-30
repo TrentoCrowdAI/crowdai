@@ -3,6 +3,7 @@ import React from 'react'
 import {connect} from 'react-redux'
 import PropTypes from 'prop-types'
 
+import PointChart from './PointChart'
 import HistogramChart from './HistogramChart'
 import BubbleChart from './BubbleChart'
 import HeatMapChart from './HeatMapChart'
@@ -134,6 +135,14 @@ class ChartWrapper extends React.Component {
         return(
           <div>
             <BubbleChart
+              {...this.props}
+            />
+          </div>
+        )
+      case 'pointChart':
+        return(
+          <div>
+            <PointChart
               {...this.props}
             />
           </div>

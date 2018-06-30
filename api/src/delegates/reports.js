@@ -40,8 +40,9 @@ const getWorkersByJob = (exports.getWorkersByJob = async id => {
       `
     SELECT DISTINCT t.worker_id, w.turk_id,
       COUNT((t.item_id, (t.data->'criteria')::json#>>'{0,id}')) AS voted_tasks,
-      SUM(CASE WHEN ((t.data->'criteria')::json#>>'{0,workerAnswer}')=crowd.answer THEN 1 ELSE 0 END) AS rights
-    FROM ${db.TABLES.Task} t, ${db.TABLES.Worker} w, (
+      SUM(CASE WHEN ((t.data->'criteria')::json#>>'{0,workerAnswer}')=crowd.answer THEN 1 ELSE 0 END) AS rights,
+      SUM(CASE WHEN ((t.data->'criteria')::json#>>'{0,workerAnswer}')=g.gold THEN 1 ELSE 0 END) AS rights_gold
+    FROM ${db.TABLES.Task} t, ${db.TABLES.Worker} w, ${db.TABLES.Gold} g, (
       SELECT a.item_id, (a.data->'criteria')::json#>>'{0,id}' AS criteria_id,
         (SELECT (b.data->'criteria')::json#>>'{0,workerAnswer}'
         FROM ${db.TABLES.Task} b
@@ -58,6 +59,7 @@ const getWorkersByJob = (exports.getWorkersByJob = async id => {
       ) AS crowd
     WHERE t.job_id=$1 AND (t.data->'answered')='true' AND t.worker_id=w.id
     AND t.item_id=crowd.item_id AND (t.data->'criteria')::json#>>'{0,id}'=crowd.criteria_id
+    AND t.item_id=g.item_id AND CAST((t.data->'criteria')::json#>>'{0,id}' AS BIGINT)=g.criteria_id
     GROUP BY t.worker_id, w.turk_id
     ORDER BY t.worker_id`,
       [id]
@@ -69,7 +71,8 @@ const getWorkersByJob = (exports.getWorkersByJob = async id => {
         'id': res.rows[x].worker_id,
         'turk_id': res.rows[x].turk_id,
         'total_tasks': Number(res.rows[x].voted_tasks),
-        'precision_for_crowd': Number(res.rows[x].rights)/Number(res.rows[x].voted_tasks).toFixed(5)*100
+        'precision_for_crowd': (Number(res.rows[x].rights)/Number(res.rows[x].voted_tasks)).toFixed(5)*100,
+        'precision_for_gold': (Number(res.rows[x].rights_gold)/Number(res.rows[x].voted_tasks)).toFixed(5)*100
       })
     }
 

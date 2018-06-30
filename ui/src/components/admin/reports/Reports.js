@@ -77,10 +77,14 @@ class Reports extends React.Component {
 			chosenmetric: value,
 			//activeworker: value==='SingleWorker' ? true : false,
 			//chosenworker: value==='SingleWorker' ? this.state.chosenworker : 'all',
-			chosenitem: value==='Distribution'||value==='SingleWorker' ? this.state.chosenitem : 'all',
-			chosencriteria: value==='Distribution'||value==='SingleWorker' ? this.state.chosencriteria : 'all',
-			activeitem: value==='Distribution'||value==='SingleWorker' ? true : false,
-			activecriteria: value==='Distribution'||value==='SingleWorker' ? true : false
+			chosenitem: 'all',
+			chosencriteria: 'all',
+			activeitem: 
+				value==='Distribution'||value==='SingleWorker' ? 
+					true : false,
+			activecriteria: 
+				value==='Distribution'||value==='SingleWorker' ? 
+					true : false
 		})
 	}
 
@@ -101,9 +105,11 @@ class Reports extends React.Component {
 
 		this.setState({
 			...this.state, 
-			chosenworker: value
+			chosenworker: value,
+			chosenitem: 'all',
+			chosencriteria: 'all'
 		})
-}
+	}
 
 	chooseItem(e, {value}) {
 		this.setState({
@@ -120,28 +126,29 @@ class Reports extends React.Component {
 		})		
 	}
 
-renderChart(chart,x,y,z,w,param) {
+	renderChart(chart,x,y,z,w,param) {
 		return(
 			<div>
-			<Dimmer active={this.props.rep_loading} inline="centered" inverted>
-          <Loader indeterminate>Loading data...</Loader>
-      </Dimmer>
-			<ChartWrapper 
-				chart={chart}
-        x={x}
-        y={y}
-				z={z}
-				w={w}
-        selector={'chart1'}
-				param={param}
-				data={Object.values(this.props.reports.tasks)}
-      />
-      </div>
+				<Dimmer active={this.props.rep_loading} inline="centered" inverted>
+					<Loader indeterminate>Loading data...</Loader>
+				</Dimmer>
+				<ChartWrapper 
+					chart={chart}
+					x={x}
+					y={y}
+					z={z}
+					w={w}
+					selector={'chart1'}
+					param={param}
+					data={Object.values(this.props.reports.tasks)}
+				/>
+			</div>
 		)
 	}
 
 	render() {
-		console.log('reports data: ',this.props.reports.tasks)
+		console.log('reports data: ', this.props.reports.tasks)
+		console.log('workers :', this.props.workers.workers)
 
 		//refresh options for charts with new loaded data every time
 		var WorkerOptions =  { 'all' : 'All Workers' }

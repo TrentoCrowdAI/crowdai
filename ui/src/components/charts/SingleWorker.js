@@ -62,8 +62,19 @@ class SingleWorker extends React.Component {
           <React.Fragment>
             <i>{"    "}Worker chooser &#x25B2;</i>
               <ChartWrapper
-                chart={'bubbleChart'}
+                chart={'pointChart'}
                 color={['lightgreen','orange','#2185d0']}
+                x={'id'}
+                y={'precision_for_gold'}
+                z={'precision_for_crowd'}
+                w={this.handleClick}
+                data={z}
+                selector={'points'}
+                param={''}
+              />
+              <br />
+              <ChartWrapper
+                chart={'bubbleChart'}
                 x={'id'}
                 y={'total_tasks'}
                 z={'precision_for_crowd'}

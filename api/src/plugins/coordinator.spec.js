@@ -72,3 +72,7 @@ describe('getEstimatedCost', () => {
     expect(called).toBe(true);
   });
 });
+
+test('should define processEstimationsPayload', () => {
+  expect(coordinator.processEstimationsPayload).toBeDefined();
+});

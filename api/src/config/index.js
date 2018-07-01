@@ -25,5 +25,9 @@ module.exports = {
   },
   cron: {
     hitStatusPollTime: process.env.HIT_STATUS_POLL_TIME
+  },
+  estimations: {
+    url: process.env.ESTIMATIONS_API,
+    baseroundItems: process.env.ESTIMATIONS_BASEROUND_ITEMS
   }
 };

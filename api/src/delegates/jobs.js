@@ -350,7 +350,9 @@ const getClassifiedItemsCount = (exports.getClassifiedItemsCount = async jobId =
  */
 exports.getAllPublished = async () => {
   let rsp = await db.query(
-    `select * from ${db.TABLES.Job} where data->>'status' = $1`,
+    `select * from ${
+      db.TABLES.Job
+    } where data->>'status' = $1 and deleted_at is null`,
     [JobStatus.PUBLISHED]
   );
 

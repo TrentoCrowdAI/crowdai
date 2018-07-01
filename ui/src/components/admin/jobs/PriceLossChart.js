@@ -9,6 +9,13 @@ import {select} from 'd3-selection';
 import ReactDOMServer from 'react-dom/server';
 
 class PriceLossChart extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      selected: undefined
+    };
+  }
+
   render() {
     return (
       <div>
@@ -21,6 +28,7 @@ class PriceLossChart extends React.Component {
             <b>Price</b> is the average number of crowd votes per paper
           </span>
         </div>
+        {this.state.selected && <PointTooltip data={this.state.selected} title="Current selection" horizontal />}
       </div>
     );
   }
@@ -43,7 +51,7 @@ class PriceLossChart extends React.Component {
       .append('text')
       .text('#Votes per task')
       .attr('y', legendY - 20)
-      .attr('x', -30);
+      .attr('x', -38);
   }
 
   generate() {
@@ -51,7 +59,17 @@ class PriceLossChart extends React.Component {
 
     return c3.generate({
       bindto: this.node,
-      data: grouped,
+      data: {
+        ...grouped,
+        onclick: (d, element) => {
+          let data = this.getData(d);
+
+          if (this.props.onPointClick) {
+            this.setState({selected: data});
+            this.props.onPointClick(data);
+          }
+        }
+      },
       axis: {
         x: {
           label: {
@@ -60,7 +78,7 @@ class PriceLossChart extends React.Component {
           },
           tick: {
             format: x => x.toFixed(2),
-            values: ticks(grouped.min - 5, grouped.max + 5, 5)
+            values: ticks(grouped.min, grouped.max, 10)
           }
         },
         y: {
@@ -80,47 +98,8 @@ class PriceLossChart extends React.Component {
       tooltip: {
         contents: (d, defaultTitleFormat, defaultValueFormat, color) => {
           const point = d[0];
-          const data = grouped.src[point.name][point.index];
-          return ReactDOMServer.renderToString(
-            <Segment>
-              <Label corner="right" style={{borderColor: color(point)}} />
-              <List divided relaxed>
-                <List.Item>
-                  <List.Icon name="balance scale" size="large" verticalAlign="middle" />
-                  <List.Content>
-                    <List.Header>Loss</List.Header>
-                    <List.Description>{data.loss_mean}</List.Description>
-                  </List.Content>
-                </List.Item>
-                <List.Item>
-                  <List.Icon name="money bill alternate outline" size="large" verticalAlign="middle" />
-                  <List.Content>
-                    <List.Header>Price</List.Header>
-                    <List.Description>{data.price_mean}</List.Description>
-                  </List.Content>
-                </List.Item>
-                <List.Item>
-                  <List.Icon name="users" size="large" verticalAlign="middle" />
-                  <List.Content>
-                    <List.Header>#Votes per task</List.Header>
-                    <List.Description>{data.votes_per_item}</List.Description>
-                  </List.Content>
-                </List.Item>
-                <List.Item>
-                  <List.Icon
-                    style={{paddingLeft: '0px', width: '1.6em'}}
-                    name="list alternate outline"
-                    size="large"
-                    verticalAlign="middle"
-                  />
-                  <List.Content>
-                    <List.Header>#Initial tests</List.Header>
-                    <List.Description>{data.worker_tests}</List.Description>
-                  </List.Content>
-                </List.Item>
-              </List>
-            </Segment>
-          );
+          const data = this.getData(point);
+          return ReactDOMServer.renderToString(<PointTooltip point={point} data={data} color={color} />);
         }
       }
     });
@@ -142,22 +121,89 @@ class PriceLossChart extends React.Component {
       min: minPrice
     };
     let x = 0;
+    const sortAscending = (a, b) =>
+      a.price_mean < b.price_mean ? -1 : a.price_mean > b.price_mean ? 1 : a.price_mean >= b.price_mean ? 0 : NaN;
 
     for (let entry of grouped) {
       const xid = `X${x}`;
       output.xs[entry.key] = xid;
+      entry.values.sort(sortAscending);
       output.columns.push([xid, ...Object.values(entry.values.map(e => e.price_mean))]);
       output.columns.push([entry.key, ...Object.values(entry.values.map(e => e.loss_mean))]);
       output.src[entry.key] = entry.values;
       ++x;
     }
+    this.__group = output;
     return output;
+  }
+
+  getData(point) {
+    return this.__group.src[point.name][point.index];
   }
 }
 
 PriceLossChart.propTypes = {
   style: PropTypes.object,
-  data: PropTypes.arrayOf(PropTypes.object)
+  data: PropTypes.arrayOf(PropTypes.object),
+  onPointClick: PropTypes.func
+};
+
+const PointTooltip = ({point, data, color, horizontal, title}) => {
+  return (
+    <Segment>
+      {color && <Label corner="right" style={{borderColor: color(point)}} />}
+      {title && (
+        <Header as="h4" textAlign="center">
+          {title}
+        </Header>
+      )}
+      <div style={{textAlign: 'center'}}>
+        <List style={{textAlign: 'initial'}} divided relaxed horizontal={horizontal}>
+          <List.Item>
+            <List.Icon name="balance scale" size="large" verticalAlign="middle" />
+            <List.Content>
+              <List.Header>Loss</List.Header>
+              <List.Description>{data.loss_mean.toFixed(3)}</List.Description>
+            </List.Content>
+          </List.Item>
+          <List.Item>
+            <List.Icon name="money bill alternate outline" size="large" verticalAlign="middle" />
+            <List.Content>
+              <List.Header>Price</List.Header>
+              <List.Description>{data.price_mean.toFixed(3)}</List.Description>
+            </List.Content>
+          </List.Item>
+          <List.Item>
+            <List.Icon name="users" size="large" verticalAlign="middle" />
+            <List.Content>
+              <List.Header>#Votes per task</List.Header>
+              <List.Description>{data.votes_per_item}</List.Description>
+            </List.Content>
+          </List.Item>
+          <List.Item>
+            <List.Icon
+              style={{paddingLeft: '0px', width: '1.6em'}}
+              name="list alternate outline"
+              size="large"
+              verticalAlign="middle"
+            />
+            <List.Content>
+              <List.Header>#Initial tests</List.Header>
+              <List.Description>{data.worker_tests}</List.Description>
+            </List.Content>
+          </List.Item>
+        </List>
+      </div>
+    </Segment>
+  );
+};
+
+PointTooltip.propTypes = {
+  data: PropTypes.object,
+  color: PropTypes.func,
+  point: PropTypes.object,
+  horizontal: PropTypes.bool,
+  title: PropTypes.string
 };
 
 export default PriceLossChart;

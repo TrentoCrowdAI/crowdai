@@ -5,7 +5,13 @@ import {connect} from 'react-redux';
 
 import {JobStatus, ShortestRunStatus} from 'src/utils/constants';
 import {actions as srActions} from './shortest-run-actions';
-import {StopButton, PublishButton, UpdateParametersButton} from 'src/components/admin/jobs/JobDashboardButtons';
+import {
+  StopButton,
+  PublishButton,
+  UpdateParametersButton,
+  JobDashboardButtonsPropTypes
+} from 'src/components/admin/jobs/JobDashboardButtons';
+import {actions} from 'src/components/admin/jobs/actions';
 
 class JobDashboardButtonsShortestRun extends React.Component {
   render() {
@@ -14,7 +20,10 @@ class JobDashboardButtonsShortestRun extends React.Component {
         <Grid.Column>
           <RunButton {...this.props} />
           <StopButton {...this.props} />
-          <UpdateParametersButton {...this.props} />
+          {canUpdate(this.props.job, this.props.jobState) && <UpdateParametersButton {...this.props} />}
+          {canRecomputeEstimations(this.props.job, this.props.jobState, this.props.estimationsPolling) && (
+            <ComputeEstimationsButton {...this.props} />
+          )}
         </Grid.Column>
       </Grid.Row>
     );
@@ -55,6 +64,17 @@ RunButton.propTypes = {
   generateBaseline: PropTypes.func
 };
 
+const ComputeEstimationsButton = ({job, computeJobEstimations}) => (
+  <Button onClick={() => computeJobEstimations(job.id)} floated="right" size="large" color="blue">
+    Recompute estimations
+  </Button>
+);
+
+ComputeEstimationsButton.propTypes = {
+  job: PropTypes.object,
+  computeJobEstimations: PropTypes.func
+};
+
 /**
  * This method checks if we can publish to AMT, and it adds conditions specific to ShortestRun.
  *
@@ -74,10 +94,22 @@ const canPublish = (job, state) => {
   );
 };
 
+const canUpdate = (job, state) => {
+  return (
+    job.data.status === JobStatus.NOT_PUBLISHED &&
+    (state.taskAssignmentApi === ShortestRunStatus.FILTERS_ASSIGNED ||
+      state.taskAssignmentApi === ShortestRunStatus.INITIAL)
+  );
+};
+
+const canRecomputeEstimations = (job, state, estimationsPolling) => {
+  return canUpdate(job, state) && !estimationsPolling;
+};
+
 JobDashboardButtonsShortestRun.propTypes = {
-  jobState: PropTypes.object,
-  job: PropTypes.object,
-  publish: PropTypes.func
+  ...JobDashboardButtonsPropTypes,
+  publish: PropTypes.func,
+  computeJobEstimations: PropTypes.func
 };
 
 const mapStateToProps = state => ({
@@ -86,7 +118,9 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = dispatch => ({
   assignFilters: jobId => dispatch(srActions.assignFilters(jobId)),
-  generateBaseline: jobId => dispatch(srActions.generateBaseline(jobId))
+  generateBaseline: jobId => dispatch(srActions.generateBaseline(jobId)),
+  computeJobEstimations: jobId =>
+    dispatch(actions.computeJobEstimations(jobId, false, () => actions.pollJobEstimationsStatus(jobId)))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(JobDashboardButtonsShortestRun);

@@ -12,6 +12,10 @@ test('should define getEstimatedCost', () => {
   expect(shortestRunManager.getEstimatedCost).toBeDefined();
 });
 
+test('should define processEstimationsPayload', () => {
+  expect(shortestRunManager.processEstimationsPayload).toBeDefined();
+});
+
 describe('manager.generateBaseline', async () => {
   let job;
 

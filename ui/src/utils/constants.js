@@ -63,6 +63,12 @@ const ResultOutcomes = {
   STOPPED: 'STOPPED'
 };
 
+const JobEstimationStatus = {
+  IN_PROGRESS: 'IN_PROGRESS',
+  DONE: 'DONE',
+  NONE: 'NONE'
+};
+
 export {
   scopes,
   FileFormats,
@@ -72,5 +78,6 @@ export {
   ShortestRunStatus,
   RegisteredTaskAssignmentStrategies,
   UserModes,
-  ResultOutcomes
+  ResultOutcomes,
+  JobEstimationStatus
 };

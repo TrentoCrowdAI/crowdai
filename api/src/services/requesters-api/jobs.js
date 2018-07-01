@@ -60,6 +60,17 @@ const getResults = async ctx => {
   );
 };
 
+const computeEstimates = async ctx => {
+  ctx.response.body = await managers.job.computeEstimates(
+    ctx.params.id,
+    ctx.request.fields.single
+  );
+};
+
+const checkEstimatesStatus = async ctx => {
+  ctx.response.body = await managers.job.checkEstimatesStatus(ctx.params.id);
+};
+
 exports.register = router => {
   router.get('/jobs', getRequesterJobs);
   router.post('/jobs', post);
@@ -70,4 +81,6 @@ exports.register = router => {
   router.post('/jobs/:id/copy', copy);
   router.get('/jobs/:id/check-csv', checkCSVCreation);
   router.get('/jobs/:id/results', getResults);
+  router.post('/jobs/:id/estimates', computeEstimates);
+  router.get('/jobs/:id/estimates-status', checkEstimatesStatus);
 };

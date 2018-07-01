@@ -392,6 +392,26 @@ const isDone = (exports.isDone = async job => {
   return itemsCount === classifiedCount;
 });
 
+/**
+ * ShortestRun implementation of processEstimationsPayload. In this case we
+ * check if the state is FILTERS_ASSIGNED, in which case we set the fixedVotes flag.
+ *
+ * @param {Object} job
+ * @param {Object} payload
+ * @return {Object}
+ */
+exports.processEstimationsPayload = (job, payload) => {
+  const { shortestRun } = job.data;
+
+  if (shortestRun.state === ShortestRunStates.FILTERS_ASSIGNED) {
+    payload.fixedVotes = true;
+    // after baseline round we only collect one vote per (item, filter)
+    payload.votesPerItem = 1;
+  }
+  payload.baseroundItems = job.data.shortestRun.baselineSize;
+  return payload;
+};
+
 const getCriteriaPayload = parameters => {
   let criteria = {};
 

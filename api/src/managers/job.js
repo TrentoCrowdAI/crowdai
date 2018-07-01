@@ -703,6 +703,10 @@ exports.computeEstimates = async (jobId, single) => {
   if (!job) {
     throw Boom.badRequest(`The job with ID=${jobId} does not exist`);
   }
+
+  if (!job.data.priors || Object.values(job.data.priors).length === 0) {
+    throw Boom.badRequest(`The job should specify Filters Knowledge.`);
+  }
   const itemsCount = await delegates.projects.getItemsCount(job.project_id);
   const filtersCount = await delegates.projects.getCriteriaCount(
     job.project_id
@@ -712,11 +716,11 @@ exports.computeEstimates = async (jobId, single) => {
     itemsPerWorker: job.data.maxTasksRule,
     votesPerItem: job.data.votesPerTaskRule,
     initialTests: job.data.initialTestsRule,
-    itemsNum: itemsCount + 1000,
+    itemsNum: itemsCount,
     filtersNum: filtersCount,
     baseroundItems: config.estimations.baseroundItems,
-    // TODO: this parameters need to update as the job progresses
-    filtersSelectivity: [0.14, 0.14, 0.42],
+    filtersSelectivity: Object.values(job.data.priors),
+    // TODO: add a feature for setting this array
     filtersDifficulty: [1.0, 1.1, 0.9],
     single
   };

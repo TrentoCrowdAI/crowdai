@@ -7,6 +7,7 @@ const request = require('request');
 const managers = require(__base + 'managers');
 const delegates = require(__base + 'delegates');
 const db = require(__base + 'db');
+const { ascendingComparator } = require(__base + 'utils/array');
 
 // This should match with the corresponding record in the task_assignment_api table.
 exports.NAME = 'Shortest Run';
@@ -407,6 +408,13 @@ exports.processEstimationsPayload = (job, payload) => {
     payload.fixedVotes = true;
     // after baseline round we only collect one vote per (item, filter)
     payload.votesPerItem = 1;
+    // we can update the filters selectivity property too.
+    let filtersSelectivity = shortestRun.parametersEstimation.map(f => ({
+      criteria: f.criteria,
+      selectivity: f.selectivity
+    }));
+    filtersSelectivity.sort(ascendingComparator(f => f.criteria));
+    payload.filtersSelectivity = filtersSelectivity.map(f => f.selectivity);
   }
   payload.baseroundItems = job.data.shortestRun.baselineSize;
   return payload;

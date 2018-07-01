@@ -103,7 +103,7 @@ const publishJob = (action$, store) =>
       .catch(error => {
         let err = flattenError(error);
         return Observable.concat(
-          Observable.of(actions.publishError(flattenError(err))),
+          Observable.of(actions.publishError(err)),
           Observable.of(toastActions.show({message: err.message, type: ToastTypes.ERROR}))
         );
       });
@@ -215,7 +215,7 @@ const fetchTaskAssignmentStrategies = (action$, store) =>
       .catch(error => {
         let err = flattenError(error);
         return Observable.concat(
-          Observable.of(actions.fetchTaskAssignmentStrategiesError(flattenError(err))),
+          Observable.of(actions.fetchTaskAssignmentStrategiesError(err)),
           Observable.of(toastActions.show({message: err.message, type: ToastTypes.ERROR}))
         );
       });
@@ -230,7 +230,7 @@ const fetchResults = (action$, store) =>
       .catch(error => {
         let err = flattenError(error);
         return Observable.concat(
-          Observable.of(actions.fetchResultsError(flattenError(err))),
+          Observable.of(actions.fetchResultsError(err)),
           Observable.of(toastActions.show({message: err.message, type: ToastTypes.ERROR}))
         );
       });
@@ -243,7 +243,7 @@ const fetchAggregationStrategies = (action$, store) =>
       .catch(error => {
         let err = flattenError(error);
         return Observable.concat(
-          Observable.of(actions.fetchAggregationStrategiesError(flattenError(err))),
+          Observable.of(actions.fetchAggregationStrategiesError(err)),
           Observable.of(toastActions.show({message: err.message, type: ToastTypes.ERROR}))
         );
       });
@@ -262,8 +262,12 @@ const computeJobEstimations = (action$, store) =>
       })
       .catch(error => {
         let err = flattenError(error);
+
+        if (err.message === 'The job should specify Filters Knowledge') {
+          err.message = `${err.message}. Please edit the job to add the priors (using Filters Knowledge tab)`;
+        }
         return Observable.concat(
-          Observable.of(actions.computeJobEstimationsError(flattenError(err))),
+          Observable.of(actions.computeJobEstimationsError(err)),
           Observable.of(toastActions.show({message: err.message, type: ToastTypes.ERROR}))
         );
       });

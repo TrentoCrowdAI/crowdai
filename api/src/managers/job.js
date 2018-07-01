@@ -712,7 +712,7 @@ exports.computeEstimates = async (jobId, single) => {
     itemsPerWorker: job.data.maxTasksRule,
     votesPerItem: job.data.votesPerTaskRule,
     initialTests: job.data.initialTestsRule,
-    itemsNum: itemsCount + 1000,
+    itemsNum: itemsCount,
     filtersNum: filtersCount,
     baseroundItems: config.estimations.baseroundItems,
     // TODO: this parameters need to update as the job progresses

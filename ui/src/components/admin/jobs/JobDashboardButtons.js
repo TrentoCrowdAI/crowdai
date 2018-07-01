@@ -134,7 +134,8 @@ const JobDashboardButtonsPropTypes = {
   jobState: PropTypes.object,
   job: PropTypes.object,
   selectedParameter: PropTypes.object,
-  estimationsPolling: PropTypes.bool
+  estimationsPolling: PropTypes.bool,
+  profile: PropTypes.object
 };
 
 JobDashboardButtons.propTypes = JobDashboardButtonsPropTypes;

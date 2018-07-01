@@ -725,7 +725,6 @@ exports.computeEstimates = async (jobId, single) => {
     single
   };
   payload = await coordinator.processEstimationsPayload(job, payload);
-
   // we make sure baseround_items is a multiple of items_per_worker
   // this is a constraint of the estimations-api
   if (payload.baseroundItems % payload.itemsPerWorker !== 0) {

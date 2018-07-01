@@ -4,7 +4,7 @@ import Papa from 'papaparse';
 
 import {actionTypes, actions} from './actions';
 import axios, {requestersApi} from 'src/utils/axios';
-import {flattenError} from 'src/utils';
+import {flattenError, isExpertMode} from 'src/utils';
 import config from 'src/config/config.json';
 import {actions as historyActions} from 'src/components/core/history/actions';
 import {actions as toastActions} from 'src/components/core/toast/actions';
@@ -64,7 +64,8 @@ const saveJob = (action$, store) =>
         // we start the estimation because it takes time. Only if we do not have a token or
         // the CSV files has changed.
         if (csvChanged || !jobSaved.data.estimationToken) {
-          actionsToConcat.push(Observable.of(actions.computeJobEstimations(jobSaved.id, false)));
+          const single = !isExpertMode(profile); // Researchers => single=false, Authors => single=true
+          actionsToConcat.push(Observable.of(actions.computeJobEstimations(jobSaved.id, single)));
         }
         return Observable.concat(...actionsToConcat);
       })

@@ -24,6 +24,7 @@ import JobDashboardButtons from './JobDashboardButtons';
 import {isExpertMode} from 'src/utils';
 import JobResults from './JobResults';
 import PriceLossChart from './PriceLossChart';
+import JobSimpleEstimations from './JobSimpleEstimations';
 
 class JobDashboard extends React.Component {
   constructor(props) {
@@ -216,40 +217,19 @@ class JobDashboard extends React.Component {
   }
 
   renderAuthorsEstimations() {
+    const {item, estimationsLoading, estimationsPolling} = this.props;
+    const isLoading = estimationsLoading || estimationsPolling;
     return (
-      <Statistic.Group widths="2">
-        <Statistic>
-          <Statistic.Value>
-            <Icon
-              name="calculator"
-              size="small"
-              style={{
-                verticalAlign: 'top',
-                marginTop: '8px',
-                marginRight: '2px'
-              }}
-            />
-            0.40
-          </Statistic.Value>
-          <Statistic.Label>Estimated precision</Statistic.Label>
-        </Statistic>
-
-        <Statistic>
-          <Statistic.Value>
-            <Icon
-              name="calculator"
-              size="small"
-              style={{
-                verticalAlign: 'top',
-                marginTop: '8px',
-                marginRight: '2px'
-              }}
-            />
-            0.80
-          </Statistic.Value>
-          <Statistic.Label>Estimated price ratio</Statistic.Label>
-        </Statistic>
-      </Statistic.Group>
+      <React.Fragment>
+        {!isLoading && item.data.estimations && <JobSimpleEstimations data={item.data.estimations[0]} />}
+        {isLoading && (
+          <Segment style={{height: '200px'}}>
+            <Dimmer active inverted>
+              <Loader inverted>Computing estimations</Loader>
+            </Dimmer>
+          </Segment>
+        )}
+      </React.Fragment>
     );
   }
 

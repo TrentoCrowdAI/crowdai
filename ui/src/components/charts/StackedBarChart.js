@@ -43,7 +43,8 @@ class StackedBarChart extends React.Component {
     var xscale = d3.scaleLinear()
     		.range([0, width])
 
-    var xAxis = d3.axisTop().scale(xscale)
+		var xAxis = d3.axisTop().scale(xscale)
+			.tickFormat(d => Math.abs(Number(d)))
     var yAxis = d3.axisLeft().scale(yscale)
 
     var rowsNames = data.map( d => d[x]+','+d[z])

@@ -76,7 +76,7 @@ class Reports extends React.Component {
 			...this.state,
 			chosenmetric: value,
 			//activeworker: value==='SingleWorker' ? true : false,
-			//chosenworker: value==='SingleWorker' ? this.state.chosenworker : 'all',
+			chosenworker: 'all',
 			chosenitem: 'all',
 			chosencriteria: 'all',
 			activeitem: 
@@ -271,7 +271,7 @@ class Reports extends React.Component {
 				y='f1_score'
 				z='matthews_correlation'
 				w='diagnostic_odds_ratio'
-				param=1
+				param=this.props.chosenworker
 				break;
 
 			case 'Comparing':
@@ -280,7 +280,7 @@ class Reports extends React.Component {
 				y='cohen_kappa'
 				z='agreement'
 				w='bennett_S'
-				param=1
+				param=this.state.chosenworker
 				break;
 
 			case 'SingleWorker':

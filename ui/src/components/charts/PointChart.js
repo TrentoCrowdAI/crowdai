@@ -43,7 +43,7 @@ class PointChart extends React.Component {
       Math.abs(a[y]-a[z])>Math.abs(b[y]-b[z]) ? 1 : Math.abs(a[y]-a[z])<Math.abs(b[y]-b[z]) ? -1 : 0
     )
 
-    console.log('point workers:',data)
+    //console.log('point workers:',data)
 
     var colors = ['#FFCD9A', '#FFB366', '#FF9A33', '#FF8000', 'red']
     var colorscale = d3.scaleOrdinal(colors)

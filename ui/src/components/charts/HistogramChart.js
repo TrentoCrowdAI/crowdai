@@ -103,7 +103,7 @@ class HistogramChart extends React.Component {
         })
 
         var nuovo = []
-        console.log(d.x0,d.x1)
+        //console.log(d.x0,d.x1)
         data.map( step => (
           d.x0===d3.min(xscale.domain()) ? (step[x]/param>=d.x0 && step[x]/param<=d.x1)
           : d.x1===d3.max(xscale.domain())-param ? (step[x]/param>d.x0)

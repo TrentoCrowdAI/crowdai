@@ -47,6 +47,7 @@ class GroupedChart extends React.Component {
     var y = this.props.y
     var z = this.props.z
     var w = this.props.w
+    var param = this.props.param
     
     var data = this.props.data.sort( (a,b) => 
       a[this.state.order]<b[this.state.order] ? 1 : a[this.state.order]>b[this.state.order] ? -1 : 0 )
@@ -71,8 +72,8 @@ class GroupedChart extends React.Component {
     x0scale.domain( data.map(d => (d[x[0]]+ (x[1]!=='null' ? (', '+d[x[1]]) : '' )) ))
     x1scale.domain(keys).range([0, x0scale.bandwidth()])
     yscale.domain([
-      -1,
-      d3.max(data, d => Math.max(d[w],d[y],d[z]))
+      -1, 1
+      //d3.max(data, d => Math.max(d[w],d[y],d[z]))
     ])
 
     var tooltip = d3.select('body')
@@ -111,17 +112,23 @@ class GroupedChart extends React.Component {
     
     //build one bar per each metric for each element
     var rects = bars.selectAll('rect')
-      .data(d => keys.map(k => { return {'key': k, 'value': d[k]} }))
+      .data(d => keys.map(k => { return {'key': k, 'value': (d[k]>1 ? 1 : d[k]) } }))
       .enter().append('rect')
         .attr('x', d => x1scale(d.key))
-        .attr('y', d => yscale(d.value))
+        .attr('y', d => 
+              (d.value>=0) ? yscale(d.value) 
+            : (d.value<0 ) ? yscale(0)
+            : yscale(d.value) )
         .attr('width', d => x1scale.bandwidth())
-        .attr('height', d => height-yscale(d.value))
+        .attr('height', d => 
+              (d.value>=0 ) ? (height/2)-yscale(d.value) 
+            : (d.value<0 ) ? (height/2*(-1))+yscale(d.value)
+            : (height)-yscale(d.value) )
         .attr('fill', d => colorscale(d.key))
 
     var gx = g.append('g')
       .attr('class', 'x axis')
-      .attr('transform', 'translate(0,'+height+')')
+      .attr('transform', 'translate(0,'+(param=='all' ? yscale(0) : height)+')')
       .call(d3
         .axisBottom(x0scale)
         .tickFormat("")
@@ -152,7 +159,8 @@ class GroupedChart extends React.Component {
 
       gx.call(d3
         .axisBottom(x0scale)
-        .tickFormat(""))
+        .tickFormat("")
+      )
 
       //rescale all components that need to be zoomed
       bars.attr('transform', d => 'translate('+x0scale(d[x[0]]+ (x[1]!=='null' ? (', '+d[x[1]]) : '') )+',0)')

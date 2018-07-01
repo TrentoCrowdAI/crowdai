@@ -7,7 +7,7 @@ import {actions} from 'src/components/admin/jobs/actions';
 import NumberInput from 'src/components/core/form/NumberInput';
 import store from 'src/store';
 
-class JobFormShortestRunPlugin extends React.Component {
+class JobFormShortestRun extends React.Component {
   constructor(props) {
     super(props);
     this.handleChange = this.handleChange.bind(this);
@@ -51,7 +51,7 @@ class JobFormShortestRunPlugin extends React.Component {
   }
 }
 
-JobFormShortestRunPlugin.propTypes = {
+JobFormShortestRun.propTypes = {
   job: PropTypes.object,
   setInputValue: PropTypes.func
 };
@@ -71,4 +71,4 @@ const cleanProps = () => {
 
 export {cleanProps};
 
-export default connect(mapStateToProps, mapDispatchToProps)(JobFormShortestRunPlugin);
+export default connect(mapStateToProps, mapDispatchToProps)(JobFormShortestRun);

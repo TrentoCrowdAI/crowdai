@@ -78,7 +78,9 @@ PublishButton.propTypes = {
 };
 
 const StopButton = ({job}) => {
-  if (job.data.status === JobStatus.PUBLISHED) {
+  // TODO: currently we disable the stop feature
+  // eslint-disable-next-line no-constant-condition
+  if (job.data.status === JobStatus.PUBLISHED && false) {
     return (
       <Button floated="right" size="large" negative>
         Stop

@@ -24,6 +24,20 @@ const saveJob = (action$, store) =>
     const profile = store.getState().profile.item;
     item.requester_id = profile.id;
     item.data.taskAssignmentStrategy = Number(item.data.taskAssignmentStrategy);
+    // we check if the user fill in the priors in the Filters Knowledge tab.
+    const priorsOk = Object.values(item.data.priors).filter(f => f === '').length === 0;
+
+    if (!priorsOk) {
+      return Observable.concat(
+        Observable.of(
+          toastActions.show({
+            message: 'Please fill in the values in the Filters Knowledge section',
+            type: ToastTypes.WARNING
+          })
+        ),
+        Observable.of(actions.submitSuccess())
+      );
+    }
     return Observable.defer(
       () => (item.id ? requestersApi.put(`/jobs/${item.id}`, item) : requestersApi.post('/jobs', item))
     )

@@ -1,31 +1,37 @@
 import React from 'react';
-import {Message, Grid, Transition} from 'semantic-ui-react';
+import {Message} from 'semantic-ui-react';
 import PropTypes from 'prop-types';
+import {toast} from 'react-toastify';
 
-import ToastTypes from 'src/components/core/toast/types';
+import ToastTypes from './types';
+import config from 'src/config/config.json';
 
-const Toast = props => {
-  return (
-    <Transition.Group animation={'fade left'} duration={500}>
-      {props.visible && (
-        <Grid>
-          <Grid.Row>
-            <Grid.Column width="4" floated="right" style={{marginRight: '2em'}}>
-              <Message
-                success={props.type === ToastTypes.SUCCESS}
-                info={props.type === ToastTypes.INFO}
-                warning={props.type === ToastTypes.WARNING}
-                error={props.type === ToastTypes.ERROR}
-                header={props.header}
-                content={props.message}
-              />
-            </Grid.Column>
-          </Grid.Row>
-        </Grid>
-      )}
-    </Transition.Group>
-  );
-};
+class Toast extends React.Component {
+  render() {
+    if (!this.props.visible) {
+      return null;
+    }
+    toast(<Msg {...this.props} />, {
+      autoClose: config.toastDismissTimeout,
+      closeButton: false,
+      hideProgressBar: true
+    });
+    return null;
+  }
+}
+
+// eslint-disable-next-line react/prop-types
+const Msg = ({closeToast, type, header, message}) => (
+  <Message
+    success={type === ToastTypes.SUCCESS}
+    info={type === ToastTypes.INFO}
+    warning={type === ToastTypes.WARNING}
+    error={type === ToastTypes.ERROR}
+    header={header}
+    content={message}
+    onDismiss={closeToast}
+  />
+);
 
 Toast.propTypes = {
   header: PropTypes.string.isRequired,

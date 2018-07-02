@@ -70,15 +70,6 @@ class JobForm extends React.Component {
               {this.state.activeStep === 'info' ? this.renderExperimentInformation() : this.renderCriteriaKnowledge()}
             </Segment>
           </div>
-
-          {this.props.error && (
-            <Message
-              error
-              header="Error"
-              content={this.props.error.message || 'Changes not saved. Please try again.'}
-            />
-          )}
-          {this.props.saved && <Message success header="Success" content="Changes saved!" />}
           <Button floated="right" positive>
             Save
           </Button>
@@ -346,6 +337,7 @@ class JobForm extends React.Component {
                     min="0"
                     max="100"
                     placeholder="% of papers you think would meet the filter"
+                    required
                   />
                 </Grid.Column>
               </Grid.Row>

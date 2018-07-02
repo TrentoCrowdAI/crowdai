@@ -6,6 +6,7 @@ import {Route, withRouter, Redirect} from 'react-router-dom';
 import ApplicationHeader from 'src/components/admin/dashboard/ApplicationHeader';
 import Dashboard from './Dashboard';
 import Breadcrumb from './Breadcrumb';
+import {ToastContainer} from 'react-toastify';
 import ToastManager from 'src/components/core/toast/ToastManager';
 
 /**
@@ -19,6 +20,7 @@ class DashboardContainer extends React.Component {
           <React.Fragment>
             <ApplicationHeader location={this.props.location} />
             <Breadcrumb />
+            <ToastContainer />
             <ToastManager />
             <Route path="/admin" component={Dashboard} />
           </React.Fragment>

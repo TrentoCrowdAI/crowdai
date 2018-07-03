@@ -45,7 +45,6 @@ const saveJob = (action$, store) =>
         let msg = 'The CSV files are now being processed.';
         let actionsToConcat = [Observable.of(actions.submitSuccess())];
         let jobSaved = response.data;
-        let csvChanged = true;
 
         if (
           jobSaved.data.itemsUrl === item.data.itemsUrl &&
@@ -55,7 +54,6 @@ const saveJob = (action$, store) =>
           item.id
         ) {
           msg = 'The job was saved correctly.';
-          csvChanged = false;
         } else {
           actionsToConcat.push(Observable.of(actions.checkCSVCreation(jobSaved)));
         }
@@ -74,12 +72,6 @@ const saveJob = (action$, store) =>
 
         if (action.onSuccessExtraAction && typeof action.onSuccessExtraAction === 'function') {
           actionsToConcat.push(Observable.of(action.onSuccessExtraAction()));
-        }
-        // we start the estimation because it takes time. Only if we do not have a token or
-        // the CSV files has changed.
-        if (csvChanged || !jobSaved.data.estimationToken) {
-          const single = !isExpertMode(profile); // Researchers => single=false, Authors => single=true
-          actionsToConcat.push(Observable.of(actions.computeJobEstimations(jobSaved.id, single)));
         }
         return Observable.concat(...actionsToConcat);
       })
@@ -163,10 +155,10 @@ const copyJob = (action$, store) =>
 const checkCSVCreation = (action$, store) =>
   action$.ofType(actionTypes.CHECK_CSV_CREATION).switchMap(action => {
     return Observable.concat(
-      pollCSV(action.job),
+      pollCSV(action.job, store),
       Observable.interval(config.polling.jobCheckCSV)
         .takeUntil(action$.ofType(actionTypes.CHECK_CSV_CREATION_DONE))
-        .mergeMap(() => pollCSV(action.job))
+        .mergeMap(() => pollCSV(action.job, store))
     );
   });
 
@@ -188,14 +180,18 @@ const fetchFiltersCSV = (action$, store) =>
       });
   });
 
-function pollCSV(job) {
+function pollCSV(job, store) {
+  const profile = store.getState().profile.item;
   return Observable.defer(() => requestersApi.get(`jobs/${job.id}/check-csv`))
     .mergeMap(response => {
       let status = response.data;
 
       if (status.itemsCreated && status.testsCreated) {
+        // we start the estimation because it takes time.
+        const single = !isExpertMode(profile); // Researchers => single=false, Authors => single=true
         return Observable.concat(
           Observable.of(actions.checkCSVCreationDone()),
+          Observable.of(actions.computeJobEstimations(job.id, single)),
           Observable.of(
             toastActions.show({
               header: `Job ${job.data.name} `,

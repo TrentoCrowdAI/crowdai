@@ -720,8 +720,6 @@ exports.computeEstimates = async (jobId, single) => {
     filtersNum: filtersCount,
     baseroundItems: config.estimations.baseroundItems,
     filtersSelectivity: Object.values(job.data.priors).map(p => p / 100),
-    // TODO: add a feature for setting this array
-    filtersDifficulty: [1.0, 1.1, 0.9],
     single
   };
   payload = await coordinator.processEstimationsPayload(job, payload);

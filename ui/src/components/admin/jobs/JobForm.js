@@ -145,37 +145,46 @@ class JobForm extends React.Component {
 
         {this.renderCriteriaSection()}
 
-        <Segment>
-          <Header as="h3">Task design</Header>
-          <Form.Group widths="equal">
-            <Form.Select
-              label="Smart abstract presentation technique"
-              name="data.abstractPresentationTechnique"
-              value={item.data.abstractPresentationTechnique}
-              options={Object.entries(AbstractPresentationTechniques).map(([key, val]) => ({text: val, value: key}))}
-              onChange={this.handleChange}
-            />
-            <Form.Select
-              label="Label options"
-              name="data.labelOptions"
-              value={item.data.labelOptions}
-              options={Object.entries(LabelOptions).map(([key, val]) => ({text: val, value: key}))}
-              onChange={this.handleChange}
-            />
-          </Form.Group>
+        {/* TODO: remove this conditional when we implement all of the Form.Select above */}
+        {isExpertMode(this.props.profile) && (
+          <Segment>
+            <Header as="h3">Task design</Header>
+            {/* TODO: implement */}
+            {false && (
+              <Form.Group widths="equal">
+                <Form.Select
+                  label="Smart abstract presentation technique"
+                  name="data.abstractPresentationTechnique"
+                  value={item.data.abstractPresentationTechnique}
+                  options={Object.entries(AbstractPresentationTechniques).map(([key, val]) => ({
+                    text: val,
+                    value: key
+                  }))}
+                  onChange={this.handleChange}
+                />
+                <Form.Select
+                  label="Label options"
+                  name="data.labelOptions"
+                  value={item.data.labelOptions}
+                  options={Object.entries(LabelOptions).map(([key, val]) => ({text: val, value: key}))}
+                  onChange={this.handleChange}
+                />
+              </Form.Group>
+            )}
 
-          {isExpertMode(this.props.profile) && (
-            <Form.Select
-              label="Task assignment strategy"
-              placeholder="Task assignment strategy"
-              name="data.taskAssignmentStrategy"
-              value={item.data.taskAssignmentStrategy}
-              options={taskAssignmentStrategies.map(s => ({text: s.name, value: Number(s.id)}))}
-              onChange={this.handleChange}
-              required
-            />
-          )}
-        </Segment>
+            {isExpertMode(this.props.profile) && (
+              <Form.Select
+                label="Task assignment strategy"
+                placeholder="Task assignment strategy"
+                name="data.taskAssignmentStrategy"
+                value={item.data.taskAssignmentStrategy}
+                options={taskAssignmentStrategies.map(s => ({text: s.name, value: Number(s.id)}))}
+                onChange={this.handleChange}
+                required
+              />
+            )}
+          </Segment>
+        )}
 
         {this.renderParametersSection()}
         {this.renderHitSection()}
@@ -229,9 +238,6 @@ class JobForm extends React.Component {
 
     return (
       <Segment>
-        <Dimmer active={item.criteriaLoading} inverted>
-          <Loader>Loading filters from CSV...</Loader>
-        </Dimmer>
         <Header as="h3">Filters</Header>
         <Form.Field>
           <Radio
@@ -267,14 +273,19 @@ class JobForm extends React.Component {
           />
         </Form.Field>
 
-        <Form.Field style={{marginTop: '2em', marginBottom: '2em'}}>
-          <Checkbox
-            label="Assist me in filter quality analysis"
-            name="data.criteriaQualityAnalysis"
-            checked={item.data.criteriaQualityAnalysis}
-            onChange={(e, {name, value}) => this.handleChange(e, {name, value: !item.data.criteriaQualityAnalysis})}
-          />
-        </Form.Field>
+        {/* TODO: implement */}
+        {false && (
+          <Form.Field style={{marginTop: '2em', marginBottom: '2em'}}>
+            <Checkbox
+              label="Assist me in filter quality analysis"
+              name="data.criteriaQualityAnalysis"
+              checked={item.data.criteriaQualityAnalysis}
+              onChange={(e, {name, value}) =>
+                this.handleChange(e, {name, value: !item.data.criteriaQualityAnalysis})
+              }
+            />
+          </Form.Field>
+        )}
 
         {criteria &&
           criteria.map((c, idx) => {
@@ -311,6 +322,10 @@ class JobForm extends React.Component {
               </div>
             );
           })}
+
+        <Dimmer active={item.criteriaLoading} inverted>
+          <Loader>Loading filters from CSV...</Loader>
+        </Dimmer>
       </Segment>
     );
   }

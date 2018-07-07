@@ -719,7 +719,9 @@ exports.computeEstimates = async (jobId, single) => {
     itemsNum: itemsCount,
     filtersNum: filtersCount,
     baseroundItems: config.estimations.baseroundItems,
-    filtersSelectivity: Object.values(job.data.priors).map(p => p / 100),
+    filtersSelectivity: Object.values(job.data.priors).map(
+      p => (100 - p) / 100 // in our estimation-api the filters are exclusion criteria
+    ),
     single
   };
   payload = await coordinator.processEstimationsPayload(job, payload);

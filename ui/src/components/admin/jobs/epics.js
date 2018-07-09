@@ -4,7 +4,7 @@ import Papa from 'papaparse';
 
 import {actionTypes, actions} from './actions';
 import axios, {requestersApi} from 'src/utils/axios';
-import {flattenError} from 'src/utils';
+import {flattenError, isExpertMode} from 'src/utils';
 import config from 'src/config/config.json';
 import {actions as historyActions} from 'src/components/core/history/actions';
 import {actions as toastActions} from 'src/components/core/toast/actions';
@@ -24,6 +24,20 @@ const saveJob = (action$, store) =>
     const profile = store.getState().profile.item;
     item.requester_id = profile.id;
     item.data.taskAssignmentStrategy = Number(item.data.taskAssignmentStrategy);
+    // we check if the user fill in the priors in the Filters Knowledge tab.
+    const priorsOk = Object.values(item.data.priors).filter(f => f === '').length === 0;
+
+    if (!priorsOk) {
+      return Observable.concat(
+        Observable.of(
+          toastActions.show({
+            message: 'Please fill in the values in the Filters Knowledge section',
+            type: ToastTypes.WARNING
+          })
+        ),
+        Observable.of(actions.submitSuccess())
+      );
+    }
     return Observable.defer(
       () => (item.id ? requestersApi.put(`/jobs/${item.id}`, item) : requestersApi.post('/jobs', item))
     )
@@ -31,7 +45,6 @@ const saveJob = (action$, store) =>
         let msg = 'The CSV files are now being processed.';
         let actionsToConcat = [Observable.of(actions.submitSuccess())];
         let jobSaved = response.data;
-        let csvChanged = true;
 
         if (
           jobSaved.data.itemsUrl === item.data.itemsUrl &&
@@ -41,7 +54,6 @@ const saveJob = (action$, store) =>
           item.id
         ) {
           msg = 'The job was saved correctly.';
-          csvChanged = false;
         } else {
           actionsToConcat.push(Observable.of(actions.checkCSVCreation(jobSaved)));
         }
@@ -60,11 +72,6 @@ const saveJob = (action$, store) =>
 
         if (action.onSuccessExtraAction && typeof action.onSuccessExtraAction === 'function') {
           actionsToConcat.push(Observable.of(action.onSuccessExtraAction()));
-        }
-        // we start the estimation because it takes time. Only if we do not have a token or
-        // the CSV files has changed.
-        if (csvChanged || !jobSaved.data.estimationToken) {
-          actionsToConcat.push(Observable.of(actions.computeJobEstimations(jobSaved.id, false)));
         }
         return Observable.concat(...actionsToConcat);
       })
@@ -148,10 +155,10 @@ const copyJob = (action$, store) =>
 const checkCSVCreation = (action$, store) =>
   action$.ofType(actionTypes.CHECK_CSV_CREATION).switchMap(action => {
     return Observable.concat(
-      pollCSV(action.job),
+      pollCSV(action.job, store),
       Observable.interval(config.polling.jobCheckCSV)
         .takeUntil(action$.ofType(actionTypes.CHECK_CSV_CREATION_DONE))
-        .mergeMap(() => pollCSV(action.job))
+        .mergeMap(() => pollCSV(action.job, store))
     );
   });
 
@@ -173,14 +180,18 @@ const fetchFiltersCSV = (action$, store) =>
       });
   });
 
-function pollCSV(job) {
+function pollCSV(job, store) {
+  const profile = store.getState().profile.item;
   return Observable.defer(() => requestersApi.get(`jobs/${job.id}/check-csv`))
     .mergeMap(response => {
       let status = response.data;
 
       if (status.itemsCreated && status.testsCreated) {
+        // we start the estimation because it takes time.
+        const single = !isExpertMode(profile); // Researchers => single=false, Authors => single=true
         return Observable.concat(
           Observable.of(actions.checkCSVCreationDone()),
+          Observable.of(actions.computeJobEstimations(job.id, single)),
           Observable.of(
             toastActions.show({
               header: `Job ${job.data.name} `,

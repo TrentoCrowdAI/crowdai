@@ -1,29 +1,18 @@
 import React from 'react';
-import {
-  Step,
-  Icon,
-  Segment,
-  Grid,
-  Form,
-  Statistic,
-  Header,
-  Message,
-  List,
-  Label,
-  Dimmer,
-  Loader
-} from 'semantic-ui-react';
+import {Step, Icon, Segment, Grid, Form, Statistic, Header, Message, Dimmer, Loader} from 'semantic-ui-react';
 import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
 
 import {actions} from './actions';
-import {JobStatus} from 'src/utils/constants';
 import JobParameters from './JobParameters';
 import HitInformation from './HitInformation';
 import JobDashboardButtons from './JobDashboardButtons';
 import {isExpertMode} from 'src/utils';
 import JobResults from './JobResults';
 import PriceLossChart from './PriceLossChart';
+import JobSimpleEstimations from './JobSimpleEstimations';
+import {JobStatus} from 'src/utils/constants';
+import JobInformation from './JobInformation';
 
 class JobDashboard extends React.Component {
   constructor(props) {
@@ -67,55 +56,7 @@ class JobDashboard extends React.Component {
   }
 
   renderJobInformation() {
-    const {item} = this.props;
-    const criteria = item.criteria || [];
-
-    return (
-      <Segment loading={this.props.loading}>
-        <Header as="h3">
-          Job Information
-          <Label horizontal color={jobStatusColors[item.data.status]}>
-            {item.data.status}
-          </Label>
-        </Header>
-        <Grid>
-          <Grid.Row>
-            <Grid.Column width="8">
-              <List divided relaxed>
-                <List.Item>
-                  <List.Content>
-                    <List.Header as="h4">Name</List.Header>
-                    <List.Description as="p">{item.data.name}</List.Description>
-                  </List.Content>
-                </List.Item>
-                <List.Item>
-                  <List.Content>
-                    <List.Header as="h4">Description</List.Header>
-                    <List.Description as="p">{item.data.description}</List.Description>
-                  </List.Content>
-                </List.Item>
-              </List>
-            </Grid.Column>
-            <Grid.Column width="8">
-              <List divided relaxed>
-                <List.Item>
-                  <List.Content>
-                    <List.Header as="h4">Number of papers</List.Header>
-                    <List.Description as="p">{item.itemsCount}</List.Description>
-                  </List.Content>
-                </List.Item>
-                <List.Item>
-                  <List.Content>
-                    <List.Header as="h4">Number of filters</List.Header>
-                    <List.Description as="p">{criteria && criteria.length}</List.Description>
-                  </List.Content>
-                </List.Item>
-              </List>
-            </Grid.Column>
-          </Grid.Row>
-        </Grid>
-      </Segment>
-    );
+    return <JobInformation job={this.props.item} loading={this.props.loading} />;
   }
 
   renderProcess() {
@@ -216,40 +157,19 @@ class JobDashboard extends React.Component {
   }
 
   renderAuthorsEstimations() {
+    const {item, estimationsLoading, estimationsPolling} = this.props;
+    const isLoading = estimationsLoading || estimationsPolling;
     return (
-      <Statistic.Group widths="2">
-        <Statistic>
-          <Statistic.Value>
-            <Icon
-              name="calculator"
-              size="small"
-              style={{
-                verticalAlign: 'top',
-                marginTop: '8px',
-                marginRight: '2px'
-              }}
-            />
-            0.40
-          </Statistic.Value>
-          <Statistic.Label>Estimated precision</Statistic.Label>
-        </Statistic>
-
-        <Statistic>
-          <Statistic.Value>
-            <Icon
-              name="calculator"
-              size="small"
-              style={{
-                verticalAlign: 'top',
-                marginTop: '8px',
-                marginRight: '2px'
-              }}
-            />
-            0.80
-          </Statistic.Value>
-          <Statistic.Label>Estimated price ratio</Statistic.Label>
-        </Statistic>
-      </Statistic.Group>
+      <React.Fragment>
+        {!isLoading && item.data.estimations && <JobSimpleEstimations data={item.data.estimations[0]} />}
+        {isLoading && (
+          <Segment style={{height: '200px'}}>
+            <Dimmer active inverted>
+              <Loader inverted>Computing estimations</Loader>
+            </Dimmer>
+          </Segment>
+        )}
+      </React.Fragment>
     );
   }
 
@@ -347,12 +267,6 @@ const JobResultSummary = ({jobState, job}) => {
 JobResultSummary.propTypes = {
   jobState: PropTypes.object,
   job: PropTypes.object
-};
-
-const jobStatusColors = {
-  [JobStatus.PUBLISHED]: 'green',
-  [JobStatus.NOT_PUBLISHED]: 'grey',
-  [JobStatus.DONE]: 'blue'
 };
 
 JobDashboard.propTypes = {

@@ -1,9 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import JobFormShortestRunPlugin, {
-  cleanProps
-} from 'src/components/admin/plugins/shortest-run/JobFormShortestRunPlugin';
+import JobFormShortestRun, {cleanProps} from 'src/components/admin/plugins/shortest-run/JobFormShortestRun';
 import {RegisteredTaskAssignmentStrategies} from 'src/utils/constants';
 
 /**
@@ -21,7 +19,7 @@ class JobFormPlugin extends React.Component {
     }
 
     if (strategy.name === RegisteredTaskAssignmentStrategies.SHORTEST_RUN) {
-      return <JobFormShortestRunPlugin job={job} strategies={this.props.strategies} />;
+      return <JobFormShortestRun job={job} strategies={this.props.strategies} />;
     }
     return null;
   }

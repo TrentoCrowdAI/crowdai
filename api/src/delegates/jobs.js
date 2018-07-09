@@ -13,7 +13,9 @@ const { NAME: SHORTEST_RUN } = require(__base + 'plugins/shortest-run/manager');
 const getByRequester = (exports.getByRequester = async requesterId => {
   try {
     let res = await db.query(
-      `select * from ${db.TABLES.Job} where requester_id = $1`,
+      `select * from ${
+        db.TABLES.Job
+      } where requester_id = $1 and deleted_at is null`,
       [requesterId]
     );
     return { rows: res.rows, meta: { count: res.rowCount } };

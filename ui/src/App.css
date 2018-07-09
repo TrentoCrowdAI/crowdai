@@ -2,3 +2,7 @@
 .ui.basic.green.label {
   background-color: #fff !important;
 }
+
+.Toastify__toast {
+  padding: 0 !important;
+}

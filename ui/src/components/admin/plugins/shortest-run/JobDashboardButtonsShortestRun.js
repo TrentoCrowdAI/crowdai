@@ -12,6 +12,7 @@ import {
   JobDashboardButtonsPropTypes
 } from 'src/components/admin/jobs/JobDashboardButtons';
 import {actions} from 'src/components/admin/jobs/actions';
+import {isExpertMode} from 'src/utils';
 
 class JobDashboardButtonsShortestRun extends React.Component {
   render() {
@@ -64,15 +65,19 @@ RunButton.propTypes = {
   generateBaseline: PropTypes.func
 };
 
-const ComputeEstimationsButton = ({job, computeJobEstimations}) => (
-  <Button onClick={() => computeJobEstimations(job.id)} floated="right" size="large" color="blue">
-    Recompute estimations
-  </Button>
-);
+const ComputeEstimationsButton = ({job, computeJobEstimations, profile}) => {
+  const single = !isExpertMode(profile);
+  return (
+    <Button onClick={() => computeJobEstimations(job.id, single)} floated="right" size="large" color="blue">
+      Recompute estimations
+    </Button>
+  );
+};
 
 ComputeEstimationsButton.propTypes = {
   job: PropTypes.object,
-  computeJobEstimations: PropTypes.func
+  computeJobEstimations: PropTypes.func,
+  profile: PropTypes.object
 };
 
 /**
@@ -119,8 +124,8 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = dispatch => ({
   assignFilters: jobId => dispatch(srActions.assignFilters(jobId)),
   generateBaseline: jobId => dispatch(srActions.generateBaseline(jobId)),
-  computeJobEstimations: jobId =>
-    dispatch(actions.computeJobEstimations(jobId, false, () => actions.pollJobEstimationsStatus(jobId)))
+  computeJobEstimations: (jobId, single) =>
+    dispatch(actions.computeJobEstimations(jobId, single, () => actions.pollJobEstimationsStatus(jobId)))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(JobDashboardButtonsShortestRun);

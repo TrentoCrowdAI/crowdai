@@ -129,29 +129,7 @@ class NestChart extends React.Component {
           +((xscale.bandwidth()/2)+5)
         )+","+(yscale(d[y]/param)-10)+") rotate(-65)")
       .text( d => (d[y]/param).toFixed(1))
-
-    //average red line
-    /*var line = d3.line()
-      .x( (d) => {return xscale(d[z]!=undefined ? d[x]+", "+d[z] : d[x])} )
-      .y( (d) => {return yscale(d[y]/param)} )
-
-    g.append("path")
-      .datum([{
-        y : media,
-        x : data[0][x],
-        z : data[0][z]
-      },{
-        y : media,
-        x : data[data.length-1][x],
-        z : data[data.length-1][z]
-      }])
-      .attr("class","average")
-      .attr("transform","translate("+(xscale.bandwidth()/2)+",0)")
-      .attr("d", line)
-      .style("stroke", "red")
-      .style("fill","none")
-      .style("stroke-width",1)*/
-    
+  
     //if average can be computed, append average value to canvas
     if(data.length>1) {
       g.append("text")

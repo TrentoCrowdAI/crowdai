@@ -5,7 +5,6 @@ import PropTypes from 'prop-types'
 
 import PointChart from './PointChart'
 import HistogramChart from './HistogramChart'
-import BubbleChart from './BubbleChart'
 import HeatMapChart from './HeatMapChart'
 import NestChart from './NestChart.js'
 import StackedBarChart from './StackedBarChart'
@@ -23,31 +22,7 @@ class ChartWrapper extends React.Component {
     this.state = {
       data: this.props.data
     }
-    //this.handleConcat = this.handleConcat.bind(this);
-    //this.handleReduce = this.handleReduce.bind(this);
   }
-
-  /*handleConcat() {
-    var num = Math.floor(Math.random()*10)+1;
-    for(var i=0; i<num; i++) {
-      this.setState(prevState => ({
-        data: prevState.data.concat(
-          [{
-            name: "nuovodato"+(count++).toString(),
-            altezza: (Math.floor(Math.random()*60)+150),
-            peso: (Math.floor(Math.random()*80)+40)
-          }]
-        )
-      }))
-    }
-  }
-
-  handleReduce() {
-    this.setState(prevState => ({
-      data: []
-    }))
-    count=0;
-  }*/
 
   render() {
     switch(this.props.chart) {
@@ -127,14 +102,6 @@ class ChartWrapper extends React.Component {
         return(
           <div>
             <TimeLineChart
-              {...this.props}
-            />
-          </div>
-        )
-      case 'bubbleChart':
-        return(
-          <div>
-            <BubbleChart
               {...this.props}
             />
           </div>

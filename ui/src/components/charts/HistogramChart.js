@@ -64,7 +64,7 @@ class HistogramChart extends React.Component {
     //map data on intervals
     var histo = d3.histogram()
       .thresholds(xscale.ticks(10))
-      (data.map(d => d[x]===0 ? d[x]/param : ((d[x]/param)-param) ))
+      (data.map(d => d[x]===0 ? d[x]/param : ((d[x]/param)-1) ))
 
     //every interval bar with a height equal to the number of corresponding elements
     var yscale = d3.scaleLinear()
@@ -72,20 +72,20 @@ class HistogramChart extends React.Component {
       .range([height,0])
     var yAxis = d3.axisLeft(yscale)
 
-    //tanslate every bar to the corresponding interval, first and last can have special cases based on border values
+    //translate every bar to the corresponding interval, first and last can have special cases based on border values
     var bar = g.selectAll(".bar")
       .data(histo)
       .enter().append("g")
       .attr("class", "bar")
       .attr("transform", d => "translate("+
-        ( d.x0===d3.min(data, d => ((d[x]/param)-param)) ? xscale(d3.min(xscale.domain())) : xscale(d.x0) )
+        ( d.x0===d3.min(data, d => ((d[x]/param)-1)) ? xscale(d3.min(xscale.domain())) : xscale(d.x0) )
         +","+yscale(d.length)+")")
 
     bar.append("rect")
       .style("fill", color )
       .attr("x", 1)
       .attr("width", d => 
-        xscale( (d3.max(xscale.domain()) / ((xscale.ticks().length)-1)) )-param
+        xscale( (d3.max(xscale.domain()) / ((xscale.ticks().length)-1)) )-1
       )
       .attr("height", d => height-yscale(d.length) )
       .on("mouseover", function() {
@@ -105,10 +105,10 @@ class HistogramChart extends React.Component {
         var nuovo = []
         //console.log(d.x0,d.x1)
         data.map( step => (
-          d.x0===d3.min(xscale.domain()) ? (step[x]/param>=d.x0 && step[x]/param<=d.x1)
-          : d.x1===d3.max(xscale.domain())-param ? (step[x]/param>d.x0)
-          : (step[x]/param>d.x0 && step[x]/param<=d.x1)
-        ) ? nuovo = nuovo.concat([step]) : null )
+          d.x0===d3.min(xscale.domain()) ? ( ((step[x]/param))>=d.x0 && ((step[x]/param))<=d.x1 )
+          : d.x1===d3.max(xscale.domain())-1 ? ( ((step[x]/param)-1)>d.x0 )
+          : ( ((step[x]/param)-1)>d.x0 && ((step[x]/param)-1)<=d.x1 )
+        ) ? nuovo = nuovo.concat([step]) : console.log(d) )
 
         this.handleClick(nuovo)
       })

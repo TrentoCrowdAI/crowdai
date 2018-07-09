@@ -98,16 +98,8 @@ class HeatMapChart extends React.Component {
         .attr('fill', d => d[z]/param==0 ? 'lightgreen' : d[z]/param==1 ? 'red' : colorScale(d[z]/param))
         .attr('rx', 2)
         .attr('ry', 2)
-        //animation to highlight corresponding label on the axis
-        /*.on("mouseover", function(d) {
-            g.selectAll(".yaxis").selectAll("text").filter( function(text) {
-                return text === d[y] })
-                .transition().duration(100).style('font','15px arial').attr('font-weight', 'bold')
-    	})*/
-    	.on("mouseout", () => 
+        .on("mouseout", () => 
             tooltip.style('visibility', 'hidden')
-            /*g.selectAll(".yaxis").selectAll("text").filter( text => text === d[y] )
-                .transition().style('font','10px arial').attr('font-weight', 'normal')*/
         )
         .on("mousemove", d => {
           tooltip.style('visibility', 'visible')
@@ -123,14 +115,6 @@ class HeatMapChart extends React.Component {
         .attr('class', 'xaxis')
         .attr('transform', 'translate(0,0)')
         .call(xAxis)
-        //if necessary, labels for x axis elements
-        /*.selectAll('text')
-        .attr('font-weight', 'normal')
-        .style('text-anchor', 'end')
-        .style('font', '10px arial')
-        .attr('dx', '-.8em')
-        .attr('dy', '-.5em')
-        .attr('transform', d => 'rotate(-65)')*/
 
     g.append('g')
         .attr('class', 'yaxis')

@@ -3,7 +3,6 @@ import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
 
 import ChartWrapper from 'src/components/charts/ChartWrapper';
-import JobChooser from './JobChooser';
 import WorkerChooser from './WorkerChooser';
 import ItemChooser from './ItemChooser';
 import CritChooser from './CritChooser';
@@ -75,7 +74,7 @@ class Reports extends React.Component {
 		this.setState({
 			...this.state,
 			chosenmetric: value,
-			//activeworker: value==='SingleWorker' ? true : false,
+			activeworker: value==='SingleWorker' ? true : false,
 			chosenworker: 'all',
 			chosenitem: 'all',
 			chosencriteria: 'all',
@@ -89,7 +88,6 @@ class Reports extends React.Component {
 	}
 
 	chooseWorker(e, {value}) {
-		//this.props.fetchSingleWorker(this.props.match.params.jobid,Number(value))
 		switch(this.state.chosenmetric) {
 			case 'SingleWorker':
 				if (value==='all') {
@@ -320,7 +318,13 @@ class Reports extends React.Component {
 							<div style={{width: "5%"}} className='empty'></div>
 							</React.Fragment>
 					}
-
+					<WorkerChooser
+						disabled={(!this.state.activeworker)}
+						options={WorkerOptions}
+						onChange={this.chooseWorker}
+						chosenworker={this.state.chosenworker}
+					/>
+					<div style={{width: "5%"}} className='empty'></div>
 					<ItemChooser 
 						disabled={(!this.state.activeitem)}
 						options={ItemOptions}
@@ -362,8 +366,6 @@ Reports.propTypes = {
 	fetchJobStats: PropTypes.func,
 	fetchContribution: PropTypes.func,
 
-	fetchItems: PropTypes.func,
-	fetchCriteria: PropTypes.func,
 	match: PropTypes.object,
 
 	rep_error: PropTypes.any,

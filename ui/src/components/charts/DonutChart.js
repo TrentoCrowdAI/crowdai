@@ -16,13 +16,7 @@ class DonutChart extends React.Component {
 
   dataWrapper() {
     //to avoid errors before data is retrieved
-    /*if(this.props.param=='all') {
-      var crit_filtered_data = this.props.data          
-    } else {
-      var crit_filtered_data = this.props.data.filter(d => d[this.props.z[1]]==this.props.param )
-    }
-
-    if(crit_filtered_data.length==0) {
+    /*if(this.props.data.length==0) {
       var svg = d3.select("."+this.props.selector)
       var margin = {top: 20, right: 30, bottom: 20, left: 50};
       var g = svg.append("g")

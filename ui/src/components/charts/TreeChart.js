@@ -20,7 +20,7 @@ class TreeChart extends React.Component {
       var g = svg.append('g')
 
       g.append('text')
-        .text('Choose an Item')
+        .text('No data in this Job yet')
         .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
     } else {*/
       this.buildGraph()
@@ -37,18 +37,15 @@ class TreeChart extends React.Component {
       .attr('class','innerspace')
       .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
     
-    var x = this.props.x //item_id
-    var y = this.props.y //criteria_id
-    var z = this.props.z //[z[0],z[1]] = ['yes','no']
-    var w = this.props.w //answer
+    var x = this.props.x
+    var y = this.props.y
+    var z = this.props.z
+    var w = this.props.w
     //var param = this.props.param //chosenitem
 
-    var data = this.props.data//.filter( d => d[x]===this.props.param )
-    //(a,b) => a[this.state.order]<b[this.state.order] ? 1 : a[this.state.order]>b[this.state.order] ? -1 : 0 )
+    var data = this.props.data
     
-    var criteria = Array.from(new Set(data.map(d => d[y])
-      //.sort((a,b) => a<b ? -1 : a>b ? 1 : 0)
-      ))
+    var criteria = Array.from(new Set(data.map(d => d[y]) ))
 
     //MAKE ALL THIS DYNAMIC FOR EFFICIENCY
 

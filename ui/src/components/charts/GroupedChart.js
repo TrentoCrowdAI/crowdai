@@ -211,34 +211,11 @@ class GroupedChart extends React.Component {
         </React.Fragment> : " "
         }
         <br />
-        <strong style={{color: '#2185d0'}}>> {y.toUpperCase()}</strong>:
+        <strong style={{color: '#2185d0'}}>> {y.toUpperCase()}</strong>
         <br />
-        {y==="cohen's kappa correlation" ?
-          <div>
-          Correlation coefficient that represents total agreement between two workers, also taking in acocunt agreement happening by chance.
-          <br />= -1, No Agreement at all, worst than random
-          <br />= 0, Agreement happening just by chance when workers try to guess answers
-          <br />= 1, Perfect Agreement, workers agree an all the answers
-          </div>
-         : ""}
+        <strong style={{color: 'orange'}}>> {z.toUpperCase()}</strong>
         <br />
-        <strong style={{color: 'orange'}}>> {z.toUpperCase()}</strong>:
-        <br />
-        {z==="basic agreement" ?
-          <div>
-          Agreement metric just taking in account observed answers,
-          <br/>
-          Percentage representing how much the two workers <b>answer THE SAME way</b> to the tasks (both answer Right or both answer Wrong).
-          </div>
-         : "" }
-        <br />
-        <strong style={{color: 'lightgreen'}}>> {w.toUpperCase()}</strong>:
-        <br />
-        {w==="bennett's s" ?
-          <div>
-          Correlation coefficient computing Expected Agreement for the couple of workers taking in coount the pattern of their answers.
-          </div>
-         : ""}
+        <strong style={{color: 'lightgreen'}}>> {w.toUpperCase()}</strong>
       </div>
     )
   }

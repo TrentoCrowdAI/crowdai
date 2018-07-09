@@ -75,7 +75,7 @@ class StackedBarChart extends React.Component {
     var min = d3.min(data, d => d.boxes[0].x0)
     var max = d3.max(data, d => d.boxes[d.boxes.length-1].x1)
 
-    xscale.domain([min, max]).nice()
+    xscale.domain([-1,1]).nice()
     yscale.domain(rowsNames)
 
     g.append("g")
@@ -93,16 +93,9 @@ class StackedBarChart extends React.Component {
     		.attr("transform", d => "translate(0,"+yscale(d[x]+','+d[z])+")")
     		.on("mouseover", function(d) {
 					d3.select(this).style("opacity","0.8")
-					//animation to highlight correspinding labels on the y axis
-    			/*g.selectAll(".y").selectAll("text").filter( function(text) {
-    				return text === d[x]+','+d[z] })
-    				.transition().duration(100).style('font','15px sans-serif')*/
     		})
     		.on("mouseout", function(d) {
     			d3.select(this).style("opacity","1")
-    			/*g.selectAll(".y").selectAll("text").filter( function(text) {
-    				return text === d[x]+','+d[z] })
-    				.transition().style('font','10px sans-serif')*/
     		})
 
     var bars = rows.selectAll("rect")

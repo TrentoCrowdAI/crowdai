@@ -65,7 +65,9 @@ class PointChart extends React.Component {
     var dots = g.selectAll(".dot")
       .data(data).enter()
         .append("circle")
-        .style("fill", d => Math.abs(d[y]-d[z])<=10 ? '#FFCD9A' 
+        .style("fill", d => 
+          Math.abs(d[y]-d[z])==0 ? 'lightgreen'
+          : Math.abs(d[y]-d[z])<=10 ? '#FFCD9A' 
           : Math.abs(d[y]-d[z])<=30 ? '#FFB366'
           : Math.abs(d[y]-d[z])<=50 ? '#FF9A33'
           : Math.abs(d[y]-d[z])<=70 ? '#FF8000'
@@ -74,7 +76,10 @@ class PointChart extends React.Component {
         .attr("class","dot")
         .attr("cx", d => xscale(d[y]) )
         .attr("cy", d => yscale(d[z]))
-        .attr("r", 5)
+        .attr("r", d => d.total_tasks/(d3.max(data, d => d.total_tasks))<1 ? d.total_tasks/(d3.max(data, d => d.total_tasks))*15 : d.total_tasks/(d3.max(data, d => d.total_tasks))*10 )
+        .style('stroke', 'white')
+        .style('opacity', '0.9')
+        .style('stoke-width', 1)
         .on('click', d =>
           w(null, {'value': d[x] })
         )
@@ -86,9 +91,9 @@ class PointChart extends React.Component {
         })
         .on('mouseout', function() {
           d3.select(this)
-            .style('opacity', '1')
-            .style('stroke', '#2185d0')
-            .style('stroke-width', 0)
+            .style('opacity', '0.9')
+            .style('stroke', 'white')
+            .style('stroke-width', 1)
         })
 
     dots.append('title')

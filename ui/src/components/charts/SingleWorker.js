@@ -209,21 +209,6 @@ class SingleWorker extends React.Component {
   }
 }
 
-/**
- * <div>
-          <ChartWrapper
-            chart={'bubbleChart'}
-            color={['lightgreen','orange','#2185d0']}
-            data={this.props.data}
-            x={'id'}
-            y={'total_tasks'}
-            z={'precision_for_crowd'}
-            w={''}
-            param={''}
-          />
-        </div>
- */
-
 SingleWorker.propTypes = {
 }
 

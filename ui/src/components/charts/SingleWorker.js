@@ -4,8 +4,6 @@ import * as d3 from 'd3'
 import PropTypes from 'prop-types'
 import ChartWrapper from './ChartWrapper'
 import '../admin/reports/reports.css'
-import { actions } from '../admin/reports/actions'
-import Math from 'math'
 import { Button } from 'semantic-ui-react';
 
 class SingleWorker extends React.Component {
@@ -64,24 +62,13 @@ class SingleWorker extends React.Component {
               <ChartWrapper
                 chart={'pointChart'}
                 color={['lightgreen','orange','#2185d0']}
-                x={'id'}
-                y={'precision_for_gold'}
-                z={'precision_for_crowd'}
-                w={this.handleClick}
+                x={'id'}                    //x axis
+                y={'precision_for_gold'}    //y axis
+                z={'precision_for_crowd'}   //color intensity
+                w={this.handleClick}        //onClick event
+                param={'total_tasks'}       //selection circle radius
                 data={z}
                 selector={'points'}
-                param={''}
-              />
-              <br />
-              <ChartWrapper
-                chart={'bubbleChart'}
-                x={'id'}
-                y={'total_tasks'}
-                z={'precision_for_crowd'}
-                w={this.handleClick}
-                data={z}
-                selector={'bubbles'}
-                param={''}
               />
             <br />
             <br />
@@ -118,28 +105,28 @@ class SingleWorker extends React.Component {
           <br />
           <ChartWrapper  
             chart={'timeLineChart'}
-            x={'item_id'}
-            y={'delivery'}
-            z={'criteria_id'}
-            w={'answer'}
-            color={['orange','#2185d0','lightgreen']}
-            param={[param.chosenitem,param.chosencriteria]}
-            selector={'timeline_chart'}
+            x={'item_id'}                                     //first upper label
+            y={'delivery'}                                    //x axis
+            z={'criteria_id'}                                 //second upper label
+            w={'answer'}                                      //bottom label and color
+            param={[param.chosenitem,param.chosencriteria]}   //filtering parameters
+            color={['orange','#2185d0','lightgreen']}         //color scale
             data={param.chosenworker==='all' ? [] : Object.values(data.answers)}
+            selector={'timeline_chart'}
           />
           <br />
           <strong style={{'color': '#2185d0', 'fontSize': '15px'}}>Tasks Completion Times :</strong>
           <br />
           <ChartWrapper  
             chart={'nestChart'}
-            x={'item_id'}
-            y={'completion_time'}
-            z={'criteria_id'}
-            w={'correct'}
-            param={1000}
-            color={['lightgreen','orange','#2185d0']}
-            selector={'wcompletion_chart'}
+            x={'item_id'}                               //x axis
+            y={'completion_time'}                       //y axis
+            z={'criteria_id'}                           //x axis
+            w={'correct'}                               //bar color
+            param={1000}                                //scale time in seconds
+            color={['lightgreen','orange','#2185d0']}   //color scale
             data={param.chosenworker==='all' ? [] : Object.values(data.answers)}
+            selector={'wcompletion_chart'}
           />
           </div>
 
@@ -152,12 +139,14 @@ class SingleWorker extends React.Component {
             <ChartWrapper 
               chart={'donutChart'}
               x={'turk_id'}
-              y={'answer'}
-              z={['item_id','criteria_id']}
-              color={['orange','#2185d0','lightgreen']}
-              param={[param.chosenitem,param.chosencriteria]}
-              selector={'chart_distribution'}
+                //x to use if there are more workers possible in data to be selected, 
+                //in this case these are all answers from the same worker so there's no need to filter or group
+              y={'answer'}                                      //percentage sectors
+              z={['item_id','criteria_id']}                     //filter and show on tooltip
+              param={[param.chosenitem,param.chosencriteria]}   //filtering parameters
+              color={['orange','#2185d0','lightgreen']}         //color scale
               data={param.chosenworker==='all' ? [] : Object.values(data.answers)}
+              selector={'chart_distribution'}
             />
 
             <strong style={{'color': '#2185d0'}}>Precision toward Gold Truth :</strong><br />
@@ -169,11 +158,11 @@ class SingleWorker extends React.Component {
               chart={'donutChart'}
               x={'turk_id'}
               y={'correct'}
-              color={['lightgreen','orange','#2185d0']}
               z={['item_id','criteria_id']}
               param={[param.chosenitem,param.chosencriteria]}
-              selector={'chart_gold'}
+              color={['lightgreen','orange','#2185d0']}
               data={param.chosenworker==='all' ? [] : Object.values(data.answers)}
+              selector={'chart_gold'}
             />
 
             <strong style={{'color': '#2185d0'}}>Precision toward Crowd Truth :</strong><br />

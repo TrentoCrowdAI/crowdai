@@ -41,7 +41,6 @@ class TreeChart extends React.Component {
     var y = this.props.y
     var z = this.props.z
     var w = this.props.w
-    //var param = this.props.param //chosenitem
 
     var data = this.props.data
     

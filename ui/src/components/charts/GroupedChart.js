@@ -128,7 +128,7 @@ class GroupedChart extends React.Component {
 
     var gx = g.append('g')
       .attr('class', 'x axis')
-      .attr('transform', 'translate(0,'+(param=='all' ? yscale(0) : height)+')')
+      .attr('transform', 'translate(0,'+yscale(0)+')')
       .call(d3
         .axisBottom(x0scale)
         .tickFormat("")

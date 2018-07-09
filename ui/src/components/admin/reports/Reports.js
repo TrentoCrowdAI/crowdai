@@ -136,9 +136,9 @@ class Reports extends React.Component {
 					y={y}
 					z={z}
 					w={w}
-					selector={'chart1'}
 					param={param}
 					data={Object.values(this.props.reports.tasks)}
+					selector={'single_page_chart'}
 				/>
 			</div>
 		)
@@ -192,102 +192,102 @@ class Reports extends React.Component {
 
 			case 'T_CompleteTime':
 				chart='histogramChart'
-				x='avgtime_ms'
-				y='item_id'
-				z='criteria_id'
-				param=1000
+				x='avgtime_ms'		//x axis intervals
+				y='item_id' 			//y axis count
+				z='criteria_id'		//nested chart second x axis
+				param=1000				//display times in seconds
 				break;
 
 			case 'Distribution':
 				chart='stackedBarChart'
-				x='item_id'
-				y=['no','not clear','yes']
-				z='criteria_id'
-				param=[this.state.chosenitem,this.state.chosencriteria]
+				x='item_id'																							//first y axis
+				y=['no','not clear','yes']															//x axis, bars possible labels
+				z='criteria_id'																					//second y axis
+				param=[this.state.chosenitem,this.state.chosencriteria]	//filtering parameters
 				break;
 
 			case 'Classification' :
 				chart='treeChart'
-				x='item_id'
-				y='criteria_id'
-				z=['yes','no']
-				w='answer'
-				param=this.state.chosenitem
+				x='item_id'				//node elements
+				y='criteria_id'		//depth levels
+				z=['yes','no']		//branches division labels
+				w='answer'				//leaves labels
+				param=1
 				break;
 
 			case 'Cohen':
 				chart='heatMapChart'
-				x='worker_A'
-				y='worker_B'
-				z='cohen_kappa'
+				x='worker_A'			//x axis
+				y='worker_B'			//y axis
+				z='cohen_kappa'		//color intensity
 				param=1
 				break;
 
 			case 'Agreement':
 				chart='heatMapChart'
-				x='worker_A'
-				y='worker_B'
-				z='agreement'
+				x='worker_A'		//x aixs
+				y='worker_B'		//y axis
+				z='agreement'		//color intensity
 				param=1
 				break;
 
 			case 'Bennett':
 				chart='heatMapChart'
-				x='worker_A'
-				y='worker_B'
-				z='bennett_S'
+				x='worker_A'		//x axis
+				y='worker_B'		//y axis
+				z='bennett_S'		//color intensity
 				param=1
 				break;
 
 			case 'PErr(a|b)':
 				chart='heatMapChart'
-				x='worker_A'
-				y='worker_B'
-				z='a_error_dependency'
+				x='worker_A'						//x axis
+				y='worker_B'						//y axis
+				z='a_error_dependency'	//color intensity
 				param=1
 				break;
 
 			case 'PErr(b|a)':
 				chart='heatMapChart'
-				x='worker_A'
-				y='worker_B'
-				z='b_error_dependency'
+				x='worker_A'						//x axis
+				y='worker_B'						//y axis
+				z='b_error_dependency'	//color intensity
 				param=1
 				break;
 
 			case 'Contribution':
 				chart='histogramChart'
-				x='error_contribution'
-				y='id'
-				z='worker_A'
+				x='error_contribution'	//x axis intervals
+				y='id'									//y axis count
+				z='worker_A'						//nested chart second x axis
 				param=1
 				break;
 
 			case 'Global':
 				chart='groupedChart'
-				x=['item_id','null']
-				y='f1_score'
-				z='matthews_correlation'
-				w='diagnostic_odds_ratio'
-				param=this.props.chosenworker
+				x=['item_id','null']				//x axis couples
+				y='f1_score'								//first score bars
+				z='matthews_correlation'		//second score bars
+				w='diagnostic_odds_ratio'		//third score bars
+				param=1
 				break;
 
 			case 'Comparing':
 				chart='groupedChart'
-				x=['worker_A','worker_B']
-				y='cohen_kappa'
-				z='agreement'
-				w='bennett_S'
-				param=this.state.chosenworker
+				x=['worker_A','worker_B']		//x axis couples
+				y='cohen_kappa'							//first score bars
+				z='agreement'								//second score bars
+				w='bennett_S'								//third score bars
+				param=1
 				break;
 
 			case 'SingleWorker':
 				chart='singleWorker'
-				x='total_tasks'
-				y=['tasks_right_for_gold','tasks_right_for_crowd']
-				z=this.props.workers.workers
-				w=this.chooseWorker
-				param=this.state
+				x='total_tasks'																				//worker chooser points radius
+				y=['tasks_right_for_gold','tasks_right_for_crowd']		//x and y axis for the chooser
+				z=this.props.workers.workers													//worker options
+				w=this.chooseWorker																		//how to modify state
+				param=this.state																			//state to modify with selection
 				break;
 
 			default:

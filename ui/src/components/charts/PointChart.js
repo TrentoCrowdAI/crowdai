@@ -76,7 +76,7 @@ class PointChart extends React.Component {
         .attr("class","dot")
         .attr("cx", d => xscale(d[y]) )
         .attr("cy", d => yscale(d[z]))
-        .attr("r", d => d.total_tasks/(d3.max(data, d => d.total_tasks))<1 ? d.total_tasks/(d3.max(data, d => d.total_tasks))*15 : d.total_tasks/(d3.max(data, d => d.total_tasks))*10 )
+        .attr("r", d => d[param]/(d3.max(data, d => d[param]))<1 ? d[param]/(d3.max(data, d => d[param]))*15 : d[param]/(d3.max(data, d => d[param]))*10 )
         .style('stroke', 'white')
         .style('opacity', '0.9')
         .style('stoke-width', 1)

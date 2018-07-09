@@ -4,7 +4,6 @@ import {combineEpics} from 'redux-observable';
 import {actionTypes, actions} from './actions';
 import {requestersApi} from 'src/utils/axios';
 import {flattenError} from 'src/utils';
-import {reportingApi} from 'src/utils/axios';
 
 const getTaskTime = (action$, store) =>
   action$.ofType(actionTypes.FETCH_TTIME).switchMap(action => {
@@ -20,32 +19,6 @@ const fetchTaskTime = (action$, store) =>
     .catch(error => Observable.of(actions.fetchItemError(flattenError(error))));
 });
 
-/*const getWorkerTimes = (action$, store) =>
-  action$.ofType(actionTypes.FETCH_WTIME).switchMap(action => {
-    return Observable.defer(() => requestersApi.get('getWorkerTimes/'+action.jobId+'/'+action.workerId))
-      .mergeMap(response => Observable.of(actions.fetchWorkerTimesSuccess(response.data)))
-      .catch(error => Observable.of(actions.fetchWorkerTimesError(flattenError(error))));
-});
-const fetchWorkerTimes = (action$, store) =>
-  action$.ofType(actionTypes.FETCH_ITEM).switchMap(action => {
-    return Observable.defer(() => requestersApi.get(`getWorkerTimes/`+action.jobId+'/'+action.workerId))
-      .mergeMap(response => Observable.of(actions.fetchItemSuccess(response.data)))
-      .catch(error => Observable.of(actions.fetchItemError(flattenError(error))));
-});*/
-
-/*const getAnswers = (action$, store) =>
-  action$.ofType(actionTypes.FETCH_WANSWERS).switchMap(action => {
-    return Observable.defer(() => requestersApi.get('getWorkerAnswers/'+action.jobId+'/'+action.workerId))
-      .mergeMap(response => Observable.of(actions.fetchAnswersSuccess(response.data)))
-      .catch(error => Observable.of(actions.fetchAnswersError(flattenError(error))));
-});
-const fetchAnswers = (action$, store) =>
-  action$.ofType(actionTypes.FETCH_ITEM).switchMap(action => {
-    return Observable.defer(() => requestersApi.get(`getWorkerAnswers/`+action.jobId+'/'+action.workerId))
-      .mergeMap(response => Observable.of(actions.fetchItemSuccess(response.data)))
-      .catch(error => Observable.of(actions.fetchItemError(flattenError(error))));
-});*/
-
 const getTasksAgreements = (action$, store) =>
   action$.ofType(actionTypes.FETCH_AGREEMENTS).switchMap(action => {
     return Observable.defer(() => requestersApi.get('getTasksAgreements/'+action.jobId))
@@ -58,33 +31,6 @@ const fetchTasksAgreements = (action$, store) =>
       .mergeMap(response => Observable.of(actions.fetchItemSuccess(response.data)))
       .catch(error => Observable.of(actions.fetchItemError(flattenError(error))));
 });
-
-/*const getWorkersAgreements = (action$, store) =>
-  action$.ofType(actionTypes.FETCH_WAGREES).switchMap(action => {
-  return Observable.defer(() => requestersApi.get('getWorkersAgreements/'+action.jobId))
-    .mergeMap(response => Observable.of(actions.fetchWorkersAgreementsSuccess(response.data)))
-    .catch(error => Observable.of(actions.fetchWorkersAgreementsError(flattenError(error))));
-});
-const fetchWorkersAgreements = (action$, store) =>
-  action$.ofType(actionTypes.FETCH_ITEM).switchMap(action => {
-    return Observable.defer(() => requestersApi.get('getWorkersAgreements/'+action.jobId))
-      .mergeMap(response => Observable.of(actions.fetchItemSuccess(response.data)))
-      .catch(error => Observable.of(actions.fetchItemError(flattenError(error))));
-});*/
-
-/*const getMetric = (action$, store) =>
-  action$.ofType(actionTypes.FETCH_METRIC).switchMap(action => {
-    return Observable.defer(() => reportingApi.get(action.metric))
-      .mergeMap(response => Observable.of(actions.fetchMetricSuccess(response.data)))
-      .catch(error => Observable.of(actions.fetchMetricError(flattenError(error))));
-});
-
-const fetchMetric = (action$, store) =>
-  action$.ofType(actionTypes.FETCH_ITEM).switchMap(action => {
-    return Observable.defer(() => reportingApi.get(action.metric))
-      .mergeMap(response => Observable.of(actions.fetchItemSuccess(response.data)))
-      .catch(error => Observable.of(actions.fetchItemError(flattenError(error))));
-});*/
 
 const getCrowdGolds = (action$, store) =>
   action$.ofType(actionTypes.FETCH_CROWDGOLDS).switchMap(action => {
@@ -167,12 +113,8 @@ const fetchJobStats = (action$, store) =>
 
 export default combineEpics(getTaskTime, fetchTaskTime,
                             getWorkers, fetchWorkers, 
-                            //getWorkerTimes, fetchWorkerTimes, 
-                            //getAnswers, fetchAnswers,
                             getWorkers, fetchWorkers,
                             getTasksAgreements, fetchTasksAgreements,
-                            //getWorkersAgreements, fetchWorkersAgreements,
-                            //getMetric, fetchMetric,
                             getCrowdGolds, fetchCrowdGolds,
                             getWorkersPairs, fetchWorkersPairs,
                             getSingleWorker, fetchSingleWorker,

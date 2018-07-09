@@ -39,45 +39,6 @@ const chart_reducer = (state = defaultState, action) => {
         error: action.error,
         loading: false
       };
-
-    /*case actionTypes.FETCH_WTIME:
-      return {
-        ...state,
-        error: undefined,
-        loading: true
-      };
-    case actionTypes.FETCH_WTIME_SUCCESS:
-      return {
-        ...state,
-        reports: action.response,
-        loading: false
-      };
-    case actionTypes.FETCH_WTIME_ERROR:
-      return {
-        ...state,
-        error: action.error,
-        loading: false
-      };*/
-
-    /*case actionTypes.FETCH_WANSWERS:
-      return {
-        ...state,
-        error: undefined,
-        loading: true
-      };
-    case actionTypes.FETCH_WANSWERS_SUCCESS:
-      return {
-        ...state,
-        reports: action.response,
-        loading: false
-      };
-    case actionTypes.FETCH_WANSWERS_ERROR:
-      return {
-        ...state,
-        error: action.error,
-        loading: false
-      };*/
-
     case actionTypes.FETCH_AGREEMENTS:
       return {
         ...state,
@@ -96,43 +57,6 @@ const chart_reducer = (state = defaultState, action) => {
         error: action.error,
         loading: false
       };
-    
-    /*case actionTypes.FETCH_WAGREES:
-      return {
-        ...state,
-        error: undefined,
-        loading: true
-      };
-    case actionTypes.FETCH_WAGREES_SUCCESS:
-      return {
-        ...state,
-        reports: action.response,
-        loading: false
-      };
-    case actionTypes.FETCH_WAGREES_ERROR:
-      return {
-        ...state,
-        error: action.error,
-        loading: false
-      };*/
-    /*case actionTypes.FETCH_METRIC:
-      return {
-        ...state,
-        error: undefined,
-        loading: true,
-      };
-    case actionTypes.FETCH_METRIC_SUCCESS:
-      return {
-        ...state,
-        reports: action.response,
-        loading: false,
-      };
-    case actionTypes.FETCH_METRIC_ERROR:
-      return {
-        ...state,
-        error: action.error,
-        loading: false,
-      };*/
     case actionTypes.FETCH_CROWDGOLDS:
       return {
         ...state,
@@ -228,31 +152,6 @@ const chart_reducer = (state = defaultState, action) => {
   }
 };
 
-/*const single_reducer = (state = defaultState, action) => {
-  switch(action.type) {
-    case actionTypes.FETCH_SINGLE:
-      return {
-        ...state,
-        error: undefined,
-        loading: true,
-      };
-    case actionTypes.FETCH_SINGLE_SUCCESS:
-      return {
-        ...state,
-        reports: action.response,
-        loading: false,
-      };
-    case actionTypes.FETCH_SINGLE_ERROR:
-      return {
-        ...state,
-        error: action.error,
-        loading: false,
-      };
-    default:
-      return state;
-  }
-}*/
-
 const worker_reducer = (state = worker_defaultState, action) => {
   switch(action.type) {
     case actionTypes.FETCH_WORKERS:
@@ -280,6 +179,5 @@ const worker_reducer = (state = worker_defaultState, action) => {
 
 export default combineReducers({
   list: chart_reducer,
-  wlist: worker_reducer,
-  //single_list: single_reducer,
+  wlist: worker_reducer
 });

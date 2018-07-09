@@ -35,7 +35,7 @@ const getJobStats = async ctx => {
 };
 
 exports.register = router => {
-  router.get('/getAllTasksTImesByJob/:id', getAllTasksTimesByJob);
+  router.get('/getAllTasksTimesByJob/:id', getAllTasksTimesByJob);
   router.get('/getWorkersByJob/:id', getWorkersByJob);
   router.get('/getTasksAgreements/:id', getTasksAgreements);
   router.get('/getCrowdGolds/:jobId', getCrowdGolds);

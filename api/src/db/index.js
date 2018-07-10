@@ -42,7 +42,7 @@ const TABLES = Object.freeze({
   TaskAssignmentApi: 'task_assignment_api',
   Result: 'result',
   AggregationApi: 'aggregation_api',
-  Excluded: 'excluded', //tables where we temporarily put workers we don't want to consider when computing crowd truth
+  Excluded: 'excluded', //tables where we temporarily put workers we don't want to consider when computing crowd truth (deprecated)
   Gold: 'gold'
 });
 

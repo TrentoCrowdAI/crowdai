@@ -297,3 +297,12 @@ CREATE TABLE aggregation_api (
   url  text,
   CONSTRAINT pk_aggregation_api PRIMARY KEY (id)
 );
+
+
+-- The charts for reporting on workers agreement uses this table
+CREATE TABLE gold
+(
+  item_id bigint,
+  criteria_id bigint,
+  gold character varying(255)
+);

@@ -28,7 +28,9 @@ send/*
 items.csv
 filters.csv
 tests.csv
+
 .env
+.env.example
 .env.dev
 .env.prod
 coverage

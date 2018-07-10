@@ -6,6 +6,7 @@ import {Route, Switch, Redirect} from 'react-router-dom';
 import Profile from 'src/components/admin/profile/Profile';
 import {actions as profileActions} from 'src/components/admin/profile/actions';
 import JobsRoute from 'src/components/admin/jobs/JobsRoute';
+import ReportsRoute from 'src/components/admin/reports/ReportsRoute'
 
 /**
  * Dashboard main
@@ -22,6 +23,7 @@ class Dashboard extends React.Component {
     return (
       <Switch>
         <Route path={'/admin/screenings'} component={JobsRoute} />
+        <Route path={'/admin/reports'} component={ReportsRoute} />
         <Route path={'/admin/profile'} component={Profile} />
         <Route render={() => <Redirect to="/admin/screenings" />} />
       </Switch>

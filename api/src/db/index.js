@@ -38,9 +38,12 @@ const TABLES = Object.freeze({
   Task: 'task',
   TestTask: 'test_task',
   TaskAnswer: 'task_answer',
+  Result: 'result',
   TaskAssignmentApi: 'task_assignment_api',
   Result: 'result',
-  AggregationApi: 'aggregation_api'
+  AggregationApi: 'aggregation_api',
+  Excluded: 'excluded', //tables where we temporarily put workers we don't want to consider when computing crowd truth
+  Gold: 'gold'
 });
 
 /**

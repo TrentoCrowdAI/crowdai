@@ -20,6 +20,12 @@ class ApplicationHeader extends React.Component {
           </Link>
         </Menu.Item>
 
+        <Menu.Item name="reports" active={pathname === '/admin/reports'}>
+          <Link to="/admin/reports" style={{color: 'rgba(0,0,0,.87)'}}>
+            Reports
+          </Link>
+        </Menu.Item>
+
         <Menu.Menu position="right">
           <Menu.Item name="profile" active={pathname === '/admin/profile'}>
             <Link to="/admin/profile" style={{color: 'rgba(0,0,0,.87)'}}>

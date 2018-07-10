@@ -1,0 +1,52 @@
+.tooltip {
+  box-shadow: 0 0 5px #999999;
+  display: none;
+  font-size: 12px;
+  left: 130px;
+  padding: 10px;
+  position: absolute;
+  text-align: center;
+  top: 95px;
+  width: 80px;
+  z-index: 10;
+  line-height: 140%; /*Interlineado*/
+  font-family: "Open Sans", sans-serif;
+  font-weight: 300;
+  background: rgba(0, 0, 0, 0.8);
+  color: #fff;
+  border-radius: 2px; }
+  
+.label {
+  font-weight: 600; }
+
+.legend { 
+  list-style: none; }
+
+.legend li { 
+  float: left; 
+  margin-right: 10px; }
+
+.legend span { 
+  border: 1px solid #ccc; 
+  float: left; 
+  width: 12px; 
+  height: 12px; 
+  margin: 2px; }
+
+.zoom {
+  cursor: move;
+  fill: none;
+  pointer-events: all; }
+
+.node circle {
+  fill: #fff;
+  stroke: #2185d0;
+  stroke-width: 3px; }
+
+.node text {
+  font: 12px sans-serif; }
+
+.link {
+  fill: none;
+  stroke: #ccc;
+  stroke-width: 4px; }

@@ -305,5 +305,6 @@ CREATE TABLE gold
   id bigserial NOT NULL,
   item_id bigint,
   criteria_id bigint,
-  gold character varying(255)
+  gold character varying(255),
+  CONSTRAINT pk_gold PRIMARY KEY (id)
 );

@@ -302,6 +302,7 @@ CREATE TABLE aggregation_api (
 -- The charts for reporting on workers agreement uses this table
 CREATE TABLE gold
 (
+  id bigserial NOT NULL,
   item_id bigint,
   criteria_id bigint,
   gold character varying(255)

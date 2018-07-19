@@ -60,4 +60,35 @@ program
     process.exit(0);
   });
 
+program
+  .version(process.env.npm_package_version)
+  .command('job:addgold')
+  .description('Generates fake gold data')
+  .option('-j, --job <jobId>', 'The job ID')
+  .action(async options => {
+    const jobId = Number(options.job);
+    let job = await delegates.jobs.getById(jobId);
+    let filters = await delegates.projects.getCriteria(job.project_id);
+    let items = await db.query(
+      `select id from ${db.TABLES.Item} where project_id = $1`,
+      [job.project_id]
+    );
+    await db.query('BEGIN');
+
+    for (let i = 0; i < filters.rows.length; i++) {
+      let filter = filters.rows[i];
+
+      for (let j = 0; j < items.rows.length; j++) {
+        let item = items.rows[j];
+        await db.query(
+          `insert into gold(item_id, criteria_id, gold) values($1, $2, $3)`,
+          [item.id, filter.id, Math.random() > 0.5 ? 'yes' : 'no']
+        );
+      }
+    }
+    await db.query('COMMIT');
+    console.log('Gold data generated correctly');
+    process.exit(0);
+  });
+
 program.parse(process.argv);

@@ -1,117 +1,536 @@
-swagger: '2.0'
+openapi: 3.0.0
+servers:
+  - description: Testing server
+    url: crowdai-api.herokuapp.com/api/v1
 info:
-  version: '1.0'
-  title: "crowdrev-api"
-  description: Service layer for CrowdRev platform.
-host: crowdai-api.herokuapp.com
-basePath: /api/v1
-schemes:
-- https
-consumes:
-- application/json
-produces:
-- application/json
+  description: | 
+    # *Aggregated Endpoint for CrowdAI metrics* <br />
+    This API contains the calls needed by Researchers who want to analyze the outcomes of performances in the crowdAI platform, in order to retrieve data and statistics of the classification algorithms in combination with items and filters interpretation. <br />
+    There are 3 levels of investigation <br />
+    - global efficiency of job tests
+    - single worker's behavioral patterns
+    - dependency levels of pairs of workers
+    <hr />
+    All computations are weighted upon a Binary Classification method, with questions interpretable both as Double-Class choices or True/False answers
+  version: "1.0"
+  title: Crowdrev-api
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+tags:
+  - name: Researchers
+    description: |
+      *Researchers' calls to retrieve their Job data*
+  - name: Questions
 paths:
-  /questions:
-    x-summary: Questions Collection
+  /global/job/{jobId}/stats:
     get:
-      summary: List All Questions
-      responses:
-        200:
-          description: Successful Response
+      tags:
+        - Researchers
+      operationId: two_workers
+      description: |
+        By passing in the appropriate parameters, it is possible to retrieve information about a specific Job (jobId), and the classification efficiency of its Tasks.
+      parameters:
+        - in: path
+          name: jobId
+          description: |
+            Job identification number from which we want to retrieve data about classification efficiency
+          required: true
           schema:
-            type: array
-            items:
-              $ref: '#/definitions/Question'
-          examples:
+            type: integer
+      responses:
+        '200':
+          description: Query results matching parameters
+          content:
             application/json:
-              - question: Favourite programming language?
-                published_at: '2015-08-05T08:40:51.620Z'
-                choices:
-                  - choice: Swift
-                    votes: 2048
-                  - choice: Python
-                    votes: 1024
-                  - choice: Objective-C
-                    votes: 512
-                  - choice: Ruby
-                    votes: 256
+              schema:
+                type: object
+                items:
+                  $ref: '#/components/schemas/Global'
+                example:
+                  item_id: "2"
+                  job_id: "1"
+                  f1_score: 0.667
+                  diagnostic_odds_ratio: 2.528
+                  sensitivity: 0.652
+                  specificity: 0.636
+                  youden_J: 0.286
+                  matthews_correlation: 0.214
+        '400':
+          description: Internal Error
+  /worker/{workerId}/job/{jobId}/stats:
+    get:
+      tags:
+        - Researchers
+      operationId: single_worker
+      description: |
+        By passing in the appropriate parameters, it is possible to retrieve information about a specific Worker's (workerId) completed tasks and behaviour inside a specific Job (jobId).
+      parameters:
+        - in: path
+          name: workerId
+          description: |
+            Identification number of the worker we want to analyse
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: jobId
+          description: |
+            Job identification number from which to retrieve worker's information
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Query results matching parameters
+          content:
+            application/json:
+              schema:
+                type: object
+                items:
+                  $ref: '#/components/schemas/SingleWorker'
+                example: 
+                  worker A: "88212be7-3e40-4470-aace-06cac8c34892"
+                  id: "3"
+                  registration: 1529684889.505,
+                  total_tasks: 7
+                  right_to_crowd: 4
+                  right_to_gold: 5
+                  votes_wrongly_classified: 5
+                  error_contribution: 40
+                  precision_for_gold: 71.429
+                  answers: [{
+                    turk_id: "88212be7-3e40-4470-aace-06cac8c34892",
+                    item_id: "1",
+                    delivery: 1529684871.101,
+                    criteria_id: "1",
+                    answer: "no",
+                    correct: true,
+                    crowd_correct: true,
+                    completion_time: null
+                    },{
+                      turk_id: "88212be7-3e40-4470-aace-06cac8c34892",
+                      item_id: "2",
+                      delivery: 1529684871.493,
+                      criteria_id: "1",
+                      answer: "no",
+                      correct: true,
+                      crowd_correct: false,
+                      completion_time: null
+                    }]
+        '400':
+          description: Internal Error
+  /worker/job/{jobId}/contribution:
+    get:
+      tags: 
+        - Researchers
+      operationId: error_contribution
+      description: |
+        By passing in the appropriate parameters, it is possible to retrieve the Percentage contribution to Crowd Error values for all the single Workers inside a specific Job (jobId).
+      parameters:
+        - in: path
+          name: jobId
+          description: |
+            Job identification number from which we want to retrieve data about worker's contribution
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+            description: Query results matching parameters
+            content:
+              application/json:
+                schema:
+                  type: object
+                  items:
+                    $ref: '#/components/schemas/ErrorContribution'
+                  example:
+                    worker_A: "88212be7-3e40-4470-aace-06cac8c34892"
+                    id: "3"
+                    total_tasks: 7
+                    precision_for_crowd: 57.143
+                    error_contribution: 40
+        '400':
+          description: Internal Error
+  /ww/job/{jobId}/stats:
+    get:
+      tags:
+        - Researchers
+      operationId: two_workers
+      description: |
+        By passing in the appropriate parameters, it is possible to retrieve information about every possible pair of co-Workers (Workers that voted on at least one common task), inside a specific Job (jobId).
+      parameters:
+        - in: path
+          name: jobId
+          description: |
+            Job identification number from which we want to retrieve data about inter-worker agreement
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Query results matching parameters
+          content:
+            application/json:
+              schema:
+                type: object
+                items:
+                  $ref: '#/components/schemas/TwoWorkers'
+                example:
+                  worker_A: "88212be7-3e40-4470-aace-06cac8c34892"
+                  worker_B: "4948c7b8-48ff-4b55-9220-aed769df219e"
+                  common_tasks: 7
+                  both_wrong: 2
+                  both_right: 2
+                  cohen_kappa: 0.087
+                  a_error_dependency: 0.5
+                  b_error_dependency: 0.667
+                  agreement: 0.571
+                  bennett_S: 0.143
+        '400':
+          description: Internal Error
+  /questions:
+    get:
+      tags:
+        - Questions
+      operationId: get_questions
+      summary: |
+        List all question.
+      responses:
+        '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  type: object
+                  items:
+                    $ref: '#/components/schemas/Questions'
+                  example:
+                    question: Favourite programming language?
+                    published_at: '2015-08-05T08:40:51.620Z'
+                    choices: [{"choice": "Swift","votes": 2048}, {"choice": "Python","votes": 1024}, {"choice": "Objective-C","votes": 512}, {"choice": "Ruby","votes": 2048}]
+          
     post:
-      description: >-
+      tags:
+        - Questions
+      operationId: create_questions
+      summary: Create a new question
+      description: |
         You may create your own question using this action. It takes a JSON
         object containing a question and a collection of answers in the
         form of choices.
-      summary: Create a New Question
-      parameters:
-        - name: body
-          in: body
-          required: true
-          schema:
-            $ref: '#/definitions/QuestionRequest'
+      requestBody:
+        description: Create a new Question
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/QuestionRequest'
       responses:
-        201:
+        '201': 
           description: ''
-          schema:
-            $ref: '#/definitions/Question'
-          examples:
-            application/json:
-                question: Favourite programming language?
-                published_at: '2015-08-05T08:40:51.620Z'
-                choices:
-                  - choice: Swift
-                    votes: 0
-                  - choice: Python
-                    votes: 0
-                  - choice: Objective-C
-                    votes: 0
-                  - choice: Ruby
-                    votes: 0
-definitions:
-  Question:
-    title: Question
-    type: object
-    properties:
-      question:
-        type: string
-      published_at:
-        type: string
-      choices:
-        type: array
-        items:
-          $ref: '#/definitions/Choice'
-    required:
-      - question
-      - published_at
-      - choices
-  Choice:
-    title: Choice
-    type: object
-    properties:
-      votes:
-        type: integer
-        format: int32
-      choice:
-        type: string
-    required:
-      - votes
-      - choice
-  QuestionRequest:
-    title: Question Request
-    type: object
-    properties:
-      question:
-        type: string
-      choices:
-        type: array
-        items:
+          content:
+           application/json:
+                schema:
+                  type: object
+                  items:
+                    $ref: '#/components/schemas/Questions'
+                  example:
+                    question: Favourite programming language?
+                    published_at: '2015-08-05T08:40:51.620Z'
+                    choices: [{"choice": "Swift","votes": 0}, {"choice": "Python","votes": 0}, {"choice": "Objective-C","votes": 0}, {"choice": "Ruby","votes": 0}]
+           
+components:
+  schemas:
+    SingleWorker:
+      type: object
+      properties:
+        worker_A:
           type: string
-    required:
-      - question
-      - choices
-    example:
-      question: Favourite programming language?
-      choices:
-        - Swift
-        - Python
-        - Objective-C
-        - Ruby
+          description: "Chosen worker turk ID"
+        id: 
+          type: string
+          description: "Chosen worker ID in the database"
+        registration: 
+          type: number
+          description: |
+            Epoch format of registration date, to value since how long the Worker is responding to Tasks
+        total_tasks:
+          type: integer
+          description: |
+            Total number of tasks voted by the worker
+        right_to_crowd:
+          type: integer
+          description: |
+            Number of times the worker voted on a task agreeing with the answer of the crowd 
+        right_to_gold:
+          type: integer
+          description: |
+            Number of times the worker voted on a task agreeing with the original gold answer
+        votes_wrongly_classified:
+          type: integer
+          description: |
+            Number of times the worker voted on items that are classified in a different way from the gold truth by the crowd
+        error_contribution:
+          type: number
+          description: |
+             Percentage of how many times the worker voted accordingly to the crowd, but opposite to the gold truth (on wrongly classified items) <br />
+             # P(answer==crowd.answer and gold!=crowd.answer)
+        precision_for_gold:
+          type: number
+          description: |
+             Percentage of how much the worker voted in agreement with the gold truth (on total completed tasks) <br />
+             # P(answer==gold)
+        answers:
+          type: array
+          items: 
+            $ref: '#/components/schemas/Answers'
+          description: |
+            Array of objects representing every task the selected worker voted 
+    ErrorContribution:
+      type: object
+      properties:
+        worker_A:
+          type: string
+          description: |
+            Chosen worker turk ID
+        id:
+          type: string
+          description: |
+            Chosen worker ID in the database
+        total_tasks: 
+          type: number
+          description: |
+            Total number of tasks voted by the worker
+        precision_for_crowd: 
+          type: number
+          description: |
+             Percentage of how much the worker voted in agreement with the crowd truth (on total voted tasks)
+             <br />
+             # P(answer==crowd.answer)
+        error_contribution:
+          type: number
+          description: |
+             Percentage of how many times the worker voted accordingly to the crowd, but opposite to the gold truth (on wrongly classified items)
+             <br />
+             # P(answer==crowd.answer and gold!=crowd.answer)
+    TwoWorkers:
+      type: object
+      properties:
+          worker_A:
+            type: string
+            description: |
+              First worker turk ID
+          worker_ B:
+            type: string
+            description: |
+              Second worker turk ID
+          common_tasks:
+            type: integer
+            description: |
+              Total number of tasks voted by both workers
+          cohen_kappa:
+            type: number
+            description: |
+               Cohen's Kappa computed on common tasks, general level of agreement taking in account agreement by chance
+          a_error_dependency:
+            type: number
+            description: |
+               Probability of A voting wrong, given that B voted wrong = level of independence of A from B
+               <br />
+               <br />
+               # P_err(A|B) = P(A.answer!=gold | B.answer!=gold)
+          b_error_dependency:
+            type: number
+            description: |
+               Probability of B voting wrong, given that A voted wrong = level of independence of B from A
+               <br />
+               <br />
+               # P_err(B|A) = P(B.answer!=gold | A.answer!=gold)
+          agreement:
+            type: number
+            description: |
+               Basic inter-workers correlation, just considering the number of exact same answers
+               <br />
+               <br />
+               # Agreement = P(A.answer==B.answer) <br />
+               = (# of times workers answered the same) / (# of common tasks)
+          bennett_S:
+            type: number
+            description: |
+              Bennett's et al. S score, representing expected agreement between the two workers when looking at answers they give on completed tasks 
+              <br />
+              <br />
+              Given these computations, <br />
+              P(yes) = P(A.answer==yes) * P(B.answer==yes) <br />
+              P(no) = P(A.answer==no) * P(B.answer==no) <br />
+              P(e) = P(yes)+P(no)
+              <br />
+              <br />
+              We can finally compute, <br />
+              # S = [P(A.answer==B.answer) - P(e)] / [1 - P(e)]
+              <br />
+              If the workers answered always the same, S = 1 <br />
+              If the workers never answered the same, S ~ -1 depending of the number of common tasks
+    Global:
+      type: object
+      properties:
+          item_id: 
+            type: string
+            description: "Item ID for which stats are computed"
+          job_id: 
+            type: string
+            description: "Chosen job ID in the database"
+          f1_score: 
+            type: number
+            description: |
+              Test accurancy score that doesn't consider true negative answers
+              <br />
+              <br />
+              Given the confusion matrix for the particular item <br />
+              | TP | FP | <br />
+              | FN | TN | <br />
+              Precision p = TP / (TP+FP), *as the probability of predicting just the positive answer*<br />
+              Recall r = TP / (FN+TP), *as the probability of a positive answer of being correct*<br />
+              # F1-score = 2 * (p*r)/(p+r) ~ [0,1]
+          diagnostic_odds_ratio: 
+            type: number
+            description: |
+              Accurancy score that indicates whether we are asking the right classification question or if we need to change positive/negative options
+              <br />
+              <br />
+              Given the confusion matrix for the particular item <br />
+              | TP | FP | <br />
+              | FN | TN | <br />
+              # DOR = (TP * TN)/(FP * FN) ~ [0,infinity[<br />
+              <br />
+              If in [0,1[ means that we can improve accurancy and test comprehension by just changhing the question, in order to switch positive answers into negative answers and viceversa <br />
+              If in [1 ,infinity[ means the higher it is, the higher test accurancy is
+          sensitivity: 
+            type: number
+            description: |
+              Percentage of true positives that are actually recognized as such (real Detection Rate)
+              <br />
+              <br />
+              Given the confusion matrix for the particular item <br />
+              | TP | FP | <br />
+              | FN | TN | <br />
+              # Sensibility = TP / (TP + TN) ~ [0,1]
+          specificity: 
+            type: number
+            description: |
+              Percentage of true negatives that are actually recognized as such (quantifies the avoiding of false positives)
+              <br />
+              <br />
+              Given the confusion matrix for the particular item <br />
+              | TP | FP | <br />
+              | FN | TN | <br />
+              # Specificity = TN / (FP + TN) ~ [0,1]
+          youden_J:
+            type: number
+            description: |
+              Test efficiency score that indicates the probability of the algorithm of right predicting the final answer
+              <br />
+              <br />
+              Given the confusion matrix for the particular item <br />
+              | TP | FP | <br />
+              | FN | TN | <br />
+              # J = specificity + sensibility - 1 ~ [-1,1]<br />
+              <br />
+              If J=-1 means that votes are always the opposite as expected, just switch answer interpretation to have a perfect test <br />
+              If J=0 means that the test is ambiguous for all the workers <br />
+              If J=1 means that the test is perfectly voted, no false negatives or false positives <br />
+          matthews_correlation: 
+            type: number
+            description: |
+              Test efficiency score that takes in account al possible combination of answers and doesn't need labels to be equally distributed
+              <br />
+              <br />
+              Given the confusion matrix for the particular item <br />
+              | TP | FP | <br />
+              | FN | TN | <br />
+              # MCC = (TP * TN - FP * FN) / sqrt((TP+FP)(TP+FN)(TN+FP)(TN+FN)) ~ [-1,1] <br />
+              <br />
+              If MCC=-1 means that the algorithm is always returning a wrong classification <br />
+              If MCC=0 means that the classification algorithm is performing similarly to random guessing <br />
+              If MCC=1 means that the algorithm is performing exactly as predicted
+    Answers:
+      type: object
+      properties:
+        turk_id:
+          type: string
+          description: |
+            Selected worker turk_id
+        item_id:
+          type: string
+          description: |
+            Corresponding task item_id      
+        delivery:
+          type: number
+          description: | 
+            When the task was completed
+        criteria_id:
+          type: string
+          description: |
+            Corresponding task criteria_id
+        answer:
+          type: string
+          description: |
+            Selected option for the task
+        correct:
+          type: boolean
+          description: |
+            If the answer is the same as the gold
+        crowd_correct:
+          type: boolean
+          description: |
+            If the answer is the same as the crowd truth
+        completion_time:
+          type: number
+          description: |
+            Time to complete the task
+    Questions: 
+      type: object
+      properties:
+        question:
+          type: string
+        published_at:
+          type: string
+        choices:
+          type: array
+          items:
+            $ref: '#/components/schemas/Choice'
+      required:
+        - question
+        - published_at
+        - choices 
+    Choice:
+      type: object
+      properties:
+        choice:
+          type: string
+        votes:
+          type: integer
+          format: int32
+      required:
+        - votes
+        - choice
+    QuestionRequest:
+      type: object
+      properties:
+        question:
+          type: string
+        choices:
+          type: array
+          items:
+            type: string
+      required:
+        - question
+        - choices
+      example:
+        question: Favourite programming language?
+        choices:
+          - Swift
+          - Python
+          - Objective-C
+          - Ruby

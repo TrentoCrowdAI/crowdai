@@ -4,7 +4,7 @@
   "private": true,
   "homepage": "https://trentocrowdai.github.io/crowdai",
   "dependencies": {
-    "axios": "^0.17.1",
+    "axios": "^0.19.0",
     "c3": "^0.6.2",
     "clone-deep": "^3.0.1",
     "koa-jwt": "^3.3.2",
@@ -28,7 +28,7 @@
     "sanitize-html": "^1.17.0",
     "semantic-ui-css": "^2.3.2",
     "semantic-ui-react": "^0.81.1",
-    "showdown": "^1.8.6",
+    "showdown": "^1.9.1",
     "valid-url": "^1.0.9"
   },
   "scripts": {
@@ -61,6 +61,9 @@
     "lint-staged": "^4.3.0"
   },
   "lint-staged": {
-    "src/**/*.js": ["node_modules/.bin/eslint --fix", "git add"]
+    "src/**/*.js": [
+      "node_modules/.bin/eslint --fix",
+      "git add"
+    ]
   }
 }
